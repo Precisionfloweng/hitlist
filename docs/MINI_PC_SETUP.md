@@ -42,14 +42,12 @@ Use a real project number. You should get a "Sync complete" email and see rows a
 sheet's Projects, Dashboard and History tabs. (Once the website exists, projects are added there.)
 
 ## 5. Keep it running (Task Scheduler)
-1. **Task Scheduler → Create Task**. Name: `Hitlist worker`.
-   - General: *Run whether user is logged on or not*.
-   - Triggers: *At startup*.
-   - Actions: *Start a program* → `C:\Hitlist\worker\windows\run_worker.bat`.
-   - Settings: *If the task fails, restart every 5 minutes*; untick *Stop the task if it runs longer than*.
-2. **Create Task** again. Name: `Hitlist weekly summary`.
-   - Triggers: *Weekly*, Monday, 7:00 AM.
-   - Actions: `C:\Hitlist\worker\windows\weekly_summary.bat`.
+Open **PowerShell as Administrator** (Start → type PowerShell → right-click → Run as administrator) and run:
+```
+powershell -ExecutionPolicy Bypass -File C:\Hitlist\worker\windows\install_tasks.ps1
+```
+Enter the PC's Windows password when asked. This creates `Hitlist worker` (starts with Windows,
+restarts itself) and `Hitlist weekly summary` (Mondays 7:00 AM), and starts the worker.
 
 Logs are in `C:\Hitlist\worker\logs\worker.log`.
 
