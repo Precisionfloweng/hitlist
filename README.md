@@ -25,6 +25,8 @@ python -m hitlist check path/to/export.xlsx --out results.json
 ```
 
 `check` prints a completion summary per equipment type and writes the full results JSON.
+Other commands (`setup`, `add-project`, `refresh`, `run`, `run-once`, `weekly-summary`) are listed at
+the top of `worker/hitlist/cli.py`. Installing on the mini PC: `docs/MINI_PC_SETUP.md`.
 
 ## Rules
 

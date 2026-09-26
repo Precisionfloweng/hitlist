@@ -7,10 +7,11 @@ name = "hitlist"
 version = "0.1.0"
 description = "Project Hitlist worker: checks BuildingStart exports for missing test data"
 requires-python = ">=3.10"
-dependencies = ["openpyxl>=3.1"]
+dependencies = ["openpyxl>=3.1", "google-auth>=2.20", "requests>=2.28"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+browser = ["playwright>=1.40"]
 
 [tool.setuptools.packages.find]
 include = ["hitlist*"]

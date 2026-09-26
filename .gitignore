@@ -45,3 +45,8 @@ out/
 Thumbs.db
 .vscode/
 .idea/
+
+# ---- Worker runtime (mini PC) ----
+browser_session/
+secrets/
+downloads/
