@@ -9,7 +9,8 @@ pfe-hitlist-*.json
 credentials*.json
 
 # ---- Client data: never commit (public repo) ----
-data/
+/data/
+/worker/data/
 exports/
 results/
 *.xlsx

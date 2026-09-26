@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hitlist"
+version = "0.1.0"
+description = "Project Hitlist worker: checks BuildingStart exports for missing test data"
+requires-python = ">=3.10"
+dependencies = ["openpyxl>=3.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["hitlist*"]
+
+[tool.setuptools.package-data]
+"hitlist.data" = ["*.json"]
