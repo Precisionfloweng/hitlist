@@ -1,0 +1,46 @@
+# ---- Secrets: never commit ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*service-account*.json
+pfe-hitlist-*.json
+credentials*.json
+
+# ---- Client data: never commit (public repo) ----
+data/
+exports/
+results/
+*.xlsx
+*.xlsm
+*.xls
+*.csv
+!tests/fixtures/**/*.csv
+!tests/fixtures/**/*.xlsx
+
+# ---- Logs ----
+logs/
+*.log
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# ---- Node / Next.js ----
+node_modules/
+.next/
+out/
+.vercel/
+
+# ---- OS / editors ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
