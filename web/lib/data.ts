@@ -93,3 +93,38 @@ export async function removeProject(number: string) {
   const p = rows.find((r) => r.project_number === number);
   if (p) await deleteRow("Projects", p._row);
 }
+
+// ---- admin: users ------------------------------------------------------------------
+export type UserRow = { email: string; name: string; role: string; active: boolean; added: string };
+
+export async function listUsers(): Promise<UserRow[]> {
+  const rows = await readTab("Users", true);
+  return rows.map((u) => ({
+    email: u.email.trim().toLowerCase(), name: u.name, role: u.role || "tech",
+    active: !["no", "false", "0"].includes((u.active || "").toLowerCase()), added: u.added,
+  })).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function saveUser(input: { email: string; name: string; role: string; active: boolean },
+                               originalEmail?: string) {
+  const email = input.email.trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error("Enter a valid email address");
+  if (!input.name.trim()) throw new Error("Name is required");
+  if (!["admin", "tech", "viewer"].includes(input.role)) throw new Error("Role must be admin, tech or viewer");
+  const rows = await readTab("Users", true);
+  const orig = (originalEmail ?? "").trim().toLowerCase();
+  if (rows.some((r) => r.email.trim().toLowerCase() === email && r.email.trim().toLowerCase() !== orig)) {
+    throw new Error(`${email} is already on the list`);
+  }
+  const existing = orig ? rows.find((r) => r.email.trim().toLowerCase() === orig) : undefined;
+  const rec = { email, name: input.name.trim(), role: input.role, active: input.active ? "yes" : "no",
+    added: existing?.added || new Date().toISOString().slice(0, 10) };
+  if (existing) await updateRow("Users", existing._row, rec);
+  else await appendRows("Users", [rec]);
+}
+
+export async function removeUser(email: string) {
+  const rows = await readTab("Users", true);
+  const u = rows.find((r) => r.email.trim().toLowerCase() === email.trim().toLowerCase());
+  if (u) await deleteRow("Users", u._row);
+}

@@ -1,5 +1,6 @@
 import Header from "../Header";
 import AdminProjects from "./AdminProjects";
+import AdminNav from "./AdminNav";
 import { requireAdmin } from "@/lib/auth";
 import { listProjects } from "@/lib/data";
 
@@ -14,7 +15,8 @@ export default async function AdminPage() {
     <>
       <Header user={user} />
       <main>
-        <h1>Admin · Project list</h1>
+        <h1>Admin</h1>
+        <AdminNav on="projects" />
         <p className="muted">Add, edit, archive or delete projects. Archived projects drop off the Projects page and the weekly summary but keep their data.</p>
         <AdminProjects initial={rows} />
       </main>
