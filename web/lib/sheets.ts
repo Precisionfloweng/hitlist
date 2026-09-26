@@ -1,0 +1,150 @@
+// The Google Sheet "PFE Hitlist Data" as a small database (same tabs as worker/hitlist/store.py).
+import "server-only";
+import { JWT } from "google-auth-library";
+
+export const SCHEMA = {
+  Projects: ["project_number", "name", "tech", "date", "address", "status", "buildingstart_url",
+    "last_sync", "last_sync_status", "fields_pct", "units_pct", "units",
+    "open_deficiencies", "open_high", "gap_flags"],
+  Users: ["email", "name", "role", "active", "added"],
+  Rules: ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
+    "order", "field", "columns", "status", "when"],
+  RuleHistory: ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status"],
+  Queue: ["id", "project_number", "requested_by", "requested_at", "status",
+    "started_at", "finished_at", "message"],
+  Dashboard: ["project_number", "type", "units", "units_complete", "required_fields",
+    "required_filled", "missing_required", "missing_optional", "fields_pct", "units_pct", "updated_at"],
+  Deficiencies: ["project_number", "group", "value", "count", "updated_at"],
+  History: ["project_number", "synced_at", "fields_pct", "units_pct", "units",
+    "open_deficiencies", "open_high"],
+} as const;
+
+export type Tab = keyof typeof SCHEMA;
+export type Rec = Record<string, string> & { _row: number };
+
+const API = "https://sheets.googleapis.com/v4/spreadsheets/";
+let client: JWT | null = null;
+
+function sheetId(): string {
+  const id = process.env.HITLIST_SHEET_ID;
+  if (!id) throw new Error("HITLIST_SHEET_ID is not set");
+  return id;
+}
+
+function auth(): JWT {
+  if (!client) {
+    const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+    if (!raw) throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON is not set");
+    const key = JSON.parse(raw);
+    client = new JWT({
+      email: key.client_email,
+      key: key.private_key,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
+  }
+  return client;
+}
+
+async function call(path: string, init: { method?: string; body?: unknown; query?: Record<string, string> } = {}) {
+  const url = new URL(API + sheetId() + path);
+  for (const [k, v] of Object.entries(init.query ?? {})) url.searchParams.set(k, v);
+  const res = await auth().request({
+    url: url.toString(),
+    method: (init.method ?? "GET") as "GET",
+    data: init.body,
+  });
+  return res.data as Record<string, unknown>;
+}
+
+const rangeFor = (tab: string, a1 = "") => encodeURIComponent(`'${tab}'${a1 ? "!" + a1 : ""}`);
+
+function toRecords(values: string[][] | undefined): Rec[] {
+  if (!values || values.length === 0) return [];
+  const head = values[0];
+  const out: Rec[] = [];
+  values.slice(1).forEach((r, i) => {
+    const rec = { _row: i + 2 } as Rec;
+    head.forEach((h, j) => (rec[h] = r[j] ?? ""));
+    if (head.some((h) => rec[h] !== "")) out.push(rec);
+  });
+  return out;
+}
+
+// Short in-memory cache so a page with several tabs doesn't hammer the API.
+const cache = new Map<string, { at: number; data: Rec[] }>();
+const TTL_MS = 15_000;
+
+export function invalidate(...tabs: Tab[]) {
+  for (const t of tabs) cache.delete(t);
+}
+
+/** Read several tabs in one API call. */
+export async function readTabs<T extends Tab>(tabs: T[], fresh = false): Promise<Record<T, Rec[]>> {
+  const now = Date.now();
+  const out = {} as Record<T, Rec[]>;
+  const need = tabs.filter((t) => {
+    const hit = cache.get(t);
+    if (!fresh && hit && now - hit.at < TTL_MS) {
+      out[t] = hit.data;
+      return false;
+    }
+    return true;
+  });
+  if (need.length) {
+    const qs = need.map((t) => "ranges=" + rangeFor(t)).join("&");
+    const data = await call(`/values:batchGet?${qs}`);
+    const ranges = (data.valueRanges as { values?: string[][] }[]) ?? [];
+    need.forEach((t, i) => {
+      const recs = toRecords(ranges[i]?.values);
+      cache.set(t, { at: now, data: recs });
+      out[t] = recs;
+    });
+  }
+  return out;
+}
+
+export async function readTab(tab: Tab, fresh = false): Promise<Rec[]> {
+  return (await readTabs([tab], fresh))[tab];
+}
+
+const toRow = (tab: Tab, rec: Record<string, unknown>) =>
+  SCHEMA[tab].map((c) => (rec[c] === undefined || rec[c] === null ? "" : String(rec[c])));
+
+export async function appendRows(tab: Tab, recs: Record<string, unknown>[]) {
+  await call(`/values/${rangeFor(tab, "A1")}:append`, {
+    method: "POST",
+    query: { valueInputOption: "RAW", insertDataOption: "INSERT_ROWS" },
+    body: { values: recs.map((r) => toRow(tab, r)) },
+  });
+  invalidate(tab);
+}
+
+export async function updateRow(tab: Tab, row: number, rec: Record<string, unknown>) {
+  await call(`/values/${rangeFor(tab, `A${row}`)}`, {
+    method: "PUT",
+    query: { valueInputOption: "RAW" },
+    body: { values: [toRow(tab, rec)] },
+  });
+  invalidate(tab);
+}
+
+let gids: Record<string, number> | null = null;
+async function gidFor(tab: Tab): Promise<number> {
+  if (!gids || gids[tab] === undefined) {
+    const meta = await call("", { query: { fields: "sheets.properties(sheetId,title)" } });
+    gids = {};
+    for (const s of (meta.sheets as { properties: { sheetId: number; title: string } }[]) ?? []) {
+      gids[s.properties.title] = s.properties.sheetId;
+    }
+  }
+  return gids[tab];
+}
+
+export async function deleteRow(tab: Tab, row: number) {
+  const gid = await gidFor(tab);
+  await call(":batchUpdate", {
+    method: "POST",
+    body: { requests: [{ deleteDimension: { range: { sheetId: gid, dimension: "ROWS", startIndex: row - 1, endIndex: row } } }] },
+  });
+  invalidate(tab);
+}

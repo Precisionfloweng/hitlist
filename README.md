@@ -12,7 +12,7 @@ plus completion % and a punch-list (deficiency) breakdown.
 | Folder | What it is |
 | --- | --- |
 | `worker/` | Python. Runs on the office mini PC: exports each project from BuildingStart, applies the rules, writes results. |
-| `web/` | Next.js website on Vercel *(coming in phase 3)*. |
+| `web/` | Next.js website on Vercel: sign-in, projects, dashboards, Refresh, admin. Setup: `docs/VERCEL_SETUP.md`. |
 | `docs/RULES.md` | Readable list of every rule (required / optional per field). |
 
 ## Worker quick start
