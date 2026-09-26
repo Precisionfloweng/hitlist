@@ -50,3 +50,5 @@ Thumbs.db
 browser_session/
 secrets/
 downloads/
+*.tsbuildinfo
+next-env.d.ts.bak
