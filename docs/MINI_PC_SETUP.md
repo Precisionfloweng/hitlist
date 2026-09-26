@@ -44,9 +44,9 @@ sheet's Projects, Dashboard and History tabs. (Once the website exists, projects
 ## 5. Keep it running (Task Scheduler)
 Open **PowerShell as Administrator** (Start → type PowerShell → right-click → Run as administrator) and run:
 ```
-powershell -ExecutionPolicy Bypass -File C:\Hitlist\worker\windows\install_tasks.ps1
+powershell -ExecutionPolicy Bypass -File C:\Hitlist\worker\windows\install_tasks.ps1 -AsSystem
 ```
-Enter the PC's Windows password when asked. This creates `Hitlist worker` (starts with Windows,
+This creates `Hitlist worker` (starts with Windows,
 restarts itself) and `Hitlist weekly summary` (Mondays 7:00 AM), and starts the worker.
 
 Logs are in `C:\Hitlist\worker\logs\worker.log`.
