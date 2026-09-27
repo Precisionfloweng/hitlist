@@ -205,8 +205,8 @@ def _email_success(store, settings, mailer, job, project, results) -> None:
         return
     s, d = results["summary"], results["deficiency_summary"]
     gaps = results.get("gap_flags") or []
-    gap_line = (f"<p><b>{len(gaps)} possible export gap(s)</b> were flagged: data that was there last "
-                "sync is blank now. Check the project page.</p>") if gaps else ""
+    gap_line = (f"<p><b>{len(gaps)} possible issue(s) found</b>: units ticked Complete with required "
+                "fields empty. Check the project page.</p>") if gaps else ""
     body = (f"<p>The sync for <b>{esc(job['project_number'])} {esc(project.get('name'))}</b> finished "
             "with no errors.</p>"
             f"<p>{s['fields_pct']}% of required fields filled · {s['units_complete']} of {s['units']} units "

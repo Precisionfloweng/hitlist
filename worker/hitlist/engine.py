@@ -238,25 +238,12 @@ def summarize_deficiencies(items: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def gap_check(previous: dict[str, Any] | None, current: dict[str, Any]) -> list[dict[str, Any]]:
-    """Flag possible export gaps: data that was there last sync but is blank now,
-    and units whose Completed box is ticked while required fields are empty."""
+    """Flag units whose Completed box is ticked while required fields are empty.
+    (`previous` is kept for callers; data that went blank since the last sync isn't flagged.)"""
     flags: list[dict[str, Any]] = []
-    prev_codes: dict[tuple[str, str], tuple[list[dict[str, Any]], str]] = {}
-    if previous:
-        for t in previous.get("types", []):
-            for u in t["units"]:
-                prev_codes[(t["key"], u["path"] or u["name"])] = (t["fields"], u["codes"])
     for t in current["types"]:
         labels = [f["label"] for f in t["fields"]]
         for u in t["units"]:
-            key = (t["key"], u["path"] or u["name"])
-            if key in prev_codes:
-                p_fields, p_codes = prev_codes[key]
-                p_map = {f["label"]: c for f, c in zip(p_fields, p_codes)}
-                lost = [lab for lab, c in zip(labels, u["codes"])
-                        if c in (MISSING_REQUIRED, MISSING_OPTIONAL) and p_map.get(lab) == PASS]
-                if lost:
-                    flags.append({"type": t["name"], "unit": u["name"], "kind": "data_disappeared", "fields": lost})
             if u.get("completed_box") and u["required_filled"] < u["required"]:
                 missing = [lab for lab, c in zip(labels, u["codes"]) if c == MISSING_REQUIRED]
                 flags.append({"type": t["name"], "unit": u["name"], "kind": "completed_but_missing", "fields": missing})

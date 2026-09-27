@@ -72,7 +72,7 @@ def test_gap_check(sample_export, sample_rules):
     unit["codes"] = "PPP--P"   # Actual Airflow was filled last time
     flags = gap_check(previous, current)
     kinds = {(f["unit"], f["kind"]) for f in flags}
-    assert ("AHU-2", "data_disappeared") in kinds
+    assert ("AHU-2", "data_disappeared") not in kinds   # no longer flagged
     assert ("AHU-2", "completed_but_missing") in kinds   # Completed ticked, required field empty
 
 

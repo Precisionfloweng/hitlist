@@ -17,6 +17,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   if (!data) notFound();
   const { project: p } = data;
   const summary = results?.summary;
+  // Only "ticked Complete but required fields empty" (older results may also hold "went blank" flags).
+  const issues = (results?.gap_flags ?? []).filter((g) => g.kind === "completed_but_missing");
   const eqHref = (type?: string) =>
     `/projects/${encodeURIComponent(p.number)}/equipment${type ? `?type=${encodeURIComponent(type)}` : ""}`;
 
@@ -65,13 +67,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               );
             })()}
 
-            {(results?.gap_flags?.length ?? 0) > 0 && (
+            {issues.length > 0 && (
               <div className="card" style={{ marginTop: 16, borderColor: "#f5c2c0" }}>
-                <b>Possible issues found ({results!.gap_flags!.length})</b>
+                <b>Possible issues found ({issues.length})</b>
                 <p className="muted" style={{ margin: "4px 0 8px" }}>The unit is ticked Complete with required fields empty. Check these in BuildingStart.</p>
                 <ul style={{ margin: 0 }}>
-                  {results!.gap_flags!.slice(0, 15).map((g, i) => (
-                    <li key={i}><b>{g.unit}</b> ({g.type}): {g.kind === "data_disappeared" ? "went blank: " : "Ticked Complete but missing: "}{g.fields.join(", ")}</li>
+                  {issues.slice(0, 15).map((g, i) => (
+                    <li key={i}><b>{g.unit}</b> ({g.type}): Ticked Complete but missing: {g.fields.join(", ")}</li>
                   ))}
                 </ul>
               </div>
