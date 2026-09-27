@@ -7,8 +7,48 @@ export type Project = {
   lastSync: string; lastSyncStatus: string; daysSinceSync: number | null;
   fieldsPct: number | null; unitsPct: number | null; units: number | null;
   openDeficiencies: number | null; openHigh: number | null; gapFlags: number | null;
-  queue: "queued" | "running" | null; row: number;
+  queue: "queued" | "running" | null; job: SyncJob | null; row: number;
 };
+
+/** The latest refresh request for a project, as the Refresh button shows it. */
+export type SyncJob = {
+  id: string; status: "queued" | "running" | "done" | "failed"; step: string;
+  requestedBy: string; requestedAt: string; startedAt: string; finishedAt: string;
+  ahead: number;             // syncs that will run before this one (queued jobs only)
+  lastMinutes: number | null; // how long this project's previous successful sync took
+};
+
+const STALE_RUNNING_MS = 90 * 60_000;   // a "running" job this old means the worker was stopped mid-sync
+
+function isActive(q: Rec, now = Date.now()) {
+  if (q.status === "queued") return true;
+  return q.status === "running" && now - Date.parse(q.started_at || q.requested_at) < STALE_RUNNING_MS;
+}
+
+export function jobFor(number: string, queue: Rec[]): SyncJob | null {
+  const mine = queue.filter((q) => q.project_number === number)
+    .sort((a, b) => a.requested_at.localeCompare(b.requested_at));
+  const last = mine[mine.length - 1];
+  if (!last) return null;
+  const queued = queue.filter((q) => q.status === "queued").sort((a, b) => a.requested_at.localeCompare(b.requested_at));
+  const running = queue.some((q) => q.status === "running" && isActive(q));
+  const ahead = last.status === "queued" ? queued.findIndex((q) => q.id === last.id) + (running ? 1 : 0) : 0;
+  const prev = [...mine].reverse().find((q) => q.status === "done" && q.started_at && q.finished_at && q.id !== last.id);
+  const lastMinutes = prev ? Math.max(1, Math.round((Date.parse(prev.finished_at) - Date.parse(prev.started_at)) / 60_000)) : null;
+  let status = last.status as SyncJob["status"];
+  let step = last.message;
+  if (status === "running" && !isActive(last)) {
+    status = "failed";
+    step = "The mini PC stopped partway through this sync. Press Refresh to try again.";
+  }
+  return { id: last.id, status, step, requestedBy: last.requested_by, requestedAt: last.requested_at,
+    startedAt: last.started_at, finishedAt: last.finished_at, ahead, lastMinutes };
+}
+
+/** Always reads the Queue tab fresh (no cache), for the live status on the Refresh button. */
+export async function syncStatus(number: string): Promise<SyncJob | null> {
+  return jobFor(number, await readTab("Queue", true));
+}
 
 const num = (v: string) => (v === "" || v === undefined ? null : Number(v));
 
@@ -19,7 +59,7 @@ export function daysSince(iso: string): number | null {
 }
 
 function toProject(p: Rec, queue: Rec[]): Project {
-  const pending = queue.filter((q) => q.project_number === p.project_number && (q.status === "queued" || q.status === "running"));
+  const pending = queue.filter((q) => q.project_number === p.project_number && isActive(q));
   return {
     number: p.project_number, name: p.name, tech: p.tech, date: p.date, address: p.address,
     status: p.status || "active", lastSync: p.last_sync, lastSyncStatus: p.last_sync_status,
@@ -27,6 +67,7 @@ function toProject(p: Rec, queue: Rec[]): Project {
     units: num(p.units), openDeficiencies: num(p.open_deficiencies), openHigh: num(p.open_high),
     gapFlags: num(p.gap_flags),
     queue: pending.some((q) => q.status === "running") ? "running" : pending.length ? "queued" : null,
+    job: jobFor(p.project_number, queue),
     row: p._row,
   };
 }
@@ -61,7 +102,7 @@ export function isMine(p: Project, u: User): boolean {
 export async function requestRefresh(number: string, by: User): Promise<"queued" | "already" | "missing"> {
   const { Projects, Queue } = await readTabs(["Projects", "Queue"], true);
   if (!Projects.some((p) => p.project_number === number)) return "missing";
-  if (Queue.some((q) => q.project_number === number && (q.status === "queued" || q.status === "running"))) {
+  if (Queue.some((q) => q.project_number === number && isActive(q))) {
     return "already";
   }
   const now = new Date();

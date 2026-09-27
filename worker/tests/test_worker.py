@@ -101,3 +101,25 @@ def test_weekly_summary(tmp_path):
     body = mail.sent[0].get_body(("html",)).get_content()
     assert "never synced" in body and "9 days" in body
     assert body.index("99-002") < body.index("99-001")   # never-synced listed first
+
+
+def test_refresh_reports_each_step(sample_export, tmp_path):
+    store, s, mail = make_store(), settings(tmp_path), Mailer("app@example.com", "")
+    store.request_refresh("99-001", "tech@example.com")
+    seen = []
+    original = store.set_job
+
+    def spy(job, **changes):
+        if "message" in changes:
+            seen.append(changes["message"])
+        original(job, **changes)
+    store.set_job = spy
+
+    def export(n, step):
+        step("Logging in to BuildingStart")
+        return sample_export
+    process_next(store, s, mail, export_fn=export)
+    assert seen[0] == "Picked up by the mini PC"
+    assert "Logging in to BuildingStart" in seen
+    assert "Checking every unit against the rules" in seen
+    assert seen[-1] == "ok"

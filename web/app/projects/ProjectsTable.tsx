@@ -54,7 +54,7 @@ export default function ProjectsTable({ rows }: { rows: Row[] }) {
                     <span className={s.cls}>{s.text}</span>
                     {p.lastSyncStatus.startsWith("failed") && <div className="error" style={{ fontSize: 12 }}>Last sync failed</div>}
                   </td>
-                  <td><RefreshButton project={p.number} queue={p.queue} /></td>
+                  <td><RefreshButton project={p.number} job={p.job} compact /></td>
                 </tr>
               );
             })}

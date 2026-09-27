@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import json
 import logging
 import time
@@ -18,22 +19,31 @@ from .store import DONE, FAILED, RUNNING, HitlistStore, now_iso
 
 log = logging.getLogger("hitlist")
 
-ExportFn = Callable[[str], Path]
+# export_fn(project) or export_fn(project, step) -> path of the downloaded xlsx
+ExportFn = Callable[..., Path]
+StepFn = Callable[[str], None]
 
 
 def default_export_fn(settings: Settings) -> ExportFn:
     if settings.export_command:
-        return lambda project: run_export(settings.export_command, project, settings.export_dir,
-                                          settings.export_timeout_minutes)
+        def command(project: str, step: StepFn = lambda m: None) -> Path:
+            step("Running the export script (large projects take 5-10 min)")
+            return run_export(settings.export_command, project, settings.export_dir,
+                              settings.export_timeout_minutes)
+        return command
 
-    def builtin(project: str) -> Path:
+    def builtin(project: str, step: StepFn = lambda m: None) -> Path:
         from .buildingstart import download_project_xlsx
+
+        def status(m: str) -> None:
+            log.info("[BuildingStart] %s", m)
+            step(m)
         try:
             return download_project_xlsx(project, settings.export_dir / project,
                                          settings.buildingstart_username, settings.buildingstart_password,
                                          settings.browser_session_dir,
                                          download_timeout_minutes=settings.export_timeout_minutes,
-                                         status=lambda m: log.info("[BuildingStart] %s", m))
+                                         status=status)
         except Exception as exc:  # noqa: BLE001 - surface as an export failure (retried once)
             raise ExportError(str(exc)) from exc
     return builtin
@@ -47,13 +57,14 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
         return False
     export_fn = export_fn or default_export_fn(settings)
     number = job["project_number"]
-    store.set_job(job, status=RUNNING, started_at=now_iso())
+    store.set_job(job, status=RUNNING, started_at=now_iso(), message="Picked up by the mini PC")
     log.info("Refreshing %s (requested by %s)", number, job["requested_by"])
     project = store.project(number)
+    step = _stepper(store, job)
     try:
         if project is None:
             raise ExportError(f"Project {number} is not on the Projects list")
-        results = _refresh(store, settings, number, export_fn)
+        results = _refresh(store, settings, number, export_fn, step)
     except Exception as exc:  # noqa: BLE001 - any failure is reported, the loop keeps going
         log.exception("Refresh of %s failed", number)
         message = str(exc)[:500]
@@ -63,28 +74,58 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
         _email_failure(store, settings, mailer, job, project, message)
         return True
 
+    step("Sending the sync-complete email")
     store.set_job(job, status=DONE, finished_at=now_iso(), message="ok")
     _email_success(store, settings, mailer, job, project, results)
     return True
 
 
-def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: ExportFn) -> dict[str, Any]:
-    try:
-        path = export_fn(number)
-    except ExportError:
-        log.warning("Export failed once for %s, retrying", number)
-        path = export_fn(number)
+def _stepper(store: HitlistStore, job: dict[str, str]) -> StepFn:
+    """Write what the worker is doing to the job's message so the website can show it."""
+    def step(message: str) -> None:
+        if job.get("message") == message:
+            return
+        try:
+            store.set_job(job, message=message)
+        except Exception:  # noqa: BLE001 - a status update must never break the sync
+            log.warning("Could not update the job status to %r", message)
+    return step
 
+
+def _call_export(export_fn: ExportFn, number: str, step: StepFn) -> Path:
+    try:
+        takes_step = len(inspect.signature(export_fn).parameters) >= 2
+    except (TypeError, ValueError):
+        takes_step = False
+    return export_fn(number, step) if takes_step else export_fn(number)
+
+
+def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: ExportFn,
+             step: StepFn = lambda m: None) -> dict[str, Any]:
+    step("Starting the BuildingStart export")
+    try:
+        path = _call_export(export_fn, number, step)
+    except ExportError as exc:
+        log.warning("Export failed once for %s, retrying", number)
+        step(f"Export failed ({str(exc)[:80]}); trying again")
+        path = _call_export(export_fn, number, step)
+
+    step("Reading the export")
+    export = read_export(path)
+    step("Checking every unit against the rules")
     rules_dict = store.load_rules_dict()
     rules = load_rules(rules_dict) if rules_dict else load_rules()
-    results = check_project(read_export(path), rules, project_number=number)
+    results = check_project(export, rules, project_number=number)
 
     settings.results_dir.mkdir(parents=True, exist_ok=True)
     result_file = settings.results_dir / f"{number}.json"
     previous = json.loads(result_file.read_text(encoding="utf-8")) if result_file.exists() else None
     results["gap_flags"] = gap_check(previous, results)
     result_file.write_text(json.dumps(results, ensure_ascii=False, default=str), encoding="utf-8")
+    step("Sending results to the website")
     _publish(settings, number, results)
+
+    step("Updating the dashboard")
 
     stamp = now_iso()
     store.replace_for_project("Dashboard", number,

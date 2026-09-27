@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "../../Header";
-import AutoRefresh from "../../AutoRefresh";
 import RefreshButton from "../../RefreshButton";
 import { pct, syncLabel } from "../../format";
 import EquipmentGrid from "./EquipmentGrid";
@@ -27,13 +26,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
     <>
       <Header user={user} />
       <main>
-        <AutoRefresh active={!!p.queue} />
         <div className="muted"><Link href="/projects">← Projects</Link></div>
         <div className="row" style={{ justifyContent: "space-between" }}>
           <h1>{p.number} · {p.name}</h1>
           <div className="row">
             <span className={s.cls}>Last sync: {s.text}</span>
-            <RefreshButton project={p.number} queue={p.queue} />
+            <RefreshButton project={p.number} job={p.job} />
           </div>
         </div>
         <div className="muted" style={{ marginTop: -10, marginBottom: 16 }}>
