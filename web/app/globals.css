@@ -104,11 +104,15 @@ main.wide { max-width: none; }
 /* Field names on a 45° angle. Earlier columns sit above later ones (z-index set inline),
    so each label can run up-right over its neighbours' header space. */
 .eq-grid th.f { width: 34px; min-width: 34px; height: 115px; padding: 0; overflow: visible; }
-/* Divider between field names, angled at 45° like the names. It starts 21px into the column so it
-   runs midway between this name and the next one (the names start at 50% = 17px, 8px up). */
-.eq-grid th.f::before { content: ""; position: absolute; left: 21px; bottom: 0; width: 1px; height: 163px;
+/* Divider between field names at 45°, 12px (square to the text) below this column's name:
+   from the pivot (17, 8 up) that is 17 - 8 + 12 × √2 ≈ 26px along the bottom edge. */
+.eq-grid th.f::before { content: ""; position: absolute; left: 26px; bottom: 0; width: 1px; height: 163px;
   background: #e6e9ee; transform-origin: 0 100%; transform: rotate(45deg); pointer-events: none; }
-.eq-grid th.f span { position: absolute; left: 50%; bottom: 8px; transform-origin: 0 100%; transform: rotate(-45deg);
+/* Each name is a 16px-tall line whose middle is pivoted at (17px, 8px up); rotated -45° its centre line
+   runs up-right from there. Names in neighbouring columns are 34px apart = 24px apart measured square
+   to the text, so the dividers go 12px either side of each name's centre line (see ::before). */
+.eq-grid th.f span { position: absolute; left: 17px; bottom: 0; height: 16px; line-height: 16px;
+  transform-origin: 0 50%; transform: rotate(-45deg);
   white-space: nowrap; max-width: 165px; overflow: hidden; text-overflow: ellipsis;
   text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 600; color: var(--ink); }
 .eq-grid th.f.opt span { color: #98a2b3; font-weight: 500; }
