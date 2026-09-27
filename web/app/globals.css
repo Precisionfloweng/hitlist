@@ -73,7 +73,7 @@ main.wide { max-width: none; }
 .eq-types .eq-sub { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
 .eq-select { display: none; width: 100%; margin-bottom: 8px; }
 .eq-head h2 { margin: 0 0 2px; font-size: 20px; }
-.eq-tools { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 14px 0 10px; }
+.eq-tools { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 10px 0 8px; }
 .eq-tools input[type=search] { width: 240px; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
 .seg button { border: 0; border-radius: 0; padding: 7px 12px; font-size: 14px; }
@@ -82,7 +82,7 @@ main.wide { max-width: none; }
 .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-left: auto; font-size: 13px; color: var(--muted); }
 .legend > span { display: inline-flex; align-items: center; gap: 5px; }
 
-.eq-scroll { overflow: auto; max-height: calc(100vh - 250px); min-height: 300px; background: #fff;
+.eq-scroll { overflow: auto; max-height: calc(100vh - 24px); min-height: 520px; background: #fff;
   border: 1px solid var(--line); border-radius: var(--radius); }
 .eq-grid { width: max-content; border-collapse: separate; border-spacing: 0; }
 .eq-grid th, .eq-grid td { border-bottom: 1px solid var(--line); padding: 0; }
@@ -94,7 +94,7 @@ main.wide { max-width: none; }
 .eq-grid thead th.d { padding-bottom: 10px; }
 /* Field names on a 45° angle. Earlier columns sit above later ones (z-index set inline),
    so each label can run up-right over its neighbours' header space. */
-.eq-grid th.f { width: 34px; min-width: 34px; height: 130px; padding: 0; overflow: visible; border-left: 1px solid #f0f2f5; }
+.eq-grid th.f { width: 34px; min-width: 34px; height: 115px; padding: 0; overflow: visible; border-left: 1px solid #f0f2f5; }
 .eq-grid th.f span { position: absolute; left: 50%; bottom: 8px; transform-origin: 0 100%; transform: rotate(-45deg);
   white-space: nowrap; max-width: 165px; overflow: hidden; text-overflow: ellipsis;
   text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 600; color: var(--ink); }
@@ -130,7 +130,7 @@ main.wide { max-width: none; }
 /* Project header + tabs (Overview / Equipment checklist / Deficiencies) */
 .phead h1 { margin-bottom: 2px; }
 .phead-sub { margin-bottom: 4px; }
-.ptabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 14px 0 20px; overflow-x: auto; }
+.ptabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 12px 0 16px; overflow-x: auto; }
 .ptabs a { padding: 10px 16px; color: var(--muted); font-weight: 600; border-bottom: 3px solid transparent;
   margin-bottom: -1px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
 .ptabs a:hover { color: var(--ink); text-decoration: none; }
