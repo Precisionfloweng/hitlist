@@ -19,7 +19,7 @@ export default function EquipmentView({ types, initialType, syncedAt }:
   { types: TypeResult[]; initialType?: string; syncedAt?: string }) {
   const sorted = useMemo(() => [...types].sort((a, b) => a.name.localeCompare(b.name)), [types]);
   const [key, setKey] = useState(() => sorted.find((t) => t.key === initialType)?.key ?? sorted[0]?.key);
-  const [filter, setFilter] = useState<Filter>("missing");
+  const [filter, setFilter] = useState<Filter>("all");
   const [q, setQ] = useState("");
   const t = sorted.find((x) => x.key === key) ?? sorted[0];
 
@@ -86,8 +86,8 @@ export default function EquipmentView({ types, initialType, syncedAt }:
         <div className="eq-tools">
           <input type="search" placeholder="Find a unit or area" value={q} onChange={(e) => setQ(e.target.value)} />
           <div className="seg" role="group">
-            <button className={filter === "missing" ? "on" : ""} onClick={() => setFilter("missing")}>Needs data ({incomplete})</button>
             <button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>All units ({t.units.length})</button>
+            <button className={filter === "missing" ? "on" : ""} onClick={() => setFilter("missing")}>Needs data ({incomplete})</button>
           </div>
           <div className="legend">
             <span><span className="ck-key p">✓</span>Filled</span>
