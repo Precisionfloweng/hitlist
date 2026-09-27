@@ -6311,6 +6311,801 @@
      "when": null
     }
    ]
+  },
+  {
+   "key": "mau",
+   "name": "Make-Up Air Units",
+   "export_sheet": "Make-Up Air Unit",
+   "export_sheet_confirmed": true,
+   "parent_types": null,
+   "fields": [
+    {
+     "label": "Manufacturer",
+     "columns": [
+      "Manufacturer"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Unit Model Number",
+     "columns": [
+      "Unit Model Number"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Unit Serial Number",
+     "columns": [
+      "Unit Serial Number"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Location",
+     "columns": [
+      "Location"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Area Served",
+     "columns": [
+      "Area Served"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Final VFD Setting",
+     "columns": [
+      "Final VFD Setting"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Design Airflow",
+     "columns": [
+      "Design Airflow"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Actual Airflow",
+     "columns": [
+      "Actual Airflow"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Airflow %",
+     "columns": [
+      "Airflow %"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Design Outlet Total Airflow",
+     "columns": [
+      "Design Outlet Total Airflow"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Design T.S.P.",
+     "columns": [
+      "Design T.S.P."
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Actual T.S.P.",
+     "columns": [
+      "Actual T.S.P."
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Design E.S.P.",
+     "columns": [
+      "Design E.S.P."
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Actual E.S.P.",
+     "columns": [
+      "Actual E.S.P."
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Fan SP In",
+     "columns": [
+      "Fan SP In"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Fan SP Out",
+     "columns": [
+      "Fan SP Out"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "External SP in",
+     "columns": [
+      "External SP in"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "External SP out",
+     "columns": [
+      "External SP out"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Design Fan RPM",
+     "columns": [
+      "Design Fan RPM"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Actual Fan RPM",
+     "columns": [
+      "Actual Fan RPM"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Des. BHP",
+     "columns": [
+      "Des. BHP"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Act. BHP",
+     "columns": [
+      "Act. BHP"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Make",
+     "columns": [
+      "Motor Make"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Horse Power",
+     "columns": [
+      "Horse Power"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor RPM",
+     "columns": [
+      "Motor RPM"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Voltage",
+     "columns": [
+      "Voltage"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Amps",
+     "columns": [
+      "Amps"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Phase",
+     "columns": [
+      "Motor Phase"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Hertz",
+     "columns": [
+      "Motor Hertz"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Service Factor",
+     "columns": [
+      "Service Factor"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Nominal Efficiency",
+     "columns": [
+      "Nominal Efficiency"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Power Factor",
+     "columns": [
+      "Power Factor"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Frame",
+     "columns": [
+      "Frame"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Drive Type",
+     "columns": [
+      "Drive Type"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Volts T1-T2",
+     "columns": [
+      "Motor Volts T1-T2"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Amps T1",
+     "columns": [
+      "Motor Amps T1"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Sheave MFG",
+     "columns": [
+      "Motor Sheave MFG"
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Motor Sheave Model",
+     "columns": [
+      "Motor Sheave Model"
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Motor Sheave Diam.",
+     "columns": [
+      "Motor Sheave Diam."
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Motor Sheave Bore",
+     "columns": [
+      "Motor Sheave Bore"
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Motor Sheave O.D.",
+     "columns": [
+      "Motor Sheave O.D."
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Fan Sheave MFG",
+     "columns": [
+      "Fan Sheave MFG"
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Fan Sheave Model",
+     "columns": [
+      "Fan Sheave Model"
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Fan Sheave Diam.",
+     "columns": [
+      "Fan Sheave Diam."
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Fan Sheave Bore",
+     "columns": [
+      "Fan Sheave Bore"
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Number of Belts",
+     "columns": [
+      "Number of Belts"
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Belt Size",
+     "columns": [
+      "Belt Size"
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Sheave Center Line",
+     "columns": [
+      "Sheave Center Line"
+     ],
+     "status": "required",
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
+    },
+    {
+     "label": "Filter Type",
+     "columns": [
+      "Filter Type"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Filter Manufacturer",
+     "columns": [
+      "Filter Manufacturer"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Filter Qty - S1",
+     "columns": [
+      "Filter Qty - S1"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Filter Size - S1",
+     "columns": [
+      "Filter Size - S1"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Pre-Filter Press. IN",
+     "columns": [
+      "Pre-Filter Press. IN"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Pre-Filter Press. OUT",
+     "columns": [
+      "Pre-Filter Press. OUT"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Des. Pre-Filter P.D.",
+     "columns": [
+      "Des. Pre-Filter P.D."
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Act. Pre-Filter P.D.",
+     "columns": [
+      "Act. Pre-Filter P.D."
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Des. Entering Air Temp. DB/WB",
+     "columns": [
+      "Des. Entering Air Temp. DB/WB"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Act. Entering Air Temp. DB/WB",
+     "columns": [
+      "Act. Entering Air Temp. DB/WB"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Des. Leaving Air Temp. DB/WB",
+     "columns": [
+      "Des. Leaving Air Temp. DB/WB"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Act. Leaving Air Temp. DB/WB",
+     "columns": [
+      "Act. Leaving Air Temp. DB/WB"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Dx Unit DB Delta T",
+     "columns": [
+      "Dx Unit DB Delta T"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "DX Coil Press. IN",
+     "columns": [
+      "DX Coil Press. IN"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "DX Coil Press. OUT",
+     "columns": [
+      "DX Coil Press. OUT"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Des. DX Coil P.D.",
+     "columns": [
+      "Des. DX Coil P.D."
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Act. DX Coil P.D.",
+     "columns": [
+      "Act. DX Coil P.D."
+     ],
+     "status": "required",
+     "when": null
+    }
+   ]
+  },
+  {
+   "key": "toilet_exhaust",
+   "name": "Toilet Exhaust Fans",
+   "export_sheet": "Toilet Exhaust Fan",
+   "export_sheet_confirmed": true,
+   "parent_types": null,
+   "fields": [
+    {
+     "label": "Area Served",
+     "columns": [
+      "Area Served"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Fan Design Airflow",
+     "columns": [
+      "Fan Design Airflow"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Fan Actual Airflow",
+     "columns": [
+      "Fan Actual Airflow"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "% Act. / Des.",
+     "columns": [
+      "% Act. / Des."
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Fan Manufacturer",
+     "columns": [
+      "Fan Manufacturer"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Fan Model Number",
+     "columns": [
+      "Fan Model Number"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Fan Serial Number",
+     "columns": [
+      "Fan Serial Number"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Volts T1-T2",
+     "columns": [
+      "Motor Volts T1-T2"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Amps T1",
+     "columns": [
+      "Motor Amps T1"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Light Switch Interlock",
+     "columns": [
+      "Light Switch Interlock"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Speed Control",
+     "columns": [
+      "Speed Control"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Manufacturer",
+     "columns": [
+      "Motor Manufacturer"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor HP",
+     "columns": [
+      "Motor HP"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor RPM",
+     "columns": [
+      "Motor RPM"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Rated Volts",
+     "columns": [
+      "Motor Rated Volts"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Phase",
+     "columns": [
+      "Motor Phase"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor Hertz",
+     "columns": [
+      "Motor Hertz"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Motor FL Amps",
+     "columns": [
+      "Motor FL Amps"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Speed Control Setting",
+     "columns": [
+      "Speed Control Setting"
+     ],
+     "status": "required",
+     "when": null
+    }
+   ]
+  },
+  {
+   "key": "filter_sub",
+   "name": "Filters (sub-item)",
+   "export_sheet": "Air Apparatus Filter",
+   "export_sheet_confirmed": true,
+   "parent_types": null,
+   "fields": [
+    {
+     "label": "Filter Type",
+     "columns": [
+      "Filter Type"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Filter Qty - S1",
+     "columns": [
+      "Filter Qty - S1"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Filter Size - S1",
+     "columns": [
+      "Filter Size - S1"
+     ],
+     "status": "required",
+     "when": null
+    }
+   ]
   }
  ]
 }

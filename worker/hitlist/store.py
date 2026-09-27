@@ -252,7 +252,14 @@ class HitlistStore:
         src = next((t for t in rules["types"] if t["key"] == type_key), None)
         if src is None:
             raise KeyError(f"No equipment type '{type_key}' in the bundled rules")
-        by_label = {r["field"]: r for r in rules_to_rows({"types": [src]})}
+        new_rows = rules_to_rows({"types": [src]})
+        if not any(r["type_key"] == type_key for r in self.rows("Rules")):
+            self.append("Rules", new_rows)          # a type added since setup: add it whole
+            self.append("RuleHistory", [{"changed_at": now_iso(), "changed_by": by, "type_key": type_key,
+                                         "field": "(new equipment type)", "old_status": "",
+                                         "new_status": f"added from bundled rules ({len(new_rows)} fields)"}])
+            return len(new_rows)
+        by_label = {r["field"]: r for r in new_rows}
         changed = 0
         for row in self.rows("Rules"):
             if row["type_key"] != type_key or row["field"] not in by_label:

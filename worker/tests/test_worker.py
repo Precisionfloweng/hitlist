@@ -235,3 +235,14 @@ def test_update_rules_keeps_status():
     assert ahu["columns"] == "Unit Manufacturer" and ahu["export_sheet"] == "Air Handling Unit"
     assert ahu["status"] == "optional"                   # the user's choice is kept
     assert store.refresh_rule_mapping(rules, "ahu") == 0  # nothing left to change
+
+
+def test_update_rules_adds_a_new_type():
+    import copy
+    store = make_store()
+    rules = copy.deepcopy(SAMPLE_RULES)
+    rules["types"].append({"key": "newtype", "name": "New Things", "export_sheet": "New Thing",
+                           "fields": [{"label": "Serial", "columns": ["Serial"], "status": "required"}]})
+    assert store.refresh_rule_mapping(rules, "newtype") == 1
+    assert any(r["type_key"] == "newtype" for r in store.rows("Rules"))
+    assert store.refresh_rule_mapping(rules, "newtype") == 0

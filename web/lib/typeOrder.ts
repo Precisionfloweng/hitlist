@@ -2,13 +2,16 @@
 // Types not listed (added later) go at the end, alphabetically.
 export const TYPE_ORDER = [
   "ahu",              // Air Handling Unit
+  "mau",              // Make-Up Air Unit
   "rtu",              // Roof Top Unit
   "fan_sub",          // sub-items
   "chw_coil_sub",
   "hw_coil_sub",
   "dx_coil_sub",
   "edh_sub",
+  "filter_sub",
   "exhaust_fan",      // Fan Unit
+  "toilet_exhaust",   // Toilet Exhaust Fan
   "fcu",              // Fan Coil
   "ductless",         // Ductless Split System
   "split",            // Split System

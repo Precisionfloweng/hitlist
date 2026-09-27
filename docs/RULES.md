@@ -912,3 +912,111 @@ Export sheet: **Electric Coil -**
 | Actual Amps | ✖ Required | EDH Act. Amps 1 |  |
 | Design Airflow | ⚠ Optional | Airflow Design |  |
 | Actual Airflow | ✖ Required | Airflow Actual |  |
+
+## Make-Up Air Units
+
+Export sheet: **Make-Up Air Unit**
+
+| Field | Status | Export column(s) | Only when |
+| --- | --- | --- | --- |
+| Manufacturer | ✖ Required | Manufacturer |  |
+| Unit Model Number | ✖ Required | Unit Model Number |  |
+| Unit Serial Number | ✖ Required | Unit Serial Number |  |
+| Location | ✖ Required | Location |  |
+| Area Served | ✖ Required | Area Served |  |
+| Final VFD Setting | ✖ Required | Final VFD Setting |  |
+| Design Airflow | ✖ Required | Design Airflow |  |
+| Actual Airflow | ✖ Required | Actual Airflow |  |
+| Airflow % | ✖ Required | Airflow % |  |
+| Design Outlet Total Airflow | ✖ Required | Design Outlet Total Airflow |  |
+| Design T.S.P. | ✖ Required | Design T.S.P. |  |
+| Actual T.S.P. | ✖ Required | Actual T.S.P. |  |
+| Design E.S.P. | ✖ Required | Design E.S.P. |  |
+| Actual E.S.P. | ✖ Required | Actual E.S.P. |  |
+| Fan SP In | ✖ Required | Fan SP In |  |
+| Fan SP Out | ✖ Required | Fan SP Out |  |
+| External SP in | ✖ Required | External SP in |  |
+| External SP out | ✖ Required | External SP out |  |
+| Design Fan RPM | ✖ Required | Design Fan RPM |  |
+| Actual Fan RPM | ✖ Required | Actual Fan RPM |  |
+| Des. BHP | ✖ Required | Des. BHP |  |
+| Act. BHP | ✖ Required | Act. BHP |  |
+| Motor Make | ✖ Required | Motor Make |  |
+| Horse Power | ✖ Required | Horse Power |  |
+| Motor RPM | ✖ Required | Motor RPM |  |
+| Voltage | ✖ Required | Voltage |  |
+| Amps | ✖ Required | Amps |  |
+| Motor Phase | ✖ Required | Motor Phase |  |
+| Motor Hertz | ✖ Required | Motor Hertz |  |
+| Service Factor | ✖ Required | Service Factor |  |
+| Nominal Efficiency | ✖ Required | Nominal Efficiency |  |
+| Power Factor | ✖ Required | Power Factor |  |
+| Frame | ✖ Required | Frame |  |
+| Drive Type | ✖ Required | Drive Type |  |
+| Motor Volts T1-T2 | ✖ Required | Motor Volts T1-T2 |  |
+| Motor Amps T1 | ✖ Required | Motor Amps T1 |  |
+| Motor Sheave MFG | ✖ Required | Motor Sheave MFG | Drive Type = Belt Drive |
+| Motor Sheave Model | ✖ Required | Motor Sheave Model | Drive Type = Belt Drive |
+| Motor Sheave Diam. | ✖ Required | Motor Sheave Diam. | Drive Type = Belt Drive |
+| Motor Sheave Bore | ✖ Required | Motor Sheave Bore | Drive Type = Belt Drive |
+| Motor Sheave O.D. | ✖ Required | Motor Sheave O.D. | Drive Type = Belt Drive |
+| Fan Sheave MFG | ✖ Required | Fan Sheave MFG | Drive Type = Belt Drive |
+| Fan Sheave Model | ✖ Required | Fan Sheave Model | Drive Type = Belt Drive |
+| Fan Sheave Diam. | ✖ Required | Fan Sheave Diam. | Drive Type = Belt Drive |
+| Fan Sheave Bore | ✖ Required | Fan Sheave Bore | Drive Type = Belt Drive |
+| Number of Belts | ✖ Required | Number of Belts | Drive Type = Belt Drive |
+| Belt Size | ✖ Required | Belt Size | Drive Type = Belt Drive |
+| Sheave Center Line | ✖ Required | Sheave Center Line | Drive Type = Belt Drive |
+| Filter Type | ✖ Required | Filter Type |  |
+| Filter Manufacturer | ✖ Required | Filter Manufacturer |  |
+| Filter Qty - S1 | ✖ Required | Filter Qty - S1 |  |
+| Filter Size - S1 | ✖ Required | Filter Size - S1 |  |
+| Pre-Filter Press. IN | ✖ Required | Pre-Filter Press. IN |  |
+| Pre-Filter Press. OUT | ✖ Required | Pre-Filter Press. OUT |  |
+| Des. Pre-Filter P.D. | ✖ Required | Des. Pre-Filter P.D. |  |
+| Act. Pre-Filter P.D. | ✖ Required | Act. Pre-Filter P.D. |  |
+| Des. Entering Air Temp. DB/WB | ✖ Required | Des. Entering Air Temp. DB/WB |  |
+| Act. Entering Air Temp. DB/WB | ✖ Required | Act. Entering Air Temp. DB/WB |  |
+| Des. Leaving Air Temp. DB/WB | ✖ Required | Des. Leaving Air Temp. DB/WB |  |
+| Act. Leaving Air Temp. DB/WB | ✖ Required | Act. Leaving Air Temp. DB/WB |  |
+| Dx Unit DB Delta T | ✖ Required | Dx Unit DB Delta T |  |
+| DX Coil Press. IN | ✖ Required | DX Coil Press. IN |  |
+| DX Coil Press. OUT | ✖ Required | DX Coil Press. OUT |  |
+| Des. DX Coil P.D. | ✖ Required | Des. DX Coil P.D. |  |
+| Act. DX Coil P.D. | ✖ Required | Act. DX Coil P.D. |  |
+
+## Toilet Exhaust Fans
+
+Export sheet: **Toilet Exhaust Fan**
+
+| Field | Status | Export column(s) | Only when |
+| --- | --- | --- | --- |
+| Area Served | ✖ Required | Area Served |  |
+| Fan Design Airflow | ✖ Required | Fan Design Airflow |  |
+| Fan Actual Airflow | ✖ Required | Fan Actual Airflow |  |
+| % Act. / Des. | ✖ Required | % Act. / Des. |  |
+| Fan Manufacturer | ✖ Required | Fan Manufacturer |  |
+| Fan Model Number | ✖ Required | Fan Model Number |  |
+| Fan Serial Number | ✖ Required | Fan Serial Number |  |
+| Motor Volts T1-T2 | ✖ Required | Motor Volts T1-T2 |  |
+| Motor Amps T1 | ✖ Required | Motor Amps T1 |  |
+| Light Switch Interlock | ✖ Required | Light Switch Interlock |  |
+| Speed Control | ✖ Required | Speed Control |  |
+| Motor Manufacturer | ✖ Required | Motor Manufacturer |  |
+| Motor HP | ✖ Required | Motor HP |  |
+| Motor RPM | ✖ Required | Motor RPM |  |
+| Motor Rated Volts | ✖ Required | Motor Rated Volts |  |
+| Motor Phase | ✖ Required | Motor Phase |  |
+| Motor Hertz | ✖ Required | Motor Hertz |  |
+| Motor FL Amps | ✖ Required | Motor FL Amps |  |
+| Speed Control Setting | ✖ Required | Speed Control Setting |  |
+
+## Filters (sub-item)
+
+Export sheet: **Air Apparatus Filter**
+
+| Field | Status | Export column(s) | Only when |
+| --- | --- | --- | --- |
+| Filter Type | ✖ Required | Filter Type |  |
+| Filter Qty - S1 | ✖ Required | Filter Qty - S1 |  |
+| Filter Size - S1 | ✖ Required | Filter Size - S1 |  |

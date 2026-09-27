@@ -99,7 +99,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "update-rules":
         for key in args.type_key:
             n = store.refresh_rule_mapping(_seed_dict(), key)
-            print(f"{key}: {n} field(s) updated" if n else f"{key}: already up to date")
+            print(f"{key}: {n} field(s) added or updated" if n else f"{key}: already up to date")
         return 0
     if args.cmd == "add-project":
         if store.project(args.number):
