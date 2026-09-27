@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from .export_reader import Export
-from .matching import best_column
+from .matching import best_column, similarity
 from .rules import IGNORE, OPTIONAL, REQUIRED, RuleSet, TypeRule
 
 # Result codes stored per field (compact, so a big project's results file stays small).
@@ -18,6 +18,8 @@ SYMBOL = {PASS: "✓", MISSING_REQUIRED: "✖", MISSING_OPTIONAL: "⚠", NOT_APP
 
 # Entries that mean "not applicable / no design", compared lower-case with spaces and dots removed.
 NA_ENTRIES = {"-", "--", "---", "–", "—", "na", "n/a", "nd", "n/d", "none"}
+
+NON_TYPE_SHEETS = {"Project", "Deficiency", "Note"}
 
 CLOSED_DEFICIENCY = {"fixed", "closed", "resolved", "complete", "completed", "void", "cancelled"}
 
@@ -118,8 +120,14 @@ def check_project(export: Export, rules: RuleSet, project_number: str | None = N
     for type_rule in rules.types:
         sheet = export.sheets.get(type_rule.export_sheet) or by_key.get(sheet_key(type_rule.export_sheet))
         if sheet is None:
-            if type_rule.export_sheet_confirmed:
-                warnings.append(f"{type_rule.name}: no sheet named '{type_rule.export_sheet}' in this export")
+            # A missing sheet usually just means the project has none of that equipment. Only a
+            # near-identical sheet name in the export suggests a typo in the rule.
+            used = {sheet_key(t.export_sheet) for t in rules.types}   # sheets other rules read
+            close = [n for n in export.sheets if n not in NON_TYPE_SHEETS and sheet_key(n) not in used
+                     and similarity(n, type_rule.export_sheet) >= 0.8]
+            if close:
+                warnings.append(f"{type_rule.name}: no sheet named '{type_rule.export_sheet}'; "
+                                f"the export has '{close[0]}'")
             continue
         tracked_sheets.add(sheet.name)
         columns = _resolve_columns(type_rule, sheet.headers, warnings)

@@ -142,6 +142,17 @@ def test_sheet_name_match_ignores_spaces_and_case(sample_rules):
     rules["types"][0]["export_sheet"] = "air handling unit "
     r = check_project(_pair_export([("A1", [1200, 1100, 480])]), load_rules(rules))
     assert r["types"][0]["units"][0]["codes"] == "PPP"
-    rules["types"][0]["export_sheet"] = "Not A Sheet"
+    rules["types"][0]["export_sheet"] = "Chiller Test"          # project simply has none: no warning
     r = check_project(_pair_export([("A1", [1200, 1100, 480])]), load_rules(rules))
-    assert r["types"] == [] and any("no sheet named 'Not A Sheet'" in w for w in r["warnings"])
+    assert r["types"] == [] and r["warnings"] == []
+    rules["types"][0]["export_sheet"] = "Air Handling Units"    # near-miss name: warn with the real one
+    r = check_project(_pair_export([("A1", [1200, 1100, 480])]), load_rules(rules))
+    assert any("the export has 'Air Handling Unit'" in w for w in r["warnings"])
+
+
+def test_no_false_warning_for_sheets_other_rules_use():
+    rules = copy.deepcopy(PAIR_RULES)
+    other = copy.deepcopy(rules["types"][0]); other["key"] = "ahu2"; other["export_sheet"] = "Air Handling Units"
+    rules["types"].append(other)     # 'Air Handling Units' missing, but 'Air Handling Unit' belongs to a rule
+    r = check_project(_pair_export([("A1", [1200, 1100, 480])]), load_rules(rules))
+    assert r["warnings"] == []

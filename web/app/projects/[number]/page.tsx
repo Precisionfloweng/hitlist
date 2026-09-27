@@ -54,7 +54,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
             )}
 
             {(() => {
-              const problems = (results?.warnings ?? []).filter((w) => /no sheet named|not in export|no export column found/.test(w));
+              const problems = (results?.warnings ?? []).filter((w) => /the export has '|not in export|no export column found/.test(w));
               return problems.length > 0 && (
                 <div className="card" style={{ marginTop: 16, borderColor: "#f3d19c", background: "#fffaf0" }}>
                   <b>Rules that didn&apos;t match this export ({problems.length})</b>
