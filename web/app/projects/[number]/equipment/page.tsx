@@ -22,7 +22,7 @@ export default async function EquipmentPage({ params, searchParams }:
       <Header user={user} />
       <main className="wide">
         <ProjectHeader project={p} tab="equipment" missingRequired={results?.summary.missing_required} />
-        {results ? <EquipmentView types={results.types} initialType={type} syncedAt={results.generated_at} /> : (
+        {results ? <EquipmentView types={results.types} initialType={type} syncedAt={results.generated_at} deficiencies={results.deficiencies} /> : (
           <div className="card">No equipment results yet. Press <b>Refresh</b> to pull this project from BuildingStart.</div>
         )}
       </main>

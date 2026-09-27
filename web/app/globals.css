@@ -124,8 +124,14 @@ main.wide { max-width: none; }
   background: var(--bad-bg); color: var(--bad); font-weight: 800; font-size: 13px; }
 .ck-key { display: inline-grid; place-items: center; width: 22px; font-size: 14px; }
 .eq-grid tbody tr:nth-child(even) td { background: #f1f4f8; }
+/* Units with an open deficiency (punch item) */
+.eq-grid tbody tr.has-def td { background: #fdeeee; }
+.eq-grid tbody tr.has-def:nth-child(even) td { background: #fae6e6; }
+.def-badge { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 999px; font-size: 11px;
+  font-weight: 700; background: var(--bad); color: #fff; vertical-align: 1px; cursor: help; }
 .eq-grid tbody tr:hover td { background: #ece3f8; }
 .eq-grid tbody tr:hover td.u { background: #ece3f8; }
+.eq-grid tbody tr.has-def:hover td { background: #ece3f8; }
 .eq-empty { padding: 24px !important; text-align: center; color: var(--muted); }
 .eq-foot { font-size: 12px; margin-top: 8px; }
 @media (max-width: 1000px) {

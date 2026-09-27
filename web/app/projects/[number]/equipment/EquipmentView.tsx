@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { loadLastType, saveLastType } from "@/lib/lastType";
-import type { TypeResult } from "@/lib/results";
+import type { Deficiency, TypeResult } from "@/lib/results";
 
 type Filter = "missing" | "all";
 const STATUS_WORD: Record<string, string> = { P: "filled", R: "required, missing", O: "optional, missing",
@@ -16,8 +16,18 @@ function Cell({ code, label }: { code: string; label: string }) {
   return <td className="ck na" title={tip}>·</td>;
 }
 
-export default function EquipmentView({ types, initialType, syncedAt }:
-  { types: TypeResult[]; initialType?: string; syncedAt?: string }) {
+export default function EquipmentView({ types, initialType, syncedAt, deficiencies = [] }:
+  { types: TypeResult[]; initialType?: string; syncedAt?: string; deficiencies?: Deficiency[] }) {
+  // Open deficiencies per unit (matched on the equipment path, or the name if the path differs).
+  const openDefs = useMemo(() => {
+    const byPath = new Map<string, Deficiency[]>(), byName = new Map<string, Deficiency[]>();
+    for (const d of deficiencies) {
+      if (!d.open) continue;
+      if (d.path) byPath.set(d.path, [...(byPath.get(d.path) ?? []), d]);
+      if (d.equipment) byName.set(d.equipment, [...(byName.get(d.equipment) ?? []), d]);
+    }
+    return (path: string, name: string) => (path && byPath.get(path)) || byName.get(name) || [];
+  }, [deficiencies]);
   const sorted = useMemo(() => [...types].sort((a, b) => a.name.localeCompare(b.name)), [types]);
   const [key, setKey] = useState(() => sorted.find((t) => t.key === initialType)?.key ?? sorted[0]?.key);
   const [filter, setFilter] = useState<Filter>("all");
@@ -124,11 +134,19 @@ export default function EquipmentView({ types, initialType, syncedAt }:
             </thead>
             <tbody>
               {units.map((u) => {
+                const defs = openDefs(u.path, u.name);
                 const done = u.required ? u.required_filled / u.required : 1;
                 return (
-                  <tr key={u.path || u.name}>
+                  <tr key={u.path || u.name} className={defs.length ? "has-def" : undefined}>
                     <td className="u" title={u.path}>
-                      <div className="u-name">{u.name}</div>
+                      <div className="u-name">
+                        {u.name}
+                        {defs.length > 0 && (
+                          <span className="def-badge" title={defs.map((d) => `#${d.number} ${d.priority}: ${d.text}`).join("\n")}>
+                            {defs.length} open
+                          </span>
+                        )}
+                      </div>
                       {u.area && <div className="u-area">{u.area}</div>}
                     </td>
                     <td className="d">
