@@ -14,7 +14,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   const number = decodeURIComponent((await params).number);
   const [data, results] = await Promise.all([getProject(number), loadResults(number)]);
   if (!data) notFound();
-  const { project: p, history } = data;
+  const { project: p } = data;
   const summary = results?.summary;
   const eqHref = (type?: string) =>
     `/projects/${encodeURIComponent(p.number)}/equipment${type ? `?type=${encodeURIComponent(type)}` : ""}`;
@@ -63,7 +63,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
             )}
 
 
-            {history.length >= 2 && (<><h2>Progress over time</h2><Trend points={history.map((h) => ({ at: h.synced_at, v: Number(h.fields_pct) }))} /></>)}
 
           </>
         ) : (
@@ -76,23 +75,4 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
 
 function Tile({ big, label }: { big: string; label: string }) {
   return <div className="card tile"><div className="big">{big}</div><div className="label">{label}</div></div>;
-}
-
-function Trend({ points }: { points: { at: string; v: number }[] }) {
-  const W = 640, H = 160, P = 28;
-  const xs = points.map((_, i) => P + (i * (W - 2 * P)) / Math.max(1, points.length - 1));
-  const ys = points.map((p) => H - P - (p.v / 100) * (H - 2 * P));
-  const d = xs.map((x, i) => `${i ? "L" : "M"}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(" ");
-  return (
-    <div className="card">
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Required fields filled over time">
-        {[0, 50, 100].map((g) => { const y = H - P - (g / 100) * (H - 2 * P);
-          return <g key={g}><line x1={P} x2={W - P} y1={y} y2={y} stroke="#e3e6eb" /><text x={4} y={y + 4} fontSize="11" fill="#667085">{g}%</text></g>; })}
-        <path d={d} fill="none" stroke="#1f4e79" strokeWidth="2.5" />
-        {xs.map((x, i) => <circle key={i} cx={x} cy={ys[i]} r="3.5" fill="#1f4e79"><title>{points[i].at.slice(0, 10)}: {points[i].v}%</title></circle>)}
-        <text x={P} y={H - 6} fontSize="11" fill="#667085">{points[0].at.slice(0, 10)}</text>
-        <text x={W - P} y={H - 6} fontSize="11" fill="#667085" textAnchor="end">{points[points.length - 1].at.slice(0, 10)}</text>
-      </svg>
-    </div>
-  );
 }
