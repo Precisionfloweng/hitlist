@@ -92,8 +92,7 @@ export default function RefreshButton({ project, job: initial, cells = false }:
           {job.ahead > 0 ? `${job.ahead} sync${job.ahead > 1 ? "s" : ""} ahead` : "Waiting on the server"}
         </div>
         {job.ahead === 0 && waited > SLOW_PICKUP_MS && (
-          <div className="sync-note error">Not picked up yet. The server usually starts a sync within a minute,
-            so the Hitlist program on it may not be running. Ask an admin to check it.</div>
+          <div className="sync-note error">The server has not started.</div>
         )}
       </>
     );
