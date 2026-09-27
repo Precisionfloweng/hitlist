@@ -13,6 +13,7 @@ credentials*.json
 /worker/data/
 exports/
 results/
+!/web/app/api/worker/results/
 *.xlsx
 *.xlsm
 *.xls
