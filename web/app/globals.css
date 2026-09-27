@@ -29,7 +29,7 @@ input, select { font: inherit; padding: 7px 10px; border: 1px solid var(--line);
 table { width: 100%; border-collapse: collapse; background: var(--card); }
 th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
 th { font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); background: #fafbfc; position: sticky; top: 0; z-index: 1; }
-tr:hover td { background: #fafbfd; }
+tr:hover td { background: #f5f0fc; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
 .pill.ok { background: var(--ok-bg); color: var(--ok); } .pill.bad { background: var(--bad-bg); color: var(--bad); }
@@ -114,8 +114,8 @@ main.wide { max-width: none; }
   background: var(--bad-bg); color: var(--bad); font-weight: 800; font-size: 13px; }
 .ck-key { display: inline-grid; place-items: center; width: 22px; font-size: 14px; }
 .eq-grid tbody tr:nth-child(even) td { background: #f1f4f8; }
-.eq-grid tbody tr:hover td { background: #e9f0f8; }
-.eq-grid tbody tr:hover td.u { background: #e9f0f8; }
+.eq-grid tbody tr:hover td { background: #ece3f8; }
+.eq-grid tbody tr:hover td.u { background: #ece3f8; }
 .eq-empty { padding: 24px !important; text-align: center; color: var(--muted); }
 .eq-foot { font-size: 12px; margin-top: 8px; }
 @media (max-width: 1000px) {
