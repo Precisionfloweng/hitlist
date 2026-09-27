@@ -270,7 +270,7 @@ def recover_interrupted(store: HitlistStore) -> int:
             store.set_job(job, status=DONE, finished_at=now_iso(), message="ok")
         else:
             store.set_job(job, status=FAILED, finished_at=now_iso(),
-                          message="The server restarted during this sync. Press Refresh to try again.")
+                          message="The server restarted during this sync. Press Sync to try again.")
         n += 1
     return n
 

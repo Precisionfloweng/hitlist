@@ -40,7 +40,7 @@ def _table(projects: list[dict[str, Any]], app_url: str) -> str:
         days = "never synced" if p["days"] is None else f"{p['days']} day{'s' if p['days'] != 1 else ''}"
         stale = p["days"] is None or p["days"] >= 7
         pct = f"{p['fields_pct']}%" if p.get("fields_pct") else "–"
-        link = (f'<a href="{esc(app_url)}/projects/{esc(project_key(p))}">Refresh</a>' if app_url else "")
+        link = (f'<a href="{esc(app_url)}/projects/{esc(project_key(p))}">Sync</a>' if app_url else "")
         rows.append(
             f"<tr><td>{esc(p['project_number'])}</td><td>{esc(p['name'])}</td><td>{esc(p.get('tech'))}</td>"
             f"<td style=\"{'color:#b42318;font-weight:bold' if stale else ''}\">{days}</td>"
@@ -62,7 +62,7 @@ def send_weekly_summary(store: HitlistStore, settings: Settings, mailer: Mailer,
             by_email[email].append(p)
     sent = {}
     intro = ("<p>Here are your projects and how long since each was last synced. "
-             "Press <b>Refresh</b> on any project you've worked on this week.</p>")
+             "Press <b>Sync</b> on any project you've worked on this week.</p>")
     for email, mine in by_email.items():
         mailer.send([email], "Weekly Hitlist summary", intro + _table(mine, settings.app_url), dry_run)
         sent[email] = len(mine)

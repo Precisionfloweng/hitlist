@@ -71,7 +71,7 @@ def main(argv: list[str] | None = None) -> int:
         from .runner import app_url, publish
         f = settings.results_dir / f"{args.number}.json"
         if not f.exists():
-            print(f"No results saved for {args.number} yet ({f}). Press Refresh on the website first.")
+            print(f"No results saved for {args.number} yet ({f}). Press Sync on the website first.")
             return 1
         print(f"Sending {f.name} ({f.stat().st_size // 1024} KB) to {app_url(settings) or '(APP_URL not set)'} ...")
         problem = publish(settings, args.number, f.read_text(encoding="utf-8"))

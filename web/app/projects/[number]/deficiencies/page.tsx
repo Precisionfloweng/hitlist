@@ -35,7 +35,7 @@ export default async function DeficienciesPage({ params }: { params: Promise<{ n
               <p className="muted">The full list appears after the next sync.</p>}
           </>
         ) : (
-          <div className="card">This project hasn&apos;t been synced yet. Press <b>Refresh</b> to pull it from BuildingStart.</div>
+          <div className="card">This project hasn&apos;t been synced yet. Press <b>Sync</b> to pull it from BuildingStart.</div>
         )}
       </main>
     </>
