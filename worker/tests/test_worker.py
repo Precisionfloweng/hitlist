@@ -119,7 +119,7 @@ def test_refresh_reports_each_step(sample_export, tmp_path):
         step("Logging in to BuildingStart")
         return sample_export
     process_next(store, s, mail, export_fn=export)
-    assert seen[0] == "Picked up by the mini PC"
+    assert seen[0] == "Picked up by the server"
     assert "Logging in to BuildingStart" in seen
     assert "Checking every unit against the rules" in seen
     assert seen[-1] == "ok"

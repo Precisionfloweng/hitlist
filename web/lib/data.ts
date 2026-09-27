@@ -39,7 +39,7 @@ export function jobFor(number: string, queue: Rec[]): SyncJob | null {
   let step = last.message;
   if (status === "running" && !isActive(last)) {
     status = "failed";
-    step = "The mini PC stopped partway through this sync. Press Refresh to try again.";
+    step = "The server stopped partway through this sync. Press Refresh to try again.";
   }
   return { id: last.id, status, step, requestedBy: last.requested_by, requestedAt: last.requested_at,
     startedAt: last.started_at, finishedAt: last.finished_at, ahead, lastMinutes };

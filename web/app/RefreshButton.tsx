@@ -91,10 +91,10 @@ export default function RefreshButton({ project, job: initial, compact = false }
         <div><span className="pill gray">Waiting</span> <span className="num">{clock(waited)}</span></div>
         <div className="sync-step">
           {job.ahead > 0 ? `${job.ahead} sync${job.ahead > 1 ? "s" : ""} ahead of this one`
-            : "Waiting for the mini PC to pick it up"}
+            : "Waiting for the server to pick it up"}
         </div>
         {job.ahead === 0 && waited > SLOW_PICKUP_MS && (
-          <div className="sync-step error">The mini PC hasn&apos;t started it. It normally starts within a minute,
+          <div className="sync-step error">The server hasn&apos;t started it. It normally starts within a minute,
             so it may be off, asleep or not running.</div>
         )}
       </>

@@ -57,7 +57,7 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
         return False
     export_fn = export_fn or default_export_fn(settings)
     number = job["project_number"]
-    store.set_job(job, status=RUNNING, started_at=now_iso(), message="Picked up by the mini PC")
+    store.set_job(job, status=RUNNING, started_at=now_iso(), message="Picked up by the server")
     log.info("Refreshing %s (requested by %s)", number, job["requested_by"])
     project = store.project(number)
     step = _stepper(store, job)
