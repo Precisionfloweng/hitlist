@@ -98,7 +98,7 @@ export default function EquipmentView({ types, initialType, syncedAt }:
             <button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>All units ({t.units.length})</button>
             <button className={filter === "missing" ? "on" : ""} onClick={() => setFilter("missing")}>Needs data ({incomplete})</button>
           </div>
-          <div className="legend">
+          <div className="legend" title="Optional fields have grey headings. Hover or tap and hold a mark to see the field name.">
             <span><span className="ck-key p">✓</span>Filled</span>
             <span><span className="ck-key r"><span>✕</span></span>Required missing</span>
             <span><span className="ck-key o">!</span>Optional missing</span>
@@ -148,7 +148,6 @@ export default function EquipmentView({ types, initialType, syncedAt }:
             </tbody>
           </table>
         </div>
-        <p className="muted eq-foot">Optional fields have grey headings. Hover or tap and hold a mark to see the field name.</p>
       </section>
     </div>
   );
