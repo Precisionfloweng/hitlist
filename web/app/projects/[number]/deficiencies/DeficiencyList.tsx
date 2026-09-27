@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import type { Deficiency } from "@/lib/results";
 
 export default function DeficiencyList({ items }: { items: Deficiency[] }) {
-  const [openOnly, setOpenOnly] = useState(true);
+  const [openOnly, setOpenOnly] = useState(false);
   const [priority, setPriority] = useState("");
   const [contact, setContact] = useState("");
   const priorities = [...new Set(items.map((d) => d.priority))].sort();
