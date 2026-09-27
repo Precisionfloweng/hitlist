@@ -194,13 +194,13 @@ def test_export_with_infinity_is_readable(tmp_path):
 
 def test_pick_project_row_by_name():
     from hitlist.buildingstart import pick_project_row
-    rows = ["LISD Hicks Elementary", "LISD Coyote Ridge ES"]
-    assert pick_project_row(rows, "99-083", "99-083 LISD Hicks ES") == 0
-    assert pick_project_row(rows, "99-083", "Coyote Ridge") == 1
+    rows = ["NISD Maple Elementary", "NISD Cedar Point ES"]
+    assert pick_project_row(rows, "99-083", "99-083 NISD Maple ES") == 0
+    assert pick_project_row(rows, "99-083", "Cedar Point") == 1
     assert pick_project_row(["Only One"], "99-083", "anything") == 0
     import pytest
     with pytest.raises(RuntimeError, match="2 BuildingStart projects are numbered 99-083"):
-        pick_project_row(rows, "99-083", "LISD")          # matches both equally
+        pick_project_row(rows, "99-083", "NISD")          # matches both equally
     with pytest.raises(RuntimeError):
         pick_project_row(rows, "99-083", "Somewhere Else")
 

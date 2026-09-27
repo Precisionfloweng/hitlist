@@ -41,7 +41,7 @@ def pick_project_row(row_names: list[str], project_number: str, project_name: st
     want = _words(project_name, project_number)
     row_words = [_words(n, project_number) for n in row_names]
     shared = set.intersection(*row_words)          # e.g. the district name on both sites
-    # Score on words that tell the rows apart; longer words count more ("Hicks" beats "ES").
+    # Score on words that tell the rows apart; longer words count more ("Maple" beats "ES").
     scores = [sum(len(w) for w in want & (words - shared)) for words in row_words]
     best = max(range(len(scores)), key=lambda i: scores[i])
     if scores[best] == 0 or scores.count(scores[best]) > 1:
