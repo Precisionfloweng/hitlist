@@ -7,6 +7,24 @@ from pathlib import Path
 from typing import Any
 
 import openpyxl
+from openpyxl.worksheet import _reader as _openpyxl_reader
+
+
+def _cast_number(value: str):
+    """openpyxl's number reader, but tolerant of values like "Infinity" or "NaN" that BuildingStart
+    writes when a calculated field divides by zero (openpyxl would crash on int("Infinity"))."""
+    try:
+        if "." in value or "e" in value.lower():
+            return float(value)
+        return int(value)
+    except ValueError:
+        try:
+            return float(value)       # Infinity, -Infinity, NaN
+        except ValueError:
+            return value              # anything else: keep the text
+
+
+_openpyxl_reader._cast_number = _cast_number
 
 # Sheets in the export that are not equipment.
 NON_EQUIPMENT_SHEETS = {"Project", "Deficiency", "Note"}

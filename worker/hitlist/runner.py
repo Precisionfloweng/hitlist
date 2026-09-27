@@ -67,17 +67,44 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
         results = _refresh(store, settings, number, export_fn, step)
     except Exception as exc:  # noqa: BLE001 - any failure is reported, the loop keeps going
         log.exception("Refresh of %s failed", number)
-        message = str(exc)[:500]
+        message = friendly_error(exc, job.get("message", ""))[:500]
         store.set_job(job, status=FAILED, finished_at=now_iso(), message=message)
         if project is not None:
             store.update_project(number, last_sync_status=f"failed: {message[:100]}")
-        _email_failure(store, settings, mailer, job, project, message)
+        _email_failure(store, settings, mailer, job, project, message,
+                       detail=f"{type(exc).__name__}: {exc}"[:500])
         return True
 
     step("Sending email")
     store.set_job(job, status=DONE, finished_at=now_iso(), message="ok")
     _email_success(store, settings, mailer, job, project, results)
     return True
+
+
+def friendly_error(exc: BaseException, step: str = "") -> str:
+    """Turn an exception into a message people can act on. The technical detail stays in the log."""
+    text = str(exc).strip()
+    name = type(exc).__name__
+    where = f" while {step[0].lower() + step[1:]}" if step and step not in ("ok", "Starting") else ""
+    low = text.lower()
+    if isinstance(exc, ExportError) and ("not found in buildingstart" in low or "not on the projects list" in low):
+        return text                                             # already plain English
+    if "not found in buildingstart" in low:
+        return text
+    if "timeout" in name.lower() or "timed out" in low or "timeout" in low:
+        return f"BuildingStart took too long to respond{where}. Try again; if it keeps happening, check that BuildingStart is up."
+    if "login" in low or "password" in low or "buildingstart_username" in low:
+        return "Couldn't log in to BuildingStart. Check the BuildingStart username and password in the server's .env file."
+    if "net::" in low or "connection" in low or "name resolution" in low or "getaddrinfo" in low:
+        return f"The server couldn't reach the internet{where}. Check its network connection and try again."
+    if "google sheets error" in low or "sheets.googleapis" in low:
+        return "The server couldn't update the Google Sheet. Try again in a few minutes."
+    if step in ("Reading export", "Checking rules") or name in ("BadZipFile", "InvalidFileException", "KeyError", "ValueError"):
+        return (f"The BuildingStart export couldn't be read{where} (it may contain a value the checker "
+                "doesn't understand). Rick has been sent the details.")
+    if isinstance(exc, ExportError):
+        return f"The BuildingStart export failed{where}: {text}"
+    return f"Something went wrong{where}. Rick has been sent the details."
 
 
 def _stepper(store: HitlistStore, job: dict[str, str]) -> StepFn:
@@ -226,12 +253,13 @@ def _website_line(results) -> str:
             f"won't show this sync. Reason: {esc(problem)}. Rick has been told.</p>")
 
 
-def _email_failure(store, settings, mailer, job, project, message) -> None:
+def _email_failure(store, settings, mailer, job, project, message, detail: str = "") -> None:
     admins = admin_emails(store, settings)
     requester = store.email_for(job["requested_by"])
     name = project.get("name", "") if project else ""
     body = (f"<p>The sync for <b>{esc(job['project_number'])} {esc(name)}</b> failed.</p>"
-            f"<p>Reason: {esc(message)}</p><p>Rick has been notified.</p>")
+            f"<p>Reason: {esc(message)}</p><p>Rick has been notified.</p>"
+            + (f'<p style="color:#888;font-size:12px">Technical detail: {esc(detail)}</p>' if detail else ""))
     mailer.send([e for e in [requester, *admins] if e], f"Sync failed: {job['project_number']} {name}", body)
 
 

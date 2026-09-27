@@ -77,7 +77,7 @@ def test_refresh_failure_emails_requester_and_admins(tmp_path):
         raise RuntimeError("BuildingStart login failed")
     process_next(store, s, mail, export_fn=broken)
     job = store.rows("Queue")[0]
-    assert job["status"] == "failed" and "login failed" in job["message"]
+    assert job["status"] == "failed" and "Couldn't log in to BuildingStart" in job["message"]
     assert store.project("99-001")["last_sync_status"].startswith("failed")
     assert set(mail.sent[-1]["To"].split(", ")) == {"tech@example.com", "boss@example.com", "rick@example.com"}
 
@@ -163,3 +163,30 @@ def test_project_rule_overrides_apply_to_that_project_only(sample_export, tmp_pa
     ahu2 = next(t for t in two["types"] if t["key"] == "ahu")
     assert next(u for u in ahu1["units"] if u["name"] == "AHU-1")["codes"][4] == "-"
     assert next(u for u in ahu2["units"] if u["name"] == "AHU-1")["codes"][4] == "R"
+
+
+def test_friendly_errors():
+    from hitlist.exporter import ExportError
+    from hitlist.runner import friendly_error
+    assert "couldn't be read" in friendly_error(ValueError("invalid literal for int() with base 10: 'Infinity'"), "Reading export")
+    assert "took too long" in friendly_error(TimeoutError("Timeout 30000ms exceeded"), "Opening export tool")
+    assert friendly_error(ExportError("Project 99-9 was not found in BuildingStart")) == "Project 99-9 was not found in BuildingStart"
+
+
+def test_export_with_infinity_is_readable(tmp_path):
+    import openpyxl, zipfile, re
+    from hitlist import read_export
+    f = tmp_path / "inf.xlsx"
+    wb = openpyxl.Workbook(); ws = wb.active; ws.title = "Air Handling Unit"
+    ws.append(["Full Path", "Equipment Name", "% Diff"]); ws.append(["AHU-1", "AHU-1", 12345])
+    wb.save(f)
+    # Rewrite the saved number as BuildingStart does after a divide-by-zero.
+    with zipfile.ZipFile(f) as z:
+        files = {n: z.read(n) for n in z.namelist()}
+    name = next(n for n in files if n.startswith("xl/worksheets/sheet"))
+    files[name] = files[name].replace(b"<v>12345</v>", b"<v>Infinity</v>")
+    with zipfile.ZipFile(f, "w") as z:
+        for n, b in files.items():
+            z.writestr(n, b)
+    e = read_export(f)
+    assert e.sheets["Air Handling Unit"].rows[0]["% Diff"] == float("inf")
