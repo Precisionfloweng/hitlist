@@ -254,3 +254,17 @@ def test_never_emails_the_sending_gmail():
     assert m.sent[-1]["To"] == "rick@example.com"
     m.send(["sender@example.com"], "x", "<p>x</p>")
     assert len(m.sent) == 1          # nothing left to send to
+
+
+def test_interrupted_syncs_are_closed_on_startup():
+    from hitlist.runner import recover_interrupted
+    store = make_store()
+    store.request_refresh("99-001", "tech@example.com")
+    store.request_refresh("99-001", "tech@example.com")
+    a, b = store.rows("Queue")
+    store.set_job(a, status="running", message="Sending email")
+    store.set_job(b, status="running", message="Downloading export")
+    assert recover_interrupted(store) == 2
+    a, b = store.rows("Queue")
+    assert (a["status"], a["message"]) == ("done", "ok")
+    assert b["status"] == "failed" and "restarted" in b["message"]

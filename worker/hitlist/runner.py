@@ -75,7 +75,6 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
                        detail=f"{type(exc).__name__}: {exc}"[:500])
         return True
 
-    step("Sending email")
     store.set_job(job, status=DONE, finished_at=now_iso(), message="ok")
     if results.get("website_problem"):
         _email_website_problem(settings, mailer, job, project, results["website_problem"])
@@ -262,8 +261,27 @@ def admin_emails(store: HitlistStore, settings: Settings) -> list[str]:
                    *(u["email"] for u in store.users() if u.get("role", "").lower() == "admin")})
 
 
+def recover_interrupted(store: HitlistStore) -> int:
+    """On startup, close off syncs that were 'running' when the worker stopped (e.g. a restart),
+    so they don't sit on 'Syncing' until the website's 90-minute cutoff. Returns how many."""
+    n = 0
+    for job in [j for j in store.rows("Queue") if j.get("status") == RUNNING]:
+        if job.get("message") == "Sending email":      # old last step: everything was already saved
+            store.set_job(job, status=DONE, finished_at=now_iso(), message="ok")
+        else:
+            store.set_job(job, status=FAILED, finished_at=now_iso(),
+                          message="The server restarted during this sync. Press Refresh to try again.")
+        n += 1
+    return n
+
+
 def run_forever(store: HitlistStore, settings: Settings, mailer: Mailer) -> None:
     log.info("Worker started; checking the queue every %ss", settings.poll_seconds)
+    try:
+        if (n := recover_interrupted(store)):
+            log.info("Closed %s sync(s) interrupted by the last restart", n)
+    except Exception:  # noqa: BLE001
+        log.exception("Could not check for interrupted syncs")
     while True:
         try:
             while process_next(store, settings, mailer):
