@@ -23,7 +23,8 @@ def make_store():
 
 
 def settings(tmp_path):
-    return Settings(results_dir=tmp_path / "results", admin_emails=["rick@example.com"])
+    return Settings(results_dir=tmp_path / "results", admin_emails=["rick@example.com"],
+                    failure_emails=["rick@example.com"])
 
 
 def test_setup_is_idempotent():
@@ -54,10 +55,9 @@ def test_refresh_success(sample_export, tmp_path):
                                                             "Electric Heat (sub-item)"}
     assert len(store.rows("History")) == 1
     assert (tmp_path / "results" / "99-001.json").exists()
-    assert "tech@example.com" in mail.sent[-1]["To"]
-    body = mail.sent[-1].get_body(("html",)).get_content()
-    assert "no errors" in body
-    assert "APP_URL is not set" in body          # no website in tests, so the email says so
+    # A successful sync emails nobody but Rick, and only because the website hand-off failed (no APP_URL in tests).
+    assert len(mail.sent) == 1 and mail.sent[0]["To"] == "rick@example.com"
+    assert "APP_URL is not set" in mail.sent[0].get_body(("html",)).get_content()
 
 
 def test_second_refresh_replaces_dashboard_rows(sample_export, tmp_path):
@@ -79,7 +79,7 @@ def test_refresh_failure_emails_requester_and_admins(tmp_path):
     job = store.rows("Queue")[0]
     assert job["status"] == "failed" and "Couldn't log in to BuildingStart" in job["message"]
     assert store.project("99-001")["last_sync_status"].startswith("failed")
-    assert set(mail.sent[-1]["To"].split(", ")) == {"tech@example.com", "boss@example.com", "rick@example.com"}
+    assert set(mail.sent[-1]["To"].split(", ")) == {"tech@example.com", "rick@example.com"}   # not the owner
 
 
 def test_unknown_project_fails_cleanly(tmp_path):
@@ -220,7 +220,7 @@ def test_projects_sharing_a_number(sample_export, tmp_path):
     assert store.project("99-001-2")["last_sync_status"] == "ok"
     assert store.project("99-001")["last_sync_status"] == ""       # the other site is untouched
     assert (tmp_path / "results" / "99-001-2.json").exists()
-    assert "Sync complete: 99-001 Second Site" in mail.sent[-1]["Subject"]
+    assert "99-001 Second Site" in mail.sent[-1]["Subject"]
 
 
 def test_update_rules_keeps_status():

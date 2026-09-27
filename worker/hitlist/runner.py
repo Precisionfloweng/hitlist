@@ -77,7 +77,8 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
 
     step("Sending email")
     store.set_job(job, status=DONE, finished_at=now_iso(), message="ok")
-    _email_success(store, settings, mailer, job, project, results)
+    if results.get("website_problem"):
+        _email_website_problem(settings, mailer, job, project, results["website_problem"])
     return True
 
 
@@ -232,43 +233,28 @@ def _link(settings: Settings, number: str) -> str:
         if settings.app_url else ""
 
 
-def _email_success(store, settings, mailer, job, project, results) -> None:
-    to = store.email_for(job["requested_by"])
+def _email_website_problem(settings, mailer, job, project, problem) -> None:
+    """The sync worked but the results didn't reach the website: only Rick needs to know."""
+    to = [e for e in settings.failure_emails if e]
     if not to:
         return
-    s, d = results["summary"], results["deficiency_summary"]
-    gaps = results.get("gap_flags") or []
-    gap_line = (f"<p><b>{len(gaps)} possible issue(s) found</b>: units ticked Complete with required "
-                "fields empty. Check the project page.</p>") if gaps else ""
     shown = project.get("project_number") or job["project_number"]
-    body = (f"<p>The sync for <b>{esc(shown)} {esc(project.get('name'))}</b> finished "
-            "with no errors.</p>"
-            f"<p>{s['fields_pct']}% of required fields filled · {s['units_complete']} of {s['units']} units "
-            f"complete · {d['open']} open deficiencies ({d['open_by_priority'].get('High', 0)} high)</p>"
-            + gap_line + _website_line(results) + _link(settings, job["project_number"]))
-    recipients = [to]
-    if results.get("website_problem"):
-        recipients += [e for e in admin_emails(store, settings) if e != to]
-    mailer.send(recipients, f"Sync complete: {shown} {project.get('name', '')}", body)
-
-
-def _website_line(results) -> str:
-    problem = results.get("website_problem")
-    if not problem:
-        return ""
-    return ("<p><b>The equipment details did not reach the website</b>, so the Equipment grid "
-            f"won't show this sync. Reason: {esc(problem)}. Rick has been told.</p>")
+    body = (f"<p>The sync for <b>{esc(shown)} {esc(project.get('name'))}</b> finished, but the equipment "
+            f"details did not reach the website, so the Equipment checklist won't show this sync.</p>"
+            f"<p>Reason: {esc(problem)}</p>" + _link(settings, job["project_number"]))
+    mailer.send(to, f"Results not on website: {shown} {project.get('name', '')}", body)
 
 
 def _email_failure(store, settings, mailer, job, project, message, detail: str = "") -> None:
-    admins = admin_emails(store, settings)
     requester = store.email_for(job["requested_by"])
+    tech = store.email_for((project or {}).get("tech", ""))
     name = project.get("name", "") if project else ""
     shown = (project or {}).get("project_number") or job["project_number"]
     body = (f"<p>The sync for <b>{esc(shown)} {esc(name)}</b> failed.</p>"
             f"<p>Reason: {esc(message)}</p><p>Rick has been notified.</p>"
             + (f'<p style="color:#888;font-size:12px">Technical detail: {esc(detail)}</p>' if detail else ""))
-    mailer.send([e for e in [requester, *admins] if e], f"Sync failed: {shown} {name}", body)
+    to = list(dict.fromkeys(e for e in [requester, tech, *settings.failure_emails] if e))   # no Cody, no repeats
+    mailer.send(to, f"Sync failed: {shown} {name}", body)
 
 
 def admin_emails(store: HitlistStore, settings: Settings) -> list[str]:

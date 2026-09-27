@@ -27,7 +27,8 @@ python -m playwright install chromium
    - `HITLIST_SHEET_ID=` the long ID from the PFE Hitlist Data sheet link
    - `BUILDINGSTART_USERNAME=` / `BUILDINGSTART_PASSWORD=` the login the worker uses
    - `GMAIL_ADDRESS=` / `GMAIL_APP_PASSWORD=` the Gmail app password
-   - `ADMIN_EMAILS=` who gets failure alerts, comma separated
+   - `ADMIN_EMAILS=` extra admins for the weekly summary, comma separated
+   - `FAILURE_EMAILS=` who gets "sync failed" emails besides the tech (blank = `GMAIL_ADDRESS`)
 
 ## 4. First run
 ```

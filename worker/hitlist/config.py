@@ -37,6 +37,8 @@ class Settings:
     app_url: str = ""                 # web app base URL, once it exists
     worker_secret: str = ""           # shared secret for the web app's worker endpoint
     admin_emails: list[str] = field(default_factory=list)
+    # Who gets "sync failed" emails besides the tech (Rick). Defaults to the sending Gmail address.
+    failure_emails: list[str] = field(default_factory=list)
     poll_seconds: int = 30
     export_timeout_minutes: int = 30
 
@@ -60,6 +62,8 @@ class Settings:
             app_url=e("APP_URL", "").rstrip("/"),
             worker_secret=e("WORKER_SECRET", ""),
             admin_emails=[x.strip() for x in e("ADMIN_EMAILS", "").split(",") if x.strip()],
+            failure_emails=[x.strip() for x in (e("FAILURE_EMAILS", "") or e("GMAIL_ADDRESS", "")).split(",")
+                            if x.strip()],
             poll_seconds=int(e("POLL_SECONDS", "30")),
             export_timeout_minutes=int(e("EXPORT_TIMEOUT_MINUTES", "30")),
         )
