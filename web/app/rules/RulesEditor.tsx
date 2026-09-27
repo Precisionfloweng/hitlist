@@ -1,5 +1,6 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { loadLastType, saveLastType } from "@/lib/lastType";
 import { useRouter } from "next/navigation";
 import type { Condition, HistoryRow, RuleType } from "@/lib/rules";
 
@@ -17,6 +18,10 @@ export default function RulesEditor({ types, history, canEdit, project }:
   { types: RuleType[]; history: HistoryRow[]; canEdit: boolean; project?: string }) {
   const router = useRouter();
   const [key, setKey] = useState(types[0]?.key);
+  useEffect(() => {
+    const last = loadLastType();
+    if (last && types.some((t) => t.key === last)) setKey(last);
+  }, [types]);
   const t = types.find((x) => x.key === key) ?? types[0];
   const [status, setStatus] = useState<Record<string, string>>({});   // `${key}:${order}` -> status
   const [cols, setCols] = useState<Record<string, string>>({});
@@ -83,7 +88,7 @@ export default function RulesEditor({ types, history, canEdit, project }:
     <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 16, alignItems: "start" }}>
       <div className="card" style={{ padding: 8, position: "sticky", top: 12 }}>
         {types.map((x) => { const c = counts(x); return (
-          <button key={x.key} onClick={() => { if (pending.length && !confirm("Discard unsaved changes?")) return; setStatus({}); setCols({}); setSheet({}); setKey(x.key); setMsg(null); }}
+          <button key={x.key} onClick={() => { if (pending.length && !confirm("Discard unsaved changes?")) return; setStatus({}); setCols({}); setSheet({}); setKey(x.key); saveLastType(x.key); setMsg(null); }}
             className={x.key === t.key ? "on" : ""}
             style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 4, border: "none",
               background: x.key === t.key ? "var(--brand)" : "transparent", color: x.key === t.key ? "#fff" : "inherit" }}>

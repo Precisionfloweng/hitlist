@@ -1,5 +1,6 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { loadLastType, saveLastType } from "@/lib/lastType";
 import type { TypeResult } from "@/lib/results";
 
 type Filter = "missing" | "all";
@@ -23,7 +24,15 @@ export default function EquipmentView({ types, initialType, syncedAt }:
   const [q, setQ] = useState("");
   const t = sorted.find((x) => x.key === key) ?? sorted[0];
 
+  // No ?type= in the link: open on the type picked last (here or on the Rules page).
+  useEffect(() => {
+    if (initialType) return;
+    const last = loadLastType();
+    if (last && sorted.some((t) => t.key === last)) setKey(last);
+  }, [initialType, sorted]);
+
   function pick(k: string) {
+    saveLastType(k);
     setKey(k);
     setQ("");
     const url = new URL(window.location.href);
