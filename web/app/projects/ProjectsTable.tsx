@@ -7,7 +7,7 @@ import type { Project } from "@/lib/data";
 
 type Row = Project & { mine: boolean };
 
-export default function ProjectsTable({ rows }: { rows: Row[] }) {
+export default function ProjectsTable({ rows, userName }: { rows: Row[]; userName: string }) {
   const [q, setQ] = useState("");
   const [mineOnly, setMineOnly] = useState(false);
   const shown = useMemo(() => {
@@ -18,8 +18,12 @@ export default function ProjectsTable({ rows }: { rows: Row[] }) {
       .sort((a, b) => a.number.localeCompare(b.number) * -1);
   }, [rows, q, mineOnly]);
 
+  const first = (userName || "").trim().split(/\s+/)[0];
+  const title = mineOnly ? `${first ? `${first}'${first.endsWith("s") ? "" : "s"}` : "My"} Projects` : "All Projects";
+
   return (
     <>
+      <h1>{title}</h1>
       <div className="row" style={{ marginBottom: 12 }}>
         <input placeholder="Search project #, name, tech or address" value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: 1, minWidth: 240 }} />
         <label className="row" style={{ gap: 6 }}>

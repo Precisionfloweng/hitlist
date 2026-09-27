@@ -13,8 +13,7 @@ export default async function ProjectsPage() {
     <>
       <Header user={user} />
       <main>
-        <h1>Projects</h1>
-        <ProjectsTable rows={rows} />
+        <ProjectsTable rows={rows} userName={user.name} />
       </main>
     </>
   );
