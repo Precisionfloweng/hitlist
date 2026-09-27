@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "../../Header";
 import { pct } from "../../format";
+import { byTypeOrder } from "@/lib/typeOrder";
 import ProjectHeader from "./ProjectHeader";
 import { requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
@@ -36,7 +37,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
 
             {results && results.types.length > 0 && (
               <div className="type-cards">
-                {[...results.types].sort((x, y) => x.name.localeCompare(y.name)).map((t) => {
+                {[...results.types].sort(byTypeOrder).map((t) => {
                   const done = t.summary.units_complete, n = t.summary.units;
                   const pctDone = n ? (100 * done) / n : 0;
                   return (
