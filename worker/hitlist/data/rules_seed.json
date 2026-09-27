@@ -6072,11 +6072,9 @@
   {
    "key": "edh_sub",
    "name": "Electric Heat (sub-item)",
-   "export_sheet": "Electric Coil",
+   "export_sheet": "Electric Coil -",
    "export_sheet_confirmed": true,
-   "parent_types": [
-    "!Terminal Unit"
-   ],
+   "parent_types": null,
    "fields": [
     {
      "label": "Design EAT",

@@ -891,7 +891,7 @@ Export sheet: **DX Coil -**
 
 ## Electric Heat (sub-item)
 
-Export sheet: **Electric Coil** · only units under: !Terminal Unit
+Export sheet: **Electric Coil -**
 
 | Field | Status | Export column(s) | Only when |
 | --- | --- | --- | --- |
