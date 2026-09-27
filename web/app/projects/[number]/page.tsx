@@ -40,10 +40,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
             {(results?.gap_flags?.length ?? 0) > 0 && (
               <div className="card" style={{ marginTop: 16, borderColor: "#f5c2c0" }}>
                 <b>Possible export gaps ({results!.gap_flags!.length})</b>
-                <p className="muted" style={{ margin: "4px 0 8px" }}>Data that was there last sync is blank now, or a unit is ticked Completed with required fields empty. Check these in BuildingStart.</p>
+                <p className="muted" style={{ margin: "4px 0 8px" }}>Data that was there last sync is blank now, or a unit is ticked Complete with required fields empty. Check these in BuildingStart.</p>
                 <ul style={{ margin: 0 }}>
                   {results!.gap_flags!.slice(0, 15).map((g, i) => (
-                    <li key={i}><b>{g.unit}</b> ({g.type}): {g.kind === "data_disappeared" ? "went blank: " : "Completed but missing: "}{g.fields.join(", ")}</li>
+                    <li key={i}><b>{g.unit}</b> ({g.type}): {g.kind === "data_disappeared" ? "went blank: " : "Ticked Complete but missing: "}{g.fields.join(", ")}</li>
                   ))}
                 </ul>
               </div>
