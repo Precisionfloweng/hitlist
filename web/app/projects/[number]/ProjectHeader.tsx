@@ -3,17 +3,18 @@ import RefreshButton from "../../RefreshButton";
 import { syncLabel } from "../../format";
 import type { Project } from "@/lib/data";
 
-export type ProjectTab = "overview" | "equipment" | "deficiencies";
+export type ProjectTab = "overview" | "equipment" | "deficiencies" | "rules";
 
 /** Title, sync status and the tabs shared by every page of a project. */
-export default function ProjectHeader({ project: p, tab, missingRequired }:
-  { project: Project; tab: ProjectTab; missingRequired?: number | null }) {
+export default function ProjectHeader({ project: p, tab, missingRequired, rulesChanged }:
+  { project: Project; tab: ProjectTab; missingRequired?: number | null; rulesChanged?: number }) {
   const s = syncLabel(p.daysSinceSync);
   const base = `/projects/${encodeURIComponent(p.number)}`;
   const tabs: { key: ProjectTab; label: string; href: string; count?: number | null }[] = [
     { key: "overview", label: "Overview", href: base },
     { key: "equipment", label: "Equipment checklist", href: `${base}/equipment`, count: missingRequired },
     { key: "deficiencies", label: "Deficiencies", href: `${base}/deficiencies`, count: p.openDeficiencies },
+    { key: "rules", label: "Rules", href: `${base}/rules`, count: rulesChanged },
   ];
   return (
     <div className="phead">

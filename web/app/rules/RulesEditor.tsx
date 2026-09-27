@@ -9,7 +9,12 @@ function describe(when: Condition[]): string {
   return when.map((c) => `${c.column || c.label} ${c.equals !== undefined ? "= " + c.equals : "> " + c.gt}`).join(" and ");
 }
 
-export default function RulesEditor({ types, history, canEdit }: { types: RuleType[]; history: HistoryRow[]; canEdit: boolean }) {
+/**
+ * Rules editor. Without `project` it edits the company default (admins).
+ * With `project` it edits required/optional/ignore for that one project; columns and sheets stay as the default.
+ */
+export default function RulesEditor({ types, history, canEdit, project }:
+  { types: RuleType[]; history: HistoryRow[]; canEdit: boolean; project?: string }) {
   const router = useRouter();
   const [key, setKey] = useState(types[0]?.key);
   const t = types.find((x) => x.key === key) ?? types[0];
@@ -40,6 +45,7 @@ export default function RulesEditor({ types, history, canEdit }: { types: RuleTy
   const counts = (x: RuleType) => ({
     r: x.fields.filter((f) => f.status === "required").length,
     o: x.fields.filter((f) => f.status === "optional").length,
+    changed: x.fields.filter((f) => f.status !== f.defaultStatus).length,
   });
   const shown = t.fields.filter((f) => !q || f.field.toLowerCase().includes(q.toLowerCase()) || f.columns.toLowerCase().includes(q.toLowerCase()));
   const sh = sheet[t.key] ?? { value: t.exportSheet, confirmed: t.confirmed };
@@ -48,11 +54,11 @@ export default function RulesEditor({ types, history, canEdit }: { types: RuleTy
   async function save() {
     setBusy(true); setMsg(null);
     const r = await fetch("/api/rules", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ typeKey: t.key, changes: pending }) });
+      body: JSON.stringify({ typeKey: t.key, changes: pending, project }) });
     const data = await r.json().catch(() => ({}));
     setBusy(false);
     if (!r.ok) { setMsg({ text: data.error || "Save failed", ok: false }); return; }
-    setMsg({ text: `Saved ${data.changed} change${data.changed === 1 ? "" : "s"}. They apply on each project's next sync.`, ok: true });
+    setMsg({ text: `Saved ${data.changed} change${data.changed === 1 ? "" : "s"}. ${project ? "They apply on this project's next sync." : "They apply on each project's next sync."}`, ok: true });
     setStatus({}); setCols({}); setSheet({});
     router.refresh();
   }
@@ -60,13 +66,14 @@ export default function RulesEditor({ types, history, canEdit }: { types: RuleTy
   async function undo(h: HistoryRow) {
     const f = t.fields.find((x) => x.field === h.field);
     let change: object | null = null;
-    if (h.old.startsWith("columns=") && f) change = { kind: "columns", order: f.order, value: h.old.slice(8) };
+    if (project && f) change = { kind: "status", order: f.order, value: h.old };
+    else if (h.old.startsWith("columns=") && f) change = { kind: "columns", order: f.order, value: h.old.slice(8) };
     else if (h.old.startsWith("sheet=")) change = { kind: "sheet", value: h.old.slice(6), confirmed: t.confirmed };
     else if (f) change = { kind: "status", order: f.order, value: h.old };
     if (!change || !confirm(`Put "${h.field}" back to ${h.old}?`)) return;
     setBusy(true);
     const r = await fetch("/api/rules", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ typeKey: t.key, changes: [change] }) });
+      body: JSON.stringify({ typeKey: t.key, changes: [change], project }) });
     setBusy(false);
     setMsg(r.ok ? { text: "Undone.", ok: true } : { text: "Undo failed", ok: false });
     router.refresh();
@@ -82,6 +89,7 @@ export default function RulesEditor({ types, history, canEdit }: { types: RuleTy
               background: x.key === t.key ? "var(--brand)" : "transparent", color: x.key === t.key ? "#fff" : "inherit" }}>
             {x.name}{!x.confirmed && <span title="Export sheet name not confirmed yet"> ●</span>}
             <div style={{ fontSize: 12, opacity: .75 }}>{c.r} required · {c.o} optional</div>
+            {project && c.changed > 0 && <div style={{ fontSize: 12, fontWeight: 600 }}>{c.changed} changed for this project</div>}
           </button>); })}
       </div>
 
@@ -90,9 +98,9 @@ export default function RulesEditor({ types, history, canEdit }: { types: RuleTy
           <div className="row">
             <b style={{ fontSize: 18 }}>{t.name}</b>
             <span className="muted">BuildingStart export sheet:</span>
-            <input value={sh.value} disabled={!canEdit} onChange={(e) => setSheet({ ...sheet, [t.key]: { ...sh, value: e.target.value } })} style={{ width: 240 }} />
+            <input value={sh.value} disabled={!canEdit || !!project} onChange={(e) => setSheet({ ...sheet, [t.key]: { ...sh, value: e.target.value } })} style={{ width: 240 }} />
             <label className="row" style={{ gap: 6 }}>
-              <input type="checkbox" checked={sh.confirmed} disabled={!canEdit} onChange={(e) => setSheet({ ...sheet, [t.key]: { ...sh, confirmed: e.target.checked } })} /> Confirmed
+              <input type="checkbox" checked={sh.confirmed} disabled={!canEdit || !!project} onChange={(e) => setSheet({ ...sheet, [t.key]: { ...sh, confirmed: e.target.checked } })} /> Confirmed
             </label>
             {t.parentTypes && <span className="muted">Only units under: {t.parentTypes.replace("!", "not ")}</span>}
           </div>
@@ -110,14 +118,15 @@ export default function RulesEditor({ types, history, canEdit }: { types: RuleTy
 
         <div className="scroll">
           <table>
-            <thead><tr><th>Field</th><th>Status</th><th>BuildingStart column(s)</th><th>Only checked when</th></tr></thead>
+            <thead><tr><th>Field</th><th>Status</th>{project && <th>Company default</th>}<th>BuildingStart column(s)</th><th>Only checked when</th></tr></thead>
             <tbody>
               {shown.map((f) => {
                 const s = status[k(f.order)] ?? f.status;
                 const c = cols[k(f.order)] ?? f.columns;
                 const changed = s !== f.status || c !== f.columns;
+                const differs = !!project && s !== f.defaultStatus;
                 return (
-                  <tr key={f.order} style={changed ? { background: "#fff8e6" } : undefined}>
+                  <tr key={f.order} style={changed ? { background: "#fff8e6" } : differs ? { background: "#eef4fb" } : undefined}>
                     <td>{f.field}</td>
                     <td style={{ whiteSpace: "nowrap" }}>
                       <div className="tabs" style={{ margin: 0, flexWrap: "nowrap" }}>
@@ -127,7 +136,14 @@ export default function RulesEditor({ types, history, canEdit }: { types: RuleTy
                         ))}
                       </div>
                     </td>
-                    <td><input value={c} disabled={!canEdit} placeholder="(matched automatically)" title="Several columns: separate with |  (filled if any has a value)"
+                    {project && <td style={{ whiteSpace: "nowrap" }}>
+                      {differs ? <>
+                        <span className="muted">{LABEL[f.defaultStatus]}</span>{" "}
+                        {canEdit && <button style={{ padding: "2px 8px", fontSize: 12 }}
+                          onClick={() => setStatus({ ...status, [k(f.order)]: f.defaultStatus })}>Reset</button>}
+                      </> : <span className="muted">Same</span>}
+                    </td>}
+                    <td><input value={c} disabled={!canEdit || !!project} placeholder="(matched automatically)" title="Several columns: separate with |  (filled if any has a value)"
                       onChange={(e) => setCols({ ...cols, [k(f.order)]: e.target.value })} style={{ width: "100%", minWidth: 220 }} /></td>
                     <td className="muted">{describe(f.when)}</td>
                   </tr>

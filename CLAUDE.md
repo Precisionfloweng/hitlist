@@ -24,6 +24,9 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Missing = blank, or only `?`/`` ` `` (BuildingStart's "can't calculate yet" marker).
 - A field may list several columns (three-phase readings): filled if ANY has a value.
 - Conditions: `equals` (spaces ignored, so "BeltDrive" = "Belt Drive") or `gt`.
+- Rules: the Rules tab is the company default (admins edit). ProjectRules holds one project's
+  required/optional/ignore changes (anyone edits, on the project's Rules tab); blank status = default.
+  The worker applies them per project (`store.apply_overrides`).
 - The "Electric Coil" sheet feeds two types: under a Terminal Unit = VAV electric heat, else EDH sub-item.
 
 ## Workflow

@@ -15,7 +15,7 @@ from .export_reader import read_export
 from .exporter import ExportError, run_export
 from .mailer import Mailer, esc
 from .rules import load_rules
-from .store import DONE, FAILED, RUNNING, HitlistStore, now_iso
+from .store import DONE, FAILED, RUNNING, HitlistStore, apply_overrides, now_iso
 
 log = logging.getLogger("hitlist")
 
@@ -113,7 +113,9 @@ def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: Ex
     export = read_export(path)
     step("Checking rules")
     rules_dict = store.load_rules_dict()
-    rules = load_rules(rules_dict) if rules_dict else load_rules()
+    if rules_dict is None:
+        rules_dict = json.loads((Path(__file__).parent / "data" / "rules_seed.json").read_text(encoding="utf-8"))
+    rules = load_rules(apply_overrides(rules_dict, store.project_rule_overrides(number)))
     results = check_project(export, rules, project_number=number)
 
     settings.results_dir.mkdir(parents=True, exist_ok=True)

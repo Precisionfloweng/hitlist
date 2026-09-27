@@ -7,7 +7,7 @@ export default function Header({ user }: { user: User }) {
       <div className="inner">
         <Link href="/projects" className="logo">PFE Hitlist</Link>
         <Link href="/projects">Projects</Link>
-        <Link href="/rules">Rules</Link>
+        <Link href="/rules">Default rules</Link>
         {user.role === "admin" && <Link href="/admin">Admin</Link>}
         <span className="spacer" />
         <Link href="/account/password">{user.name}</Link>

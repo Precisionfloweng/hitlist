@@ -19,7 +19,10 @@ SCHEMA: dict[str, list[str]] = {
     "Users": ["email", "name", "role", "active", "added", "password_hash"],
     "Rules": ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
               "order", "field", "columns", "status", "when"],
-    "RuleHistory": ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status"],
+    "RuleHistory": ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status",
+                    "project_number"],
+    # One project's differences from the default rules (status only). Blank status = use the default.
+    "ProjectRules": ["project_number", "type_key", "field", "status", "changed_by", "changed_at"],
     "Queue": ["id", "project_number", "requested_by", "requested_at", "status",
               "started_at", "finished_at", "message"],
     "Dashboard": ["project_number", "type", "units", "units_complete", "required_fields",
@@ -227,12 +230,34 @@ class HitlistStore:
             return None
         return rows_to_rules(rows)
 
+    def project_rule_overrides(self, project_number: str) -> dict[tuple[str, str], str]:
+        """{(type_key, field): status} for one project. Missing tab = no overrides."""
+        try:
+            rows = self.rows("ProjectRules")
+        except Exception:  # noqa: BLE001 - tab not created yet
+            return {}
+        return {(r["type_key"], r["field"]): r["status"] for r in rows
+                if r.get("project_number") == project_number and r.get("status")}
+
     def seed_rules(self, rules: dict[str, Any]) -> int:
         if self.rows("Rules"):
             return 0
         rows = rules_to_rows(rules)
         self.append("Rules", rows)
         return len(rows)
+
+
+def apply_overrides(rules: dict[str, Any], overrides: dict[tuple[str, str], str]) -> dict[str, Any]:
+    """Copy of the rules with one project's required/optional/ignore changes applied."""
+    if not overrides:
+        return rules
+    out = json.loads(json.dumps(rules))
+    for t in out["types"]:
+        for f in t["fields"]:
+            status = overrides.get((t["key"], f["label"]))
+            if status in ("required", "optional", "ignore"):
+                f["status"] = status
+    return out
 
 
 def rules_to_rows(rules: dict[str, Any]) -> list[dict[str, Any]]:

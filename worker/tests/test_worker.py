@@ -146,3 +146,20 @@ def test_publish_explains_problems(monkeypatch, tmp_path):
     assert calls == ["https://hitlist.example.com/api/worker/results/99-001"]
     monkeypatch.setattr(requests, "post", lambda url, **kw: _Resp(200))
     assert publish(s, "99-001", {"a": 1}) == ""
+
+
+def test_project_rule_overrides_apply_to_that_project_only(sample_export, tmp_path):
+    store, s, mail = make_store(), settings(tmp_path), Mailer("app@example.com", "")
+    store.append("Projects", [{"project_number": "99-002", "name": "Other Site", "status": "active"}])
+    # On 99-001 only, Sheave MFG (AHU field 5) doesn't count.
+    store.append("ProjectRules", [{"project_number": "99-001", "type_key": "ahu", "field": "Sheave MFG",
+                                   "status": "ignore"}])
+    for n in ("99-001", "99-002"):
+        store.request_refresh(n, "tech@example.com")
+        process_next(store, s, mail, export_fn=lambda _: sample_export)
+    one = json.loads((tmp_path / "results" / "99-001.json").read_text(encoding="utf-8"))
+    two = json.loads((tmp_path / "results" / "99-002.json").read_text(encoding="utf-8"))
+    ahu1 = next(t for t in one["types"] if t["key"] == "ahu")
+    ahu2 = next(t for t in two["types"] if t["key"] == "ahu")
+    assert next(u for u in ahu1["units"] if u["name"] == "AHU-1")["codes"][4] == "-"
+    assert next(u for u in ahu2["units"] if u["name"] == "AHU-1")["codes"][4] == "R"

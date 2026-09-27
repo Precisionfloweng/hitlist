@@ -9,7 +9,9 @@ export const SCHEMA = {
   Users: ["email", "name", "role", "active", "added", "password_hash"],
   Rules: ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
     "order", "field", "columns", "status", "when"],
-  RuleHistory: ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status"],
+  RuleHistory: ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status", "project_number"],
+  // One project's differences from the default rules (status only). Blank status = use the default.
+  ProjectRules: ["project_number", "type_key", "field", "status", "changed_by", "changed_at"],
   Queue: ["id", "project_number", "requested_by", "requested_at", "status",
     "started_at", "finished_at", "message"],
   Dashboard: ["project_number", "type", "units", "units_complete", "required_fields",
@@ -172,4 +174,17 @@ export async function updateRows(tab: Tab, updates: { row: number; rec: Record<s
     },
   });
   invalidate(tab);
+}
+
+/** Create a tab (with its header row) if the sheet doesn't have it yet. */
+const ensured = new Set<Tab>();
+export async function ensureTab(tab: Tab) {
+  if (ensured.has(tab)) return;
+  await gidFor(tab);
+  if (gids?.[tab] === undefined) {
+    await call(":batchUpdate", { method: "POST", body: { requests: [{ addSheet: { properties: { title: tab } } }] } });
+    gids = null;
+  }
+  await ensureHeader(tab);
+  ensured.add(tab);
 }
