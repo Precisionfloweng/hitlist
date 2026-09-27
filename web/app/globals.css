@@ -153,3 +153,8 @@ main.wide { max-width: none; }
 th.ctr, td.ctr { text-align: center; }
 .num-font { font-variant-numeric: tabular-nums; }
 .sync.centered { align-items: center; margin: 0 auto; text-align: center; }
+
+/* Rules pages reuse the equipment-type cards; their list is always shown */
+.rule-types ul { display: flex !important; }
+.eq-types .eq-changed { font-weight: 700; color: #6b4fbb; }
+.eq-types li button.on .eq-changed { color: #fff; }

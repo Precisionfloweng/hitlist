@@ -85,18 +85,20 @@ export default function RulesEditor({ types, history, canEdit, project }:
   }
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 16, alignItems: "start" }}>
-      <div className="card" style={{ padding: 8, position: "sticky", top: 12 }}>
-        {types.map((x) => { const c = counts(x); return (
-          <button key={x.key} onClick={() => { if (pending.length && !confirm("Discard unsaved changes?")) return; setStatus({}); setCols({}); setSheet({}); setKey(x.key); saveLastType(x.key); setMsg(null); }}
-            className={x.key === t.key ? "on" : ""}
-            style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 4, border: "none",
-              background: x.key === t.key ? "var(--brand)" : "transparent", color: x.key === t.key ? "#fff" : "inherit" }}>
-            {x.name}{!x.confirmed && <span title="Export sheet name not confirmed yet"> ●</span>}
-            <div style={{ fontSize: 12, opacity: .75 }}>{c.r} required · {c.o} optional</div>
-            {project && c.changed > 0 && <div style={{ fontSize: 12, fontWeight: 600 }}>{c.changed} changed for this project</div>}
-          </button>); })}
-      </div>
+    <div style={{ display: "grid", gridTemplateColumns: "200px minmax(0, 1fr)", gap: 16, alignItems: "start" }}>
+      <nav className="eq-types rule-types" aria-label="Equipment types">
+        <ul>
+          {types.map((x) => { const c = counts(x); return (
+            <li key={x.key}>
+              <button className={x.key === t.key ? "on" : ""}
+                onClick={() => { if (pending.length && !confirm("Discard unsaved changes?")) return; setStatus({}); setCols({}); setSheet({}); setKey(x.key); saveLastType(x.key); setMsg(null); }}>
+                <span className="eq-name">{x.name}{!x.confirmed && <span title="Export sheet name not confirmed yet"> ●</span>}</span>
+                <span className="eq-sub">{c.r} required · {c.o} optional</span>
+                {project && c.changed > 0 && <span className="eq-sub eq-changed">{c.changed} changed for this project</span>}
+              </button>
+            </li>); })}
+        </ul>
+      </nav>
 
       <div>
         <div className="card" style={{ marginBottom: 12 }}>
