@@ -22,6 +22,10 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 ## Rules engine facts
 - Field codes: P filled, R required+missing, O optional+missing, - not applicable.
 - Missing = blank, or only `?`/`` ` `` (BuildingStart's "can't calculate yet" marker).
+- N/A entries (-, --, dashes, na, n/a, nd, n/d, none; any case, spaces/dots ignored) = code N:
+  answered, left out of the counts. `?` is still missing, `0` is a reading.
+- Design/Actual pairs (matched by name, 80 in the default rules): a completely blank Design skips
+  both fields (unit doesn't have it); a "-" Design still requires the Actual.
 - A field may list several columns (three-phase readings): filled if ANY has a value.
 - Conditions: `equals` (spaces ignored, so "BeltDrive" = "Belt Drive") or `gt`.
 - Rules: the Rules tab is the company default (admins edit). ProjectRules holds one project's

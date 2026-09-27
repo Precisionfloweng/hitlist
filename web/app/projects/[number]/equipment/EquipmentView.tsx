@@ -3,13 +3,15 @@ import { useMemo, useState } from "react";
 import type { TypeResult } from "@/lib/results";
 
 type Filter = "missing" | "all";
-const STATUS_WORD: Record<string, string> = { P: "filled", R: "required, missing", O: "optional, missing", "-": "not applicable" };
+const STATUS_WORD: Record<string, string> = { P: "filled", R: "required, missing", O: "optional, missing",
+  N: "marked N/A (-, N/A, ND…)", "-": "doesn't apply" };
 
 function Cell({ code, label }: { code: string; label: string }) {
   const tip = `${label}: ${STATUS_WORD[code] ?? ""}`;
   if (code === "P") return <td className="ck p" title={tip}>✓</td>;
   if (code === "R") return <td className="ck r" title={tip}><span>✕</span></td>;
   if (code === "O") return <td className="ck o" title={tip}>!</td>;
+  if (code === "N") return <td className="ck mn" title={tip}>–</td>;
   return <td className="ck na" title={tip}>·</td>;
 }
 
@@ -91,6 +93,7 @@ export default function EquipmentView({ types, initialType, syncedAt }:
             <span><span className="ck-key p">✓</span>Filled</span>
             <span><span className="ck-key r"><span>✕</span></span>Required missing</span>
             <span><span className="ck-key o">!</span>Optional missing</span>
+            <span><span className="ck-key mn">–</span>Marked N/A</span>
             <span><span className="ck-key na">·</span>Doesn&apos;t apply</span>
           </div>
         </div>

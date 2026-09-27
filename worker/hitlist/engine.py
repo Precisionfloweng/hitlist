@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Any
@@ -11,8 +12,12 @@ from .matching import best_column
 from .rules import IGNORE, OPTIONAL, REQUIRED, RuleSet, TypeRule
 
 # Result codes stored per field (compact, so a big project's results file stays small).
-PASS, MISSING_REQUIRED, MISSING_OPTIONAL, NOT_APPLICABLE = "P", "R", "O", "-"
-SYMBOL = {PASS: "✓", MISSING_REQUIRED: "✖", MISSING_OPTIONAL: "⚠", NOT_APPLICABLE: ""}
+# MARKED_NA: the tech typed "-", "N/A", "ND" etc. Answered, but left out of the completion counts.
+PASS, MISSING_REQUIRED, MISSING_OPTIONAL, NOT_APPLICABLE, MARKED_NA = "P", "R", "O", "-", "N"
+SYMBOL = {PASS: "✓", MISSING_REQUIRED: "✖", MISSING_OPTIONAL: "⚠", NOT_APPLICABLE: "", MARKED_NA: "–"}
+
+# Entries that mean "not applicable / no design", compared lower-case with spaces and dots removed.
+NA_ENTRIES = {"-", "--", "---", "–", "—", "na", "n/a", "nd", "n/d", "none"}
 
 CLOSED_DEFICIENCY = {"fixed", "closed", "resolved", "complete", "completed", "void", "cancelled"}
 
@@ -25,6 +30,30 @@ def is_missing(value: Any) -> bool:
         return False
     text = str(value).strip()
     return text == "" or set(text) <= {"?", "`"}
+
+
+def is_na(value: Any) -> bool:
+    """Did the tech mark this "not applicable"? (-, N/A, NA, ND, N/D, none ... any case)"""
+    if value is None or isinstance(value, bool):
+        return False
+    text = str(value).strip().lower().replace(" ", "").replace(".", "")
+    return text in NA_ENTRIES
+
+
+def is_blank(value: Any) -> bool:
+    return value is None or (not isinstance(value, bool) and str(value).strip() == "")
+
+
+_DESIGN = re.compile(r"^(design|des)\.?\s+", re.I)
+_ACTUAL = re.compile(r"^(actual|act)\.?\s+", re.I)
+
+
+def design_partners(type_rule: TypeRule) -> dict[int, int]:
+    """{actual field index: design field index} for pairs like "Design O/A" / "Actual O/A"."""
+    designs = {_DESIGN.sub("", f.label).strip().lower(): i
+               for i, f in enumerate(type_rule.fields) if _DESIGN.match(f.label)}
+    return {i: designs[key] for i, f in enumerate(type_rule.fields) if _ACTUAL.match(f.label)
+            and (key := _ACTUAL.sub("", f.label).strip().lower()) in designs}
 
 
 def _parent_path(full_path: str) -> str | None:
@@ -90,6 +119,8 @@ def check_project(export: Export, rules: RuleSet, project_number: str | None = N
         tracked_sheets.add(sheet.name)
         columns = _resolve_columns(type_rule, sheet.headers, warnings)
         cond_columns = _resolve_conditions(type_rule, sheet.headers, warnings)
+        partners = design_partners(type_rule)          # actual index -> design index
+        paired_designs = set(partners.values())
         fields_out = [{"label": f.label, "status": f.status} for f in type_rule.fields]
         units = []
         for row in sheet.rows:
@@ -103,12 +134,23 @@ def check_project(export: Export, rules: RuleSet, project_number: str | None = N
                 continue
             codes = []
             req_total = req_filled = opt_total = opt_filled = 0
-            for f, cols, ccols in zip(type_rule.fields, columns, cond_columns):
+            # A design cell left completely blank means this unit doesn't have that item
+            # (e.g. no outside air): skip the design and its actual. A "-" design still needs the actual.
+            no_design = {i for i in paired_designs
+                         if columns[i] is not None and all(is_blank(row.get(c)) for c in columns[i])}
+            for i, (f, cols, ccols) in enumerate(zip(type_rule.fields, columns, cond_columns)):
                 if (f.status == IGNORE or cols is None
                         or not all(c.holds(row, cc) for c, cc in zip(f.when, ccols))):
                     codes.append(NOT_APPLICABLE)
                     continue
-                filled = any(not is_missing(row.get(c)) for c in cols)
+                values = [row.get(c) for c in cols]
+                filled = any(not is_missing(v) and not is_na(v) for v in values)
+                if not filled and any(is_na(v) for v in values):
+                    codes.append(MARKED_NA)
+                    continue
+                if not filled and (i in no_design or partners.get(i) in no_design):
+                    codes.append(NOT_APPLICABLE)
+                    continue
                 if f.status == REQUIRED:
                     req_total += 1
                     req_filled += filled

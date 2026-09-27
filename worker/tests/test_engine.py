@@ -3,7 +3,8 @@ import json
 
 from hitlist import check_project, gap_check, load_rules, read_export
 from hitlist.cli import main
-from hitlist.engine import is_missing
+from hitlist.engine import design_partners, is_missing, is_na
+from hitlist.export_reader import Export, Sheet
 
 
 def _type(results, key):
@@ -35,7 +36,7 @@ def test_codes_per_unit(sample_export, sample_rules):
     # fields: Manufacturer, Design Airflow, Actual Airflow, %Diff(ignored), Sheave MFG (belt only), Volts (any phase)
     assert _unit(ahu, "AHU-1")["codes"] == "PPP-RP"   # belt drive, sheave missing -> required missing
     assert _unit(ahu, "AHU-2")["codes"] == "PPR--P"   # direct drive -> sheave n/a; volts on T2-T3 counts
-    assert _unit(ahu, "AHU-3")["codes"] == "ROR-PR"
+    assert _unit(ahu, "AHU-3")["codes"] == "R---PR"   # design + actual airflow both blank -> skipped
     assert ahu["summary"]["units"] == 3
     assert ahu["summary"]["units_complete"] == 0
 
@@ -98,3 +99,39 @@ def test_cli_writes_results(sample_export, tmp_path, capsys):
     data = json.loads(out.read_text(encoding="utf-8"))
     assert data["project_number"] == "99-001"
     assert "required fields filled" in capsys.readouterr().out
+
+
+def test_na_entries():
+    for v in ["-", "--", "—", "–", "na", "NA", "N/A", "n/a", " N / A ", "N.A.", "nd", "ND", "N/D", "n.d.", "None"]:
+        assert is_na(v), v
+    for v in ["", None, "?", "0", 0, "no", "Belt Drive", "-5"]:
+        assert not is_na(v), v
+
+
+def _pair_export(rows):
+    headers = ["Full Path", "Equipment Name", "Design O/A", "Actual O/A", "Actual Volts"]
+    return Export(project={"Number": "99-009"}, sheets={"Air Handling Unit": Sheet(
+        "Air Handling Unit", headers, [dict(zip(headers, [n, n, *r])) for n, r in rows])})
+
+
+PAIR_RULES = {"version": 1, "types": [{"key": "ahu", "name": "AHUs", "export_sheet": "Air Handling Unit",
+    "fields": [{"label": "Design O/A", "columns": ["Design O/A"], "status": "required"},
+               {"label": "Actual O/A", "columns": ["Actual O/A"], "status": "required"},
+               {"label": "Actual Volts", "columns": ["Actual Volts"], "status": "required"}]}]}
+
+
+def test_design_actual_pairs():
+    assert design_partners(load_rules(PAIR_RULES).types[0]) == {1: 0}
+    r = check_project(_pair_export([
+        ("A1", [1200, None, 480]),     # design, no reading     -> actual missing
+        ("A2", ["-", None, 480]),      # "-" design             -> actual still needed
+        ("A3", ["-", 1150, 480]),      # "-" design + reading   -> fine
+        ("A4", [None, None, 480]),     # no design at all       -> both skipped
+        ("A5", [None, 900, 480]),      # no design, has reading -> reading counts, design skipped
+        ("A6", ["N/A", "n/a", None]),  # marked N/A             -> answered; volts still missing
+        ("A7", ["?", None, 480]),      # "can't calculate"      -> still missing
+    ]), load_rules(PAIR_RULES))
+    codes = {u["name"]: u["codes"] for u in r["types"][0]["units"]}
+    assert codes == {"A1": "PRP", "A2": "NRP", "A3": "NPP", "A4": "--P", "A5": "-PP", "A6": "NNR", "A7": "RRP"}
+    a6 = next(u for u in r["types"][0]["units"] if u["name"] == "A6")
+    assert (a6["required"], a6["required_filled"]) == (1, 0)   # N/A entries are left out of the counts

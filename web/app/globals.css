@@ -111,6 +111,7 @@ main.wide { max-width: none; }
 .ck.p, .ck-key.p { color: #4caf6e; }
 .ck.o, .ck-key.o { color: var(--warn); font-weight: 700; }
 .ck.na, .ck-key.na { color: #c5cad3; }
+.ck.mn, .ck-key.mn { color: #98a2b3; font-weight: 700; }
 .ck.r span, .ck-key.r span { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px;
   background: var(--bad-bg); color: var(--bad); font-weight: 800; font-size: 13px; }
 .ck-key { display: inline-grid; place-items: center; width: 22px; font-size: 14px; }
