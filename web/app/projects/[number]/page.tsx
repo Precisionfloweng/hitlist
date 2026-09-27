@@ -32,6 +32,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
         <div className="row" style={{ justifyContent: "space-between" }}>
           <h1>{p.number} · {p.name}</h1>
           <div className="row">
+            {results && <Link className="btn primary" href={eqHref()}>Open equipment checklist →</Link>}
             <span className={s.cls}>Last sync: {s.text}</span>
             <RefreshButton project={p.number} job={p.job} />
           </div>
@@ -63,10 +64,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               </div>
             )}
 
-            <div className="row" style={{ justifyContent: "space-between", margin: "24px 0 10px" }}>
-              <h2 style={{ margin: 0 }}>Completion by equipment type</h2>
-              <Link className="btn primary" href={eqHref()}>Open equipment checklist →</Link>
-            </div>
+            <h2>Completion by equipment type</h2>
             <table className="card" style={{ padding: 0 }}>
               <thead><tr><th>Type</th><th className="num">Units</th><th className="num">Complete</th><th>Fields filled</th><th className="num">Missing required</th><th className="num">Missing optional</th></tr></thead>
               <tbody>
