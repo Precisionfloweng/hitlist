@@ -12,7 +12,7 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
   const base = `/projects/${encodeURIComponent(p.number)}`;
   const tabs: { key: ProjectTab; label: string; href: string; count?: number | null }[] = [
     { key: "overview", label: "Overview", href: base },
-    { key: "equipment", label: "Equipment checklist", href: `${base}/equipment`, count: missingRequired },
+    { key: "equipment", label: "Equipment checklist", href: `${base}/equipment` },
     { key: "deficiencies", label: "Deficiencies", href: `${base}/deficiencies`, count: p.openDeficiencies },
     { key: "rules", label: "Rules", href: `${base}/rules`, count: rulesChanged },
   ];
