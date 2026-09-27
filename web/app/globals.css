@@ -61,17 +61,17 @@ tr:hover td { background: #f5f0fc; }
 
 /* ---- Equipment checklist page ---- */
 main.wide { max-width: none; }
-.eq { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; align-items: start; }
+.eq { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 14px; align-items: start; }
 .eq-types { position: sticky; top: 12px; }
 .eq-types ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.eq-types li button { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; text-align: left;
+.eq-types li button { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 1px 6px; text-align: left; padding: 6px 8px !important;
   padding: 8px 12px; border: 1px solid transparent; background: transparent; border-radius: 8px; }
 .eq-types li button:hover { background: #fff; border-color: var(--line); }
 .eq-types li button.on { background: #fff; border-color: var(--brand); box-shadow: inset 3px 0 0 var(--brand); }
-.eq-types .eq-name { font-weight: 600; font-size: 14px; }
+.eq-types .eq-name { font-weight: 600; font-size: 13px; line-height: 1.25; }
 .eq-types .eq-pct { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .eq-types .bar { grid-column: 1 / -1; height: 5px; min-width: 0; }
-.eq-types .eq-sub { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
+.eq-types .eq-sub { grid-column: 1 / -1; font-size: 11px; color: var(--muted); }
 .eq-select { display: none; width: 100%; margin-bottom: 8px; }
 .eq-head h2 { margin: 0 0 2px; font-size: 20px; }
 .eq-tools { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 10px 0 8px; }
