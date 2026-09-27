@@ -14,11 +14,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   const number = decodeURIComponent((await params).number);
   const [data, results] = await Promise.all([getProject(number), loadResults(number)]);
   if (!data) notFound();
-  const { project: p, dashboard, history } = data;
+  const { project: p, history } = data;
   const summary = results?.summary;
   const eqHref = (type?: string) =>
     `/projects/${encodeURIComponent(p.number)}/equipment${type ? `?type=${encodeURIComponent(type)}` : ""}`;
-  const typeKey = (name: string) => results?.types.find((t) => t.name === name)?.key;
 
   return (
     <>
@@ -63,21 +62,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               </div>
             )}
 
-            <h2>Completion by equipment type</h2>
-            <table className="card" style={{ padding: 0 }}>
-              <thead><tr><th>Type</th><th className="num">Units</th><th className="num">Complete</th><th>Fields filled</th><th className="num">Missing required</th><th className="num">Missing optional</th></tr></thead>
-              <tbody>
-                {dashboard.sort((a, b) => Number(a.fields_pct) - Number(b.fields_pct)).map((d) => (
-                  <tr key={d.type}>
-                    <td>{typeKey(d.type) ? <Link href={eqHref(typeKey(d.type))}>{d.type}</Link> : d.type}</td><td className="num">{d.units}</td><td className="num">{d.units_complete}</td>
-                    <td style={{ minWidth: 160 }}><div className="row" style={{ gap: 8, flexWrap: "nowrap" }}>
-                      <div className="bar" style={{ flex: 1 }}><span style={{ width: `${d.fields_pct}%` }} /></div>
-                      <span className="num" style={{ width: 44 }}>{pct(Number(d.fields_pct))}</span></div></td>
-                    <td className="num">{d.missing_required}</td><td className="num">{d.missing_optional}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
 
             {history.length >= 2 && (<><h2>Progress over time</h2><Trend points={history.map((h) => ({ at: h.synced_at, v: Number(h.fields_pct) }))} /></>)}
 
