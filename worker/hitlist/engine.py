@@ -112,9 +112,14 @@ def check_project(export: Export, rules: RuleSet, project_number: str | None = N
 
     types_out = []
     tracked_sheets = set()
+    # Match sheet names ignoring case and spaces ("Electric Coil-" finds "Electric Coil -").
+    sheet_key = lambda n: re.sub(r"\s+", "", str(n or "")).lower()  # noqa: E731
+    by_key = {sheet_key(n): sh for n, sh in export.sheets.items()}
     for type_rule in rules.types:
-        sheet = export.sheets.get(type_rule.export_sheet)
+        sheet = export.sheets.get(type_rule.export_sheet) or by_key.get(sheet_key(type_rule.export_sheet))
         if sheet is None:
+            if type_rule.export_sheet_confirmed:
+                warnings.append(f"{type_rule.name}: no sheet named '{type_rule.export_sheet}' in this export")
             continue
         tracked_sheets.add(sheet.name)
         columns = _resolve_columns(type_rule, sheet.headers, warnings)

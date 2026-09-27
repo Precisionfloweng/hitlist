@@ -51,6 +51,20 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               </div>
             )}
 
+            {(() => {
+              const problems = (results?.warnings ?? []).filter((w) => /no sheet named|not in export|no export column found/.test(w));
+              return problems.length > 0 && (
+                <div className="card" style={{ marginTop: 16, borderColor: "#f3d19c", background: "#fffaf0" }}>
+                  <b>Rules that didn&apos;t match this export ({problems.length})</b>
+                  <p className="muted" style={{ margin: "4px 0 8px" }}>
+                    A sheet or column name in the <Link href="/rules">Default rules</Link> isn&apos;t in this project&apos;s
+                    BuildingStart export, so those items weren&apos;t checked. Fix the name on the Rules page and Refresh.
+                  </p>
+                  <ul style={{ margin: 0 }}>{problems.slice(0, 20).map((w, i) => <li key={i}>{w}</li>)}</ul>
+                </div>
+              );
+            })()}
+
             {(results?.gap_flags?.length ?? 0) > 0 && (
               <div className="card" style={{ marginTop: 16, borderColor: "#f5c2c0" }}>
                 <b>Possible export gaps ({results!.gap_flags!.length})</b>

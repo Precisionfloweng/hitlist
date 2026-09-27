@@ -135,3 +135,13 @@ def test_design_actual_pairs():
     assert codes == {"A1": "PRP", "A2": "NRP", "A3": "NPP", "A4": "--P", "A5": "-PP", "A6": "NNR", "A7": "RRP"}
     a6 = next(u for u in r["types"][0]["units"] if u["name"] == "A6")
     assert (a6["required"], a6["required_filled"]) == (1, 0)   # N/A entries are left out of the counts
+
+
+def test_sheet_name_match_ignores_spaces_and_case(sample_rules):
+    rules = copy.deepcopy(PAIR_RULES)
+    rules["types"][0]["export_sheet"] = "air handling unit "
+    r = check_project(_pair_export([("A1", [1200, 1100, 480])]), load_rules(rules))
+    assert r["types"][0]["units"][0]["codes"] == "PPP"
+    rules["types"][0]["export_sheet"] = "Not A Sheet"
+    r = check_project(_pair_export([("A1", [1200, 1100, 480])]), load_rules(rules))
+    assert r["types"] == [] and any("no sheet named 'Not A Sheet'" in w for w in r["warnings"])
