@@ -112,8 +112,9 @@ main.wide { max-width: none; }
 .ck.r span, .ck-key.r span { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px;
   background: var(--bad-bg); color: var(--bad); font-weight: 800; font-size: 13px; }
 .ck-key { display: inline-grid; place-items: center; width: 22px; font-size: 14px; }
-.eq-grid tbody tr:hover td { background: #f5f8fc; }
-.eq-grid tbody tr:hover td.u { background: #f5f8fc; }
+.eq-grid tbody tr:nth-child(even) td { background: #f1f4f8; }
+.eq-grid tbody tr:hover td { background: #e9f0f8; }
+.eq-grid tbody tr:hover td.u { background: #e9f0f8; }
 .eq-empty { padding: 24px !important; text-align: center; color: var(--muted); }
 .eq-foot { font-size: 12px; margin-top: 8px; }
 @media (max-width: 1000px) {
