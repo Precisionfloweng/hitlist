@@ -907,8 +907,8 @@ Export sheet: **Electric Coil -**
 | EDH Stages | ⚠ Optional | EDH Stages |  |
 | Phase | ⚠ Optional | Phase |  |
 | Design Volts | ⚠ Optional | EDH Design Volts |  |
-| Actual Volts | ✖ Required | EDH Act. Volts 1 / EDH Act. Volts 2 / EDH Act. Volts 3 |  |
+| Actual Volts | ✖ Required | EDH Act. Volts 1 |  |
 | Design Amps | ⚠ Optional | EDH Design Amps |  |
-| Actual Amps | ✖ Required | EDH Act. Amps 1 / EDH Act. Amps 3 / EDH Act. Amps 2 |  |
+| Actual Amps | ✖ Required | EDH Act. Amps 1 |  |
 | Design Airflow | ⚠ Optional | Airflow Design |  |
 | Actual Airflow | ✖ Required | Airflow Actual |  |

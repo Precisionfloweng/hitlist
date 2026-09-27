@@ -6175,9 +6175,7 @@
     {
      "label": "Actual Volts",
      "columns": [
-      "EDH Act. Volts 1",
-      "EDH Act. Volts 2",
-      "EDH Act. Volts 3"
+      "EDH Act. Volts 1"
      ],
      "status": "required",
      "when": null
@@ -6193,9 +6191,7 @@
     {
      "label": "Actual Amps",
      "columns": [
-      "EDH Act. Amps 1",
-      "EDH Act. Amps 3",
-      "EDH Act. Amps 2"
+      "EDH Act. Amps 1"
      ],
      "status": "required",
      "when": null
