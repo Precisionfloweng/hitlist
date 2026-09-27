@@ -30,8 +30,8 @@ export default function ProjectsTable({ rows }: { rows: Row[] }) {
       <div className="scroll">
         <table>
           <thead>
-            <tr><th>Project #</th><th>Project</th><th>Tech</th><th>Complete</th><th className="num">Units</th>
-              <th className="num">Open high</th><th>Last sync</th><th>Sync status</th><th></th></tr>
+            <tr><th>Project #</th><th>Project</th><th>Tech</th><th>Complete</th><th className="ctr">Units</th>
+              <th className="ctr">Open high</th><th className="ctr">Last sync</th><th className="ctr">Sync status</th><th></th></tr>
           </thead>
           <tbody>
             {shown.map((p) => {
@@ -48,9 +48,9 @@ export default function ProjectsTable({ rows }: { rows: Row[] }) {
                       <span className="num" style={{ width: 40 }}>{pct(p.fieldsPct)}</span>
                     </div>
                   </td>
-                  <td className="num">{p.units ?? "–"}</td>
-                  <td className="num">{p.openHigh ? <span className="pill bad">{p.openHigh}</span> : p.openHigh === 0 ? "0" : "–"}</td>
-                  <td>
+                  <td className="ctr num-font">{p.units ?? "–"}</td>
+                  <td className="ctr num-font">{p.openHigh ? <span className="pill bad">{p.openHigh}</span> : p.openHigh === 0 ? "0" : "–"}</td>
+                  <td className="ctr">
                     <span className={s.cls}>{s.text}</span>
                   </td>
                   <RefreshButton project={p.number} job={p.job} cells />

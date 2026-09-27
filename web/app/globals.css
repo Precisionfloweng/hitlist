@@ -142,3 +142,8 @@ main.wide { max-width: none; }
 .tile-link { color: inherit; display: block; }
 .tile-link:hover { text-decoration: none; }
 .tile-link .tile:hover { border-color: var(--brand); }
+
+/* Centered table columns (projects list) */
+th.ctr, td.ctr { text-align: center; }
+.num-font { font-variant-numeric: tabular-nums; }
+.sync.centered { align-items: center; margin: 0 auto; text-align: center; }

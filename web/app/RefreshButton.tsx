@@ -122,7 +122,7 @@ export default function RefreshButton({ project, job: initial, cells = false }:
   if (cells) {
     return (
       <>
-        <td><div className="sync">{status}{errorLine}</div></td>
+        <td className="ctr"><div className="sync centered">{status}{errorLine}</div></td>
         <td className="refresh-cell">{button}</td>
       </>
     );
