@@ -53,8 +53,8 @@ tr:hover td { background: #fafbfd; }
 .login input { width: 100%; margin: 8px 0 12px; }
 
 /* Refresh button + live sync status: a fixed-width box so the table doesn't jump around */
-.sync { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: 240px; }
-.sync.compact { width: 170px; margin-left: auto; align-items: flex-end; text-align: right; }
+.sync { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: 200px; }
+.refresh-cell { text-align: right; width: 1%; white-space: nowrap; }
 .sync .pill { white-space: nowrap; }
 .sync-head { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .sync-head .num { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }

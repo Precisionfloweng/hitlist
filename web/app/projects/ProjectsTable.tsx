@@ -31,7 +31,7 @@ export default function ProjectsTable({ rows }: { rows: Row[] }) {
         <table>
           <thead>
             <tr><th>Project #</th><th>Project</th><th>Tech</th><th>Complete</th><th className="num">Units</th>
-              <th className="num">Open high</th><th>Last sync</th><th></th></tr>
+              <th className="num">Open high</th><th>Last sync</th><th>Sync status</th><th></th></tr>
           </thead>
           <tbody>
             {shown.map((p) => {
@@ -52,13 +52,12 @@ export default function ProjectsTable({ rows }: { rows: Row[] }) {
                   <td className="num">{p.openHigh ? <span className="pill bad">{p.openHigh}</span> : p.openHigh === 0 ? "0" : "–"}</td>
                   <td>
                     <span className={s.cls}>{s.text}</span>
-                    {p.lastSyncStatus.startsWith("failed") && <div className="error" style={{ fontSize: 12 }}>Last sync failed</div>}
                   </td>
-                  <td><RefreshButton project={p.number} job={p.job} compact /></td>
+                  <RefreshButton project={p.number} job={p.job} cells />
                 </tr>
               );
             })}
-            {shown.length === 0 && <tr><td colSpan={8} className="muted">No projects match.</td></tr>}
+            {shown.length === 0 && <tr><td colSpan={9} className="muted">No projects match.</td></tr>}
           </tbody>
         </table>
       </div>

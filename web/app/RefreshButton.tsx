@@ -5,7 +5,6 @@ import type { SyncJob } from "@/lib/data";
 
 const RANK = { queued: 0, running: 1, done: 2, failed: 2 } as const;
 const POLL_MS = 4000;
-const SHOW_DONE_MS = 15 * 60_000;     // keep "Sync failed" visible this long after it finished
 const SLOW_PICKUP_MS = 2 * 60_000;    // the worker checks the queue every 30 seconds
 
 const active = (j: SyncJob | null) => !!j && (j.status === "queued" || j.status === "running");
@@ -25,8 +24,12 @@ function newer(a: SyncJob | null, b: SyncJob | null) {
   return RANK[a.status] > RANK[b.status] || (a.status === b.status && a.step !== b.step);
 }
 
-export default function RefreshButton({ project, job: initial, compact = false }:
-  { project: string; job: SyncJob | null; compact?: boolean }) {
+/**
+ * Live sync status plus the Refresh button.
+ * `cells` renders two table cells (Sync Status, then the button) for the projects list.
+ */
+export default function RefreshButton({ project, job: initial, cells = false }:
+  { project: string; job: SyncJob | null; cells?: boolean }) {
   const router = useRouter();
   const [job, setJob] = useState<SyncJob | null>(initial);
   const [sending, setSending] = useState(false);
@@ -73,16 +76,16 @@ export default function RefreshButton({ project, job: initial, compact = false }
     setSending(false);
   }
 
-  const button = (label = "Refresh") => (
-    <button disabled={sending} onClick={start} title="Pull the latest data from BuildingStart">
-      {sending ? "Sending…" : label}
+  const button = (
+    <button disabled={sending || isActive} onClick={start} title="Pull the latest data from BuildingStart">
+      {sending ? "Sending…" : job?.status === "failed" ? "Try again" : "Refresh"}
     </button>
   );
 
-  let body: React.ReactNode;
+  let status: React.ReactNode = <span className="muted">–</span>;
   if (job?.status === "queued") {
     const waited = now - ms(job.requestedAt);
-    body = (
+    status = (
       <>
         <div className="sync-head"><span className="pill gray">Waiting</span> <span className="num">{clock(waited)}</span></div>
         <div className="sync-step">
@@ -96,29 +99,39 @@ export default function RefreshButton({ project, job: initial, compact = false }
   } else if (job?.status === "running") {
     const took = now - ms(job.startedAt || job.requestedAt);
     const slow = job.lastMinutes ? took > job.lastMinutes * 2 * 60_000 + 5 * 60_000 : took > 30 * 60_000;
-    body = (
+    status = (
       <>
         <div className="sync-head"><span className="pill warn">Syncing</span> <span className="num">{clock(took)}</span></div>
         <div className="sync-step" title={job.step}>{job.step || "Working…"}</div>
-        {!compact && job.lastMinutes && <div className="sync-note muted">Last sync took about {job.lastMinutes} min</div>}
+        {!cells && job.lastMinutes && <div className="sync-note muted">Last sync took about {job.lastMinutes} min</div>}
         {slow && <div className="sync-note error">Taking longer than usual.</div>}
       </>
     );
-  } else if (job?.status === "failed" && now - ms(job.finishedAt || job.requestedAt) < SHOW_DONE_MS) {
-    body = (
+  } else if (job?.status === "failed") {
+    status = (
       <>
-        {button("Try again")}
-        <div className="sync-note error">Sync failed: {job.step}</div>
+        <div className="sync-head"><span className="pill bad">Failed</span></div>
+        <div className="sync-note error">{job.step}</div>
       </>
     );
-  } else {
-    body = button();
+  } else if (job?.status === "done") {
+    status = <div className="sync-head"><span className="pill ok">✓ Complete</span></div>;
   }
+  const errorLine = error && <div className="sync-note error">{error}</div>;
 
+  if (cells) {
+    return (
+      <>
+        <td><div className="sync">{status}{errorLine}</div></td>
+        <td className="refresh-cell">{button}</td>
+      </>
+    );
+  }
   return (
-    <div className={compact ? "sync compact" : "sync"}>
-      {body}
-      {error && <div className="sync-note error">{error}</div>}
+    <div className="row" style={{ alignItems: "flex-start", flexWrap: "nowrap" }}>
+      {job && <div className="sync">{status}{errorLine}</div>}
+      {!job && errorLine}
+      {button}
     </div>
   );
 }
