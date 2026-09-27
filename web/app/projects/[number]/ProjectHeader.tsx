@@ -35,7 +35,7 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
         {tabs.map((t) => (
           <Link key={t.key} href={t.href} className={t.key === tab ? "on" : ""} aria-current={t.key === tab ? "page" : undefined}>
             {t.label}
-            {t.count ? <span className="ptab-count">{t.count}</span> : null}
+            {t.count ? <span className={`ptab-count${t.key === "deficiencies" ? " red" : ""}`}>{t.count}</span> : null}
           </Link>
         ))}
       </nav>

@@ -154,6 +154,7 @@ main.wide { max-width: none; }
 .ptabs a.on { color: var(--brand); border-bottom-color: var(--brand); }
 .ptab-count { font-size: 12px; font-weight: 700; background: #eef0f3; color: var(--muted); border-radius: 999px; padding: 1px 8px; }
 .ptabs a.on .ptab-count { background: #e3ecf5; color: var(--brand); }
+.ptab-count.red, .ptabs a.on .ptab-count.red { background: var(--bad-bg); color: var(--bad); }
 .tile-link { color: inherit; display: block; }
 .tile-link:hover { text-decoration: none; }
 .tile-link .tile:hover { border-color: var(--brand); }
