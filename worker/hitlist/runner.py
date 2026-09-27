@@ -26,24 +26,24 @@ StepFn = Callable[[str], None]
 
 def default_export_fn(settings: Settings) -> ExportFn:
     if settings.export_command:
-        def command(project: str, step: StepFn = lambda m: None) -> Path:
+        def command(project: str, step: StepFn = lambda m: None, **_: Any) -> Path:
             step("Downloading export")
             return run_export(settings.export_command, project, settings.export_dir,
                               settings.export_timeout_minutes)
         return command
 
-    def builtin(project: str, step: StepFn = lambda m: None) -> Path:
+    def builtin(project: str, step: StepFn = lambda m: None, name: str = "", folder: str = "") -> Path:
         from .buildingstart import download_project_xlsx
 
         def status(m: str) -> None:
             log.info("[BuildingStart] %s", m)
             step(m)
         try:
-            return download_project_xlsx(project, settings.export_dir / project,
+            return download_project_xlsx(project, settings.export_dir / (folder or project),
                                          settings.buildingstart_username, settings.buildingstart_password,
                                          settings.browser_session_dir,
                                          download_timeout_minutes=settings.export_timeout_minutes,
-                                         status=status)
+                                         status=status, project_name=name)
         except Exception as exc:  # noqa: BLE001 - surface as an export failure (retried once)
             raise ExportError(str(exc)) from exc
     return builtin
@@ -64,7 +64,7 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
     try:
         if project is None:
             raise ExportError(f"Project {number} is not on the Projects list")
-        results = _refresh(store, settings, number, export_fn, step)
+        results = _refresh(store, settings, number, export_fn, step, project)
     except Exception as exc:  # noqa: BLE001 - any failure is reported, the loop keeps going
         log.exception("Refresh of %s failed", number)
         message = friendly_error(exc, job.get("message", ""))[:500]
@@ -119,22 +119,28 @@ def _stepper(store: HitlistStore, job: dict[str, str]) -> StepFn:
     return step
 
 
-def _call_export(export_fn: ExportFn, number: str, step: StepFn) -> Path:
+def _call_export(export_fn: ExportFn, number: str, step: StepFn, name: str = "", folder: str = "") -> Path:
     try:
-        takes_step = len(inspect.signature(export_fn).parameters) >= 2
+        params = inspect.signature(export_fn).parameters
     except (TypeError, ValueError):
-        takes_step = False
-    return export_fn(number, step) if takes_step else export_fn(number)
+        params = {}
+    has_kw = any(p.kind == p.VAR_KEYWORD for p in params.values())
+    kwargs = {k: v for k, v in (("name", name), ("folder", folder)) if has_kw or k in params}
+    return export_fn(number, step, **kwargs) if len(params) >= 2 else export_fn(number)
 
 
 def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: ExportFn,
-             step: StepFn = lambda m: None) -> dict[str, Any]:
+             step: StepFn = lambda m: None, project: dict[str, str] | None = None) -> dict[str, Any]:
+    # `number` is the project's key (usually its number). BuildingStart is searched by the real
+    # project number, and by name when two projects share a number.
+    bs_number = (project or {}).get("project_number") or number
+    bs_name = (project or {}).get("name", "")
     try:
-        path = _call_export(export_fn, number, step)
+        path = _call_export(export_fn, bs_number, step, name=bs_name, folder=number)
     except ExportError as exc:
         log.warning("Export failed once for %s, retrying", number)
         step("Export failed, trying again")
-        path = _call_export(export_fn, number, step)
+        path = _call_export(export_fn, bs_number, step, name=bs_name, folder=number)
 
     step("Reading export")
     export = read_export(path)
@@ -234,7 +240,8 @@ def _email_success(store, settings, mailer, job, project, results) -> None:
     gaps = results.get("gap_flags") or []
     gap_line = (f"<p><b>{len(gaps)} possible issue(s) found</b>: units ticked Complete with required "
                 "fields empty. Check the project page.</p>") if gaps else ""
-    body = (f"<p>The sync for <b>{esc(job['project_number'])} {esc(project.get('name'))}</b> finished "
+    shown = project.get("project_number") or job["project_number"]
+    body = (f"<p>The sync for <b>{esc(shown)} {esc(project.get('name'))}</b> finished "
             "with no errors.</p>"
             f"<p>{s['fields_pct']}% of required fields filled · {s['units_complete']} of {s['units']} units "
             f"complete · {d['open']} open deficiencies ({d['open_by_priority'].get('High', 0)} high)</p>"
@@ -242,7 +249,7 @@ def _email_success(store, settings, mailer, job, project, results) -> None:
     recipients = [to]
     if results.get("website_problem"):
         recipients += [e for e in admin_emails(store, settings) if e != to]
-    mailer.send(recipients, f"Sync complete: {job['project_number']} {project.get('name', '')}", body)
+    mailer.send(recipients, f"Sync complete: {shown} {project.get('name', '')}", body)
 
 
 def _website_line(results) -> str:
@@ -257,10 +264,11 @@ def _email_failure(store, settings, mailer, job, project, message, detail: str =
     admins = admin_emails(store, settings)
     requester = store.email_for(job["requested_by"])
     name = project.get("name", "") if project else ""
-    body = (f"<p>The sync for <b>{esc(job['project_number'])} {esc(name)}</b> failed.</p>"
+    shown = (project or {}).get("project_number") or job["project_number"]
+    body = (f"<p>The sync for <b>{esc(shown)} {esc(name)}</b> failed.</p>"
             f"<p>Reason: {esc(message)}</p><p>Rick has been notified.</p>"
             + (f'<p style="color:#888;font-size:12px">Technical detail: {esc(detail)}</p>' if detail else ""))
-    mailer.send([e for e in [requester, *admins] if e], f"Sync failed: {job['project_number']} {name}", body)
+    mailer.send([e for e in [requester, *admins] if e], f"Sync failed: {shown} {name}", body)
 
 
 def admin_emails(store: HitlistStore, settings: Settings) -> list[str]:

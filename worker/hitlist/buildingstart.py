@@ -8,6 +8,8 @@ Needs:  pip install playwright   then   python -m playwright install chromium
 
 from __future__ import annotations
 
+import re
+
 import time
 from pathlib import Path
 from typing import Callable
@@ -21,10 +23,39 @@ SEL_LOGIN_BTN = "#ctl00_ContentPlaceHolder1_lgvLogin_ctlLogin_lgnLogin_LoginButt
 SEL_PROJ_FILTER = "input[data-field='ProjectNumber']"
 
 
+_WORD = re.compile(r"[a-z0-9]+")
+_FILLER = {"the", "of", "and", "at", "for", "project", "site", "phase"}
+
+
+def _words(text: str, number: str) -> set[str]:
+    """Distinctive words of a project name, without the project number."""
+    text = str(text or "").lower().replace(str(number or "").lower(), " ")
+    return {w for w in _WORD.findall(text) if w not in _FILLER and not w.isdigit()}
+
+
+def pick_project_row(row_names: list[str], project_number: str, project_name: str) -> int:
+    """Which BuildingStart row to open when searching by number returns several projects.
+    Picks the row whose name shares the most distinctive words with the Hitlist project name."""
+    if len(row_names) == 1:
+        return 0
+    want = _words(project_name, project_number)
+    row_words = [_words(n, project_number) for n in row_names]
+    shared = set.intersection(*row_words)          # e.g. the district name on both sites
+    # Score on words that tell the rows apart; longer words count more ("Hicks" beats "ES").
+    scores = [sum(len(w) for w in want & (words - shared)) for words in row_words]
+    best = max(range(len(scores)), key=lambda i: scores[i])
+    if scores[best] == 0 or scores.count(scores[best]) > 1:
+        names = "; ".join(f"'{n.strip()}'" for n in row_names)
+        raise RuntimeError(f"{len(row_names)} BuildingStart projects are numbered {project_number}: {names}. "
+                           f"Change the Hitlist project name ('{project_name}') so it matches one of them.")
+    return best
+
+
 def download_project_xlsx(project_number: str, output_dir: Path, username: str, password: str,
                           session_dir: Path = Path("browser_session"), headless: bool = True,
                           download_timeout_minutes: int = 15,
-                          status: Callable[[str], None] = lambda m: print(f"[BuildingStart] {m}")) -> Path:
+                          status: Callable[[str], None] = lambda m: print(f"[BuildingStart] {m}"),
+                          project_name: str = "") -> Path:
     if not username or not password:
         raise RuntimeError("BUILDINGSTART_USERNAME / BUILDINGSTART_PASSWORD are not set in .env")
     from playwright.sync_api import sync_playwright
@@ -64,10 +95,16 @@ def download_project_xlsx(project_number: str, output_dir: Path, username: str, 
             # 4. Open the project (Project Name cell of the matching row)
             page.keyboard.press("Escape")
             time.sleep(1)
-            row_cells = page.locator(f"tr:has-text('{project_number}') td")
-            if row_cells.count() == 0:
+            rows = page.locator(f"tr:has-text('{project_number}')")
+            if rows.count() == 0:
                 raise RuntimeError(f"Project {project_number} was not found in BuildingStart")
-            cell = row_cells.nth(5)
+            # Two sites under one contract can share a number: open the one whose name matches.
+            if rows.count() > 1:
+                names = [rows.nth(i).locator("td").nth(5).inner_text() for i in range(rows.count())]
+                row = rows.nth(pick_project_row(names, project_number, project_name))
+            else:
+                row = rows.nth(0)
+            cell = row.locator("td").nth(5)
             cell.wait_for(timeout=15000)
             cell.click()
             page.wait_for_load_state("domcontentloaded", timeout=30000)

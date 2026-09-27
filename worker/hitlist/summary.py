@@ -9,7 +9,7 @@ from typing import Any
 from .config import Settings
 from .mailer import Mailer, esc
 from .runner import admin_emails
-from .store import HitlistStore
+from .store import HitlistStore, project_key
 
 
 def days_since(stamp: str, now: datetime | None = None) -> int | None:
@@ -40,7 +40,7 @@ def _table(projects: list[dict[str, Any]], app_url: str) -> str:
         days = "never synced" if p["days"] is None else f"{p['days']} day{'s' if p['days'] != 1 else ''}"
         stale = p["days"] is None or p["days"] >= 7
         pct = f"{p['fields_pct']}%" if p.get("fields_pct") else "–"
-        link = (f'<a href="{esc(app_url)}/projects/{esc(p["project_number"])}">Refresh</a>' if app_url else "")
+        link = (f'<a href="{esc(app_url)}/projects/{esc(project_key(p))}">Refresh</a>' if app_url else "")
         rows.append(
             f"<tr><td>{esc(p['project_number'])}</td><td>{esc(p['name'])}</td><td>{esc(p.get('tech'))}</td>"
             f"<td style=\"{'color:#b42318;font-weight:bold' if stale else ''}\">{days}</td>"

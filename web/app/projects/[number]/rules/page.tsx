@@ -27,7 +27,7 @@ export default async function ProjectRulesPage({ params }: { params: Promise<{ n
           anything you change here applies to this project only (highlighted blue), on its next sync.
           {changed > 0 && <> This project has <b>{changed}</b> field{changed === 1 ? "" : "s"} changed from the default.</>}
         </p>
-        <RulesEditor types={rules.types} history={rules.history} canEdit={user.role !== "viewer"} project={data.project.number} />
+        <RulesEditor types={rules.types} history={rules.history} canEdit={user.role !== "viewer"} project={data.project.id} />
       </main>
     </>
   );

@@ -9,8 +9,8 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   const user = await requireAdmin();
   const projects = await listProjects(true);
-  const rows = projects.map((p) => ({ number: p.number, name: p.name, tech: p.tech, date: p.date,
-    address: p.address, status: p.status || "active" }));
+  const rows = projects.map((p) => ({ id: p.id, number: p.number, name: p.name, tech: p.tech, date: p.date,
+    address: p.address, status: p.status || "active", sharedWith: p.sharedWith }));
   return (
     <>
       <Header user={user} />

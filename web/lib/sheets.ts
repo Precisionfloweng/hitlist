@@ -5,7 +5,7 @@ import { JWT } from "google-auth-library";
 export const SCHEMA = {
   Projects: ["project_number", "name", "tech", "date", "address", "status", "buildingstart_url",
     "last_sync", "last_sync_status", "fields_pct", "units_pct", "units",
-    "open_deficiencies", "open_high", "gap_flags"],
+    "open_deficiencies", "open_high", "gap_flags", "project_id"],
   Users: ["email", "name", "role", "active", "added", "password_hash"],
   Rules: ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
     "order", "field", "columns", "status", "when"],

@@ -15,7 +15,7 @@ from urllib.parse import quote
 SCHEMA: dict[str, list[str]] = {
     "Projects": ["project_number", "name", "tech", "date", "address", "status", "buildingstart_url",
                  "last_sync", "last_sync_status", "fields_pct", "units_pct", "units",
-                 "open_deficiencies", "open_high", "gap_flags"],
+                 "open_deficiencies", "open_high", "gap_flags", "project_id"],
     "Users": ["email", "name", "role", "active", "added", "password_hash"],
     "Rules": ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
               "order", "field", "columns", "status", "when"],
@@ -34,6 +34,10 @@ SCHEMA: dict[str, list[str]] = {
 }
 
 QUEUED, RUNNING, DONE, FAILED = "queued", "running", "done", "failed"
+
+
+def project_key(p: dict[str, Any]) -> str:
+    return (p.get("project_id") or "").strip() or p["project_number"]
 
 
 def now_iso() -> str:
@@ -181,8 +185,11 @@ class HitlistStore:
         self.b.write(tab, 1, rows)
 
     # ---- projects ---------------------------------------------------------------
-    def project(self, number: str) -> dict[str, str] | None:
-        return next((p for p in self.rows("Projects") if p["project_number"] == number), None)
+    # A project's key is its project_id; blank means "same as the project number". Two sites under
+    # one contract can share a number, so the second gets e.g. "26-083-2". Everything the web app
+    # and worker store per project (Queue, Dashboard, results files...) uses this key.
+    def project(self, key: str) -> dict[str, str] | None:
+        return next((p for p in self.rows("Projects") if project_key(p) == key), None)
 
     def update_project(self, number: str, **changes: Any) -> None:
         p = self.project(number)

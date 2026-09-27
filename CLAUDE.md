@@ -19,6 +19,13 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - `web/` Next.js on Vercel (Hobby now, Pro before rollout). Sign-in with emailed 6-digit codes.
 - Refresh is manual (button); weekly summary email shows days since last sync.
 
+## Project keys
+- Projects can share a number (two sites on one contract). Each project's key is `project_id`, blank
+  meaning "same as project_number"; a second site gets e.g. "26-083-2". URLs, Queue.project_number,
+  Dashboard/Deficiencies/History/ProjectRules rows, results files and export folders all use the key.
+- The worker searches BuildingStart by the real number; with several rows it opens the one whose name
+  best matches the Hitlist name (`buildingstart.pick_project_row`).
+
 ## Rules engine facts
 - Field codes: P filled, R required+missing, O optional+missing, - not applicable.
 - Missing = blank, or only `?`/`` ` `` (BuildingStart's "can't calculate yet" marker).

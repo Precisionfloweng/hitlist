@@ -190,3 +190,34 @@ def test_export_with_infinity_is_readable(tmp_path):
             z.writestr(n, b)
     e = read_export(f)
     assert e.sheets["Air Handling Unit"].rows[0]["% Diff"] == float("inf")
+
+
+def test_pick_project_row_by_name():
+    from hitlist.buildingstart import pick_project_row
+    rows = ["LISD Hicks Elementary", "LISD Coyote Ridge ES"]
+    assert pick_project_row(rows, "99-083", "99-083 LISD Hicks ES") == 0
+    assert pick_project_row(rows, "99-083", "Coyote Ridge") == 1
+    assert pick_project_row(["Only One"], "99-083", "anything") == 0
+    import pytest
+    with pytest.raises(RuntimeError, match="2 BuildingStart projects are numbered 99-083"):
+        pick_project_row(rows, "99-083", "LISD")          # matches both equally
+    with pytest.raises(RuntimeError):
+        pick_project_row(rows, "99-083", "Somewhere Else")
+
+
+def test_projects_sharing_a_number(sample_export, tmp_path):
+    store, s, mail = make_store(), settings(tmp_path), Mailer("app@example.com", "")
+    store.append("Projects", [{"project_number": "99-001", "name": "Second Site", "status": "active",
+                               "project_id": "99-001-2"}])
+    calls = []
+
+    def export(n, step, name="", folder=""):
+        calls.append((n, name, folder))
+        return sample_export
+    store.request_refresh("99-001-2", "tech@example.com")
+    process_next(store, s, mail, export_fn=export)
+    assert calls == [("99-001", "Second Site", "99-001-2")]      # BuildingStart searched by real number + name
+    assert store.project("99-001-2")["last_sync_status"] == "ok"
+    assert store.project("99-001")["last_sync_status"] == ""       # the other site is untouched
+    assert (tmp_path / "results" / "99-001-2.json").exists()
+    assert "Sync complete: 99-001 Second Site" in mail.sent[-1]["Subject"]

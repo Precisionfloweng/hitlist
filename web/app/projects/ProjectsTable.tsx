@@ -41,9 +41,9 @@ export default function ProjectsTable({ rows, userName }: { rows: Row[]; userNam
             {shown.map((p) => {
               const s = syncLabel(p.daysSinceSync);
               return (
-                <tr key={p.number}>
-                  <td><Link href={`/projects/${encodeURIComponent(p.number)}`}>{p.number}</Link></td>
-                  <td><Link href={`/projects/${encodeURIComponent(p.number)}`}>{p.name}</Link>
+                <tr key={p.id}>
+                  <td><Link href={`/projects/${encodeURIComponent(p.id)}`}>{p.number}</Link></td>
+                  <td><Link href={`/projects/${encodeURIComponent(p.id)}`}>{p.name}</Link>
                     {p.address && <div className="muted" style={{ fontSize: 12 }}>{p.address}</div>}</td>
                   <td>{p.tech}</td>
                   <td style={{ minWidth: 140 }}>
@@ -57,7 +57,7 @@ export default function ProjectsTable({ rows, userName }: { rows: Row[]; userNam
                   <td className="ctr">
                     <span className={s.cls}>{s.text}</span>
                   </td>
-                  <RefreshButton project={p.number} job={p.job} cells />
+                  <RefreshButton project={p.id} job={p.job} cells />
                 </tr>
               );
             })}

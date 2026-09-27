@@ -13,7 +13,8 @@ export async function POST(req: Request) {
     } else if (body.action === "save" && body.project) {
       const p = body.project;
       if (!p.number?.trim() || !p.name?.trim()) throw new Error("Project # and name are required");
-      await saveProject({ ...p, number: p.number.trim(), name: p.name.trim() }, body.original);
+      const id = await saveProject({ ...p, number: p.number.trim(), name: p.name.trim() }, body.original);
+      return NextResponse.json({ ok: true, id });
     } else {
       throw new Error("Bad request");
     }

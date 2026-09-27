@@ -9,7 +9,7 @@ export type ProjectTab = "overview" | "equipment" | "deficiencies" | "rules";
 export default function ProjectHeader({ project: p, tab, missingRequired, rulesChanged }:
   { project: Project; tab: ProjectTab; missingRequired?: number | null; rulesChanged?: number }) {
   const s = syncLabel(p.daysSinceSync);
-  const base = `/projects/${encodeURIComponent(p.number)}`;
+  const base = `/projects/${encodeURIComponent(p.id)}`;
   const tabs: { key: ProjectTab; label: string; href: string; count?: number | null }[] = [
     { key: "overview", label: "Overview", href: base },
     { key: "equipment", label: "Equipment checklist", href: `${base}/equipment` },
@@ -28,7 +28,7 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
         </div>
         <div className="row" style={{ alignItems: "flex-start" }}>
           <span className={s.cls} style={{ marginTop: 8 }}>Last sync: {s.text}</span>
-          <RefreshButton project={p.number} job={p.job} />
+          <RefreshButton project={p.id} job={p.job} />
         </div>
       </div>
       <nav className="ptabs">

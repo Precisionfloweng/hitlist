@@ -4,6 +4,8 @@ import { deleteResults } from "./results";
 import type { User } from "./auth";
 
 export type Project = {
+  id: string;          // key used in links and storage: usually the number; "26-083-2" for a second site on 26-083
+  sharedWith: string[];// names of other projects with the same number
   number: string; name: string; tech: string; date: string; address: string; status: string;
   lastSync: string; lastSyncStatus: string; daysSinceSync: number | null;
   fieldsPct: number | null; unitsPct: number | null; units: number | null;
@@ -19,6 +21,9 @@ export type SyncJob = {
   ahead: number;             // syncs that will run before this one (queued jobs only)
   lastMinutes: number | null; // how long this project's previous successful sync took
 };
+
+/** A project's key. Blank project_id = the project number (two sites can share a number). */
+export const keyOf = (p: Rec) => (p.project_id || "").trim() || p.project_number;
 
 const STALE_RUNNING_MS = 90 * 60_000;   // a "running" job this old means the worker was stopped mid-sync
 
@@ -67,17 +72,20 @@ function punchTotals(defs: Rec[]): Map<string, number> {
   return out;
 }
 
-function toProject(p: Rec, queue: Rec[], punch?: Map<string, number>): Project {
-  const pending = queue.filter((q) => q.project_number === p.project_number && isActive(q));
+function toProject(p: Rec, queue: Rec[], punch?: Map<string, number>, all: Rec[] = []): Project {
+  const key = keyOf(p);
+  const pending = queue.filter((q) => q.project_number === key && isActive(q));
   return {
+    id: key,
+    sharedWith: all.filter((o) => o.project_number === p.project_number && keyOf(o) !== key).map((o) => o.name),
     number: p.project_number, name: p.name, tech: p.tech, date: p.date, address: p.address,
     status: p.status || "active", lastSync: p.last_sync, lastSyncStatus: p.last_sync_status,
     daysSinceSync: daysSince(p.last_sync), fieldsPct: num(p.fields_pct), unitsPct: num(p.units_pct),
     units: num(p.units), openDeficiencies: num(p.open_deficiencies), openHigh: num(p.open_high),
     gapFlags: num(p.gap_flags),
-    punchItems: p.last_sync ? (punch?.get(p.project_number) ?? 0) : null,
+    punchItems: p.last_sync ? (punch?.get(key) ?? 0) : null,
     queue: pending.some((q) => q.status === "running") ? "running" : pending.length ? "queued" : null,
-    job: jobFor(p.project_number, queue),
+    job: jobFor(key, queue),
     row: p._row,
   };
 }
@@ -85,17 +93,17 @@ function toProject(p: Rec, queue: Rec[], punch?: Map<string, number>): Project {
 export async function listProjects(fresh = false): Promise<Project[]> {
   const { Projects, Queue, Deficiencies } = await readTabs(["Projects", "Queue", "Deficiencies"], fresh);
   const punch = punchTotals(Deficiencies);
-  return Projects.filter((p) => p.status !== "deleted").map((p) => toProject(p, Queue, punch));
+  return Projects.filter((p) => p.status !== "deleted").map((p) => toProject(p, Queue, punch, Projects));
 }
 
-export async function getProject(number: string) {
+export async function getProject(key: string) {
   const { Projects, Queue, Dashboard, Deficiencies, History } =
     await readTabs(["Projects", "Queue", "Dashboard", "Deficiencies", "History"]);
-  const p = Projects.find((x) => x.project_number === number);
+  const p = Projects.find((x) => keyOf(x) === key);
   if (!p) return null;
-  const mine = <T extends Rec>(rows: T[]) => rows.filter((r) => r.project_number === number);
+  const mine = <T extends Rec>(rows: T[]) => rows.filter((r) => r.project_number === key);
   return {
-    project: toProject(p, Queue, punchTotals(Deficiencies)),
+    project: toProject(p, Queue, punchTotals(Deficiencies), Projects),
     dashboard: mine(Dashboard),
     deficiencies: mine(Deficiencies),
     history: mine(History).sort((a, b) => a.synced_at.localeCompare(b.synced_at)),
@@ -111,8 +119,9 @@ export function isMine(p: Project, u: User): boolean {
 }
 
 export async function requestRefresh(number: string, by: User): Promise<"queued" | "already" | "missing"> {
+  // `number` is the project's key; the Queue's project_number column holds that key.
   const { Projects, Queue } = await readTabs(["Projects", "Queue"], true);
-  if (!Projects.some((p) => p.project_number === number)) return "missing";
+  if (!Projects.some((p) => keyOf(p) === number)) return "missing";
   if (Queue.some((q) => q.project_number === number && isActive(q))) {
     return "already";
   }
@@ -126,25 +135,43 @@ export async function requestRefresh(number: string, by: User): Promise<"queued"
 // ---- admin: project list ------------------------------------------------------------
 export type ProjectInput = { number: string; name: string; tech: string; date: string; address: string; status: string };
 
-export async function saveProject(input: ProjectInput, originalNumber?: string) {
+/** Add or edit a project. `originalKey` is the key of the row being edited. Returns the project's key.
+ *  A number already in use is allowed (two sites on one contract) as long as the name differs;
+ *  the new project then gets its own key, e.g. "26-083-2". */
+export async function saveProject(input: ProjectInput, originalKey?: string): Promise<string> {
+  await ensureHeader("Projects");
   const rows = await readTab("Projects", true);
-  const clash = rows.find((r) => r.project_number === input.number && r.project_number !== originalNumber);
-  if (clash) throw new Error(`Project ${input.number} already exists`);
-  const existing = originalNumber ? rows.find((r) => r.project_number === originalNumber) : undefined;
+  const existing = originalKey ? rows.find((r) => keyOf(r) === originalKey) : undefined;
+  const others = rows.filter((r) => r !== existing);
+  const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+  if (others.some((r) => r.project_number === input.number && same(r.name, input.name))) {
+    throw new Error(`Project ${input.number} ${input.name} already exists`);
+  }
+  let projectId = existing?.project_id || "";
+  if (existing && !projectId && existing.project_number !== input.number) {
+    projectId = existing.project_number;   // number changed: keep the old key so its data stays attached
+  }
+  if (!existing) {
+    const taken = new Set(rows.map(keyOf));
+    let key = input.number, n = 2;
+    while (taken.has(key)) key = `${input.number}-${n++}`;
+    projectId = key === input.number ? "" : key;
+  }
   const rec = {
     ...(existing ?? {}), project_number: input.number, name: input.name, tech: input.tech,
     date: input.date || new Date().toISOString().slice(0, 10), address: input.address,
-    status: input.status || "active",
+    status: input.status || "active", project_id: projectId,
   };
   if (existing) await updateRow("Projects", existing._row, rec);
   else await appendRows("Projects", [rec]);
+  return projectId || input.number;
 }
 
 /** Delete a project and everything kept for it: results file, dashboard, deficiency and
  *  history rows, and its project rules. (Archiving is the way to hide a project but keep it.) */
 export async function removeProject(number: string) {
   const rows = await readTab("Projects", true);
-  const p = rows.find((r) => r.project_number === number);
+  const p = rows.find((r) => keyOf(r) === number);
   if (!p) return;
   const tabs = ["Dashboard", "Deficiencies", "History", "ProjectRules"] as const;
   for (const tab of tabs) {
