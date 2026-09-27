@@ -449,8 +449,8 @@ Export sheet: **Electric Coil** · only units under: Terminal Unit
 | Stages | ⚠ Optional | EDH Stages |  |
 | Design Volts | ⚠ Optional | EDH Design Volts |  |
 | Design Amps | ⚠ Optional | EDH Design Amps |  |
-| Actual Volts | ✖ Required | EDH Act. Volts 1 / EDH Act. Volts 2 / EDH Act. Volts 3 |  |
-| Actual Amps | ✖ Required | EDH Act. Amps 1 / EDH Act. Amps 3 / EDH Act. Amps 2 |  |
+| Actual Volts | ✖ Required | EDH Act. Volts 1 |  |
+| Actual Amps | ✖ Required | EDH Act. Amps 1 |  |
 | Phase | ⚠ Optional | Phase |  |
 | EAT Design | ⚠ Optional | EAT Design |  |
 | LAT Design | ⚠ Optional | LAT Design |  |
