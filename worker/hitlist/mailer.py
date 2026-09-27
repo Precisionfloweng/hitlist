@@ -17,7 +17,9 @@ class Mailer:
         self.sent: list[EmailMessage] = []   # kept for tests / logging
 
     def send(self, to: Iterable[str], subject: str, body_html: str, dry_run: bool = False) -> None:
-        recipients = sorted({t.strip() for t in to if t and t.strip()})
+        # Never mail the sending Gmail account itself: Rick only wants mail at his work address.
+        sender = (self.address or "").strip().lower()
+        recipients = sorted({t.strip() for t in to if t and t.strip() and t.strip().lower() != sender})
         if not recipients:
             return
         msg = EmailMessage()

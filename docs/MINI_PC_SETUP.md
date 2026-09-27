@@ -28,7 +28,7 @@ python -m playwright install chromium
    - `BUILDINGSTART_USERNAME=` / `BUILDINGSTART_PASSWORD=` the login the worker uses
    - `GMAIL_ADDRESS=` / `GMAIL_APP_PASSWORD=` the Gmail app password
    - `ADMIN_EMAILS=` extra admins for the weekly summary, comma separated
-   - `FAILURE_EMAILS=` who gets "sync failed" emails besides the tech (blank = `GMAIL_ADDRESS`)
+   - `FAILURE_EMAILS=` who gets "sync failed" emails besides the tech (work address; nothing is ever sent to `GMAIL_ADDRESS`)
 
 ## 4. First run
 ```

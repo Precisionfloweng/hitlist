@@ -246,3 +246,11 @@ def test_update_rules_adds_a_new_type():
     assert store.refresh_rule_mapping(rules, "newtype") == 1
     assert any(r["type_key"] == "newtype" for r in store.rows("Rules"))
     assert store.refresh_rule_mapping(rules, "newtype") == 0
+
+
+def test_never_emails_the_sending_gmail():
+    m = Mailer("sender@example.com", "")
+    m.send(["sender@example.com", "Sender@Example.com", "rick@example.com"], "x", "<p>x</p>")
+    assert m.sent[-1]["To"] == "rick@example.com"
+    m.send(["sender@example.com"], "x", "<p>x</p>")
+    assert len(m.sent) == 1          # nothing left to send to
