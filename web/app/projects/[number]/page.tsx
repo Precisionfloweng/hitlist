@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Header from "../../Header";
 import RefreshButton from "../../RefreshButton";
 import { pct, syncLabel } from "../../format";
-import EquipmentGrid from "./EquipmentGrid";
 import Deficiencies from "./Deficiencies";
 import { requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
@@ -21,6 +20,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   const group = (g: string) => deficiencies.filter((d) => d.group === g)
     .map((d) => ({ value: d.value, count: Number(d.count) })).sort((a, b) => b.count - a.count);
   const summary = results?.summary;
+  const eqHref = (type?: string) =>
+    `/projects/${encodeURIComponent(p.number)}/equipment${type ? `?type=${encodeURIComponent(type)}` : ""}`;
+  const typeKey = (name: string) => results?.types.find((t) => t.name === name)?.key;
 
   return (
     <>
@@ -61,13 +63,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               </div>
             )}
 
-            <h2>Completion by equipment type</h2>
+            <div className="row" style={{ justifyContent: "space-between", margin: "24px 0 10px" }}>
+              <h2 style={{ margin: 0 }}>Completion by equipment type</h2>
+              <Link className="btn primary" href={eqHref()}>Open equipment checklist →</Link>
+            </div>
             <table className="card" style={{ padding: 0 }}>
               <thead><tr><th>Type</th><th className="num">Units</th><th className="num">Complete</th><th>Fields filled</th><th className="num">Missing required</th><th className="num">Missing optional</th></tr></thead>
               <tbody>
                 {dashboard.sort((a, b) => Number(a.fields_pct) - Number(b.fields_pct)).map((d) => (
                   <tr key={d.type}>
-                    <td>{d.type}</td><td className="num">{d.units}</td><td className="num">{d.units_complete}</td>
+                    <td>{typeKey(d.type) ? <Link href={eqHref(typeKey(d.type))}>{d.type}</Link> : d.type}</td><td className="num">{d.units}</td><td className="num">{d.units_complete}</td>
                     <td style={{ minWidth: 160 }}><div className="row" style={{ gap: 8, flexWrap: "nowrap" }}>
                       <div className="bar" style={{ flex: 1 }}><span style={{ width: `${d.fields_pct}%` }} /></div>
                       <span className="num" style={{ width: 44 }}>{pct(Number(d.fields_pct))}</span></div></td>
@@ -78,10 +83,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
             </table>
 
             {history.length >= 2 && (<><h2>Progress over time</h2><Trend points={history.map((h) => ({ at: h.synced_at, v: Number(h.fields_pct) }))} /></>)}
-
-            <h2>Equipment</h2>
-            {results ? <EquipmentGrid types={results.types} /> :
-              <p className="muted">Detailed equipment results appear here after the next sync.</p>}
 
             <h2>Deficiencies</h2>
             <div className="two">
