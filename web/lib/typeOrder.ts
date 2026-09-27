@@ -14,8 +14,8 @@ export const TYPE_ORDER = [
   "split",            // Split System
   "wshp",             // Water Source Heat Pump
   "coil_test",        // Coil Test
-  "vav_electric_heat",// Electric Coil (under a Terminal Unit)
   "vav",              // Terminal Unit
+  "vav_electric_heat",// Electric Coil (under a Terminal Unit)
   "temp_sensor",      // Temp / Hum Sensor
   "flow_sensor",      // Flow Sensor
   "pressure_sensor",  // Pressure Sensor

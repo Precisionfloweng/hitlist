@@ -1,6 +1,7 @@
 import "server-only";
 import { appendRows, ensureHeader, ensureTab, readTab, readTabs, updateRows, type Rec } from "./sheets";
 import type { User } from "./auth";
+import { byTypeOrder } from "./typeOrder";
 
 export type Condition = { column?: string | null; label?: string; equals?: string; gt?: number };
 export type RuleField = {
@@ -38,7 +39,7 @@ export async function loadRules(project?: string): Promise<{ types: RuleType[]; 
     t.fields.push({ order: Number(r.order) || 0, field: r.field, columns: r.columns, when,
       defaultStatus: def, status: overrides.get(`${r.type_key}|${r.field}`) ?? def });
   }
-  const types = [...byKey.values()].sort((a, b) => a.name.localeCompare(b.name));
+  const types = [...byKey.values()].sort(byTypeOrder);
   types.forEach((t) => t.fields.sort((a, b) => a.order - b.order));
   const history = RuleHistory.filter((h) => (h.project_number || "") === (project ?? "")).map((h) => ({ changedAt: h.changed_at, changedBy: h.changed_by, typeKey: h.type_key,
     field: h.field, old: h.old_status, new: h.new_status })).sort((a, b) => b.changedAt.localeCompare(a.changedAt));

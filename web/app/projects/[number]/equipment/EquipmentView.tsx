@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadLastType, saveLastType } from "@/lib/lastType";
 import type { Deficiency, TypeResult } from "@/lib/results";
+import { byTypeOrder } from "@/lib/typeOrder";
 
 type Filter = "missing" | "all";
 const STATUS_WORD: Record<string, string> = { P: "filled", R: "required, missing", O: "optional, missing",
@@ -32,7 +33,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
     }
     return (path: string, name: string) => byPath.get(norm(path || "").join("/")) || byName.get(name) || [];
   }, [deficiencies]);
-  const sorted = useMemo(() => [...types].sort((a, b) => a.name.localeCompare(b.name)), [types]);
+  const sorted = useMemo(() => [...types].sort(byTypeOrder), [types]);
   const [key, setKey] = useState(() => sorted.find((t) => t.key === initialType)?.key ?? sorted[0]?.key);
   const [filter, setFilter] = useState<Filter>("all");
   const [q, setQ] = useState("");
