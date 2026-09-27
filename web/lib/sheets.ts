@@ -6,7 +6,7 @@ export const SCHEMA = {
   Projects: ["project_number", "name", "tech", "date", "address", "status", "buildingstart_url",
     "last_sync", "last_sync_status", "fields_pct", "units_pct", "units",
     "open_deficiencies", "open_high", "gap_flags"],
-  Users: ["email", "name", "role", "active", "added"],
+  Users: ["email", "name", "role", "active", "added", "password_hash"],
   Rules: ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
     "order", "field", "columns", "status", "when"],
   RuleHistory: ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status"],
@@ -145,6 +145,18 @@ export async function deleteRow(tab: Tab, row: number) {
   await call(":batchUpdate", {
     method: "POST",
     body: { requests: [{ deleteDimension: { range: { sheetId: gid, dimension: "ROWS", startIndex: row - 1, endIndex: row } } }] },
+  });
+  invalidate(tab);
+}
+
+/** Make sure row 1 of a tab has every column in SCHEMA (new columns are only ever added at the end). */
+export async function ensureHeader(tab: Tab) {
+  const data = await call(`/values/${rangeFor(tab, "1:1")}`);
+  const have = ((data.values as string[][] | undefined)?.[0] ?? []);
+  const want = SCHEMA[tab] as readonly string[];
+  if (want.every((c, i) => have[i] === c)) return;
+  await call(`/values/${rangeFor(tab, "A1")}`, {
+    method: "PUT", query: { valueInputOption: "RAW" }, body: { values: [want] },
   });
   invalidate(tab);
 }

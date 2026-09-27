@@ -1,16 +1,18 @@
-// Sign-in with a 6-digit code emailed to the user. No passwords stored anywhere.
+// Sign-in: email + password. The emailed 6-digit code is only used the first time
+// (to set a password) and when someone forgets it.
 import "server-only";
 import { createHash, randomInt } from "node:crypto";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { readTab } from "./sheets";
+import { ensureHeader, readTab, updateRow } from "./sheets";
+import { checkPassword, hashPassword, passwordProblem } from "./password";
 
-export type User = { email: string; name: string; role: "admin" | "tech" | "viewer" };
+export type User = { email: string; name: string; role: "admin" | "tech" | "viewer"; hasPassword: boolean };
 
 const SESSION = "hl_session";
 const PENDING = "hl_pending";
-const SESSION_DAYS = 90;
+const SESSION_YEARS = 10;          // effectively "stay signed in"; access is re-checked on every request
 const CODE_MINUTES = 10;
 const MAX_TRIES = 5;
 
@@ -28,16 +30,51 @@ const cookieOpts = (maxAgeSeconds: number) => ({
   path: "/", maxAge: maxAgeSeconds,
 });
 
-/** Active user from the Users tab, or null. */
-export async function findUser(email: string): Promise<User | null> {
+async function userRow(email: string, fresh = false) {
   const e = email.trim().toLowerCase();
-  const rows = await readTab("Users");
-  const u = rows.find((r) => r.email.trim().toLowerCase() === e);
-  if (!u || ["no", "false", "0"].includes((u.active || "").toLowerCase())) return null;
-  const role = (["admin", "tech", "viewer"].includes(u.role) ? u.role : "tech") as User["role"];
-  return { email: e, name: u.name || e, role };
+  const rows = await readTab("Users", fresh);
+  return rows.find((r) => r.email.trim().toLowerCase() === e);
 }
 
+function toUser(u: Record<string, string>): User | null {
+  if (["no", "false", "0"].includes((u.active || "").toLowerCase())) return null;
+  const role = (["admin", "tech", "viewer"].includes(u.role) ? u.role : "tech") as User["role"];
+  return { email: u.email.trim().toLowerCase(), name: u.name || u.email, role, hasPassword: !!u.password_hash };
+}
+
+/** Active user from the Users tab, or null. */
+export async function findUser(email: string): Promise<User | null> {
+  const u = await userRow(email);
+  return u ? toUser(u) : null;
+}
+
+async function startSession(email: string) {
+  const token = await new SignJWT({ email }).setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime(`${SESSION_YEARS * 365}d`).sign(key());
+  (await cookies()).set(SESSION, token, cookieOpts(SESSION_YEARS * 365 * 86400));
+}
+
+// ---- password sign-in -----------------------------------------------------------------
+const failures = new Map<string, { n: number; until: number }>();
+
+export async function signInWithPassword(email: string, password: string): Promise<"ok" | "wrong" | "no-password" | "locked"> {
+  const e = email.trim().toLowerCase();
+  const f = failures.get(e);
+  if (f && f.until > Date.now()) return "locked";
+  const row = await userRow(e, true);
+  const user = row ? toUser(row) : null;
+  if (user && !row!.password_hash) return "no-password";
+  if (!user || !checkPassword(password, row!.password_hash)) {
+    const n = (f?.n ?? 0) + 1;
+    failures.set(e, { n, until: n >= 5 ? Date.now() + 5 * 60_000 : 0 });
+    return "wrong";
+  }
+  failures.delete(e);
+  await startSession(user.email);
+  return "ok";
+}
+
+// ---- emailed code (first time / forgot password) ---------------------------------------
 export async function startSignIn(email: string): Promise<string | null> {
   const user = await findUser(email);
   if (!user) return null;
@@ -67,11 +104,19 @@ export async function finishSignIn(code: string): Promise<"ok" | "wrong" | "expi
   }
   const user = await findUser(payload.email);
   if (!user) return "expired";
-  const session = await new SignJWT({ email: user.email })
-    .setProtectedHeader({ alg: "HS256" }).setExpirationTime(`${SESSION_DAYS}d`).sign(key());
-  jar.set(SESSION, session, cookieOpts(SESSION_DAYS * 86400));
+  await startSession(user.email);
   jar.delete(PENDING);
   return "ok";
+}
+
+export async function setPassword(user: User, password: string): Promise<string | null> {
+  const problem = passwordProblem(password);
+  if (problem) return problem;
+  await ensureHeader("Users");
+  const row = await userRow(user.email, true);
+  if (!row) return "User not found";
+  await updateRow("Users", row._row, { ...row, password_hash: hashPassword(password) });
+  return null;
 }
 
 export async function signOut() {
@@ -93,6 +138,7 @@ export async function currentUser(): Promise<User | null> {
 export async function requireUser(): Promise<User> {
   const u = await currentUser();
   if (!u) redirect("/login");
+  if (!u.hasPassword) redirect("/account/password");
   return u;
 }
 

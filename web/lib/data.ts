@@ -1,5 +1,5 @@
 import "server-only";
-import { appendRows, deleteRow, readTab, readTabs, updateRow, type Rec } from "./sheets";
+import { appendRows, deleteRow, ensureHeader, readTab, readTabs, updateRow, type Rec } from "./sheets";
 import type { User } from "./auth";
 
 export type Project = {
@@ -111,6 +111,7 @@ export async function saveUser(input: { email: string; name: string; role: strin
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error("Enter a valid email address");
   if (!input.name.trim()) throw new Error("Name is required");
   if (!["admin", "tech", "viewer"].includes(input.role)) throw new Error("Role must be admin, tech or viewer");
+  await ensureHeader("Users");
   const rows = await readTab("Users", true);
   const orig = (originalEmail ?? "").trim().toLowerCase();
   if (rows.some((r) => r.email.trim().toLowerCase() === email && r.email.trim().toLowerCase() !== orig)) {
@@ -118,7 +119,8 @@ export async function saveUser(input: { email: string; name: string; role: strin
   }
   const existing = orig ? rows.find((r) => r.email.trim().toLowerCase() === orig) : undefined;
   const rec = { email, name: input.name.trim(), role: input.role, active: input.active ? "yes" : "no",
-    added: existing?.added || new Date().toISOString().slice(0, 10) };
+    added: existing?.added || new Date().toISOString().slice(0, 10),
+    password_hash: existing?.password_hash || "" };  // keep their password when an admin edits the row
   if (existing) await updateRow("Users", existing._row, rec);
   else await appendRows("Users", [rec]);
 }

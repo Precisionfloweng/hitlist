@@ -34,7 +34,7 @@ export async function POST(req: Request) {
           `<p>${escapeHtml(me.name)} has given you access to <b>PFE Hitlist</b>, where you can see each project's ` +
           `test &amp; balance completion, what's still missing, and open deficiencies.</p>` +
           `<p><a href="${site}/login">Sign in at ${site.replace(/^https?:\/\//, "")}</a> with this email address. ` +
-          `We'll email you a 6-digit code; no password needed.</p>`);
+          `The first time, click <b>Email me a code</b>, enter the 6-digit code we send, and create your password. After that you just sign in with your email and password.</p>`);
       }
     } else {
       throw new Error("Bad request");
