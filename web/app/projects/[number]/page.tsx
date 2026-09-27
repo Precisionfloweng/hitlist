@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "../../Header";
-import RefreshButton from "../../RefreshButton";
-import { pct, syncLabel } from "../../format";
-import Deficiencies from "./Deficiencies";
+import { pct } from "../../format";
+import ProjectHeader from "./ProjectHeader";
 import { requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
@@ -15,10 +14,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   const number = decodeURIComponent((await params).number);
   const [data, results] = await Promise.all([getProject(number), loadResults(number)]);
   if (!data) notFound();
-  const { project: p, dashboard, deficiencies, history } = data;
-  const s = syncLabel(p.daysSinceSync);
-  const group = (g: string) => deficiencies.filter((d) => d.group === g)
-    .map((d) => ({ value: d.value, count: Number(d.count) })).sort((a, b) => b.count - a.count);
+  const { project: p, dashboard, history } = data;
   const summary = results?.summary;
   const eqHref = (type?: string) =>
     `/projects/${encodeURIComponent(p.number)}/equipment${type ? `?type=${encodeURIComponent(type)}` : ""}`;
@@ -28,18 +24,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
     <>
       <Header user={user} />
       <main>
-        <div className="muted"><Link href="/projects">← Projects</Link></div>
-        <div className="row" style={{ justifyContent: "space-between" }}>
-          <h1>{p.number} · {p.name}</h1>
-          <div className="row">
-            {results && <Link className="btn primary" href={eqHref()}>Open equipment checklist →</Link>}
-            <span className={s.cls}>Last sync: {s.text}</span>
-            <RefreshButton project={p.number} job={p.job} />
-          </div>
-        </div>
-        <div className="muted" style={{ marginTop: -10, marginBottom: 16 }}>
-          {[p.tech && `Tech: ${p.tech}`, p.address].filter(Boolean).join(" · ")}
-        </div>
+        <ProjectHeader project={p} tab="overview" missingRequired={summary?.missing_required} />
         {p.lastSyncStatus.startsWith("failed") && <p className="error">The last sync failed: {p.lastSyncStatus.slice(8)}</p>}
 
         {p.lastSync ? (
@@ -47,8 +32,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
             <div className="tiles">
               <Tile big={pct(p.fieldsPct)} label="Required fields filled" />
               <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />
-              <Tile big={String(summary?.missing_required ?? "–")} label="Required fields missing" />
-              <Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" />
+              <Link href={eqHref()} className="tile-link"><Tile big={String(summary?.missing_required ?? "–")} label="Required fields missing" /></Link>
+              <Link href={`/projects/${encodeURIComponent(p.number)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>
               <Tile big={String(p.openHigh ?? "–")} label="Open high priority" />
             </div>
 
@@ -82,14 +67,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
 
             {history.length >= 2 && (<><h2>Progress over time</h2><Trend points={history.map((h) => ({ at: h.synced_at, v: Number(h.fields_pct) }))} /></>)}
 
-            <h2>Deficiencies</h2>
-            <div className="two">
-              <Breakdown title="Open by priority" rows={group("open_priority")} />
-              <Breakdown title="Open by contractor role" rows={group("open_role")} />
-              <Breakdown title="Open by assigned contact" rows={group("open_contact")} />
-              <Breakdown title="All by status" rows={group("status")} />
-            </div>
-            {results && <Deficiencies items={results.deficiencies} />}
           </>
         ) : (
           <div className="card">This project hasn&apos;t been synced yet. Press <b>Refresh</b> to pull it from BuildingStart (takes 5–10 minutes).</div>
@@ -101,24 +78,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
 
 function Tile({ big, label }: { big: string; label: string }) {
   return <div className="card tile"><div className="big">{big}</div><div className="label">{label}</div></div>;
-}
-
-function Breakdown({ title, rows }: { title: string; rows: { value: string; count: number }[] }) {
-  const max = Math.max(1, ...rows.map((r) => r.count));
-  return (
-    <div className="card">
-      <b>{title}</b>
-      {rows.length === 0 ? <p className="muted">None</p> : (
-        <table style={{ marginTop: 8 }}><tbody>
-          {rows.map((r) => (
-            <tr key={r.value}><td style={{ width: "45%" }}>{r.value}</td>
-              <td><div className="bar"><span style={{ width: `${(100 * r.count) / max}%` }} /></div></td>
-              <td className="num" style={{ width: 50 }}>{r.count}</td></tr>
-          ))}
-        </tbody></table>
-      )}
-    </div>
-  );
 }
 
 function Trend({ points }: { points: { at: string; v: number }[] }) {

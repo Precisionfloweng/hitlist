@@ -50,6 +50,7 @@ tr:hover td { background: #fafbfd; }
 
 /* Refresh button + live sync status: a fixed-width box so the table doesn't jump around */
 .sync { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: 200px; }
+.sync.inline { width: auto; max-width: 240px; margin-top: 8px; }
 .refresh-cell { text-align: right; width: 1%; white-space: nowrap; }
 .sync .pill { white-space: nowrap; }
 .sync-head { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
@@ -125,3 +126,17 @@ main.wide { max-width: none; }
   .legend { margin-left: 0; }
 }
 .s-R { color: var(--bad); font-weight: 700; } .s-O { color: var(--warn); }
+
+/* Project header + tabs (Overview / Equipment checklist / Deficiencies) */
+.phead h1 { margin-bottom: 2px; }
+.phead-sub { margin-bottom: 4px; }
+.ptabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 14px 0 20px; overflow-x: auto; }
+.ptabs a { padding: 10px 16px; color: var(--muted); font-weight: 600; border-bottom: 3px solid transparent;
+  margin-bottom: -1px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
+.ptabs a:hover { color: var(--ink); text-decoration: none; }
+.ptabs a.on { color: var(--brand); border-bottom-color: var(--brand); }
+.ptab-count { font-size: 12px; font-weight: 700; background: #eef0f3; color: var(--muted); border-radius: 999px; padding: 1px 8px; }
+.ptabs a.on .ptab-count { background: #e3ecf5; color: var(--brand); }
+.tile-link { color: inherit; display: block; }
+.tile-link:hover { text-decoration: none; }
+.tile-link .tile:hover { border-color: var(--brand); }

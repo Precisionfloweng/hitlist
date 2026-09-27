@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import type { Deficiency } from "@/lib/results";
 
-export default function Deficiencies({ items }: { items: Deficiency[] }) {
+export default function DeficiencyList({ items }: { items: Deficiency[] }) {
   const [openOnly, setOpenOnly] = useState(true);
   const [priority, setPriority] = useState("");
   const [contact, setContact] = useState("");

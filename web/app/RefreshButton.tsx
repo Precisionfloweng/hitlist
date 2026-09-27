@@ -129,7 +129,7 @@ export default function RefreshButton({ project, job: initial, cells = false }:
   }
   return (
     <div className="row" style={{ alignItems: "flex-start", flexWrap: "nowrap" }}>
-      {job && <div className="sync">{status}{errorLine}</div>}
+      {job && <div className="sync inline">{status}{errorLine}</div>}
       {!job && errorLine}
       {button}
     </div>

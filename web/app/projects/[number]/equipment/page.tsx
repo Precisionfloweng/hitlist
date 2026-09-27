@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "../../../Header";
-import RefreshButton from "../../../RefreshButton";
+import ProjectHeader from "../ProjectHeader";
 import EquipmentView from "./EquipmentView";
 import { requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
@@ -17,17 +16,12 @@ export default async function EquipmentPage({ params, searchParams }:
   const [data, results] = await Promise.all([getProject(number), loadResults(number)]);
   if (!data) notFound();
   const p = data.project;
-  const href = `/projects/${encodeURIComponent(p.number)}`;
 
   return (
     <>
       <Header user={user} />
       <main className="wide">
-        <div className="muted"><Link href={href}>← {p.number} · {p.name}</Link></div>
-        <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
-          <h1>Equipment checklist</h1>
-          <RefreshButton project={p.number} job={p.job} />
-        </div>
+        <ProjectHeader project={p} tab="equipment" missingRequired={results?.summary.missing_required} />
         {results ? <EquipmentView types={results.types} initialType={type} syncedAt={results.generated_at} /> : (
           <div className="card">No equipment results yet. Press <b>Refresh</b> to pull this project from BuildingStart.</div>
         )}
