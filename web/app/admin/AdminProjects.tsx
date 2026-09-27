@@ -73,7 +73,7 @@ export default function AdminProjects({ initial }: { initial: Row[] }) {
                     }
                   }}>Save</button>
                   <button className="danger" disabled={busy === r.original} onClick={async () => {
-                    if (!confirm(`Delete ${r.original} ${r.name}? This removes it from the list. (Archive keeps it.)`)) return;
+                    if (!confirm(`Delete ${r.original} ${r.name} for good?\n\nThis also deletes its sync results, history and project rules. To hide it but keep its data, set its status to Archived instead.`)) return;
                     if (await send({ action: "delete", original: r.original }, r.original)) setRows((rs) => rs.filter((_, j) => j !== i));
                   }}>Delete</button>
                 </td>

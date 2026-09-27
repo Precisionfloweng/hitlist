@@ -1,6 +1,6 @@
 // One results file per project, kept in a PRIVATE Vercel Blob store.
 import "server-only";
-import { get, put } from "@vercel/blob";
+import { del, get, put } from "@vercel/blob";
 
 export type TypeResult = {
   key: string; name: string; export_sheet: string;
@@ -35,4 +35,8 @@ export async function loadResults(project: string): Promise<Results | null> {
   } catch {
     return null;
   }
+}
+
+export async function deleteResults(project: string) {
+  try { await del(pathFor(project)); } catch { /* already gone */ }
 }

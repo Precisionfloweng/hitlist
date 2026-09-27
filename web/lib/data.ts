@@ -1,5 +1,6 @@
 import "server-only";
-import { appendRows, deleteRow, ensureHeader, readTab, readTabs, updateRow, type Rec } from "./sheets";
+import { appendRows, deleteRow, deleteRows, ensureHeader, readTab, readTabs, updateRow, type Rec } from "./sheets";
+import { deleteResults } from "./results";
 import type { User } from "./auth";
 
 export type Project = {
@@ -129,10 +130,20 @@ export async function saveProject(input: ProjectInput, originalNumber?: string) 
   else await appendRows("Projects", [rec]);
 }
 
+/** Delete a project and everything kept for it: results file, dashboard, deficiency and
+ *  history rows, and its project rules. (Archiving is the way to hide a project but keep it.) */
 export async function removeProject(number: string) {
   const rows = await readTab("Projects", true);
   const p = rows.find((r) => r.project_number === number);
-  if (p) await deleteRow("Projects", p._row);
+  if (!p) return;
+  const tabs = ["Dashboard", "Deficiencies", "History", "ProjectRules"] as const;
+  for (const tab of tabs) {
+    let recs: Rec[] = [];
+    try { recs = await readTab(tab, true); } catch { continue; }   // e.g. ProjectRules not created yet
+    await deleteRows(tab, recs.filter((r) => r.project_number === number).map((r) => r._row));
+  }
+  await deleteResults(number);
+  await deleteRow("Projects", p._row);
 }
 
 // ---- admin: users ------------------------------------------------------------------

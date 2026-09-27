@@ -188,3 +188,15 @@ export async function ensureTab(tab: Tab) {
   await ensureHeader(tab);
   ensured.add(tab);
 }
+
+/** Delete several rows of one tab in a single call (bottom-up, so row numbers stay valid). */
+export async function deleteRows(tab: Tab, rows: number[]) {
+  if (!rows.length) return;
+  const gid = await gidFor(tab);
+  if (gid === undefined) return;
+  const requests = [...new Set(rows)].sort((a, b) => b - a).map((row) => ({
+    deleteDimension: { range: { sheetId: gid, dimension: "ROWS", startIndex: row - 1, endIndex: row } },
+  }));
+  await call(":batchUpdate", { method: "POST", body: { requests } });
+  invalidate(tab);
+}
