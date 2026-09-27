@@ -18,15 +18,19 @@ function Cell({ code, label }: { code: string; label: string }) {
 
 export default function EquipmentView({ types, initialType, syncedAt, deficiencies = [] }:
   { types: TypeResult[]; initialType?: string; syncedAt?: string; deficiencies?: Deficiency[] }) {
-  // Open deficiencies per unit (matched on the equipment path, or the name if the path differs).
+  // Open deficiencies per unit: its own, plus any on its sub-items (a coil's item also lights up its AHU).
+  // Matched on the equipment path (segments trimmed), or the name if a unit's own path doesn't match.
   const openDefs = useMemo(() => {
+    const norm = (path: string) => path.split("/").map((x) => x.trim()).filter(Boolean);
     const byPath = new Map<string, Deficiency[]>(), byName = new Map<string, Deficiency[]>();
+    const add = (m: Map<string, Deficiency[]>, k: string, d: Deficiency) => m.set(k, [...(m.get(k) ?? []), d]);
     for (const d of deficiencies) {
       if (!d.open) continue;
-      if (d.path) byPath.set(d.path, [...(byPath.get(d.path) ?? []), d]);
-      if (d.equipment) byName.set(d.equipment, [...(byName.get(d.equipment) ?? []), d]);
+      const segs = norm(d.path || "");
+      for (let i = 1; i <= segs.length; i++) add(byPath, segs.slice(0, i).join("/"), d);
+      if (d.equipment) add(byName, d.equipment, d);
     }
-    return (path: string, name: string) => (path && byPath.get(path)) || byName.get(name) || [];
+    return (path: string, name: string) => byPath.get(norm(path || "").join("/")) || byName.get(name) || [];
   }, [deficiencies]);
   const sorted = useMemo(() => [...types].sort((a, b) => a.name.localeCompare(b.name)), [types]);
   const [key, setKey] = useState(() => sorted.find((t) => t.key === initialType)?.key ?? sorted[0]?.key);
@@ -142,7 +146,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
                       <div className="u-name">
                         {u.name}
                         {defs.length > 0 && (
-                          <span className="def-badge" title={defs.map((d) => `#${d.number} ${d.priority}: ${d.text}`).join("\n")}>
+                          <span className="def-badge" title={defs.map((d) => `#${d.number} ${d.priority}${d.equipment && d.equipment !== u.name ? ` (${d.equipment})` : ""}: ${d.text}`).join("\n")}>
                             {defs.length} open
                           </span>
                         )}
