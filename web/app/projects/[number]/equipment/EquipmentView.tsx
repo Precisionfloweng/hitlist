@@ -98,11 +98,13 @@ export default function EquipmentView({ types, initialType, syncedAt }:
               <tr>
                 <th className="u">Unit</th>
                 <th className="d">Done</th>
-                {cols.map((c) => (
-                  <th key={c.i} className={`f ${c.status === "optional" ? "opt" : ""}`} title={`${c.label} (${c.status})`}>
+                {cols.map((c, n) => (
+                  <th key={c.i} className={`f ${c.status === "optional" ? "opt" : ""}`} title={`${c.label} (${c.status})`}
+                    style={{ zIndex: 2 + cols.length - n }}>
                     <span>{c.label}</span>
                   </th>
                 ))}
+                <th className="pad" aria-hidden />
               </tr>
             </thead>
             <tbody>
@@ -119,11 +121,12 @@ export default function EquipmentView({ types, initialType, syncedAt }:
                       <div className={`d-bar ${done >= 1 ? "full" : ""}`}><span style={{ width: `${done * 100}%` }} /></div>
                     </td>
                     {cols.map((c) => <Cell key={c.i} code={u.codes[c.i] ?? "-"} label={c.label} />)}
+                    <td className="pad" />
                   </tr>
                 );
               })}
               {units.length === 0 && (
-                <tr><td colSpan={cols.length + 2} className="eq-empty">
+                <tr><td colSpan={cols.length + 3} className="eq-empty">
                   {q ? "No units match your search." : "Every unit has all its required data. ✓"}
                 </td></tr>
               )}
