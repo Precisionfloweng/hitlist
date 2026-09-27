@@ -30,8 +30,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
         {p.lastSync ? (
           <>
             <div className="tiles">
-              <Tile big={pct(p.fieldsPct)} label="Required fields filled" />
               <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />
+              <Tile big={pct(p.fieldsPct)} label="Required fields filled" />
               <Link href={eqHref()} className="tile-link"><Tile big={String(summary?.missing_required ?? "–")} label="Required fields missing" /></Link>
               <Link href={`/projects/${encodeURIComponent(p.number)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>
               <Tile big={String(p.openHigh ?? "–")} label="Open high priority" />
