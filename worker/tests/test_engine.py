@@ -156,3 +156,16 @@ def test_no_false_warning_for_sheets_other_rules_use():
     rules["types"].append(other)     # 'Air Handling Units' missing, but 'Air Handling Unit' belongs to a rule
     r = check_project(_pair_export([("A1", [1200, 1100, 480])]), load_rules(rules))
     assert r["warnings"] == []
+
+
+def test_velocity_only_when_face_area_filled():
+    rules = {"version": 1, "types": [{"key": "coil", "name": "Coils", "export_sheet": "Air Handling Unit",
+        "fields": [{"label": "Face Area Sq.Ft.", "columns": ["Design O/A"], "status": "optional"},
+                   {"label": "Air Velocity Actual", "columns": ["Actual O/A"], "status": "required",
+                    "when": [{"column": "Design O/A", "label": "Airside Face Area", "filled": True}]}]}]}
+    r = check_project(_pair_export([("C1", [12.5, None, 1]),     # face area in -> velocity required
+                                    ("C2", [None, None, 1]),     # no face area -> velocity n/a
+                                    ("C3", ["-", None, 1])]),    # face area marked N/A -> velocity n/a
+                      load_rules(rules))
+    codes = {u["name"]: u["codes"] for u in r["types"][0]["units"]}
+    assert codes == {"C1": "PR", "C2": "O-", "C3": "N-"}

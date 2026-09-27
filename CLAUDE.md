@@ -34,7 +34,8 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Design/Actual pairs (matched by name, 80 in the default rules): a completely blank Design skips
   both fields (unit doesn't have it); a "-" Design still requires the Actual.
 - A field may list several columns (three-phase readings): filled if ANY has a value.
-- Conditions: `equals` (spaces ignored, so "BeltDrive" = "Belt Drive") or `gt`.
+- Conditions: `equals` (spaces ignored, so "BeltDrive" = "Belt Drive"), `gt`, or `filled` (column has a value;
+  coil air velocities only count when Airside Face Area is filled in).
 - Rules: the Rules tab is the company default (admins edit). ProjectRules holds one project's
   required/optional/ignore changes (anyone edits, on the project's Rules tab); blank status = default.
   The worker applies them per project (`store.apply_overrides`).

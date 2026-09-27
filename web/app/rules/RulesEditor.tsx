@@ -7,7 +7,7 @@ import type { Condition, HistoryRow, RuleType } from "@/lib/rules";
 const LABEL: Record<string, string> = { required: "✖ Required", optional: "⚠ Optional", ignore: "Ignore" };
 
 function describe(when: Condition[]): string {
-  return when.map((c) => `${c.column || c.label} ${c.equals !== undefined ? "= " + c.equals : "> " + c.gt}`).join(" and ");
+  return when.map((c) => `${c.column || c.label} ${c.filled ? "is filled in" : c.equals !== undefined ? "= " + c.equals : "> " + c.gt}`).join(" and ");
 }
 
 /**

@@ -415,11 +415,11 @@ Export sheet: **Coil Test *(sheet name not yet confirmed)***
 | Leav Water Temp Actual | ✖ Required | *(matched automatically)* |  |
 | Water Delta T Design | ⚠ Optional | *(matched automatically)* |  |
 | Water Delta T Actual | ✖ Required | *(matched automatically)* |  |
-| Face Area Sq.Ft. | ⚠ Optional | *(matched automatically)* |  |
+| Face Area Sq.Ft. | ⚠ Optional | Airside Face Area |  |
 | Airflow Design | ⚠ Optional | *(matched automatically)* |  |
 | Airflow Actual | ✖ Required | *(matched automatically)* |  |
-| Air Velocity Design | ⚠ Optional | *(matched automatically)* |  |
-| Air Velocity Actual | ⚠ Optional | *(matched automatically)* |  |
+| Air Velocity Design | ⚠ Optional | Air Velocity Design | Airside Face Area is filled in |
+| Air Velocity Actual | ⚠ Optional | Air Velocity Actual | Airside Face Area is filled in |
 | Ent Air DB Temp Design | ⚠ Optional | *(matched automatically)* |  |
 | Ent Air DB Temp Actual | ✖ Required | *(matched automatically)* |  |
 | Ent Air WB Temp Design | ⚠ Optional | *(matched automatically)* |  |
@@ -815,8 +815,8 @@ Export sheet: **Air Apparatus Coil**
 | Air Temp Delta T Actual | ✖ Required | Air Temp Delta T Actual |  |
 | Coil Inlet PSI Actual | ✖ Required | Coil Inlet PSI Actual |  |
 | Coil Outlet PSI Actual | ✖ Required | Coil Outlet PSI Actual |  |
-| Air Velocity Design | ⚠ Optional | Air Velocity Design |  |
-| Air Velocity Actual | ✖ Required | Air Velocity Actual |  |
+| Air Velocity Design | ⚠ Optional | Air Velocity Design | Airside Face Area is filled in |
+| Air Velocity Actual | ✖ Required | Air Velocity Actual | Airside Face Area is filled in |
 | Coil APD Design | ⚠ Optional | Design Coil APD |  |
 | Design Capacity MBH | ⚠ Optional | Design Coil Capacity |  |
 | Coil APD Actual | ✖ Required | Actual Coil APD |  |
@@ -848,12 +848,12 @@ Export sheet: **Air Apparatus Heat Coil *(sheet name not yet confirmed)***
 | Leav Air DB Temp Actual | ✖ Required | *(matched automatically)* |  |
 | Air Temp Delta T Design | ⚠ Optional | *(matched automatically)* |  |
 | Air Temp Delta T Actual | ✖ Required | *(matched automatically)* |  |
-| Face Area Sq.Ft. | ⚠ Optional | *(matched automatically)* |  |
+| Face Area Sq.Ft. | ⚠ Optional | Airside Face Area |  |
 | Rows | ⚠ Optional | *(matched automatically)* |  |
 | Fins Per Inch | ⚠ Optional | *(matched automatically)* |  |
 | Design Capacity MBH | ⚠ Optional | *(matched automatically)* |  |
-| Air Velocity Design | ⚠ Optional | *(matched automatically)* |  |
-| Air Velocity Actual | ⚠ Optional | *(matched automatically)* |  |
+| Air Velocity Design | ⚠ Optional | Air Velocity Design | Airside Face Area is filled in |
+| Air Velocity Actual | ⚠ Optional | Air Velocity Actual | Airside Face Area is filled in |
 | Coil Inlet PSI Actual | ✖ Required | *(matched automatically)* |  |
 | Coil Outlet PSI Actual | ✖ Required | *(matched automatically)* |  |
 | Coil APD Design | ⚠ Optional | *(matched automatically)* |  |
@@ -882,8 +882,8 @@ Export sheet: **DX Coil -**
 | Rows | ⚠ Optional | # Rows |  |
 | Fins Per Inch | ⚠ Optional | Fins Per Inch |  |
 | Design Capacity MBH | ⚠ Optional | Design Coil Capacity |  |
-| Air Velocity Design | ⚠ Optional | Air Velocity Design |  |
-| Air Velocity Actual | ✖ Required | Air Velocity Actual |  |
+| Air Velocity Design | ⚠ Optional | Air Velocity Design | Airside Face Area is filled in |
+| Air Velocity Actual | ✖ Required | Air Velocity Actual | Airside Face Area is filled in |
 | Coil APD Design | ⚠ Optional | Design Coil APD |  |
 | Coil APD Actual | ✖ Required | Actual Coil APD |  |
 | Airflow Design | ⚠ Optional | Airflow Design |  |

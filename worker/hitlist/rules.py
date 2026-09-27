@@ -48,12 +48,13 @@ def _number(value: Any) -> float | None:
 @dataclass
 class Condition:
     """A field only applies when this holds, e.g. Drive Type = Belt Drive,
-    or Design Fan Airflow > 0.5 (the box has a fan)."""
+    Design Fan Airflow > 0.5 (the box has a fan), or Airside Face Area filled in."""
 
     column: str | None
     label: str
     equals: str | None = None
     gt: float | None = None
+    filled: bool = False
 
     def holds(self, row: dict[str, Any], column: str | None = None) -> bool:
         col = column or self.column
@@ -66,6 +67,9 @@ class Condition:
         if self.gt is not None:
             n = _number(value)
             return n is not None and n > self.gt
+        if self.filled:
+            from .engine import is_missing, is_na   # local import: engine imports this module
+            return not is_missing(value) and not is_na(value)
         return True
 
 
@@ -115,7 +119,7 @@ def _parse(data: dict[str, Any]) -> RuleSet:
             cols = [norm_header(c) for c in f["columns"]] if f.get("columns") else None
             when = [Condition(norm_header(c["column"]) if c.get("column") else None,
                               c.get("label") or c.get("column") or "",
-                              c.get("equals"), c.get("gt"))
+                              c.get("equals"), c.get("gt"), bool(c.get("filled")))
                     for c in (f.get("when") or [])]
             fields.append(FieldRule(f["label"], cols, f.get("status", REQUIRED), when))
         types.append(TypeRule(t["key"], t["name"], t["export_sheet"],

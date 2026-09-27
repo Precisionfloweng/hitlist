@@ -20,7 +20,7 @@ for t in data["types"]:
             "| Field | Status | Export column(s) | Only when |", "| --- | --- | --- | --- |"]
     for f in t["fields"]:
         cols = " / ".join(f["columns"]) if f.get("columns") else "*(matched automatically)*"
-        when = "; ".join(f"{c.get('column') or c.get('label')} {'= ' + c['equals'] if 'equals' in c else '> ' + str(c['gt'])}"
+        when = "; ".join(f"{c.get('column') or c.get('label')} {'is filled in' if c.get('filled') else '= ' + c['equals'] if 'equals' in c else '> ' + str(c['gt'])}"
                          for c in (f.get("when") or []))
         out.append(f"| {f['label']} | {MARK[f['status']]} | {cols} | {when} |")
     out.append("")

@@ -3172,7 +3172,9 @@
     },
     {
      "label": "Face Area Sq.Ft.",
-     "columns": null,
+     "columns": [
+      "Airside Face Area"
+     ],
      "status": "optional",
      "when": null
     },
@@ -3190,15 +3192,31 @@
     },
     {
      "label": "Air Velocity Design",
-     "columns": null,
+     "columns": [
+      "Air Velocity Design"
+     ],
      "status": "optional",
-     "when": null
+     "when": [
+      {
+       "column": "Airside Face Area",
+       "label": "Airside Face Area",
+       "filled": true
+      }
+     ]
     },
     {
      "label": "Air Velocity Actual",
-     "columns": null,
+     "columns": [
+      "Air Velocity Actual"
+     ],
      "status": "optional",
-     "when": null
+     "when": [
+      {
+       "column": "Airside Face Area",
+       "label": "Airside Face Area",
+       "filled": true
+      }
+     ]
     },
     {
      "label": "Ent Air DB Temp Design",
@@ -5741,7 +5759,13 @@
       "Air Velocity Design"
      ],
      "status": "optional",
-     "when": null
+     "when": [
+      {
+       "column": "Airside Face Area",
+       "label": "Airside Face Area",
+       "filled": true
+      }
+     ]
     },
     {
      "label": "Air Velocity Actual",
@@ -5749,7 +5773,13 @@
       "Air Velocity Actual"
      ],
      "status": "required",
-     "when": null
+     "when": [
+      {
+       "column": "Airside Face Area",
+       "label": "Airside Face Area",
+       "filled": true
+      }
+     ]
     },
     {
      "label": "Coil APD Design",
@@ -5920,7 +5950,9 @@
     },
     {
      "label": "Face Area Sq.Ft.",
-     "columns": null,
+     "columns": [
+      "Airside Face Area"
+     ],
      "status": "optional",
      "when": null
     },
@@ -5944,15 +5976,31 @@
     },
     {
      "label": "Air Velocity Design",
-     "columns": null,
+     "columns": [
+      "Air Velocity Design"
+     ],
      "status": "optional",
-     "when": null
+     "when": [
+      {
+       "column": "Airside Face Area",
+       "label": "Airside Face Area",
+       "filled": true
+      }
+     ]
     },
     {
      "label": "Air Velocity Actual",
-     "columns": null,
+     "columns": [
+      "Air Velocity Actual"
+     ],
      "status": "optional",
-     "when": null
+     "when": [
+      {
+       "column": "Airside Face Area",
+       "label": "Airside Face Area",
+       "filled": true
+      }
+     ]
     },
     {
      "label": "Coil Inlet PSI Actual",
@@ -6123,7 +6171,13 @@
       "Air Velocity Design"
      ],
      "status": "optional",
-     "when": null
+     "when": [
+      {
+       "column": "Airside Face Area",
+       "label": "Airside Face Area",
+       "filled": true
+      }
+     ]
     },
     {
      "label": "Air Velocity Actual",
@@ -6131,7 +6185,13 @@
       "Air Velocity Actual"
      ],
      "status": "required",
-     "when": null
+     "when": [
+      {
+       "column": "Airside Face Area",
+       "label": "Airside Face Area",
+       "filled": true
+      }
+     ]
     },
     {
      "label": "Coil APD Design",

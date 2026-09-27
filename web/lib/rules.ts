@@ -3,7 +3,7 @@ import { appendRows, ensureHeader, ensureTab, readTab, readTabs, updateRows, typ
 import type { User } from "./auth";
 import { byTypeOrder } from "./typeOrder";
 
-export type Condition = { column?: string | null; label?: string; equals?: string; gt?: number };
+export type Condition = { column?: string | null; label?: string; equals?: string; gt?: number; filled?: boolean };
 export type RuleField = {
   order: number; field: string; columns: string; when: Condition[];
   status: string;          // what applies (the project's own choice, or the default)
