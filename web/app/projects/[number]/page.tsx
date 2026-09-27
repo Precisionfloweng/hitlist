@@ -31,11 +31,25 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
           <>
             <div className="tiles">
               <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />
-              <Tile big={pct(p.fieldsPct)} label="Required fields filled" />
-              <Link href={eqHref()} className="tile-link"><Tile big={String(summary?.missing_required ?? "–")} label="Required fields missing" /></Link>
               <Link href={`/projects/${encodeURIComponent(p.number)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>
               <Link href={`/projects/${encodeURIComponent(p.number)}/deficiencies`} className="tile-link"><Tile big={results ? String(results.deficiencies.filter((d) => !d.open).length) : "–"} label="Closed deficiencies" /></Link>
             </div>
+
+            {results && results.types.length > 0 && (
+              <div className="type-cards">
+                {[...results.types].sort((x, y) => x.name.localeCompare(y.name)).map((t) => {
+                  const done = t.summary.units_complete, n = t.summary.units;
+                  const pctDone = n ? (100 * done) / n : 0;
+                  return (
+                    <Link key={t.key} href={eqHref(t.key)} className="type-card" title={`${t.name}: ${done} of ${n} units fully complete`}>
+                      <span className="tc-name">{t.name}</span>
+                      <span className="tc-num"><b>{done}</b> / {n}</span>
+                      <span className={`tc-bar ${pctDone >= 100 ? "full" : ""}`}><span style={{ width: `${pctDone}%` }} /></span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
 
             {(results?.gap_flags?.length ?? 0) > 0 && (
               <div className="card" style={{ marginTop: 16, borderColor: "#f5c2c0" }}>
