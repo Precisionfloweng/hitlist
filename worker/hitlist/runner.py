@@ -122,7 +122,7 @@ def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: Ex
     results["gap_flags"] = gap_check(previous, results)
     result_file.write_text(json.dumps(results, ensure_ascii=False, default=str), encoding="utf-8")
     step("Saving results")
-    _publish(settings, number, results)
+    website_problem = _publish(settings, number, results)
 
     step("Updating dashboard")
 
@@ -143,20 +143,53 @@ def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: Ex
     store.update_project(number, last_sync=stamp, last_sync_status="ok", fields_pct=s["fields_pct"],
                          units_pct=s["units_pct"], units=s["units"], open_deficiencies=d["open"],
                          open_high=open_high, gap_flags=len(results["gap_flags"]))
+    if website_problem:
+        results["website_problem"] = website_problem
     return results
 
 
-def _publish(settings: Settings, number: str, results: dict[str, Any]) -> None:
-    """Hand the results file to the web app (which stores it in Vercel Blob)."""
-    if not settings.app_url:
-        return
+def app_url(settings: Settings) -> str:
+    url = (settings.app_url or "").strip().rstrip("/")
+    if url and not url.startswith(("http://", "https://")):
+        url = "https://" + url
+    return url
+
+
+def publish(settings: Settings, number: str, results: dict[str, Any] | str) -> str:
+    """Hand the results file to the web app (which stores it in Vercel Blob).
+
+    Returns "" on success, otherwise a plain-English reason (the sync itself still counts as done).
+    """
+    url = app_url(settings)
+    if not url:
+        return "APP_URL is not set in the server's .env file"
+    if not settings.worker_secret:
+        return "WORKER_SECRET is not set in the server's .env file"
     import requests
+    body = results if isinstance(results, str) else json.dumps(results, ensure_ascii=False, default=str)
+    target = f"{url}/api/worker/results/{number}"
     try:
-        r = requests.post(f"{settings.app_url}/api/worker/results/{number}", json=results,
-                          headers={"x-worker-secret": settings.worker_secret}, timeout=60)
-        r.raise_for_status()
+        r = requests.post(target, data=body.encode("utf-8"), timeout=120,
+                          headers={"x-worker-secret": settings.worker_secret,
+                                   "content-type": "application/json"})
     except Exception as exc:  # noqa: BLE001
-        log.warning("Could not send results for %s to the web app: %s", number, exc)
+        return f"could not reach {url} ({exc.__class__.__name__}: {str(exc)[:150]})"
+    if r.ok:
+        return ""
+    detail = r.text[:200].strip()
+    if r.status_code == 401:
+        return ("the website rejected the WORKER_SECRET: the one in the server's .env must match "
+                "WORKER_SECRET in Vercel exactly")
+    if r.status_code == 404:
+        return f"{target} was not found (404): check APP_URL in the server's .env"
+    return f"the website returned {r.status_code}: {detail}"
+
+
+def _publish(settings: Settings, number: str, results: dict[str, Any]) -> str:
+    problem = publish(settings, number, results)
+    if problem:
+        log.warning("Could not send results for %s to the website: %s", number, problem)
+    return problem
 
 
 def _link(settings: Settings, number: str) -> str:
@@ -176,8 +209,19 @@ def _email_success(store, settings, mailer, job, project, results) -> None:
             "with no errors.</p>"
             f"<p>{s['fields_pct']}% of required fields filled · {s['units_complete']} of {s['units']} units "
             f"complete · {d['open']} open deficiencies ({d['open_by_priority'].get('High', 0)} high)</p>"
-            + gap_line + _link(settings, job["project_number"]))
-    mailer.send([to], f"Sync complete: {job['project_number']} {project.get('name', '')}", body)
+            + gap_line + _website_line(results) + _link(settings, job["project_number"]))
+    recipients = [to]
+    if results.get("website_problem"):
+        recipients += [e for e in admin_emails(store, settings) if e != to]
+    mailer.send(recipients, f"Sync complete: {job['project_number']} {project.get('name', '')}", body)
+
+
+def _website_line(results) -> str:
+    problem = results.get("website_problem")
+    if not problem:
+        return ""
+    return ("<p><b>The equipment details did not reach the website</b>, so the Equipment grid "
+            f"won't show this sync. Reason: {esc(problem)}. Rick has been told.</p>")
 
 
 def _email_failure(store, settings, mailer, job, project, message) -> None:

@@ -54,8 +54,10 @@ def test_refresh_success(sample_export, tmp_path):
                                                             "Electric Heat (sub-item)"}
     assert len(store.rows("History")) == 1
     assert (tmp_path / "results" / "99-001.json").exists()
-    assert mail.sent[-1]["To"] == "tech@example.com"
-    assert "no errors" in mail.sent[-1].get_body(("html",)).get_content()
+    assert "tech@example.com" in mail.sent[-1]["To"]
+    body = mail.sent[-1].get_body(("html",)).get_content()
+    assert "no errors" in body
+    assert "APP_URL is not set" in body          # no website in tests, so the email says so
 
 
 def test_second_refresh_replaces_dashboard_rows(sample_export, tmp_path):
@@ -123,3 +125,24 @@ def test_refresh_reports_each_step(sample_export, tmp_path):
     assert "Logging in to BuildingStart" in seen
     assert "Checking rules" in seen
     assert seen[-1] == "ok"
+
+
+class _Resp:
+    def __init__(self, code, text=""):
+        self.status_code, self.text, self.ok = code, text, code < 400
+
+
+def test_publish_explains_problems(monkeypatch, tmp_path):
+    import requests
+    from hitlist.runner import publish
+    s = Settings(results_dir=tmp_path, app_url="hitlist.example.com/", worker_secret="x" * 32)
+    calls = []
+
+    def fake_post(url, **kw):
+        calls.append(url)
+        return _Resp(401)
+    monkeypatch.setattr(requests, "post", fake_post)
+    assert "WORKER_SECRET" in publish(s, "99-001", {"a": 1})
+    assert calls == ["https://hitlist.example.com/api/worker/results/99-001"]
+    monkeypatch.setattr(requests, "post", lambda url, **kw: _Resp(200))
+    assert publish(s, "99-001", {"a": 1}) == ""

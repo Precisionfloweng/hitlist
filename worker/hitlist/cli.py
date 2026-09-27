@@ -7,6 +7,7 @@
     python -m hitlist run                                       worker loop (what the mini PC runs)
     python -m hitlist run-once                                  handle queued refreshes, then stop
     python -m hitlist weekly-summary [--dry-run]                send the Monday summary emails
+    python -m hitlist publish NUMBER                            re-send a project's last results to the website
 """
 
 from __future__ import annotations
@@ -45,6 +46,8 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--by", required=True, help="email or name of the person asking")
     sub.add_parser("run")
     sub.add_parser("run-once")
+    pub = sub.add_parser("publish", help="Re-send a project's last results to the website")
+    pub.add_argument("number")
     w = sub.add_parser("weekly-summary")
     w.add_argument("--dry-run", action="store_true", help="build the emails but don't send them")
     args = p.parse_args(argv)
@@ -61,6 +64,16 @@ def main(argv: list[str] | None = None) -> int:
     settings = Settings.from_env(args.env)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s",
                         handlers=[logging.StreamHandler(), _file_log()])
+    if args.cmd == "publish":
+        from .runner import app_url, publish
+        f = settings.results_dir / f"{args.number}.json"
+        if not f.exists():
+            print(f"No results saved for {args.number} yet ({f}). Press Refresh on the website first.")
+            return 1
+        print(f"Sending {f.name} ({f.stat().st_size // 1024} KB) to {app_url(settings) or '(APP_URL not set)'} ...")
+        problem = publish(settings, args.number, f.read_text(encoding="utf-8"))
+        print("Problem: " + problem if problem else "Done. The Equipment grid should show on the project page now.")
+        return 1 if problem else 0
     if not settings.sheet_id or not settings.service_account_file:
         print("Set HITLIST_SHEET_ID and GOOGLE_SERVICE_ACCOUNT_FILE in .env first.")
         return 2
