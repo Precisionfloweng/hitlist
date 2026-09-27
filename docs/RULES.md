@@ -180,59 +180,59 @@ Export sheet: **Fan Unit**
 
 ## FCUs
 
-Export sheet: **Fan Coil Unit *(sheet name not yet confirmed)***
+Export sheet: **Fan Coil**
 
 | Field | Status | Export column(s) | Only when |
 | --- | --- | --- | --- |
-| Design Airflow | ⚠ Optional | *(matched automatically)* |  |
-| Actual Airflow | ✖ Required | *(matched automatically)* |  |
-| Design O/A | ✖ Required | *(matched automatically)* |  |
-| Actual O/A | ✖ Required | *(matched automatically)* |  |
-| Design T.S.P. | ⚠ Optional | *(matched automatically)* |  |
-| Actual T.S.P. | ✖ Required | *(matched automatically)* |  |
-| Design E.S.P. | ⚠ Optional | *(matched automatically)* |  |
-| Actual E.S.P. | ✖ Required | *(matched automatically)* |  |
-| Design RPM | ⚠ Optional | *(matched automatically)* |  |
-| Actual Fan RPM | ✖ Required | *(matched automatically)* |  |
-| Design Outlet CFM | ⚠ Optional | *(matched automatically)* |  |
-| MFG | ✖ Required | *(matched automatically)* |  |
-| Model | ✖ Required | *(matched automatically)* |  |
-| Serial | ✖ Required | *(matched automatically)* |  |
-| VFD Setting | ⚠ Optional | *(matched automatically)* |  |
-| Fan Speed Setting | ⚠ Optional | *(matched automatically)* |  |
-| Filter Type | ✖ Required | *(matched automatically)* |  |
-| Qty S1 | ✖ Required | *(matched automatically)* |  |
-| Size S1 | ✖ Required | *(matched automatically)* |  |
-| Motor Make | ✖ Required | *(matched automatically)* |  |
-| Motor Type | ✖ Required | *(matched automatically)* |  |
-| Frame | ✖ Required | *(matched automatically)* |  |
-| HP | ✖ Required | *(matched automatically)* |  |
-| RPM | ✖ Required | *(matched automatically)* |  |
-| Voltage | ✖ Required | *(matched automatically)* |  |
-| Phase | ✖ Required | *(matched automatically)* |  |
-| Hertz | ✖ Required | *(matched automatically)* |  |
-| Amps | ✖ Required | *(matched automatically)* |  |
-| S.F. | ✖ Required | *(matched automatically)* |  |
-| Nom. Eff. | ✖ Required | *(matched automatically)* |  |
-| PF | ✖ Required | *(matched automatically)* |  |
-| Sheave MFG | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Sheave Model | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Sheave Dia. | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Sheave Bore | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Fan Sheave MFG | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Fan Sheave Model | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Fan Sheave Diameter | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Fan Sheave Bore | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Belts | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Belt Size | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Centerline | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Volts T1 | ✖ Required | *(matched automatically)* |  |
-| Amps T1 | ✖ Required | *(matched automatically)* |  |
-| Operating Dia. | ✖ Required | *(matched automatically)* | Motor Type = Belt Drive |
-| Location | ⚠ Optional | *(matched automatically)* |  |
-| Area Served | ⚠ Optional | *(matched automatically)* |  |
-| Heating EAT | ✖ Required | *(matched automatically)* |  |
-| Heating LAT | ✖ Required | *(matched automatically)* |  |
+| Design Airflow | ⚠ Optional | Design Airflow |  |
+| Actual Airflow | ✖ Required | Actual Airflow |  |
+| Design O/A | ✖ Required | Design Outside Air |  |
+| Actual O/A | ✖ Required | Actual Outside Air |  |
+| Design T.S.P. | ⚠ Optional | Design T.S.P. |  |
+| Actual T.S.P. | ✖ Required | Actual T.S.P. |  |
+| Design E.S.P. | ⚠ Optional | Design E.S.P. |  |
+| Actual E.S.P. | ✖ Required | Actual E.S.P. |  |
+| Design RPM | ⚠ Optional | Design RPM |  |
+| Actual Fan RPM | ✖ Required | Actual RPM |  |
+| Design Outlet CFM | ⚠ Optional | Total For Outlets |  |
+| MFG | ✖ Required | Unit Manufacturer |  |
+| Model | ✖ Required | Unit Model Number |  |
+| Serial | ✖ Required | Unit Serial Number |  |
+| VFD Setting | ⚠ Optional | Final VFD Setting |  |
+| Fan Speed Setting | ⚠ Optional | Fan Speed - Final |  |
+| Filter Type | ✖ Required | Filter Type |  |
+| Qty S1 | ✖ Required | Filter Qty - S1 |  |
+| Size S1 | ✖ Required | Filter Size - S1 |  |
+| Motor Make | ✖ Required | Motor Manufacturer |  |
+| Motor Type | ✖ Required | Motor Type |  |
+| Frame | ✖ Required | Motor Frame |  |
+| HP | ✖ Required | Motor HP |  |
+| RPM | ✖ Required | Motor RPM |  |
+| Voltage | ✖ Required | Motor Rated Volts |  |
+| Phase | ✖ Required | Motor Phase |  |
+| Hertz | ✖ Required | Motor Hertz |  |
+| Amps | ✖ Required | Motor FL Amps |  |
+| S.F. | ✖ Required | Motor Service Factor |  |
+| Nom. Eff. | ✖ Required | Nominal Efficiency |  |
+| PF | ✖ Required | Power Factor |  |
+| Sheave MFG | ✖ Required | Motor Sheave MFG | Motor Type = Belt Drive |
+| Sheave Model | ✖ Required | Motor Sheave Model | Motor Type = Belt Drive |
+| Sheave Dia. | ✖ Required | Motor Sheave Diam. | Motor Type = Belt Drive |
+| Sheave Bore | ✖ Required | Motor Sheave Bore | Motor Type = Belt Drive |
+| Fan Sheave MFG | ✖ Required | Fan Sheave MFG | Motor Type = Belt Drive |
+| Fan Sheave Model | ✖ Required | Fan Sheave Model | Motor Type = Belt Drive |
+| Fan Sheave Diameter | ✖ Required | Fan Sheave Diam. | Motor Type = Belt Drive |
+| Fan Sheave Bore | ✖ Required | Fan Sheave Bore | Motor Type = Belt Drive |
+| Belts | ✖ Required | Number of Belts | Motor Type = Belt Drive |
+| Belt Size | ✖ Required | Belt Size | Motor Type = Belt Drive |
+| Centerline | ✖ Required | Sheave Center Line | Motor Type = Belt Drive |
+| Volts T1 | ✖ Required | Motor Volts T1-T2 / Motor Volts T2-T3 / Motor Volts T1-T3 |  |
+| Amps T1 | ✖ Required | Motor Amps T1 / Motor Amps T2 / Motor Amps T3 |  |
+| Operating Dia. | ✖ Required | Operating Diameter | Motor Type = Belt Drive |
+| Location | ⚠ Optional | Location |  |
+| Area Served | ⚠ Optional | Serves |  |
+| Heating EAT | ✖ Required | Heating E.A.T |  |
+| Heating LAT | ✖ Required | Heating L.A.T. |  |
 
 ## Ductless
 

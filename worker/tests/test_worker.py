@@ -221,3 +221,17 @@ def test_projects_sharing_a_number(sample_export, tmp_path):
     assert store.project("99-001")["last_sync_status"] == ""       # the other site is untouched
     assert (tmp_path / "results" / "99-001-2.json").exists()
     assert "Sync complete: 99-001 Second Site" in mail.sent[-1]["Subject"]
+
+
+def test_update_rules_keeps_status():
+    store = make_store()
+    rows = store.rows("Rules")
+    ahu = next(r for r in rows if r["type_key"] == "ahu" and r["field"] == "Manufacturer")
+    store.update("Rules", ahu["_row"], {**ahu, "status": "optional", "columns": "Wrong Column", "export_sheet": "Old"})
+    import copy
+    rules = copy.deepcopy(SAMPLE_RULES)
+    assert store.refresh_rule_mapping(rules, "ahu") >= 1
+    ahu = next(r for r in store.rows("Rules") if r["type_key"] == "ahu" and r["field"] == "Manufacturer")
+    assert ahu["columns"] == "Unit Manufacturer" and ahu["export_sheet"] == "Air Handling Unit"
+    assert ahu["status"] == "optional"                   # the user's choice is kept
+    assert store.refresh_rule_mapping(rules, "ahu") == 0  # nothing left to change

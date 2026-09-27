@@ -8,6 +8,7 @@
     python -m hitlist run-once                                  handle queued refreshes, then stop
     python -m hitlist weekly-summary [--dry-run]                send the Monday summary emails
     python -m hitlist publish NUMBER                            re-send a project's last results to the website
+    python -m hitlist update-rules TYPE_KEY                     copy a type's sheet/column links from the bundled rules
 """
 
 from __future__ import annotations
@@ -46,6 +47,8 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--by", required=True, help="email or name of the person asking")
     sub.add_parser("run")
     sub.add_parser("run-once")
+    ur = sub.add_parser("update-rules", help="Copy a type's sheet and column links from the bundled rules")
+    ur.add_argument("type_key", nargs="+", help="e.g. fcu edh_sub")
     pub = sub.add_parser("publish", help="Re-send a project's last results to the website")
     pub.add_argument("number")
     w = sub.add_parser("weekly-summary")
@@ -92,6 +95,11 @@ def main(argv: list[str] | None = None) -> int:
                 store.append("Users", [{"email": email, "name": name, "role": "admin",
                                         "active": "yes", "added": date.today().isoformat()}])
                 print(f"Added admin {email}.")
+        return 0
+    if args.cmd == "update-rules":
+        for key in args.type_key:
+            n = store.refresh_rule_mapping(_seed_dict(), key)
+            print(f"{key}: {n} field(s) updated" if n else f"{key}: already up to date")
         return 0
     if args.cmd == "add-project":
         if store.project(args.number):

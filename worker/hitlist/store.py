@@ -246,6 +246,29 @@ class HitlistStore:
         return {(r["type_key"], r["field"]): r["status"] for r in rows
                 if r.get("project_number") == project_number and r.get("status")}
 
+    def refresh_rule_mapping(self, rules: dict[str, Any], type_key: str, by: str = "server") -> int:
+        """Copy one type's export sheet, parent filter, columns and conditions from `rules` (the bundled
+        defaults) into the Rules tab. Required/optional/ignore choices are kept. Returns rows changed."""
+        src = next((t for t in rules["types"] if t["key"] == type_key), None)
+        if src is None:
+            raise KeyError(f"No equipment type '{type_key}' in the bundled rules")
+        by_label = {r["field"]: r for r in rules_to_rows({"types": [src]})}
+        changed = 0
+        for row in self.rows("Rules"):
+            if row["type_key"] != type_key or row["field"] not in by_label:
+                continue
+            new = by_label[row["field"]]
+            keep = {k: row[k] for k in ("status", "_row")}
+            upd = {**row, **{k: new[k] for k in ("export_sheet", "sheet_confirmed", "parent_types", "columns", "when")}, **keep}
+            if any(str(upd[k]) != str(row.get(k, "")) for k in ("export_sheet", "sheet_confirmed", "parent_types", "columns", "when")):
+                self.update("Rules", row["_row"], upd)
+                changed += 1
+        if changed:
+            self.append("RuleHistory", [{"changed_at": now_iso(), "changed_by": by, "type_key": type_key,
+                                         "field": "(sheet and columns)", "old_status": "",
+                                         "new_status": f"updated from bundled rules ({changed} fields)"}])
+        return changed
+
     def seed_rules(self, rules: dict[str, Any]) -> int:
         if self.rows("Rules"):
             return 0

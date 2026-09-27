@@ -1478,203 +1478,267 @@
   {
    "key": "fcu",
    "name": "FCUs",
-   "export_sheet": "Fan Coil Unit",
-   "export_sheet_confirmed": false,
+   "export_sheet": "Fan Coil",
+   "export_sheet_confirmed": true,
    "parent_types": null,
    "fields": [
     {
      "label": "Design Airflow",
-     "columns": null,
+     "columns": [
+      "Design Airflow"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Actual Airflow",
-     "columns": null,
+     "columns": [
+      "Actual Airflow"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Design O/A",
-     "columns": null,
+     "columns": [
+      "Design Outside Air"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Actual O/A",
-     "columns": null,
+     "columns": [
+      "Actual Outside Air"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Design T.S.P.",
-     "columns": null,
+     "columns": [
+      "Design T.S.P."
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Actual T.S.P.",
-     "columns": null,
+     "columns": [
+      "Actual T.S.P."
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Design E.S.P.",
-     "columns": null,
+     "columns": [
+      "Design E.S.P."
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Actual E.S.P.",
-     "columns": null,
+     "columns": [
+      "Actual E.S.P."
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Design RPM",
-     "columns": null,
+     "columns": [
+      "Design RPM"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Actual Fan RPM",
-     "columns": null,
+     "columns": [
+      "Actual RPM"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Design Outlet CFM",
-     "columns": null,
+     "columns": [
+      "Total For Outlets"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "MFG",
-     "columns": null,
+     "columns": [
+      "Unit Manufacturer"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Model",
-     "columns": null,
+     "columns": [
+      "Unit Model Number"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Serial",
-     "columns": null,
+     "columns": [
+      "Unit Serial Number"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "VFD Setting",
-     "columns": null,
+     "columns": [
+      "Final VFD Setting"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Fan Speed Setting",
-     "columns": null,
+     "columns": [
+      "Fan Speed - Final"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Filter Type",
-     "columns": null,
+     "columns": [
+      "Filter Type"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Qty S1",
-     "columns": null,
+     "columns": [
+      "Filter Qty - S1"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Size S1",
-     "columns": null,
+     "columns": [
+      "Filter Size - S1"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Motor Make",
-     "columns": null,
+     "columns": [
+      "Motor Manufacturer"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Motor Type",
-     "columns": null,
+     "columns": [
+      "Motor Type"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Frame",
-     "columns": null,
+     "columns": [
+      "Motor Frame"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "HP",
-     "columns": null,
+     "columns": [
+      "Motor HP"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "RPM",
-     "columns": null,
+     "columns": [
+      "Motor RPM"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Voltage",
-     "columns": null,
+     "columns": [
+      "Motor Rated Volts"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Phase",
-     "columns": null,
+     "columns": [
+      "Motor Phase"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Hertz",
-     "columns": null,
+     "columns": [
+      "Motor Hertz"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Amps",
-     "columns": null,
+     "columns": [
+      "Motor FL Amps"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "S.F.",
-     "columns": null,
+     "columns": [
+      "Motor Service Factor"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Nom. Eff.",
-     "columns": null,
+     "columns": [
+      "Nominal Efficiency"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "PF",
-     "columns": null,
+     "columns": [
+      "Power Factor"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Sheave MFG",
-     "columns": null,
+     "columns": [
+      "Motor Sheave MFG"
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1682,11 +1746,13 @@
     },
     {
      "label": "Sheave Model",
-     "columns": null,
+     "columns": [
+      "Motor Sheave Model"
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1694,11 +1760,13 @@
     },
     {
      "label": "Sheave Dia.",
-     "columns": null,
+     "columns": [
+      "Motor Sheave Diam."
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1706,11 +1774,13 @@
     },
     {
      "label": "Sheave Bore",
-     "columns": null,
+     "columns": [
+      "Motor Sheave Bore"
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1718,11 +1788,13 @@
     },
     {
      "label": "Fan Sheave MFG",
-     "columns": null,
+     "columns": [
+      "Fan Sheave MFG"
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1730,11 +1802,13 @@
     },
     {
      "label": "Fan Sheave Model",
-     "columns": null,
+     "columns": [
+      "Fan Sheave Model"
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1742,11 +1816,13 @@
     },
     {
      "label": "Fan Sheave Diameter",
-     "columns": null,
+     "columns": [
+      "Fan Sheave Diam."
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1754,11 +1830,13 @@
     },
     {
      "label": "Fan Sheave Bore",
-     "columns": null,
+     "columns": [
+      "Fan Sheave Bore"
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1766,11 +1844,13 @@
     },
     {
      "label": "Belts",
-     "columns": null,
+     "columns": [
+      "Number of Belts"
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1778,11 +1858,13 @@
     },
     {
      "label": "Belt Size",
-     "columns": null,
+     "columns": [
+      "Belt Size"
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1790,11 +1872,13 @@
     },
     {
      "label": "Centerline",
-     "columns": null,
+     "columns": [
+      "Sheave Center Line"
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1802,23 +1886,33 @@
     },
     {
      "label": "Volts T1",
-     "columns": null,
+     "columns": [
+      "Motor Volts T1-T2",
+      "Motor Volts T2-T3",
+      "Motor Volts T1-T3"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Amps T1",
-     "columns": null,
+     "columns": [
+      "Motor Amps T1",
+      "Motor Amps T2",
+      "Motor Amps T3"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Operating Dia.",
-     "columns": null,
+     "columns": [
+      "Operating Diameter"
+     ],
      "status": "required",
      "when": [
       {
-       "column": null,
+       "column": "Motor Type",
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
@@ -1826,25 +1920,33 @@
     },
     {
      "label": "Location",
-     "columns": null,
+     "columns": [
+      "Location"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Area Served",
-     "columns": null,
+     "columns": [
+      "Serves"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Heating EAT",
-     "columns": null,
+     "columns": [
+      "Heating E.A.T"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Heating LAT",
-     "columns": null,
+     "columns": [
+      "Heating L.A.T."
+     ],
      "status": "required",
      "when": null
     }
