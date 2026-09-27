@@ -88,14 +88,12 @@ export default function RefreshButton({ project, job: initial, compact = false }
     const waited = now - ms(job.requestedAt);
     body = (
       <>
-        <div><span className="pill gray">Waiting</span> <span className="num">{clock(waited)}</span></div>
+        <div className="sync-head"><span className="pill gray">Waiting</span> <span className="num">{clock(waited)}</span></div>
         <div className="sync-step">
-          {job.ahead > 0 ? `${job.ahead} sync${job.ahead > 1 ? "s" : ""} ahead of this one`
-            : "Waiting for the server to pick it up"}
+          {job.ahead > 0 ? `${job.ahead} sync${job.ahead > 1 ? "s" : ""} ahead` : "Waiting on the server"}
         </div>
         {job.ahead === 0 && waited > SLOW_PICKUP_MS && (
-          <div className="sync-step error">The server hasn&apos;t started it. It normally starts within a minute,
-            so it may be off, asleep or not running.</div>
+          <div className="sync-note error">The server hasn&apos;t started it. It may be off or asleep.</div>
         )}
       </>
     );
@@ -104,24 +102,25 @@ export default function RefreshButton({ project, job: initial, compact = false }
     const slow = job.lastMinutes ? took > job.lastMinutes * 2 * 60_000 + 5 * 60_000 : took > 30 * 60_000;
     body = (
       <>
-        <div><span className="pill warn">Syncing</span> <span className="num">{clock(took)}</span></div>
-        <div className="sync-step">{job.step || "Working…"}</div>
-        {!compact && job.lastMinutes && <div className="sync-step muted">Last sync took about {job.lastMinutes} min</div>}
-        {slow && <div className="sync-step error">This is taking longer than usual.</div>}
+        <div className="sync-head"><span className="pill warn">Syncing</span> <span className="num">{clock(took)}</span></div>
+        <div className="sync-step" title={job.step}>{job.step || "Working…"}</div>
+        {!compact && job.lastMinutes && <div className="sync-note muted">Last sync took about {job.lastMinutes} min</div>}
+        {slow && <div className="sync-note error">Taking longer than usual.</div>}
       </>
     );
   } else if (job?.status === "failed" && now - ms(job.finishedAt || job.requestedAt) < SHOW_DONE_MS) {
     body = (
       <>
-        <div className="row" style={{ gap: 6, flexWrap: "nowrap" }}><span className="pill bad">Sync failed</span>{button("Try again")}</div>
-        <div className="sync-step error">{job.step}</div>
+        {button("Try again")}
+        <div className="sync-note error">Sync failed: {job.step}</div>
       </>
     );
   } else if (job?.status === "done" && now - ms(job.finishedAt) < SHOW_DONE_MS) {
     body = (
-      <div className="row" style={{ gap: 6, flexWrap: "nowrap" }}>
-        <span className="pill ok">✓ Synced {ago(job.finishedAt, now)}</span>{button()}
-      </div>
+      <>
+        {button()}
+        <div className="sync-step ok-text">✓ Synced {ago(job.finishedAt, now)}</div>
+      </>
     );
   } else {
     body = button();
@@ -130,7 +129,7 @@ export default function RefreshButton({ project, job: initial, compact = false }
   return (
     <div className={compact ? "sync compact" : "sync"}>
       {body}
-      {error && <div className="sync-step error">{error}</div>}
+      {error && <div className="sync-note error">{error}</div>}
     </div>
   );
 }

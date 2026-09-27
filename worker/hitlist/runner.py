@@ -27,7 +27,7 @@ StepFn = Callable[[str], None]
 def default_export_fn(settings: Settings) -> ExportFn:
     if settings.export_command:
         def command(project: str, step: StepFn = lambda m: None) -> Path:
-            step("Running the export script (large projects take 5-10 min)")
+            step("Downloading export")
             return run_export(settings.export_command, project, settings.export_dir,
                               settings.export_timeout_minutes)
         return command
@@ -57,7 +57,7 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
         return False
     export_fn = export_fn or default_export_fn(settings)
     number = job["project_number"]
-    store.set_job(job, status=RUNNING, started_at=now_iso(), message="Picked up by the server")
+    store.set_job(job, status=RUNNING, started_at=now_iso(), message="Starting")
     log.info("Refreshing %s (requested by %s)", number, job["requested_by"])
     project = store.project(number)
     step = _stepper(store, job)
@@ -74,7 +74,7 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
         _email_failure(store, settings, mailer, job, project, message)
         return True
 
-    step("Sending the sync-complete email")
+    step("Sending email")
     store.set_job(job, status=DONE, finished_at=now_iso(), message="ok")
     _email_success(store, settings, mailer, job, project, results)
     return True
@@ -102,17 +102,16 @@ def _call_export(export_fn: ExportFn, number: str, step: StepFn) -> Path:
 
 def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: ExportFn,
              step: StepFn = lambda m: None) -> dict[str, Any]:
-    step("Starting the BuildingStart export")
     try:
         path = _call_export(export_fn, number, step)
     except ExportError as exc:
         log.warning("Export failed once for %s, retrying", number)
-        step(f"Export failed ({str(exc)[:80]}); trying again")
+        step("Export failed, trying again")
         path = _call_export(export_fn, number, step)
 
-    step("Reading the export")
+    step("Reading export")
     export = read_export(path)
-    step("Checking every unit against the rules")
+    step("Checking rules")
     rules_dict = store.load_rules_dict()
     rules = load_rules(rules_dict) if rules_dict else load_rules()
     results = check_project(export, rules, project_number=number)
@@ -122,10 +121,10 @@ def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: Ex
     previous = json.loads(result_file.read_text(encoding="utf-8")) if result_file.exists() else None
     results["gap_flags"] = gap_check(previous, results)
     result_file.write_text(json.dumps(results, ensure_ascii=False, default=str), encoding="utf-8")
-    step("Sending results to the website")
+    step("Saving results")
     _publish(settings, number, results)
 
-    step("Updating the dashboard")
+    step("Updating dashboard")
 
     stamp = now_iso()
     store.replace_for_project("Dashboard", number,
