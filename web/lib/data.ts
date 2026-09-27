@@ -8,6 +8,7 @@ export type Project = {
   lastSync: string; lastSyncStatus: string; daysSinceSync: number | null;
   fieldsPct: number | null; unitsPct: number | null; units: number | null;
   openDeficiencies: number | null; openHigh: number | null; gapFlags: number | null;
+  punchItems: number | null;   // all deficiencies, open and closed
   queue: "queued" | "running" | null; job: SyncJob | null; row: number;
 };
 
@@ -59,7 +60,14 @@ export function daysSince(iso: string): number | null {
   return Number.isNaN(t) ? null : Math.floor((Date.now() - t) / 86_400_000);
 }
 
-function toProject(p: Rec, queue: Rec[]): Project {
+/** Total deficiencies per project, from the "status" counts the worker saves. */
+function punchTotals(defs: Rec[]): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const d of defs) if (d.group === "status") out.set(d.project_number, (out.get(d.project_number) ?? 0) + (Number(d.count) || 0));
+  return out;
+}
+
+function toProject(p: Rec, queue: Rec[], punch?: Map<string, number>): Project {
   const pending = queue.filter((q) => q.project_number === p.project_number && isActive(q));
   return {
     number: p.project_number, name: p.name, tech: p.tech, date: p.date, address: p.address,
@@ -67,6 +75,7 @@ function toProject(p: Rec, queue: Rec[]): Project {
     daysSinceSync: daysSince(p.last_sync), fieldsPct: num(p.fields_pct), unitsPct: num(p.units_pct),
     units: num(p.units), openDeficiencies: num(p.open_deficiencies), openHigh: num(p.open_high),
     gapFlags: num(p.gap_flags),
+    punchItems: p.last_sync ? (punch?.get(p.project_number) ?? 0) : null,
     queue: pending.some((q) => q.status === "running") ? "running" : pending.length ? "queued" : null,
     job: jobFor(p.project_number, queue),
     row: p._row,
@@ -74,8 +83,9 @@ function toProject(p: Rec, queue: Rec[]): Project {
 }
 
 export async function listProjects(fresh = false): Promise<Project[]> {
-  const { Projects, Queue } = await readTabs(["Projects", "Queue"], fresh);
-  return Projects.filter((p) => p.status !== "deleted").map((p) => toProject(p, Queue));
+  const { Projects, Queue, Deficiencies } = await readTabs(["Projects", "Queue", "Deficiencies"], fresh);
+  const punch = punchTotals(Deficiencies);
+  return Projects.filter((p) => p.status !== "deleted").map((p) => toProject(p, Queue, punch));
 }
 
 export async function getProject(number: string) {
@@ -85,7 +95,7 @@ export async function getProject(number: string) {
   if (!p) return null;
   const mine = <T extends Rec>(rows: T[]) => rows.filter((r) => r.project_number === number);
   return {
-    project: toProject(p, Queue),
+    project: toProject(p, Queue, punchTotals(Deficiencies)),
     dashboard: mine(Dashboard),
     deficiencies: mine(Deficiencies),
     history: mine(History).sort((a, b) => a.synced_at.localeCompare(b.synced_at)),
