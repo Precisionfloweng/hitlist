@@ -99,7 +99,7 @@ main.wide { max-width: none; }
 .eq-grid th.u, .eq-grid td.u { position: sticky; left: 0; z-index: 1; background: #fff; min-width: 210px; max-width: 260px;
   padding: 6px 12px; border-right: 1px solid var(--line); }
 .eq-grid thead th.u { z-index: 1000; background: #fafbfc; padding-bottom: 10px; }
-.eq-grid th.d, .eq-grid td.d { padding: 6px 12px; width: 74px; min-width: 74px; border-right: 1px solid var(--line); }
+.eq-grid th.d, .eq-grid td.d { padding: 6px 6px; width: 48px; min-width: 48px; max-width: 48px; text-align: center; border-right: 1px solid var(--line); }
 .eq-grid thead th.d { padding-bottom: 10px; }
 /* Field names on a 45° angle. Earlier columns sit above later ones (z-index set inline),
    so each label can run up-right over its neighbours' header space. */
@@ -111,7 +111,7 @@ main.wide { max-width: none; }
 .eq-grid th.pad, .eq-grid td.pad { width: 120px; min-width: 120px; border-left: 0; }
 .u-name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .u-area { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.d-num { font-size: 13px; font-variant-numeric: tabular-nums; }
+.d-num { font-size: 12px; font-variant-numeric: tabular-nums; }
 .d-bar { height: 4px; background: #eceff3; border-radius: 99px; overflow: hidden; margin-top: 3px; }
 .d-bar > span { display: block; height: 100%; background: var(--warn); }
 .d-bar.full > span { background: var(--ok); }
