@@ -40,11 +40,20 @@ def pick_project_row(row_names: list[str], project_number: str, project_name: st
         return 0
     want = _words(project_name, project_number)
     row_words = [_words(n, project_number) for n in row_names]
+    # 1. A row whose name is the same as the Hitlist name (ignoring the number, case and punctuation).
+    exact = [i for i, words in enumerate(row_words) if words == want]
+    if len(exact) == 1:
+        return exact[0]
+    # 2. Words that tell the rows apart; longer words count more ("Maple" beats "ES").
     shared = set.intersection(*row_words)          # e.g. the district name on both sites
-    # Score on words that tell the rows apart; longer words count more ("Maple" beats "ES").
     scores = [sum(len(w) for w in want & (words - shared)) for words in row_words]
     best = max(range(len(scores)), key=lambda i: scores[i])
-    if scores[best] == 0 or scores.count(scores[best]) > 1:
+    if scores[best] > 0 and scores.count(scores[best]) == 1:
+        return best
+    # 3. Closest name overall: most words in common, then fewest extra words.
+    ranks = [(len(want & words), -len(words - want)) for words in row_words]
+    best = max(range(len(ranks)), key=lambda i: ranks[i])
+    if ranks[best][0] == 0 or ranks.count(ranks[best]) > 1:
         names = "; ".join(f"'{n.strip()}'" for n in row_names)
         raise RuntimeError(f"{len(row_names)} BuildingStart projects are numbered {project_number}: {names}. "
                            f"Change the Hitlist project name ('{project_name}') so it matches one of them.")

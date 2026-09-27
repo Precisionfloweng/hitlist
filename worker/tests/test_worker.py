@@ -268,3 +268,11 @@ def test_interrupted_syncs_are_closed_on_startup():
     a, b = store.rows("Queue")
     assert (a["status"], a["message"]) == ("done", "ok")
     assert b["status"] == "failed" and "restarted" in b["message"]
+
+
+def test_pick_project_row_prefers_the_exact_or_closest_name():
+    from hitlist.buildingstart import pick_project_row
+    rows = ["99-127 Acme", "99-127 Acme Holdings Corp"]
+    assert pick_project_row(rows, "99-127", "99-127 Acme") == 0             # exact
+    assert pick_project_row(rows, "99-127", "Acme Holdings") == 1           # closest
+    assert pick_project_row(rows, "99-127", "acme") == 0                    # case / number ignored
