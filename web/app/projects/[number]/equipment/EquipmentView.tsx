@@ -29,9 +29,6 @@ export default function EquipmentView({ types, initialType, syncedAt }:
     window.history.replaceState(null, "", url);
   }
 
-  // Fields that apply to at least one unit of this type.
-  const cols = useMemo(() => !t ? [] :
-    t.fields.map((f, i) => ({ ...f, i })).filter((f) => t.units.some((u) => (u.codes[f.i] ?? "-") !== "-")), [t]);
   const incomplete = t ? t.units.filter((u) => u.required_filled < u.required).length : 0;
   const units = useMemo(() => {
     if (!t) return [];
@@ -40,6 +37,12 @@ export default function EquipmentView({ types, initialType, syncedAt }:
       .filter((u) => filter === "all" || u.required_filled < u.required)
       .filter((u) => !s || u.name.toLowerCase().includes(s) || (u.area || "").toLowerCase().includes(s));
   }, [t, filter, q]);
+  // Only show fields that apply to at least one of the units on screen.
+  const cols = useMemo(() => {
+    if (!t) return [];
+    const shown = units.length ? units : t.units;
+    return t.fields.map((f, i) => ({ ...f, i })).filter((f) => shown.some((u) => (u.codes[f.i] ?? "-") !== "-"));
+  }, [t, units]);
   if (!t) return <div className="card">No equipment in this export.</div>;
 
   const missingReq = t.summary.missing_required;
