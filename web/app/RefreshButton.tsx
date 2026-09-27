@@ -77,7 +77,7 @@ export default function RefreshButton({ project, job: initial, cells = false }:
   }
 
   const button = (
-    <button disabled={sending || isActive} onClick={start} title="Pull the latest data from BuildingStart">
+    <button className="primary" disabled={sending || isActive} onClick={start} title="Pull the latest data from BuildingStart">
       {sending ? "Sending…" : job?.status === "failed" ? "Try again" : "Refresh"}
     </button>
   );
