@@ -160,3 +160,16 @@ export async function ensureHeader(tab: Tab) {
   });
   invalidate(tab);
 }
+
+/** Update several rows of one tab in a single API call. */
+export async function updateRows(tab: Tab, updates: { row: number; rec: Record<string, unknown> }[]) {
+  if (!updates.length) return;
+  await call("/values:batchUpdate", {
+    method: "POST",
+    body: {
+      valueInputOption: "RAW",
+      data: updates.map((u) => ({ range: `'${tab}'!A${u.row}`, values: [toRow(tab, u.rec)] })),
+    },
+  });
+  invalidate(tab);
+}
