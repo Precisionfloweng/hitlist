@@ -3856,54 +3856,71 @@
    "key": "pressure_sensor",
    "name": "Pressure Sensors",
    "export_sheet": "Pressure Sensor",
-   "export_sheet_confirmed": false,
+   "export_sheet_confirmed": true,
    "parent_types": null,
    "fields": [
     {
      "label": "Preliminary EMS",
-     "columns": null,
+     "columns": [
+      "Prelim. EMS"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Preliminary Test",
-     "columns": null,
+     "columns": [
+      "Prelim. Test"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Preliminary Diff",
-     "columns": null,
+     "columns": [
+      "Prelim. Diff."
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Offset",
-     "columns": null,
+     "columns": [
+      "EMS Offset"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Final EMS",
-     "columns": null,
+     "columns": [
+      "Final EMS"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Final Test",
-     "columns": null,
+     "columns": [
+      "Final Test"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Final Diff",
-     "columns": null,
+     "columns": [
+      "Final Diff."
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "% Diff",
-     "columns": null,
+     "columns": [
+      "% DIff.",
+      "% Diff."
+     ],
      "status": "optional",
      "when": null
     }
