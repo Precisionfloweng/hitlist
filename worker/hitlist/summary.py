@@ -21,7 +21,8 @@ def days_since(stamp: str, now: datetime | None = None) -> int | None:
         return None
     if when.tzinfo is None:
         when = when.replace(tzinfo=timezone.utc)
-    return ((now or datetime.now(timezone.utc)) - when).days
+    # Calendar days in the server's own time zone (Central), so last night's sync is 1 day, not 0.
+    return ((now or datetime.now(timezone.utc)).astimezone().date() - when.astimezone().date()).days
 
 
 def active_projects(store: HitlistStore, now: datetime | None = None) -> list[dict[str, Any]]:

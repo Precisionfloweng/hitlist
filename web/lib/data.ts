@@ -59,10 +59,16 @@ export async function syncStatus(number: string): Promise<SyncJob | null> {
 
 const num = (v: string) => (v === "" || v === undefined ? null : Number(v));
 
+/** Calendar date (YYYY-MM-DD) in PFE's time zone. The website runs in UTC, so this can't use the server's clock. */
+const localDay = (t: number) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(t);
+
+/** Calendar days since a sync, in Central time: a sync last night is 1 ("Yesterday"), not "Today". */
 export function daysSince(iso: string): number | null {
   if (!iso) return null;
   const t = Date.parse(iso);
-  return Number.isNaN(t) ? null : Math.floor((Date.now() - t) / 86_400_000);
+  if (Number.isNaN(t)) return null;
+  const days = (Date.parse(localDay(Date.now())) - Date.parse(localDay(t))) / 86_400_000;
+  return Math.max(0, Math.round(days));
 }
 
 /** Total deficiencies per project, from the "status" counts the worker saves. */
