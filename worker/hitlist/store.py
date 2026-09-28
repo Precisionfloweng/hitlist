@@ -266,17 +266,28 @@ class HitlistStore:
                                          "field": "(new equipment type)", "old_status": "",
                                          "new_status": f"added from bundled rules ({len(new_rows)} fields)"}])
             return len(new_rows)
-        # Same number of fields: pair them by position, so renamed fields follow. Otherwise by name.
-        if len(mine) == len(new_rows):
+        # Same number of fields: pair them by position, so renamed fields follow.
+        # More fields in the bundled rules and --statuses: rewrite the type to match them exactly.
+        # Otherwise pair by name, and add any bundled field the tab doesn't have.
+        same = len(mine) == len(new_rows)
+        rewrite = statuses and len(new_rows) > len(mine)
+        extra: list[dict[str, Any]] = []
+        if same or rewrite:
             pairs = list(zip(mine, new_rows))
+            extra = new_rows[len(mine):]
         else:
             by_label: dict[str, list[dict[str, Any]]] = {}
             for n in new_rows:
                 by_label.setdefault(n["field"], []).append(n)
             pairs = [(row, by_label[row["field"]].pop(0)) for row in mine if by_label.get(row["field"])]
+            have = {r["field"] for r in mine}
+            last = max(int(r.get("order") or 0) for r in mine)
+            extra = [{**n, "order": last + i + 1} for i, n in enumerate(x for x in new_rows if x["field"] not in have)]
         keys = ["type_name", "export_sheet", "sheet_confirmed", "parent_types", "field", "columns", "when"]
         if statuses:
             keys.append("status")
+        if rewrite:
+            keys.append("order")
         changed, renamed = 0, {}
         for row, new in pairs:
             upd = {**row, **{k: new[k] for k in keys}}
@@ -285,7 +296,10 @@ class HitlistStore:
                 changed += 1
                 if upd["field"] != row["field"]:
                     renamed[row["field"]] = upd["field"]
-        if renamed:                                 # keep each project's changes on the renamed fields
+        if extra:
+            self.append("Rules", extra)
+            changed += len(extra)
+        if renamed and same:                        # keep each project's changes on the renamed fields
             try:
                 overrides = self.rows("ProjectRules")
             except Exception:  # noqa: BLE001 - tab not created yet

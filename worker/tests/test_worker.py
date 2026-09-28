@@ -255,6 +255,22 @@ def test_update_rules_renames_fields_and_keeps_project_changes():
     assert row["status"] == "ignore"
 
 
+def test_update_rules_adds_new_fields():
+    import copy
+    store = make_store()
+    rules = copy.deepcopy(SAMPLE_RULES)
+    ahu = next(t for t in rules["types"] if t["key"] == "ahu")
+    ahu["fields"].insert(1, {"label": "Brand New", "columns": ["Brand New"], "status": "optional"})
+    count = lambda: len([r for r in store.rows("Rules") if r["type_key"] == "ahu"])
+    before = count()
+    assert store.refresh_rule_mapping(rules, "ahu") >= 1                       # by name: added at the end
+    assert count() == before + 1
+    store2 = make_store()
+    store2.refresh_rule_mapping(rules, "ahu", statuses=True)                  # rewrite: same order as bundled
+    rows = sorted((r for r in store2.rows("Rules") if r["type_key"] == "ahu"), key=lambda r: int(r["order"]))
+    assert [r["field"] for r in rows] == [f["label"] for f in ahu["fields"]]
+
+
 def test_update_rules_adds_a_new_type():
     import copy
     store = make_store()

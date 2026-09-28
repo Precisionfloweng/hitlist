@@ -37,7 +37,8 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Conditions: `equals` (spaces ignored, so "BeltDrive" = "Belt Drive"), `gt`, or `filled` (column has a value;
   coil air velocities only count when Airside Face Area is filled in).
 - Rules: the Rules tab is the company default (admins edit). `update-rules TYPE [--statuses]` copies a type from
-  the bundled seed; with the same field count it pairs fields by position, so renames carry over (and to ProjectRules). ProjectRules holds one project's
+  the bundled seed; with the same field count it pairs fields by position, so renames carry over (and to ProjectRules);
+  new fields are appended, or with --statuses the type is rewritten to match the seed exactly. ProjectRules holds one project's
   required/optional/ignore changes (anyone edits, on the project's Rules tab); blank status = default.
   The worker applies them per project (`store.apply_overrides`).
 - The "Electric Coil" sheet feeds two types: under a Terminal Unit = VAV electric heat, else EDH sub-item.
