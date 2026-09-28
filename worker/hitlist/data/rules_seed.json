@@ -2259,7 +2259,7 @@
   },
   {
    "key": "split",
-   "name": "Splits",
+   "name": "Split System",
    "export_sheet": "Split System",
    "export_sheet_confirmed": true,
    "parent_types": null,

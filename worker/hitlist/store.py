@@ -251,7 +251,7 @@ class HitlistStore:
 
     def refresh_rule_mapping(self, rules: dict[str, Any], type_key: str, by: str = "server",
                              statuses: bool = False) -> int:
-        """Copy one type's export sheet, parent filter, field names, columns and conditions from `rules`
+        """Copy one type's name, export sheet, parent filter, field names, columns and conditions from `rules`
         (the bundled defaults) into the Rules tab. Required/optional/ignore choices are kept unless
         `statuses` is set. Returns rows changed."""
         src = next((t for t in rules["types"] if t["key"] == type_key), None)
@@ -274,7 +274,7 @@ class HitlistStore:
             for n in new_rows:
                 by_label.setdefault(n["field"], []).append(n)
             pairs = [(row, by_label[row["field"]].pop(0)) for row in mine if by_label.get(row["field"])]
-        keys = ["export_sheet", "sheet_confirmed", "parent_types", "field", "columns", "when"]
+        keys = ["type_name", "export_sheet", "sheet_confirmed", "parent_types", "field", "columns", "when"]
         if statuses:
             keys.append("status")
         changed, renamed = 0, {}
