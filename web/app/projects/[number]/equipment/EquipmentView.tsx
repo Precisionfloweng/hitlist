@@ -6,7 +6,7 @@ import { byTypeOrder } from "@/lib/typeOrder";
 
 type Filter = "missing" | "all";
 const STATUS_WORD: Record<string, string> = { P: "filled", R: "required, missing", O: "optional, missing",
-  N: "marked N/A (-, N/A, ND…)", "-": "doesn't apply" };
+  N: "marked with a dash", "-": "doesn't apply" };
 
 function Cell({ code, label }: { code: string; label: string }) {
   const tip = `${label}: ${STATUS_WORD[code] ?? ""}`;
@@ -117,8 +117,9 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
             <span><span className="ck-key p">✓</span>Filled</span>
             <span><span className="ck-key r"><span>✕</span></span>Required missing</span>
             <span><span className="ck-key o">!</span>Optional missing</span>
-            <span><span className="ck-key mn">–</span>Marked N/A</span>
+            <span><span className="ck-key mn">–</span>Marked with a dash</span>
             <span><span className="ck-key na">·</span>Doesn&apos;t apply</span>
+            <a className="help-q" href="/help#checklist" title="What do the marks mean?">?</a>
           </div>
         </div>
 
@@ -127,7 +128,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
             <thead>
               <tr>
                 <th className="u">Unit</th>
-                <th className="d">Done</th>
+                <th className="d">Done <a className="help-q" href="/help#done" title="What does Done mean?">?</a></th>
                 {cols.map((c, n) => (
                   <th key={c.i} className={`f ${c.status === "optional" ? "opt" : ""}`} title={`${c.label} (${c.status})`}
                     style={{ zIndex: 2 + cols.length - n }}>

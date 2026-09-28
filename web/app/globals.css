@@ -191,3 +191,16 @@ th.ctr, td.ctr { text-align: center; }
 .tc-bar { height: 4px; background: #eceff3; border-radius: 99px; overflow: hidden; }
 .tc-bar > span { display: block; height: 100%; background: var(--brand); }
 .tc-bar.full > span { background: var(--ok); }
+
+/* Help page */
+main.help { max-width: 860px; }
+.help .lead { font-size: 16px; }
+.help h2 { margin-top: 32px; padding-top: 8px; border-top: 1px solid var(--line); }
+.help section { scroll-margin-top: 16px; }
+.help li { margin: 5px 0; }
+.help-toc ol { margin: 6px 0 0; padding-left: 22px; columns: 2; }
+.help-table td { vertical-align: top; }
+.help-table td:first-child { width: 190px; white-space: nowrap; }
+.help-q { display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; margin-left: 4px;
+  background: #e3e8ef; color: var(--brand); font-size: 11px; font-weight: 800; text-decoration: none; vertical-align: 1px; }
+.help-q:hover { background: var(--brand); color: #fff; text-decoration: none; }

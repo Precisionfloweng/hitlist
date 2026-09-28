@@ -9,6 +9,7 @@ export default function Header({ user }: { user: User }) {
         <Link href="/projects">Projects</Link>
         <Link href="/rules">Default rules</Link>
         {user.role === "admin" && <Link href="/admin">Admin</Link>}
+        <Link href="/help">Help</Link>
         <span className="spacer" />
         <Link href="/account/password">{user.name}</Link>
         <form action="/api/auth/logout" method="post"><button type="submit">Sign out</button></form>
