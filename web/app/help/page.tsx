@@ -13,6 +13,7 @@ const SECTIONS = [
   ["issues", "Possible issues found"],
   ["deficiencies", "Deficiencies"],
   ["rules", "Rules"],
+  ["sharing", "Sharing and confidentiality"],
   ["ipad", "iPad Home Screen"],
 ] as const;
 
@@ -128,6 +129,15 @@ export default async function HelpPage() {
             <li><b>Default rules</b> (top bar) are the company standard. Only admins can change them.</li>
             <li>A project&apos;s <b>Rules</b> tab lets anyone change a field for <b>that project only</b>. Changed fields are highlighted blue, with the default shown next to them and a <b>Reset</b> button. Every change is logged and can be undone.</li>
             <li>Rule changes show up on the project&apos;s next <b>Sync</b>.</li>
+          </ul>
+        </section>
+
+        <section id="sharing">
+          <h2>Sharing and confidentiality</h2>
+          <ul>
+            <li>Everything in Hitlist is <b>confidential Precision Flow Engineering information</b>. That includes project data, checklists, deficiencies and screenshots of any page.</li>
+            <li><b>Don&apos;t share it with customers, contractors or anyone outside PFE without permission</b> from Rick or Cody.</li>
+            <li>If a customer should see their project, ask Rick or Cody. With permission, they can set the customer up with their own <b>read-only</b> sign-in. Don&apos;t share your own sign-in.</li>
           </ul>
         </section>
 
