@@ -7361,6 +7361,363 @@
      "when": null
     }
    ]
+  },
+  {
+   "key": "duct_traverse",
+   "name": "Duct Traverses",
+   "export_sheet": "Duct Traverse",
+   "export_sheet_confirmed": true,
+   "parent_types": null,
+   "fields": [
+    {
+     "label": "Type of Traverse",
+     "columns": [
+      "Type of Traverse"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Duct Size",
+     "columns": [
+      "Diameter",
+      "Outer Width"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Air Flow Area",
+     "columns": [
+      "Air Flow Area"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Number of Rows",
+     "columns": [
+      "Number Of Rows"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Readings per Row",
+     "columns": [
+      "Readings Per Row"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Average Reading",
+     "columns": [
+      "Average Reading"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Design Total Flow",
+     "columns": [
+      "Design Total Flow"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Measured Total Flow",
+     "columns": [
+      "Actual Total Flow"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "% Airflow Final",
+     "columns": [
+      "% Airflow Final"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Duct Static Press.",
+     "columns": [
+      "Duct Static Press."
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Insulation Width",
+     "columns": [
+      "Insulation Width"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Location of Holes",
+     "columns": [
+      "Location of Holes 1"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Location of Traverse",
+     "columns": [
+      "Location of Traverse"
+     ],
+     "status": "optional",
+     "when": null
+    }
+   ]
+  },
+  {
+   "key": "face_velocity",
+   "name": "Face Velocity Tests",
+   "export_sheet": "Face Velocity Test",
+   "export_sheet_confirmed": true,
+   "parent_types": null,
+   "fields": [
+    {
+     "label": "Type of Traverse",
+     "columns": [
+      "Type of Traverse"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Duct Size",
+     "columns": [
+      "Diameter",
+      "Outer Width"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Air Flow Area",
+     "columns": [
+      "Air Flow Area"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Number of Rows",
+     "columns": [
+      "Number Of Rows"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Readings per Row",
+     "columns": [
+      "Readings Per Row"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Average Reading",
+     "columns": [
+      "Average Reading"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Design Total Flow",
+     "columns": [
+      "Design Total Flow"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Measured Total Flow",
+     "columns": [
+      "Actual Total Flow"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Duct Static Press.",
+     "columns": [
+      "Duct Static Press."
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Insulation Width",
+     "columns": [
+      "Insulation Width"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Location of Holes",
+     "columns": [
+      "Location of Holes 1"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Location of Traverse",
+     "columns": [
+      "Location of Traverse"
+     ],
+     "status": "optional",
+     "when": null
+    }
+   ]
+  },
+  {
+   "key": "autoflow_valve",
+   "name": "Autoflow Valves",
+   "export_sheet": "Autoflow Valve",
+   "export_sheet_confirmed": true,
+   "parent_types": null,
+   "fields": [
+    {
+     "label": "Manufacturer",
+     "columns": [
+      "Valve Manufacturer"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Model Number",
+     "columns": [
+      "Valve Model Number"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Valve Size",
+     "columns": [
+      "Valve Size"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Range (PSI)",
+     "columns": [
+      "Range (PSI)"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Design GPM",
+     "columns": [
+      "Design GPM"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Actual GPM",
+     "columns": [
+      "Actual GPM"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "% Diff",
+     "columns": [
+      "% Diff Design to Actual"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Actual D.P. PSI",
+     "columns": [
+      "Actual D.P. PSI"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Entering Water Temp",
+     "columns": [
+      "Entering Water Temp"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Leaving Water Temp",
+     "columns": [
+      "Leaving Water Temp"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Water Delta T",
+     "columns": [
+      "Water Delta T"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Entering Air Temp",
+     "columns": [
+      "Entering Air Temp"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Leaving Air Temp",
+     "columns": [
+      "Leaving Air Temp"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Air Delta T",
+     "columns": [
+      "Air Delta T"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Coil In PSI",
+     "columns": [
+      "Coil In PSI"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Coil Out PSI",
+     "columns": [
+      "Coil Out PSI"
+     ],
+     "status": "optional",
+     "when": null
+    }
+   ]
   }
  ]
 }

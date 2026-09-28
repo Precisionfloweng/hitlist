@@ -17,6 +17,8 @@ export const TYPE_ORDER = [
   "split",            // Split System
   "wshp",             // Water Source Heat Pump
   "coil_test",        // Coil Test
+  "duct_traverse",    // Duct Traverse
+  "face_velocity",    // Face Velocity Test
   "vav",              // Terminal Unit
   "vav_electric_heat",// Electric Coil (under a Terminal Unit)
   "temp_sensor",      // Temp / Hum Sensor
@@ -28,6 +30,7 @@ export const TYPE_ORDER = [
   "cooling_tower",    // Cooling Tower
   "boiler",           // Boiler
   "ach",              // ACH / Pressurization
+  "autoflow_valve",   // Autoflow Valve
 ];
 
 export function byTypeOrder<T extends { key: string; name: string }>(a: T, b: T): number {
