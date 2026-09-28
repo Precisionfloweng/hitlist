@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from .config import Settings
-from .mailer import BRAND, FONT, MUTED, Mailer, button, esc
+from .mailer import BRAND, FONT, MUTED, Mailer, esc
 from .runner import admin_emails
 from .store import HitlistStore, project_key
 
@@ -53,14 +53,20 @@ def _link(app_url: str, p: dict[str, Any]) -> str:
 
 
 def _table(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str:
-    th = (f'style="text-align:left;padding:8px 10px;background:{BRAND};color:#ffffff;font-family:{FONT};'
-          f'font-size:13px;font-weight:bold"')
+    def th(i: int) -> str:     # Project left-aligned, every other column centered
+        align = "left" if i == 0 else "center"
+        return (f'align="{align}" style="text-align:{align};padding:8px 10px;background:{BRAND};color:#ffffff;'
+                f'font-family:{FONT};font-size:13px;font-weight:bold"')
     cols = ["Project", *(["Tech"] if show_tech else []), "Last sync", "Complete", "Open deficiencies"]
-    head = "<tr>" + "".join(f"<th {th}>{c}</th>" for c in cols) + "</tr>"
+    head = "<tr>" + "".join(f"<th {th(i)}>{c}</th>" for i, c in enumerate(cols)) + "</tr>"
     rows = []
     for i, p in enumerate(projects):
-        td = (f'style="padding:8px 10px;border-bottom:1px solid #e3e6eb;font-family:{FONT};font-size:14px;'
-              f'background:{"#f1f4f8" if i % 2 else "#ffffff"}"')
+        bg = "#f1f4f8" if i % 2 else "#ffffff"
+
+        def td(n: int) -> str:
+            align = "left" if n == 0 else "center"
+            return (f'align="{align}" style="text-align:{align};padding:8px 10px;border-bottom:1px solid #e3e6eb;'
+                    f'font-family:{FONT};font-size:14px;background:{bg}"')
         stale = p["days"] is None or p["days"] >= 7
         url = _link(app_url, p)
         name = f"{esc(p['project_number'])} {esc(p['name'])}"
@@ -68,7 +74,7 @@ def _table(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str
         when = when_text(p["days"])
         when = f'<span style="color:#b42318;font-weight:bold">{when}</span>' if stale else when
         cells = [name, *([esc(p.get("tech"))] if show_tech else []), when, _pct(p), esc(p.get("open_deficiencies") or 0)]
-        rows.append("<tr>" + "".join(f"<td {td}>{c}</td>" for c in cells) + "</tr>")
+        rows.append("<tr>" + "".join(f"<td {td(n)}>{c}</td>" for n, c in enumerate(cells)) + "</tr>")
     return ('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
             'style="border-collapse:collapse;border:1px solid #e3e6eb">' + head + "".join(rows) + "</table>")
 
@@ -86,7 +92,6 @@ def _text(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str:
 
 def _body(intro: str, projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> tuple[str, str]:
     html = (f"<p style=\"margin:0 0 14px\">{intro}</p>" + _table(projects, app_url, show_tech)
-            + (f'<p style="margin:18px 0 0">{button(app_url, "Open Hitlist")}</p>' if app_url else "")
             + f'<p style="margin:14px 0 0;font-size:12px;color:{MUTED}">Red means 7 or more days since the last sync.</p>')
     return html, intro + "\n\n" + _text(projects, app_url, show_tech)
 
@@ -100,7 +105,7 @@ def send_weekly_summary(store: HitlistStore, settings: Settings, mailer: Mailer,
         if email:
             by_email[email].append(p)
     sent = {}
-    intro = "Here are your projects and when each was last synced. Press Sync on any project you've worked on this week."
+    intro = "Here are your projects and when each was last synced. Click a project to open it, and press Sync on any you've worked on this week."
     for email, mine in by_email.items():
         html, text = _body(intro, mine, settings.app_url, show_tech=False)
         mailer.send([email], "Weekly Hitlist summary", html, dry_run, text=text)

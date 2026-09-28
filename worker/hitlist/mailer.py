@@ -58,8 +58,11 @@ def _wrap(inner: str) -> str:
 
 
 def button(url: str, label: str) -> str:
-    return (f'<a href="{esc(url)}" style="display:inline-block;background:{BRAND};color:#ffffff;padding:10px 18px;'
-            f'font-family:{FONT};font-size:15px;font-weight:bold;text-decoration:none;border-radius:6px">{esc(label)}</a>')
+    """A button Outlook draws properly (it ignores padding on links, so the colour sits on a table cell)."""
+    return (f'<table role="presentation" cellpadding="0" cellspacing="0"><tr>'
+            f'<td bgcolor="{BRAND}" style="background:{BRAND};border-radius:6px;padding:10px 20px">'
+            f'<a href="{esc(url)}" style="color:#ffffff;font-family:{FONT};font-size:15px;font-weight:bold;'
+            f'text-decoration:none">{esc(label)}</a></td></tr></table>')
 
 
 def _to_text(markup: str) -> str:

@@ -41,7 +41,7 @@ export async function POST(req: Request) {
           `<p style="margin:0 0 12px">Hi ${escapeHtml(body.user.name.split(" ")[0])},</p>` +
           `<p style="margin:0 0 12px">Precision Flow Engineering has given you read-only access to the status of ` +
           `${names.map((n) => `<b>${escapeHtml(n)}</b>`).join(", ")}.</p>` +
-          `<p style="margin:0 0 16px">${emailButton(`${site}/login`, "Sign in")}</p>` +
+          `<div style="margin:0 0 16px">${emailButton(`${site}/login`, "Sign in")}</div>` +
           firstTime(site) +
           `<p style="margin:16px 0 0">This information is confidential and provided for your project only.</p>`);
       } else if (!original && body.welcome) {
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
           `<p style="margin:0 0 12px">Hi ${escapeHtml(body.user.name.split(" ")[0])},</p>` +
           `<p style="margin:0 0 12px">${escapeHtml(me.name)} has given you access to <b>PFE Hitlist</b>, where you can see each ` +
           `project's completion, what's still missing, and open deficiencies.</p>` +
-          `<p style="margin:0 0 16px">${emailButton(`${site}/login`, "Sign in to Hitlist")}</p>` +
+          `<div style="margin:0 0 16px">${emailButton(`${site}/login`, "Sign in to Hitlist")}</div>` +
           firstTime(site) +
           `<p style="margin:18px 0 6px"><b>Put it on your iPad's Home Screen</b> so it opens like an app:</p>` +
           `<ol style="margin:0;padding-left:22px">` +

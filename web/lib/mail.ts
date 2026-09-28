@@ -16,9 +16,12 @@ export function wrapEmail(inner: string): string {
     `</table></td></tr></table>`;
 }
 
+/** A button Outlook draws properly (it ignores padding on links, so the colour sits on a table cell). */
 export function emailButton(url: string, label: string): string {
-  return `<a href="${url}" style="display:inline-block;background:${BRAND};color:#ffffff;padding:10px 18px;font-family:${FONT};` +
-    `font-size:15px;font-weight:bold;text-decoration:none;border-radius:6px">${label}</a>`;
+  return `<table role="presentation" cellpadding="0" cellspacing="0"><tr>` +
+    `<td bgcolor="${BRAND}" style="background:${BRAND};border-radius:6px;padding:10px 20px">` +
+    `<a href="${url}" style="color:#ffffff;font-family:${FONT};font-size:15px;font-weight:bold;text-decoration:none">${label}</a>` +
+    `</td></tr></table>`;
 }
 
 /** Plain version from the HTML (Outlook shows this for mail it has put in Junk). */
