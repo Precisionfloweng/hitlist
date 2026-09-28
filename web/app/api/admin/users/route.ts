@@ -32,7 +32,7 @@ export async function POST(req: Request) {
         await sendMail(body.user.email.trim(), "You've been given access to PFE Hitlist",
           `<p>Hi ${escapeHtml(body.user.name.split(" ")[0])},</p>` +
           `<p>${escapeHtml(me.name)} has given you access to <b>PFE Hitlist</b>, where you can see each project's ` +
-          `test &amp; balance completion, what's still missing, and open deficiencies.</p>` +
+          `completion, what's still missing, and open deficiencies.</p>` +
           `<p><a href="${site}/login">Sign in at ${site.replace(/^https?:\/\//, "")}</a> with this email address. ` +
           `The first time, click <b>Email me a code</b>, enter the 6-digit code we send, and create your password. After that you just sign in with your email and password.</p>` +
           `<p><b>Put it on your iPad's Home Screen</b> so it opens like an app:</p>` +
