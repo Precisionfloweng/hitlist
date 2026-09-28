@@ -27,7 +27,7 @@ python -m playwright install chromium
    - `HITLIST_SHEET_ID=` the long ID from the PFE Hitlist Data sheet link
    - `BUILDINGSTART_USERNAME=` / `BUILDINGSTART_PASSWORD=` the login the worker uses
    - `GMAIL_ADDRESS=` / `GMAIL_APP_PASSWORD=` the Gmail app password
-   - `ADMIN_EMAILS=` extra admins for the weekly summary, comma separated
+   - `ADMIN_EMAILS=` extra people for the all-projects weekly summary, comma separated (admins get it automatically; the owner only if listed here)
    - `FAILURE_EMAILS=` who gets "sync failed" emails besides the tech (work address; nothing is ever sent to `GMAIL_ADDRESS`)
 
 ## 4. First run
@@ -48,7 +48,7 @@ Open **PowerShell as Administrator** (Start → type PowerShell → right-click 
 powershell -ExecutionPolicy Bypass -File C:\Hitlist\worker\windows\install_tasks.ps1 -AsSystem
 ```
 This creates `Hitlist worker` (starts with Windows,
-restarts itself) and `Hitlist weekly summary` (Mondays 7:00 AM), and starts the worker.
+restarts itself) and `Hitlist weekly summary` (Mondays 6:15 AM; output in `logs\weekly_summary.log`), and starts the worker.
 
 Logs are in `C:\Hitlist\worker\logs\worker.log`.
 

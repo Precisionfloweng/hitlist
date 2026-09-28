@@ -43,11 +43,11 @@ $a1 = New-ScheduledTaskAction -Execute "$here\run_worker.bat" -WorkingDirectory 
 $t1 = New-ScheduledTaskTrigger -AtStartup
 Add-Task "Hitlist worker" $a1 $t1 $s1
 
-# 2. Weekly summary: Mondays 7:00 AM
+# 2. Weekly summary: Mondays 6:15 AM
 $s2 = New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Hours 1) `
         -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
 $a2 = New-ScheduledTaskAction -Execute "$here\weekly_summary.bat" -WorkingDirectory $worker
-$t2 = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 7:00am
+$t2 = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 6:15am
 Add-Task "Hitlist weekly summary" $a2 $t2 $s2
 
 Start-ScheduledTask -TaskName "Hitlist worker"

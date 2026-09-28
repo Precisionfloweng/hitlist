@@ -257,8 +257,9 @@ def _email_failure(store, settings, mailer, job, project, message, detail: str =
 
 
 def admin_emails(store: HitlistStore, settings: Settings) -> list[str]:
+    """Who gets the all-projects weekly summary: admins, plus ADMIN_EMAILS. The owner only if listed there."""
     return sorted({*settings.admin_emails,
-                   *(u["email"] for u in store.users() if u.get("role", "").lower() in ("admin", "owner"))})
+                   *(u["email"] for u in store.users() if u.get("role", "").lower() == "admin")})
 
 
 def recover_interrupted(store: HitlistStore) -> int:
