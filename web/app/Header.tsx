@@ -10,7 +10,7 @@ export default function Header({ user }: { user: User }) {
           <span className="logo-bar" aria-hidden="true" />
         </Link>
         <Link href="/projects">Projects</Link>
-        {user.role !== "customer" && <Link href="/rules">Default rules</Link>}
+        {user.role !== "customer" && <Link href="/rules">Default Rules</Link>}
         {user.role === "admin" && <Link href="/admin">Admin</Link>}
         {user.role !== "customer" && <Link href="/help">Help</Link>}
         <span className="spacer" />

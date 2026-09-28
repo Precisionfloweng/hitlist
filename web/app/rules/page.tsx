@@ -12,7 +12,7 @@ export default async function RulesPage() {
     <>
       <Header user={user} />
       <main>
-        <h1>Default rules</h1>
+        <h1>Default Rules</h1>
         <p className="muted">
           What each equipment type needs filled in. <span className="s-R">✖ Required</span> counts toward completion %,
           {" "}<span className="s-O">⚠ Optional</span> shows as a warning, <b>Ignore</b> isn&apos;t checked.

@@ -126,7 +126,7 @@ export default async function HelpPage() {
           <h2>Rules</h2>
           <ul>
             <li>Rules decide which fields are <b>Required</b>, <b>Optional</b> or <b>Ignored</b> for each equipment type.</li>
-            <li><b>Default rules</b> (top bar) are the company standard. Only admins can change them.</li>
+            <li><b>Default Rules</b> (top bar) are the company standard. Only admins can change them.</li>
             <li>A project&apos;s <b>Rules</b> tab lets anyone change a field for <b>that project only</b>. Changed fields are highlighted blue, with the default shown next to them and a <b>Reset</b> button. Every change is logged and can be undone.</li>
             <li>Rule changes show up on the project&apos;s next <b>Sync</b>.</li>
           </ul>
@@ -160,7 +160,7 @@ export default async function HelpPage() {
               <li><b>Two sites on one contract</b> can share a project number, as long as the names differ. The server opens the BuildingStart project whose name matches best, so keep the Hitlist name close to the BuildingStart name.</li>
               <li><b>Users</b> (<Link href="/admin/users">Admin → Users</Link>): add people with their work email. Tick <b>Email them a welcome</b> to send sign-in and iPad instructions. Roles: <b>Admin</b> (everything), <b>Tech</b> (projects, Sync, project rules), <b>Viewer</b> (read-only).</li>
               <li><b>Emails</b>: a failed sync emails the tech and Rick. The Monday summary goes to each tech and the admins. Successful syncs don&apos;t send email.</li>
-              <li><b>&quot;Rules that didn&apos;t match this export&quot;</b> on an Overview means a sheet or column name in the Default rules looks mistyped. Fix it on the Rules page and Sync.</li>
+              <li><b>&quot;Rules that didn&apos;t match this export&quot;</b> on an Overview means a sheet or column name in the Default Rules looks mistyped. Fix it on the Rules page and Sync.</li>
             </ul>
           </section>
         )}

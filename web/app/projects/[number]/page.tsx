@@ -60,7 +60,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                 <div className="card" style={{ marginTop: 16, borderColor: "#f3d19c", background: "#fffaf0" }}>
                   <b>Rules that didn&apos;t match this export ({problems.length})</b>
                   <p className="muted" style={{ margin: "4px 0 8px" }}>
-                    A sheet or column name in the <Link href="/rules">Default rules</Link> isn&apos;t in this project&apos;s
+                    A sheet or column name in the <Link href="/rules">Default Rules</Link> isn&apos;t in this project&apos;s
                     BuildingStart export, so those items weren&apos;t checked. Fix the name on the Rules page and press Sync.
                   </p>
                   <ul style={{ margin: 0 }}>{problems.slice(0, 20).map((w, i) => <li key={i}>{w}</li>)}</ul>
