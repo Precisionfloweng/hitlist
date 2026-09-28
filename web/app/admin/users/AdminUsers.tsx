@@ -26,6 +26,7 @@ export default function AdminUsers({ initial, me }: { initial: U[]; me: string }
   const roleSelect = (value: string, onChange: (v: string) => void, disabled = false) => (
     <select value={value} disabled={disabled} onChange={(e) => onChange(e.target.value)}>
       <option value="tech">tech</option><option value="admin">admin</option><option value="viewer">viewer</option>
+      <option value="owner">owner</option>
     </select>
   );
 
@@ -60,14 +61,18 @@ export default function AdminUsers({ initial, me }: { initial: U[]; me: string }
             )}
             {rows.map((u, i) => {
               const self = u.original === me;
+              const owner = initial.find((x) => x.email === u.original)?.role === "owner";   // saved as owner
               return (
                 <tr key={u.original || i} style={u.active ? undefined : { opacity: 0.6 }}>
                   <td><input value={u.name} onChange={(e) => set(i, { name: e.target.value })} style={{ width: 170 }} /></td>
                   <td><input type="email" value={u.email} onChange={(e) => set(i, { email: e.target.value })} style={{ width: 250 }} /></td>
-                  <td>{roleSelect(u.role, (v) => set(i, { role: v }), self)}</td>
+                  <td>{roleSelect(u.role, (v) => {
+                    if (v === "owner" && !confirm(`Make ${u.name} an owner?\n\nOwners have full admin access and can't be removed, turned off or changed back from the site.`)) return;
+                    set(i, { role: v });
+                  }, self || owner)}</td>
                   <td>
                     <label className="row" style={{ gap: 6 }}>
-                      <input type="checkbox" checked={u.active} disabled={self} onChange={(e) => set(i, { active: e.target.checked })} />
+                      <input type="checkbox" checked={u.active} disabled={self || owner} onChange={(e) => set(i, { active: e.target.checked })} />
                       {u.active ? <span className="pill ok">On</span> : <span className="pill gray">Off</span>}
                     </label>
                   </td>
@@ -79,7 +84,7 @@ export default function AdminUsers({ initial, me }: { initial: U[]; me: string }
                         setMsg({ text: `Saved ${u.name}`, ok: true });
                       }
                     }}>Save</button>
-                    {!self && (
+                    {!self && !owner && (
                       <button className="danger" disabled={busy === u.original} onClick={async () => {
                         if (!confirm(`Remove ${u.name} (${u.original}) from the list? To just block sign-in, turn Access off instead.`)) return;
                         if (await send({ action: "delete", original: u.original }, u.original)) setRows((rs) => rs.filter((_, j) => j !== i));

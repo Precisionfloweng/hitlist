@@ -199,7 +199,7 @@ export async function saveUser(input: { email: string; name: string; role: strin
   const email = input.email.trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error("Enter a valid email address");
   if (!input.name.trim()) throw new Error("Name is required");
-  if (!["admin", "tech", "viewer"].includes(input.role)) throw new Error("Role must be admin, tech or viewer");
+  if (!["owner", "admin", "tech", "viewer"].includes(input.role)) throw new Error("Role must be owner, admin, tech or viewer");
   await ensureHeader("Users");
   const rows = await readTab("Users", true);
   const orig = (originalEmail ?? "").trim().toLowerCase();

@@ -8,7 +8,8 @@ import { redirect } from "next/navigation";
 import { ensureHeader, readTab, updateRow } from "./sheets";
 import { checkPassword, hashPassword, passwordProblem } from "./password";
 
-export type User = { email: string; name: string; role: "admin" | "tech" | "viewer"; hasPassword: boolean };
+// role "owner" in the Users tab = an admin who can't be removed, turned off or demoted from the site.
+export type User = { email: string; name: string; role: "admin" | "tech" | "viewer"; owner: boolean; hasPassword: boolean };
 
 const SESSION = "hl_session";
 const PENDING = "hl_pending";
@@ -38,8 +39,9 @@ async function userRow(email: string, fresh = false) {
 
 function toUser(u: Record<string, string>): User | null {
   if (["no", "false", "0"].includes((u.active || "").toLowerCase())) return null;
-  const role = (["admin", "tech", "viewer"].includes(u.role) ? u.role : "tech") as User["role"];
-  return { email: u.email.trim().toLowerCase(), name: u.name || u.email, role, hasPassword: !!u.password_hash };
+  const owner = u.role === "owner";
+  const role = (owner ? "admin" : ["admin", "tech", "viewer"].includes(u.role) ? u.role : "tech") as User["role"];
+  return { email: u.email.trim().toLowerCase(), name: u.name || u.email, role, owner, hasPassword: !!u.password_hash };
 }
 
 /** Active user from the Users tab, or null. */

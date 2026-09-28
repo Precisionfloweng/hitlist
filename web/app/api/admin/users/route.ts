@@ -17,15 +17,22 @@ export async function POST(req: Request) {
   try {
     const original = body.original?.trim().toLowerCase();
     const isSelf = original === me.email;
+    const target = original ? (await listUsers()).find((u) => u.email === original) : undefined;
+    if (target?.role === "owner") {
+      if (body.action === "delete") throw new Error(`${target.name} is an owner and can't be removed`);
+      if (body.user && (body.user.role !== "owner" || !body.user.active)) {
+        throw new Error(`${target.name} is an owner: their role and access can't be changed`);
+      }
+    }
     if (body.action === "delete" && original) {
       if (isSelf) throw new Error("You can't remove yourself");
       await removeUser(original);
     } else if (body.action === "save" && body.user) {
-      if (isSelf && (body.user.role !== "admin" || !body.user.active)) {
+      if (isSelf && !["admin", "owner"].includes(body.user.role) || isSelf && !body.user.active) {
         throw new Error("You can't remove your own admin access or turn yourself off");
       }
       await saveUser(body.user, original);
-      const admins = (await listUsers()).filter((u) => u.role === "admin" && u.active);
+      const admins = (await listUsers()).filter((u) => ["admin", "owner"].includes(u.role) && u.active);
       if (admins.length === 0) throw new Error("There must be at least one active admin");
       if (!original && body.welcome) {
         const site = new URL(req.url).origin;
