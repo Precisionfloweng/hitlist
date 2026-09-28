@@ -136,8 +136,8 @@ export default async function HelpPage() {
           <h2>Sharing and confidentiality</h2>
           <ul>
             <li>Everything in Hitlist is <b>confidential Precision Flow Engineering information</b>. That includes project data, checklists, deficiencies and screenshots of any page.</li>
-            <li><b>Don&apos;t share it with customers, contractors or anyone outside PFE without permission</b> from Rick or Cody.</li>
-            <li>If a customer should see their project, ask Rick or Cody. With permission, they can set the customer up with their own <b>read-only</b> sign-in. Don&apos;t share your own sign-in.</li>
+            <li><b>Don&apos;t share it with customers, contractors or anyone outside PFE without permission</b> from Cody.</li>
+            <li>If a customer should see their project, ask Cody. With permission, the customer can be set up with their own <b>read-only</b> sign-in. Don&apos;t share your own sign-in.</li>
           </ul>
         </section>
 
