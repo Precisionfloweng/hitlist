@@ -34,7 +34,14 @@ export async function POST(req: Request) {
           `<p>${escapeHtml(me.name)} has given you access to <b>PFE Hitlist</b>, where you can see each project's ` +
           `test &amp; balance completion, what's still missing, and open deficiencies.</p>` +
           `<p><a href="${site}/login">Sign in at ${site.replace(/^https?:\/\//, "")}</a> with this email address. ` +
-          `The first time, click <b>Email me a code</b>, enter the 6-digit code we send, and create your password. After that you just sign in with your email and password.</p>`);
+          `The first time, click <b>Email me a code</b>, enter the 6-digit code we send, and create your password. After that you just sign in with your email and password.</p>` +
+          `<p><b>Put it on your iPad's Home Screen</b> so it opens like an app:</p>` +
+          `<ol>` +
+          `<li>Open <a href="${site}">${site.replace(/^https?:\/\//, "")}</a> in <b>Safari</b>.</li>` +
+          `<li>Tap the <b>Share</b> button (the square with an arrow pointing up) at the top of the screen.</li>` +
+          `<li>Scroll down and tap <b>Add to Home Screen</b>, then tap <b>Add</b>. It will be named <b>PFE</b>.</li>` +
+          `<li>Open <b>PFE</b> from your Home Screen and sign in once. It stays signed in after that.</li>` +
+          `</ol>`);
       }
     } else {
       throw new Error("Bad request");
