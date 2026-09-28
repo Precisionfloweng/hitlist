@@ -5626,7 +5626,7 @@
    "parent_types": null,
    "fields": [
     {
-     "label": "GPM Design",
+     "label": "Design GPM",
      "columns": [
       "Water Flow Design"
      ],
@@ -5634,7 +5634,7 @@
      "when": null
     },
     {
-     "label": "Water Flow Actual",
+     "label": "Actual GPM",
      "columns": [
       "Water Flow Actual"
      ],
@@ -5650,7 +5650,7 @@
      "when": null
     },
     {
-     "label": "Press Drop Design",
+     "label": "Design Press Drop",
      "columns": [
       "Press. Drop Design"
      ],
@@ -5658,7 +5658,7 @@
      "when": null
     },
     {
-     "label": "Press Drop Actual",
+     "label": "Actual Press Drop",
      "columns": [
       "Press. Drop Actual"
      ],
@@ -5666,7 +5666,7 @@
      "when": null
     },
     {
-     "label": "Ent Water Temp Design",
+     "label": "Design Ent Water Temp",
      "columns": [
       "Ent. Water Temp Design"
      ],
@@ -5674,7 +5674,7 @@
      "when": null
     },
     {
-     "label": "Ent Water Temp Actual",
+     "label": "Actual Ent Water Temp",
      "columns": [
       "Ent. Water Temp Actual"
      ],
@@ -5682,7 +5682,7 @@
      "when": null
     },
     {
-     "label": "Leav Water Temp Design",
+     "label": "Design Leav Water Temp",
      "columns": [
       "Leav. Water Temp Design"
      ],
@@ -5690,7 +5690,7 @@
      "when": null
     },
     {
-     "label": "Leav Water Temp Actual",
+     "label": "Actual Leav Water Temp",
      "columns": [
       "Leav. Water Temp Actual"
      ],
@@ -5698,7 +5698,7 @@
      "when": null
     },
     {
-     "label": "Water Delta T Design",
+     "label": "Design Water Delta T",
      "columns": [
       "Water Delta T Design"
      ],
@@ -5706,7 +5706,7 @@
      "when": null
     },
     {
-     "label": "Water Delta T Actual",
+     "label": "Actual Water Delta T",
      "columns": [
       "Water Delta T Actual"
      ],
@@ -5714,7 +5714,7 @@
      "when": null
     },
     {
-     "label": "Ent Air DB Temp Design",
+     "label": "Design Ent Air DB Temp",
      "columns": [
       "Ent. Air DB Temp Design"
      ],
@@ -5722,7 +5722,7 @@
      "when": null
     },
     {
-     "label": "Ent Air DB Temp Actual",
+     "label": "Actual Ent Air DB Temp",
      "columns": [
       "Ent. Air DB Temp Actual"
      ],
@@ -5730,7 +5730,7 @@
      "when": null
     },
     {
-     "label": "Ent Air WB Temp Design",
+     "label": "Design Ent Air WB Temp",
      "columns": [
       "Ent. Air WB Temp Design"
      ],
@@ -5738,7 +5738,7 @@
      "when": null
     },
     {
-     "label": "Ent Air WB Temp Actual",
+     "label": "Actual Ent Air WB Temp",
      "columns": [
       "Ent. Air WB Temp Actual"
      ],
@@ -5746,7 +5746,7 @@
      "when": null
     },
     {
-     "label": "Leav Air DB Temp Design",
+     "label": "Design Leav Air DB Temp",
      "columns": [
       "Leav. Air DB Temp Design"
      ],
@@ -5754,7 +5754,7 @@
      "when": null
     },
     {
-     "label": "Leav Air DB Temp Actual",
+     "label": "Actual Leav Air DB Temp",
      "columns": [
       "Leav. Air DB Temp Actual"
      ],
@@ -5762,7 +5762,7 @@
      "when": null
     },
     {
-     "label": "Leav Air WB Temp Design",
+     "label": "Design Leav Air WB Temp",
      "columns": [
       "Leav. Air WB Temp Design"
      ],
@@ -5770,7 +5770,7 @@
      "when": null
     },
     {
-     "label": "Leav Air WB Temp Actual",
+     "label": "Actual Leav Air WB Temp",
      "columns": [
       "Leav. Air WB Temp Actual"
      ],
@@ -5778,7 +5778,7 @@
      "when": null
     },
     {
-     "label": "Air Temp Delta T Design",
+     "label": "Design Air Temp Delta T",
      "columns": [
       "Air Temp Delta T Design"
      ],
@@ -5786,7 +5786,7 @@
      "when": null
     },
     {
-     "label": "Air Temp Delta T Actual",
+     "label": "Actual Air Temp Delta T",
      "columns": [
       "Air Temp Delta T Actual"
      ],
@@ -5810,7 +5810,7 @@
      "when": null
     },
     {
-     "label": "Air Velocity Design",
+     "label": "Design Air Velocity",
      "columns": [
       "Air Velocity Design"
      ],
@@ -5824,7 +5824,7 @@
      ]
     },
     {
-     "label": "Air Velocity Actual",
+     "label": "Actual Air Velocity",
      "columns": [
       "Air Velocity Actual"
      ],
@@ -5838,7 +5838,7 @@
      ]
     },
     {
-     "label": "Coil APD Design",
+     "label": "Design Coil APD",
      "columns": [
       "Design Coil APD"
      ],
@@ -5854,7 +5854,7 @@
      "when": null
     },
     {
-     "label": "Coil APD Actual",
+     "label": "Actual Coil APD",
      "columns": [
       "Actual Coil APD"
      ],
@@ -5899,108 +5899,142 @@
    "key": "hw_coil_sub",
    "name": "HW Coils (sub-item)",
    "export_sheet": "Air Apparatus Heat Coil",
-   "export_sheet_confirmed": false,
+   "export_sheet_confirmed": true,
    "parent_types": null,
    "fields": [
     {
-     "label": "GPM Design",
-     "columns": null,
+     "label": "Design GPM",
+     "columns": [
+      "Des. Water Flow"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Water Flow Actual",
-     "columns": null,
+     "label": "Actual GPM",
+     "columns": [
+      "Act. Water Flow"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "% Final GPM",
-     "columns": null,
-     "status": "required",
-     "when": null
-    },
-    {
-     "label": "Press Drop Design",
-     "columns": null,
+     "columns": [
+      "% Final Flow"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Press Drop Actual",
-     "columns": null,
-     "status": "required",
-     "when": null
-    },
-    {
-     "label": "Ent Water Temp Design",
-     "columns": null,
+     "label": "Design Press Drop",
+     "columns": [
+      "Press. Drop Design"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Ent Water Temp Actual",
-     "columns": null,
+     "label": "Actual Press Drop",
+     "columns": [
+      "Press. Drop Actual"
+     ],
      "status": "required",
      "when": null
     },
     {
-     "label": "Leav Water Temp Design",
-     "columns": null,
+     "label": "Design Ent Water Temp",
+     "columns": [
+      "Ent. Water Temp Design"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Leav Water Temp Actual",
-     "columns": null,
+     "label": "Actual Ent Water Temp",
+     "columns": [
+      "Ent. Water Temp Actual"
+     ],
      "status": "required",
      "when": null
     },
     {
-     "label": "Water Delta T Design",
-     "columns": null,
+     "label": "Design Leav Water Temp",
+     "columns": [
+      "Leav. Water Temp Design"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Water Delta T Actual",
-     "columns": null,
+     "label": "Actual Leav Water Temp",
+     "columns": [
+      "Leav. Water Temp Actual"
+     ],
      "status": "required",
      "when": null
     },
     {
-     "label": "Ent Air DB Temp Design",
-     "columns": null,
+     "label": "Design Water Delta T",
+     "columns": [
+      "Water Delta T Design"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Ent Air DB Temp Actual",
-     "columns": null,
+     "label": "Actual Water Delta T",
+     "columns": [
+      "Water Delta T Actual"
+     ],
      "status": "required",
      "when": null
     },
     {
-     "label": "Leav Air DB Temp Design",
-     "columns": null,
+     "label": "Design Ent Air DB Temp",
+     "columns": [
+      "Ent. Air DB Temp Design"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Leav Air DB Temp Actual",
-     "columns": null,
+     "label": "Actual Ent Air DB Temp",
+     "columns": [
+      "Ent. Air DB Temp Actual"
+     ],
      "status": "required",
      "when": null
     },
     {
-     "label": "Air Temp Delta T Design",
-     "columns": null,
+     "label": "Design Leav Air DB Temp",
+     "columns": [
+      "Leav. Air DB Temp Design"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Air Temp Delta T Actual",
-     "columns": null,
+     "label": "Actual Leav Air DB Temp",
+     "columns": [
+      "Leav. Air DB Temp Actual"
+     ],
+     "status": "required",
+     "when": null
+    },
+    {
+     "label": "Design Air Temp Delta T",
+     "columns": [
+      "Air Temp Delta T Design"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Actual Air Temp Delta T",
+     "columns": [
+      "Air Temp Delta T Actual"
+     ],
      "status": "required",
      "when": null
     },
@@ -6014,24 +6048,30 @@
     },
     {
      "label": "Rows",
-     "columns": null,
+     "columns": [
+      "# Rows"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Fins Per Inch",
-     "columns": null,
+     "columns": [
+      "Fins Per Inch"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Design Capacity MBH",
-     "columns": null,
+     "columns": [
+      "Design Coil Capacity"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Air Velocity Design",
+     "label": "Design Air Velocity",
      "columns": [
       "Air Velocity Design"
      ],
@@ -6045,7 +6085,7 @@
      ]
     },
     {
-     "label": "Air Velocity Actual",
+     "label": "Actual Air Velocity",
      "columns": [
       "Air Velocity Actual"
      ],
@@ -6060,43 +6100,57 @@
     },
     {
      "label": "Coil Inlet PSI Actual",
-     "columns": null,
+     "columns": [
+      "Coil Inlet PSI Actual"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Coil Outlet PSI Actual",
-     "columns": null,
+     "columns": [
+      "Coil Outlet PSI Actual"
+     ],
      "status": "required",
      "when": null
     },
     {
-     "label": "Coil APD Design",
-     "columns": null,
+     "label": "Design Coil APD",
+     "columns": [
+      "Design Coil APD"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Coil APD Actual",
-     "columns": null,
+     "label": "Actual Coil APD",
+     "columns": [
+      "Actual Coil APD"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Design Airflow",
-     "columns": null,
+     "columns": [
+      "Airflow Design"
+     ],
      "status": "optional",
      "when": null
     },
     {
-     "label": "Design Airflow",
-     "columns": null,
+     "label": "Actual Airflow",
+     "columns": [
+      "Airflow Actual"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Coil Type",
-     "columns": null,
+     "columns": [
+      "Coil Type"
+     ],
      "status": "required",
      "when": null
     }

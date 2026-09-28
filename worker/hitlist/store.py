@@ -249,30 +249,50 @@ class HitlistStore:
         return {(r["type_key"], r["field"]): r["status"] for r in rows
                 if r.get("project_number") == project_number and r.get("status")}
 
-    def refresh_rule_mapping(self, rules: dict[str, Any], type_key: str, by: str = "server") -> int:
-        """Copy one type's export sheet, parent filter, columns and conditions from `rules` (the bundled
-        defaults) into the Rules tab. Required/optional/ignore choices are kept. Returns rows changed."""
+    def refresh_rule_mapping(self, rules: dict[str, Any], type_key: str, by: str = "server",
+                             statuses: bool = False) -> int:
+        """Copy one type's export sheet, parent filter, field names, columns and conditions from `rules`
+        (the bundled defaults) into the Rules tab. Required/optional/ignore choices are kept unless
+        `statuses` is set. Returns rows changed."""
         src = next((t for t in rules["types"] if t["key"] == type_key), None)
         if src is None:
             raise KeyError(f"No equipment type '{type_key}' in the bundled rules")
         new_rows = rules_to_rows({"types": [src]})
-        if not any(r["type_key"] == type_key for r in self.rows("Rules")):
+        mine = sorted((r for r in self.rows("Rules") if r["type_key"] == type_key),
+                      key=lambda r: int(r.get("order") or 0))
+        if not mine:
             self.append("Rules", new_rows)          # a type added since setup: add it whole
             self.append("RuleHistory", [{"changed_at": now_iso(), "changed_by": by, "type_key": type_key,
                                          "field": "(new equipment type)", "old_status": "",
                                          "new_status": f"added from bundled rules ({len(new_rows)} fields)"}])
             return len(new_rows)
-        by_label = {r["field"]: r for r in new_rows}
-        changed = 0
-        for row in self.rows("Rules"):
-            if row["type_key"] != type_key or row["field"] not in by_label:
-                continue
-            new = by_label[row["field"]]
-            keep = {k: row[k] for k in ("status", "_row")}
-            upd = {**row, **{k: new[k] for k in ("export_sheet", "sheet_confirmed", "parent_types", "columns", "when")}, **keep}
-            if any(str(upd[k]) != str(row.get(k, "")) for k in ("export_sheet", "sheet_confirmed", "parent_types", "columns", "when")):
+        # Same number of fields: pair them by position, so renamed fields follow. Otherwise by name.
+        if len(mine) == len(new_rows):
+            pairs = list(zip(mine, new_rows))
+        else:
+            by_label: dict[str, list[dict[str, Any]]] = {}
+            for n in new_rows:
+                by_label.setdefault(n["field"], []).append(n)
+            pairs = [(row, by_label[row["field"]].pop(0)) for row in mine if by_label.get(row["field"])]
+        keys = ["export_sheet", "sheet_confirmed", "parent_types", "field", "columns", "when"]
+        if statuses:
+            keys.append("status")
+        changed, renamed = 0, {}
+        for row, new in pairs:
+            upd = {**row, **{k: new[k] for k in keys}}
+            if any(str(upd[k]) != str(row.get(k, "")) for k in keys):
                 self.update("Rules", row["_row"], upd)
                 changed += 1
+                if upd["field"] != row["field"]:
+                    renamed[row["field"]] = upd["field"]
+        if renamed:                                 # keep each project's changes on the renamed fields
+            try:
+                overrides = self.rows("ProjectRules")
+            except Exception:  # noqa: BLE001 - tab not created yet
+                overrides = []
+            for o in overrides:
+                if o["type_key"] == type_key and o["field"] in renamed:
+                    self.update("ProjectRules", o["_row"], {**o, "field": renamed[o["field"]]})
         if changed:
             self.append("RuleHistory", [{"changed_at": now_iso(), "changed_by": by, "type_key": type_key,
                                          "field": "(sheet and columns)", "old_status": "",

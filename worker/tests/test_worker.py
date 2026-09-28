@@ -237,6 +237,24 @@ def test_update_rules_keeps_status():
     assert store.refresh_rule_mapping(rules, "ahu") == 0  # nothing left to change
 
 
+def test_update_rules_renames_fields_and_keeps_project_changes():
+    import copy
+    store = make_store()
+    rules = copy.deepcopy(SAMPLE_RULES)
+    ahu = next(t for t in rules["types"] if t["key"] == "ahu")
+    old = ahu["fields"][0]["label"]
+    store.append("ProjectRules", [{"project_number": "99-001", "type_key": "ahu", "field": old, "status": "ignore"}])
+    ahu["fields"][0]["label"] = "Renamed Field"
+    ahu["fields"][0]["status"] = "ignore"
+    assert store.refresh_rule_mapping(rules, "ahu") == 1
+    row = next(r for r in store.rows("Rules") if r["type_key"] == "ahu" and r["order"] in ("1", 1))
+    assert row["field"] == "Renamed Field" and row["status"] != "ignore"      # status kept by default
+    assert store.project_rule_overrides("99-001") == {("ahu", "Renamed Field"): "ignore"}
+    assert store.refresh_rule_mapping(rules, "ahu", statuses=True) == 1
+    row = next(r for r in store.rows("Rules") if r["type_key"] == "ahu" and r["order"] in ("1", 1))
+    assert row["status"] == "ignore"
+
+
 def test_update_rules_adds_a_new_type():
     import copy
     store = make_store()

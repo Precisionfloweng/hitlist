@@ -31,12 +31,13 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Missing = blank, or only `?`/`` ` `` (BuildingStart's "can't calculate yet" marker).
 - N/A entries (-, --, dashes, na, n/a, nd, n/d, none; any case, spaces/dots ignored) = code N:
   answered, left out of the counts. `?` is still missing, `0` is a reading.
-- Design/Actual pairs (matched by name, 80 in the default rules): a completely blank Design skips
+- Design/Actual pairs (matched by name: "Design X" / "Actual X", 112 in the default rules): a completely blank Design skips
   both fields (unit doesn't have it); a "-" Design still requires the Actual.
 - A field may list several columns (three-phase readings): filled if ANY has a value.
 - Conditions: `equals` (spaces ignored, so "BeltDrive" = "Belt Drive"), `gt`, or `filled` (column has a value;
   coil air velocities only count when Airside Face Area is filled in).
-- Rules: the Rules tab is the company default (admins edit). ProjectRules holds one project's
+- Rules: the Rules tab is the company default (admins edit). `update-rules TYPE [--statuses]` copies a type from
+  the bundled seed; with the same field count it pairs fields by position, so renames carry over (and to ProjectRules). ProjectRules holds one project's
   required/optional/ignore changes (anyone edits, on the project's Rules tab); blank status = default.
   The worker applies them per project (`store.apply_overrides`).
 - The "Electric Coil" sheet feeds two types: under a Terminal Unit = VAV electric heat, else EDH sub-item.
