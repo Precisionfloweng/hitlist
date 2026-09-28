@@ -11,13 +11,15 @@ export default function ProjectsTable({ rows, userName, customer = false, canSyn
   { rows: Row[]; userName: string; customer?: boolean; canSync?: boolean }) {
   const [q, setQ] = useState("");
   const [mineOnly, setMineOnly] = useState(false);
+  // Someone who isn't the tech on any project (e.g. the owner) still sees everything with My projects ticked.
+  const hasMine = rows.some((r) => r.mine);
   const shown = useMemo(() => {
     const s = q.trim().toLowerCase();
     return rows
-      .filter((r) => (!mineOnly || r.mine) &&
+      .filter((r) => (!mineOnly || !hasMine || r.mine) &&
         (!s || [r.number, r.name, r.tech, r.address].some((v) => (v || "").toLowerCase().includes(s))))
       .sort((a, b) => a.number.localeCompare(b.number) * -1);
-  }, [rows, q, mineOnly]);
+  }, [rows, q, mineOnly, hasMine]);
 
   const first = (userName || "").trim().split(/\s+/)[0];
   const title = customer ? "Your Projects" : mineOnly ? `${first ? `${first}'${first.endsWith("s") ? "" : "s"}` : "My"} Projects` : "All Projects";
