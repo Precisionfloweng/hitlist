@@ -24,7 +24,7 @@ export default function ProjectsTable({ rows, userName, customer = false, canSyn
 
   return (
     <>
-      <h1>{title}</h1>
+      <h1 className="page-title">{title}</h1>
       <div className="row" style={{ marginBottom: 12 }}>
         <input placeholder="Search project #, name, tech or address" value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: 1, minWidth: 240 }} />
         {!customer && <label className="row" style={{ gap: 6 }}>
@@ -33,7 +33,7 @@ export default function ProjectsTable({ rows, userName, customer = false, canSyn
         <span className="muted">{shown.length} of {rows.length}</span>
       </div>
       <div className="scroll">
-        <table>
+        <table className="proj-table">
           <thead>
             <tr><th>Project #</th><th>Project</th><th>Tech</th><th>Complete</th><th className="ctr">Units</th>
               <th className="ctr">Punch items</th><th className="ctr">Last sync</th><th className="ctr">Sync status</th>{canSync && <th></th>}</tr>
