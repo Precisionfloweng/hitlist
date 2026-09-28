@@ -13,7 +13,12 @@ export const viewport: Viewport = { themeColor: "#1f4e79" };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <footer className="site-footer">
+          © {new Date().getFullYear()} Precision Flow Engineering. All rights reserved. Confidential, for PFE use only.
+        </footer>
+      </body>
     </html>
   );
 }

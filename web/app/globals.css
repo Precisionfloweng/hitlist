@@ -204,3 +204,7 @@ main.help { max-width: 860px; }
 .help-q { display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; margin-left: 4px;
   background: #e3e8ef; color: var(--brand); font-size: 11px; font-weight: 800; text-decoration: none; vertical-align: 1px; }
 .help-q:hover { background: var(--brand); color: #fff; text-decoration: none; }
+
+/* Small print at the bottom of every page */
+.site-footer { max-width: 1280px; margin: 24px auto 0; padding: 14px 20px 22px; text-align: center;
+  font-size: 11px; color: #98a2b3; border-top: 1px solid var(--line); }
