@@ -88,6 +88,7 @@ main.wide { max-width: none; }
 .eq-types .eq-sub { grid-column: 1 / -1; font-size: 11px; color: var(--muted); }
 .eq-select { display: none; width: 100%; margin-bottom: 8px; }
 .eq-head h2 { margin: 0 0 2px; font-size: 20px; }
+.eq > .eq-head { margin-bottom: 10px; }
 .eq-tools { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 10px 0 8px; }
 .eq-tools input[type=search] { width: 240px; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }

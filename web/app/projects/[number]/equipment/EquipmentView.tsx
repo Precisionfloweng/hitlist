@@ -75,6 +75,16 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
 
   return (
     <div className="eq">
+        <div className="eq-head">
+          <div>
+            <h2>{t.name}</h2>
+            <div className="muted">
+              {t.summary.units_complete} of {t.summary.units} units complete · {missingReq} required field{missingReq === 1 ? "" : "s"} missing
+              {syncedAt && <> · synced {new Date(syncedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</>}
+            </div>
+          </div>
+        </div>
+
       <nav className="eq-types" aria-label="Equipment types">
         <select className="eq-select" value={t.key} onChange={(e) => pick(e.target.value)}>
           {sorted.map((x) => <option key={x.key} value={x.key}>{x.name} ({Math.round(x.summary.fields_pct)}%)</option>)}
@@ -97,16 +107,6 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
       </nav>
 
       <section className="eq-main">
-        <div className="eq-head">
-          <div>
-            <h2>{t.name}</h2>
-            <div className="muted">
-              {t.summary.units_complete} of {t.summary.units} units complete · {missingReq} required field{missingReq === 1 ? "" : "s"} missing
-              {syncedAt && <> · synced {new Date(syncedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</>}
-            </div>
-          </div>
-        </div>
-
         <div className="eq-tools">
           <input type="search" placeholder="Find a unit or area" value={q} onChange={(e) => setQ(e.target.value)} />
           <div className="seg" role="group">
