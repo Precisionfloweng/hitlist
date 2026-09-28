@@ -6,16 +6,19 @@ import type { Project } from "@/lib/data";
 export type ProjectTab = "overview" | "equipment" | "deficiencies" | "rules";
 
 /** Title, sync status and the tabs shared by every page of a project. */
-export default function ProjectHeader({ project: p, tab, missingRequired, rulesChanged }:
-  { project: Project; tab: ProjectTab; missingRequired?: number | null; rulesChanged?: number }) {
+export default function ProjectHeader({ project: p, tab, missingRequired, rulesChanged, user }:
+  { project: Project; tab: ProjectTab; missingRequired?: number | null; rulesChanged?: number;
+    user: { customer: boolean; canSync: boolean } }) {
   const s = syncLabel(p.daysSinceSync);
   const base = `/projects/${encodeURIComponent(p.id)}`;
-  const tabs: { key: ProjectTab; label: string; href: string; count?: number | null }[] = [
+  type Tab = { key: ProjectTab; label: string; href: string; count?: number | null };
+  const allTabs: Tab[] = [
     { key: "overview", label: "Overview", href: base },
     { key: "equipment", label: "Equipment checklist", href: `${base}/equipment` },
     { key: "deficiencies", label: "Deficiencies", href: `${base}/deficiencies`, count: p.openDeficiencies },
     { key: "rules", label: "Rules", href: `${base}/rules`, count: rulesChanged },
   ];
+  const tabs = allTabs.filter((t) => !(user.customer && t.key === "rules"));   // customers don't see rules
   return (
     <div className="phead">
       <div className="muted"><Link href="/projects">← Projects</Link></div>
@@ -28,7 +31,7 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
         </div>
         <div className="row" style={{ alignItems: "flex-start" }}>
           <span className={s.cls} style={{ marginTop: 8 }}>Last sync: {s.text}</span>
-          <RefreshButton project={p.id} job={p.job} />
+          {user.canSync && <RefreshButton project={p.id} job={p.job} />}
         </div>
       </div>
       <nav className="ptabs">

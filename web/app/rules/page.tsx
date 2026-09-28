@@ -1,12 +1,12 @@
 import Header from "../Header";
 import RulesEditor from "./RulesEditor";
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { loadRules } from "@/lib/rules";
 
 export const dynamic = "force-dynamic";
 
 export default async function RulesPage() {
-  const user = await requireUser();
+  const user = await requireStaff();
   const { types, history } = await loadRules();
   return (
     <>

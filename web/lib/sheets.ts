@@ -6,7 +6,8 @@ export const SCHEMA = {
   Projects: ["project_number", "name", "tech", "date", "address", "status", "buildingstart_url",
     "last_sync", "last_sync_status", "fields_pct", "units_pct", "units",
     "open_deficiencies", "open_high", "gap_flags", "project_id"],
-  Users: ["email", "name", "role", "active", "added", "password_hash"],
+  // projects: for role "customer", the project keys they may see (" | " separated)
+  Users: ["email", "name", "role", "active", "added", "password_hash", "projects"],
   Rules: ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
     "order", "field", "columns", "status", "when"],
   RuleHistory: ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status", "project_number"],

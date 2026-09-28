@@ -9,7 +9,9 @@ import { ensureHeader, readTab, updateRow } from "./sheets";
 import { checkPassword, hashPassword, passwordProblem } from "./password";
 
 // role "owner" in the Users tab = an admin who can't be removed, turned off or demoted from the site.
-export type User = { email: string; name: string; role: "admin" | "tech" | "viewer"; owner: boolean; hasPassword: boolean };
+// role "customer" = an outside person who sees only the projects listed for them, read-only.
+export type User = { email: string; name: string; role: "admin" | "tech" | "viewer" | "customer"; owner: boolean;
+  hasPassword: boolean; projects: string[] };
 
 const SESSION = "hl_session";
 const PENDING = "hl_pending";
@@ -40,8 +42,10 @@ async function userRow(email: string, fresh = false) {
 function toUser(u: Record<string, string>): User | null {
   if (["no", "false", "0"].includes((u.active || "").toLowerCase())) return null;
   const owner = u.role === "owner";
-  const role = (owner ? "admin" : ["admin", "tech", "viewer"].includes(u.role) ? u.role : "tech") as User["role"];
-  return { email: u.email.trim().toLowerCase(), name: u.name || u.email, role, owner, hasPassword: !!u.password_hash };
+  const role = (owner ? "admin" : ["admin", "tech", "viewer", "customer"].includes(u.role) ? u.role : "tech") as User["role"];
+  const projects = (u.projects || "").split("|").map((x) => x.trim()).filter(Boolean);
+  return { email: u.email.trim().toLowerCase(), name: u.name || u.email, role, owner, projects,
+    hasPassword: !!u.password_hash };
 }
 
 /** Active user from the Users tab, or null. */
@@ -143,6 +147,21 @@ export async function requireUser(): Promise<User> {
   if (!u.hasPassword) redirect("/account/password");
   return u;
 }
+
+/** Staff only (not customers): for the Rules and Help pages. */
+export async function requireStaff(): Promise<User> {
+  const u = await requireUser();
+  if (u.role === "customer") redirect("/projects");
+  return u;
+}
+
+/** Can this person see this project? Customers only see the projects listed for them. */
+export function canSee(u: User, projectKey: string): boolean {
+  return u.role !== "customer" || u.projects.includes(projectKey);
+}
+
+/** Customers and viewers are read-only: no Sync, no rule changes. */
+export const canEdit = (u: User) => u.role === "admin" || u.role === "tech";
 
 export async function requireAdmin(): Promise<User> {
   const u = await requireUser();

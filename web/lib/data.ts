@@ -184,22 +184,27 @@ export async function removeProject(number: string) {
 }
 
 // ---- admin: users ------------------------------------------------------------------
-export type UserRow = { email: string; name: string; role: string; active: boolean; added: string };
+export type UserRow = { email: string; name: string; role: string; active: boolean; added: string; projects: string[] };
 
 export async function listUsers(): Promise<UserRow[]> {
   const rows = await readTab("Users", true);
   return rows.map((u) => ({
     email: u.email.trim().toLowerCase(), name: u.name, role: u.role || "tech",
     active: !["no", "false", "0"].includes((u.active || "").toLowerCase()), added: u.added,
+    projects: (u.projects || "").split("|").map((x) => x.trim()).filter(Boolean),
   })).sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function saveUser(input: { email: string; name: string; role: string; active: boolean },
+export async function saveUser(input: { email: string; name: string; role: string; active: boolean; projects?: string[] },
                                originalEmail?: string) {
   const email = input.email.trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error("Enter a valid email address");
   if (!input.name.trim()) throw new Error("Name is required");
-  if (!["owner", "admin", "tech", "viewer"].includes(input.role)) throw new Error("Role must be owner, admin, tech or viewer");
+  if (!["owner", "admin", "tech", "viewer", "customer"].includes(input.role)) {
+    throw new Error("Role must be owner, admin, tech, viewer or customer");
+  }
+  const projects = input.role === "customer" ? [...new Set((input.projects ?? []).map((x) => x.trim()).filter(Boolean))] : [];
+  if (input.role === "customer" && projects.length === 0) throw new Error("Pick at least one project for a customer");
   await ensureHeader("Users");
   const rows = await readTab("Users", true);
   const orig = (originalEmail ?? "").trim().toLowerCase();
@@ -209,7 +214,8 @@ export async function saveUser(input: { email: string; name: string; role: strin
   const existing = orig ? rows.find((r) => r.email.trim().toLowerCase() === orig) : undefined;
   const rec = { email, name: input.name.trim(), role: input.role, active: input.active ? "yes" : "no",
     added: existing?.added || new Date().toISOString().slice(0, 10),
-    password_hash: existing?.password_hash || "" };  // keep their password when an admin edits the row
+    password_hash: existing?.password_hash || "",   // keep their password when an admin edits the row
+    projects: projects.join(" | ") };
   if (existing) await updateRow("Users", existing._row, rec);
   else await appendRows("Users", [rec]);
 }

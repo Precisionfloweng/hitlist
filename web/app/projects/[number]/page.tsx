@@ -4,7 +4,7 @@ import Header from "../../Header";
 import { pct } from "../../format";
 import { byTypeOrder } from "@/lib/typeOrder";
 import ProjectHeader from "./ProjectHeader";
-import { requireUser } from "@/lib/auth";
+import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
 
@@ -14,7 +14,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
   const [data, results] = await Promise.all([getProject(number), loadResults(number)]);
-  if (!data) notFound();
+  if (!data || !canSee(user, data.project.id)) notFound();
   const { project: p } = data;
   const summary = results?.summary;
   // Only "ticked Complete but required fields empty" (older results may also hold "went blank" flags).
@@ -26,7 +26,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
     <>
       <Header user={user} />
       <main>
-        <ProjectHeader project={p} tab="overview" missingRequired={summary?.missing_required} />
+        <ProjectHeader user={{ customer: user.role === "customer", canSync: canEdit(user) }} project={p} tab="overview" missingRequired={summary?.missing_required} />
         {p.lastSyncStatus.startsWith("failed") && <p className="error">The last sync failed: {p.lastSyncStatus.slice(8)}</p>}
 
         {p.lastSync ? (
@@ -54,6 +54,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
             )}
 
             {(() => {
+              if (user.role === "customer") return null;   // internal setup notes
               const problems = (results?.warnings ?? []).filter((w) => /the export has '|not in export|no export column found/.test(w));
               return problems.length > 0 && (
                 <div className="card" style={{ marginTop: 16, borderColor: "#f3d19c", background: "#fffaf0" }}>

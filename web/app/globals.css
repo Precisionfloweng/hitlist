@@ -208,3 +208,8 @@ main.help { max-width: 860px; }
 /* Small print at the bottom of every page */
 .site-footer { max-width: 1280px; margin: 24px auto 0; padding: 14px 20px 22px; text-align: center;
   font-size: 11px; color: #98a2b3; border-top: 1px solid var(--line); }
+
+/* Admin > Users: projects a customer can see */
+.proj-pick { margin-top: 6px; max-height: 160px; overflow: auto; padding: 6px 8px; border: 1px solid var(--line);
+  border-radius: 8px; background: #fafbfc; min-width: 240px; }
+.proj-pick label { display: flex; gap: 6px; align-items: center; font-size: 13px; padding: 2px 0; white-space: nowrap; }

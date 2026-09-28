@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Header from "../Header";
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,7 @@ const SECTIONS = [
 ] as const;
 
 export default async function HelpPage() {
-  const user = await requireUser();
+  const user = await requireStaff();
   const admin = user.role === "admin";
   return (
     <>

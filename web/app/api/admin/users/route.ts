@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
-import { listUsers, removeUser, saveUser } from "@/lib/data";
+import { listProjects, listUsers, removeUser, saveUser } from "@/lib/data";
 import { sendMail } from "@/lib/mail";
 
 type Body = {
   action?: "save" | "delete";
-  user?: { email: string; name: string; role: string; active: boolean };
+  user?: { email: string; name: string; role: string; active: boolean; projects?: string[] };
   original?: string;
   welcome?: boolean;
 };
@@ -34,7 +34,17 @@ export async function POST(req: Request) {
       await saveUser(body.user, original);
       const admins = (await listUsers()).filter((u) => ["admin", "owner"].includes(u.role) && u.active);
       if (admins.length === 0) throw new Error("There must be at least one active admin");
-      if (!original && body.welcome) {
+      if (!original && body.welcome && body.user.role === "customer") {
+        const site = new URL(req.url).origin;
+        const names = (await listProjects()).filter((p) => body.user!.projects?.includes(p.id)).map((p) => `${p.number} ${p.name}`);
+        await sendMail(body.user.email.trim(), "Your access to project status from Precision Flow Engineering",
+          `<p>Hi ${escapeHtml(body.user.name.split(" ")[0])},</p>` +
+          `<p>Precision Flow Engineering has given you read-only access to the status of ` +
+          `${names.map((n) => `<b>${escapeHtml(n)}</b>`).join(", ")}.</p>` +
+          `<p><a href="${site}/login">Sign in at ${site.replace(/^https?:\/\//, "")}</a> with this email address. ` +
+          `The first time, click <b>Email me a code</b>, enter the 6-digit code we send, and create your password. After that you just sign in with your email and password.</p>` +
+          `<p>This information is confidential and provided for your project only.</p>`);
+      } else if (!original && body.welcome) {
         const site = new URL(req.url).origin;
         await sendMail(body.user.email.trim(), "You've been given access to PFE Hitlist",
           `<p>Hi ${escapeHtml(body.user.name.split(" ")[0])},</p>` +

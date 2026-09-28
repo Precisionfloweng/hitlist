@@ -276,3 +276,9 @@ def test_pick_project_row_prefers_the_exact_or_closest_name():
     assert pick_project_row(rows, "99-127", "99-127 Acme") == 0             # exact
     assert pick_project_row(rows, "99-127", "Acme Holdings") == 1           # closest
     assert pick_project_row(rows, "99-127", "acme") == 0                    # case / number ignored
+
+
+def test_customers_are_never_emailed_as_a_tech():
+    store = make_store()
+    store.append("Users", [{"email": "cust@example.com", "name": "Taylor Customer", "role": "customer", "active": "yes"}])
+    assert store.email_for("Taylor") != "cust@example.com"

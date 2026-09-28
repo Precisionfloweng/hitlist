@@ -7,7 +7,8 @@ import type { Project } from "@/lib/data";
 
 type Row = Project & { mine: boolean };
 
-export default function ProjectsTable({ rows, userName }: { rows: Row[]; userName: string }) {
+export default function ProjectsTable({ rows, userName, customer = false, canSync = true }:
+  { rows: Row[]; userName: string; customer?: boolean; canSync?: boolean }) {
   const [q, setQ] = useState("");
   const [mineOnly, setMineOnly] = useState(false);
   const shown = useMemo(() => {
@@ -19,23 +20,23 @@ export default function ProjectsTable({ rows, userName }: { rows: Row[]; userNam
   }, [rows, q, mineOnly]);
 
   const first = (userName || "").trim().split(/\s+/)[0];
-  const title = mineOnly ? `${first ? `${first}'${first.endsWith("s") ? "" : "s"}` : "My"} Projects` : "All Projects";
+  const title = customer ? "Your Projects" : mineOnly ? `${first ? `${first}'${first.endsWith("s") ? "" : "s"}` : "My"} Projects` : "All Projects";
 
   return (
     <>
       <h1>{title}</h1>
       <div className="row" style={{ marginBottom: 12 }}>
         <input placeholder="Search project #, name, tech or address" value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: 1, minWidth: 240 }} />
-        <label className="row" style={{ gap: 6 }}>
+        {!customer && <label className="row" style={{ gap: 6 }}>
           <input type="checkbox" checked={mineOnly} onChange={(e) => setMineOnly(e.target.checked)} /> My projects
-        </label>
+        </label>}
         <span className="muted">{shown.length} of {rows.length}</span>
       </div>
       <div className="scroll">
         <table>
           <thead>
             <tr><th>Project #</th><th>Project</th><th>Tech</th><th>Complete</th><th className="ctr">Units</th>
-              <th className="ctr">Punch items</th><th className="ctr">Last sync</th><th className="ctr">Sync status</th><th></th></tr>
+              <th className="ctr">Punch items</th><th className="ctr">Last sync</th><th className="ctr">Sync status</th>{canSync && <th></th>}</tr>
           </thead>
           <tbody>
             {shown.map((p) => {
@@ -57,7 +58,7 @@ export default function ProjectsTable({ rows, userName }: { rows: Row[]; userNam
                   <td className="ctr">
                     <span className={s.cls}>{s.text}</span>
                   </td>
-                  <RefreshButton project={p.id} job={p.job} cells />
+                  {canSync ? <RefreshButton project={p.id} job={p.job} cells /> : <td className="ctr muted">{p.lastSyncStatus === "ok" ? "✓ Complete" : "–"}</td>}
                 </tr>
               );
             })}

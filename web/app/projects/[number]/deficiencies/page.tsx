@@ -3,7 +3,7 @@ import Header from "../../../Header";
 import ProjectHeader from "../ProjectHeader";
 import Breakdown from "./Breakdown";
 import DeficiencyList from "./DeficiencyList";
-import { requireUser } from "@/lib/auth";
+import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
 
@@ -13,7 +13,7 @@ export default async function DeficienciesPage({ params }: { params: Promise<{ n
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
   const [data, results] = await Promise.all([getProject(number), loadResults(number)]);
-  if (!data) notFound();
+  if (!data || !canSee(user, data.project.id)) notFound();
   const { project: p, deficiencies } = data;
   const group = (g: string) => deficiencies.filter((d) => d.group === g)
     .map((d) => ({ value: d.value, count: Number(d.count) })).sort((a, b) => b.count - a.count);
@@ -22,7 +22,7 @@ export default async function DeficienciesPage({ params }: { params: Promise<{ n
     <>
       <Header user={user} />
       <main>
-        <ProjectHeader project={p} tab="deficiencies" missingRequired={results?.summary.missing_required} />
+        <ProjectHeader user={{ customer: user.role === "customer", canSync: canEdit(user) }} project={p} tab="deficiencies" missingRequired={results?.summary.missing_required} />
         {p.lastSync ? (
           <>
             <div className="two">

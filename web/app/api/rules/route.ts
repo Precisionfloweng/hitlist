@@ -6,7 +6,7 @@ import { saveProjectRuleChanges, saveRuleChanges, type RuleChange } from "@/lib/
 export async function POST(req: Request) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: "Please sign in again." }, { status: 401 });
-  if (user.role === "viewer") return NextResponse.json({ error: "Viewers can't change rules" }, { status: 403 });
+  if (user.role === "viewer" || user.role === "customer") return NextResponse.json({ error: "You have read-only access" }, { status: 403 });
   const { typeKey, changes, project } = (await req.json().catch(() => ({}))) as
     { typeKey?: string; changes?: RuleChange[]; project?: string };
   if (!typeKey || !Array.isArray(changes)) return NextResponse.json({ error: "Bad request" }, { status: 400 });
