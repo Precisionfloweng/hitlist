@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from .config import Settings
-from .mailer import Mailer, esc
+from .mailer import BRAND, FONT, MUTED, Mailer, button, esc
 from .runner import admin_emails
 from .store import HitlistStore, project_key
 
@@ -35,22 +35,60 @@ def active_projects(store: HitlistStore, now: datetime | None = None) -> list[di
     return sorted(out, key=lambda p: (p["days"] is not None, -(p["days"] or 0)))
 
 
-def _table(projects: list[dict[str, Any]], app_url: str) -> str:
+def when_text(days: int | None) -> str:
+    if days is None:
+        return "Never synced"
+    return "Today" if days == 0 else "Yesterday" if days == 1 else f"{days} days ago"
+
+
+def _pct(p: dict[str, Any]) -> str:
+    try:
+        return f"{round(float(p.get('fields_pct')))}%"
+    except (TypeError, ValueError):
+        return "–"
+
+
+def _link(app_url: str, p: dict[str, Any]) -> str:
+    return f"{app_url.rstrip('/')}/projects/{project_key(p)}" if app_url else ""
+
+
+def _table(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str:
+    th = (f'style="text-align:left;padding:8px 10px;background:{BRAND};color:#ffffff;font-family:{FONT};'
+          f'font-size:13px;font-weight:bold"')
+    cols = ["Project", *(["Tech"] if show_tech else []), "Last sync", "Complete", "Open deficiencies"]
+    head = "<tr>" + "".join(f"<th {th}>{c}</th>" for c in cols) + "</tr>"
     rows = []
-    for p in projects:
-        days = "never synced" if p["days"] is None else f"{p['days']} day{'s' if p['days'] != 1 else ''}"
+    for i, p in enumerate(projects):
+        td = (f'style="padding:8px 10px;border-bottom:1px solid #e3e6eb;font-family:{FONT};font-size:14px;'
+              f'background:{"#f1f4f8" if i % 2 else "#ffffff"}"')
         stale = p["days"] is None or p["days"] >= 7
-        pct = f"{p['fields_pct']}%" if p.get("fields_pct") else "–"
-        link = (f'<a href="{esc(app_url)}/projects/{esc(project_key(p))}">Sync</a>' if app_url else "")
-        rows.append(
-            f"<tr><td>{esc(p['project_number'])}</td><td>{esc(p['name'])}</td><td>{esc(p.get('tech'))}</td>"
-            f"<td style=\"{'color:#b42318;font-weight:bold' if stale else ''}\">{days}</td>"
-            f"<td>{pct}</td><td>{esc(p.get('open_high') or 0)}</td><td>{link}</td></tr>")
-    head = ("<tr style=\"background:#eee\"><th align=left>Project #</th><th align=left>Project</th>"
-            "<th align=left>Tech</th><th align=left>Since last sync</th><th align=left>Complete</th>"
-            "<th align=left>Open high</th><th></th></tr>")
-    return ("<table cellpadding=6 style=\"border-collapse:collapse;border:1px solid #ddd\">"
-            + head + "".join(rows) + "</table>")
+        url = _link(app_url, p)
+        name = f"{esc(p['project_number'])} {esc(p['name'])}"
+        name = f'<a href="{esc(url)}" style="color:{BRAND};font-weight:bold;text-decoration:none">{name}</a>' if url else f"<b>{name}</b>"
+        when = when_text(p["days"])
+        when = f'<span style="color:#b42318;font-weight:bold">{when}</span>' if stale else when
+        cells = [name, *([esc(p.get("tech"))] if show_tech else []), when, _pct(p), esc(p.get("open_deficiencies") or 0)]
+        rows.append("<tr>" + "".join(f"<td {td}>{c}</td>" for c in cells) + "</tr>")
+    return ('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+            'style="border-collapse:collapse;border:1px solid #e3e6eb">' + head + "".join(rows) + "</table>")
+
+
+def _text(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str:
+    out = []
+    for p in projects:
+        tech = f" ({p.get('tech')})" if show_tech and p.get("tech") else ""
+        out.append(f"{p['project_number']} {p['name']}{tech}\n"
+                   f"   Last sync: {when_text(p['days'])} | Complete: {_pct(p)} | "
+                   f"Open deficiencies: {p.get('open_deficiencies') or 0}"
+                   + (f"\n   {_link(app_url, p)}" if app_url else ""))
+    return "\n\n".join(out)
+
+
+def _body(intro: str, projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> tuple[str, str]:
+    html = (f"<p style=\"margin:0 0 14px\">{intro}</p>" + _table(projects, app_url, show_tech)
+            + (f'<p style="margin:18px 0 0">{button(app_url, "Open Hitlist")}</p>' if app_url else "")
+            + f'<p style="margin:14px 0 0;font-size:12px;color:{MUTED}">Red means 7 or more days since the last sync.</p>')
+    return html, intro + "\n\n" + _text(projects, app_url, show_tech)
 
 
 def send_weekly_summary(store: HitlistStore, settings: Settings, mailer: Mailer,
@@ -62,13 +100,13 @@ def send_weekly_summary(store: HitlistStore, settings: Settings, mailer: Mailer,
         if email:
             by_email[email].append(p)
     sent = {}
-    intro = ("<p>Here are your projects and how long since each was last synced. "
-             "Press <b>Sync</b> on any project you've worked on this week.</p>")
+    intro = "Here are your projects and when each was last synced. Press Sync on any project you've worked on this week."
     for email, mine in by_email.items():
-        mailer.send([email], "Weekly Hitlist summary", intro + _table(mine, settings.app_url), dry_run)
+        html, text = _body(intro, mine, settings.app_url, show_tech=False)
+        mailer.send([email], "Weekly Hitlist summary", html, dry_run, text=text)
         sent[email] = len(mine)
     for email in admin_emails(store, settings):
-        mailer.send([email], "Weekly Hitlist summary: all projects",
-                    "<p>All active projects, stalest first.</p>" + _table(projects, settings.app_url), dry_run)
+        html, text = _body("All active projects, the longest since a sync first.", projects, settings.app_url, show_tech=True)
+        mailer.send([email], "Weekly Hitlist summary: all projects", html, dry_run, text=text)
         sent[email] = len(projects)
     return sent

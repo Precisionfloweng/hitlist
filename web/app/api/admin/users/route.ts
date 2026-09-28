@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
 import { listProjects, listUsers, removeUser, saveUser } from "@/lib/data";
-import { sendMail } from "@/lib/mail";
+import { emailButton, sendMail } from "@/lib/mail";
 
 type Body = {
   action?: "save" | "delete";
@@ -38,26 +38,26 @@ export async function POST(req: Request) {
         const site = new URL(req.url).origin;
         const names = (await listProjects()).filter((p) => body.user!.projects?.includes(p.id)).map((p) => `${p.number} ${p.name}`);
         await sendMail(body.user.email.trim(), "Your access to project status from Precision Flow Engineering",
-          `<p>Hi ${escapeHtml(body.user.name.split(" ")[0])},</p>` +
-          `<p>Precision Flow Engineering has given you read-only access to the status of ` +
+          `<p style="margin:0 0 12px">Hi ${escapeHtml(body.user.name.split(" ")[0])},</p>` +
+          `<p style="margin:0 0 12px">Precision Flow Engineering has given you read-only access to the status of ` +
           `${names.map((n) => `<b>${escapeHtml(n)}</b>`).join(", ")}.</p>` +
-          `<p><a href="${site}/login">Sign in at ${site.replace(/^https?:\/\//, "")}</a> with this email address. ` +
-          `The first time, click <b>Email me a code</b>, enter the 6-digit code we send, and create your password. After that you just sign in with your email and password.</p>` +
-          `<p>This information is confidential and provided for your project only.</p>`);
+          `<p style="margin:0 0 16px">${emailButton(`${site}/login`, "Sign in")}</p>` +
+          firstTime(site) +
+          `<p style="margin:16px 0 0">This information is confidential and provided for your project only.</p>`);
       } else if (!original && body.welcome) {
         const site = new URL(req.url).origin;
         await sendMail(body.user.email.trim(), "You've been given access to PFE Hitlist",
-          `<p>Hi ${escapeHtml(body.user.name.split(" ")[0])},</p>` +
-          `<p>${escapeHtml(me.name)} has given you access to <b>PFE Hitlist</b>, where you can see each project's ` +
-          `completion, what's still missing, and open deficiencies.</p>` +
-          `<p><a href="${site}/login">Sign in at ${site.replace(/^https?:\/\//, "")}</a> with this email address. ` +
-          `The first time, click <b>Email me a code</b>, enter the 6-digit code we send, and create your password. After that you just sign in with your email and password.</p>` +
-          `<p><b>Put it on your iPad's Home Screen</b> so it opens like an app:</p>` +
-          `<ol>` +
-          `<li>Open <a href="${site}">${site.replace(/^https?:\/\//, "")}</a> in <b>Safari</b>.</li>` +
-          `<li>Tap the <b>Share</b> button (the square with an arrow pointing up) at the top of the screen.</li>` +
-          `<li>Scroll down and tap <b>Add to Home Screen</b>, then tap <b>Add</b>. It will be named <b>PFE</b>.</li>` +
-          `<li>Open <b>PFE</b> from your Home Screen and sign in once. It stays signed in after that.</li>` +
+          `<p style="margin:0 0 12px">Hi ${escapeHtml(body.user.name.split(" ")[0])},</p>` +
+          `<p style="margin:0 0 12px">${escapeHtml(me.name)} has given you access to <b>PFE Hitlist</b>, where you can see each ` +
+          `project's completion, what's still missing, and open deficiencies.</p>` +
+          `<p style="margin:0 0 16px">${emailButton(`${site}/login`, "Sign in to Hitlist")}</p>` +
+          firstTime(site) +
+          `<p style="margin:18px 0 6px"><b>Put it on your iPad's Home Screen</b> so it opens like an app:</p>` +
+          `<ol style="margin:0;padding-left:22px">` +
+          `<li>Open <b>${site.replace(/^https?:\/\//, "")}</b> in <b>Safari</b>.</li>` +
+          `<li>Tap <b>Share</b> (the square with an arrow pointing up).</li>` +
+          `<li>Tap <b>Add to Home Screen</b>, then <b>Add</b>. It&#39;s named <b>PFE</b>.</li>` +
+          `<li>Open <b>PFE</b> from the Home Screen and sign in once. It stays signed in.</li>` +
           `</ol>`);
       }
     } else {
@@ -67,6 +67,16 @@ export async function POST(req: Request) {
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 400 });
   }
+}
+
+/** "First time signing in" steps, shared by the welcome emails. */
+function firstTime(site: string) {
+  return `<p style="margin:0 0 6px"><b>First time signing in</b> (at ${site.replace(/^https?:\/\//, "")}):</p>` +
+    `<ol style="margin:0;padding-left:22px">` +
+    `<li>Enter this email address and click <b>Email me a code</b>.</li>` +
+    `<li>Enter the 6-digit code we send you and create your password.</li>` +
+    `<li>After that, sign in with your email and password.</li>` +
+    `</ol>`;
 }
 
 function escapeHtml(s: string) {

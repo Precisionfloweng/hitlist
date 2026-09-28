@@ -101,7 +101,9 @@ def test_weekly_summary(tmp_path):
     assert sent["tech@example.com"] == 2          # archived project left out
     assert sent["boss@example.com"] == 2 and sent["rick@example.com"] == 2
     body = mail.sent[0].get_body(("html",)).get_content()
-    assert "never synced" in body and "9 days" in body
+    assert "Never synced" in body and "9 days ago" in body
+    text = mail.sent[0].get_body(("plain",)).get_content()
+    assert "99-001 Sample Building" in text and "Last sync: 9 days ago" in text and "<" not in text
     assert body.index("99-002") < body.index("99-001")   # never-synced listed first
 
 
