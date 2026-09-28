@@ -5084,90 +5084,118 @@
    "key": "boiler",
    "name": "Boilers",
    "export_sheet": "Boiler",
-   "export_sheet_confirmed": false,
+   "export_sheet_confirmed": true,
    "parent_types": null,
    "fields": [
     {
      "label": "MFG",
-     "columns": null,
+     "columns": [
+      "Unit Manufacturer"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Model",
-     "columns": null,
+     "columns": [
+      "Unit Model Number"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Serial",
-     "columns": null,
+     "columns": [
+      "Unit Serial Number"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "BTU Input",
-     "columns": null,
+     "columns": [
+      "BTU Input"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "BTU Output",
-     "columns": null,
+     "columns": [
+      "BTU Output"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Fuel Type",
-     "columns": null,
+     "columns": [
+      "Fuel Type"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Design GPM",
-     "columns": null,
+     "columns": [
+      "Design Water Flow"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Actual GPM",
-     "columns": null,
+     "columns": [
+      "Actual Water Flow"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Design DP",
-     "columns": null,
+     "columns": [
+      "Design Diff Pressure"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Actual DP",
-     "columns": null,
+     "columns": [
+      "Actual Diff Pressure"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Design EWT",
-     "columns": null,
+     "columns": [
+      "Design EWT"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Design LWT",
-     "columns": null,
+     "columns": [
+      "Design LWT"
+     ],
      "status": "optional",
      "when": null
     },
     {
      "label": "Actual EWT",
-     "columns": null,
+     "columns": [
+      "Actual EWT"
+     ],
      "status": "required",
      "when": null
     },
     {
      "label": "Actual LWT",
-     "columns": null,
+     "columns": [
+      "Actual LWT"
+     ],
      "status": "required",
      "when": null
     }
