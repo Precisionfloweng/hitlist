@@ -11,7 +11,13 @@ a:hover { text-decoration: underline; }
 header.top { background: var(--brand); color: var(--brand-ink); }
 header.top .inner { max-width: 1280px; margin: 0 auto; padding: 12px 20px; display: flex; gap: 20px; align-items: center; }
 header.top a { color: var(--brand-ink); opacity: .9; }
-header.top .logo { font-weight: 700; font-size: 17px; opacity: 1; }
+/* Logo: HIT in white, LIST in green, with a part-filled progress bar underneath */
+header.top .logo { display: inline-flex; flex-direction: column; line-height: 1; opacity: 1; text-decoration: none; }
+header.top .logo:hover { text-decoration: none; }
+header.top .logo-word { font-size: 21px; font-weight: 900; letter-spacing: 3px; color: #fff; }
+header.top .logo-word span { color: #5fd08a; }
+header.top .logo-bar { height: 3px; margin-top: 4px; margin-right: 3px; border-radius: 2px;
+  background: linear-gradient(90deg, #5fd08a 0 55%, rgba(255, 255, 255, .35) 55%); }
 header.top .spacer { flex: 1; }
 header.top form button { background: transparent; border: 1px solid rgba(255,255,255,.5); color: #fff; }
 main { max-width: 1280px; margin: 0 auto; padding: 20px; }

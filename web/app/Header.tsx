@@ -5,7 +5,10 @@ export default function Header({ user }: { user: User }) {
   return (
     <header className="top">
       <div className="inner">
-        <Link href="/projects" className="logo">PFE Hitlist</Link>
+        <Link href="/projects" className="logo" aria-label="PFE Hitlist: projects" title="PFE Hitlist">
+          <span className="logo-word">HIT<span>LIST</span></span>
+          <span className="logo-bar" aria-hidden="true" />
+        </Link>
         <Link href="/projects">Projects</Link>
         {user.role !== "customer" && <Link href="/rules">Default rules</Link>}
         {user.role === "admin" && <Link href="/admin">Admin</Link>}
