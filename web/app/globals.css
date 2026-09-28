@@ -164,6 +164,7 @@ h1.page-title { color: #1f4e79; }
 .proj-table thead th { background: #1f4e79; color: #fff; font-weight: 600; border-bottom: none; }
 .proj-table tbody tr:nth-child(even) td { background: #f1f4f8; }
 .proj-table tbody tr:hover td { background: #ece3f8; }
+.proj-table .pill.ok { background: #1a7f37; color: #fff; }
 .phead-sub { margin-bottom: 4px; }
 .ptabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 12px 0 16px; overflow-x: auto; }
 .ptabs a { padding: 10px 16px; color: var(--muted); font-weight: 600; border-bottom: 3px solid transparent;
