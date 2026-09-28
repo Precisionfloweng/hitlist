@@ -85,7 +85,7 @@ export default function RulesEditor({ types, history, canEdit, project }:
   }
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "200px minmax(0, 1fr)", gap: 16, alignItems: "start" }}>
+    <div>
       <nav className="eq-types rule-types" aria-label="Equipment types">
         <ul>
           {types.map((x) => { const c = counts(x); return (

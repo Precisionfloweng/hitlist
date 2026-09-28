@@ -184,7 +184,8 @@ th.ctr, td.ctr { text-align: center; }
 .sync.centered { align-items: center; margin: 0 auto; text-align: center; }
 
 /* Rules pages reuse the equipment-type cards; their list is always shown */
-.rule-types ul { display: flex !important; }
+.rule-types { position: static; margin-bottom: 14px; }
+.rule-types ul { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
 .eq-types .eq-changed { font-weight: 700; color: #6b4fbb; }
 .eq-types li button.on .eq-changed { color: #fff; }
 
