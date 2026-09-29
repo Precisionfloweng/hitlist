@@ -142,8 +142,21 @@ main.wide { max-width: none; }
 /* Units with an open deficiency (punch item) */
 .eq-grid tbody tr.has-def td { background: #fdeeee; }
 .eq-grid tbody tr.has-def:nth-child(even) td { background: #fae6e6; }
-.def-badge { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 999px; font-size: 11px;
-  font-weight: 700; background: var(--bad); color: #fff; vertical-align: 1px; cursor: help; }
+.def-badge { display: inline-block; margin-right: 6px; padding: 0 6px !important; border: 0; border-radius: 999px;
+  font-size: 11px; line-height: 16px; font-weight: 700; background: var(--bad); color: #fff; vertical-align: 1px;
+  cursor: pointer; }
+/* Tapped badge: the unit's open deficiencies */
+.def-pop { position: fixed; z-index: 3000; width: 370px; max-width: calc(100vw - 16px); max-height: 320px; overflow: auto;
+  background: #fff; border: 1px solid #d5dae1; border-radius: 10px; box-shadow: 0 8px 24px rgba(16, 24, 40, .18);
+  font-size: 14px; color: var(--ink); }
+.def-pop-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px 12px; border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; background: #fff; }
+.def-pop-head b { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.def-pop-head button { border: 0; background: none; padding: 4px 8px; font-size: 14px; color: var(--muted); }
+.def-pop ul { list-style: none; margin: 0; padding: 0; }
+.def-pop li { padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: normal; }
+.def-pop li:last-child { border-bottom: 0; }
+.def-pop-meta { font-size: 12px; font-weight: 600; color: var(--bad); margin-bottom: 2px; }
 .eq-grid tbody tr:hover td { background: #ece3f8; }
 .eq-grid tbody tr:hover td.u { background: #ece3f8; }
 .eq-grid tbody tr.has-def:hover td { background: #ece3f8; }

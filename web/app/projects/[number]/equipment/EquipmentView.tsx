@@ -37,6 +37,24 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
   const [key, setKey] = useState(() => sorted.find((t) => t.key === initialType)?.key ?? sorted[0]?.key);
   const [filter, setFilter] = useState<Filter>("all");
   const [q, setQ] = useState("");
+  // Tapped "open" badge: its deficiencies in a small panel (iPads have no hover).
+  const [pop, setPop] = useState<{ unit: string; defs: Deficiency[]; x: number; y: number } | null>(null);
+  useEffect(() => {
+    if (!pop) return;
+    const close = (e: Event) => {
+      if (e.target instanceof Element && e.target.closest(".def-pop, .def-badge")) return;
+      setPop(null);
+    };
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setPop(null); };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("scroll", close, true);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("scroll", close, true);
+      document.removeEventListener("keydown", esc);
+    };
+  }, [pop]);
   const t = sorted.find((x) => x.key === key) ?? sorted[0];
 
   // No ?type= in the link: open on the type picked last (here or on the Rules page).
@@ -150,9 +168,14 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
                       {(defs.length > 0 || u.area) && (
                         <div className="u-area">
                           {defs.length > 0 && (
-                            <span className="def-badge" title={defs.map((d) => `#${d.number} ${d.priority}${d.equipment && d.equipment !== u.name ? ` (${d.equipment})` : ""}: ${d.text}`).join("\n")}>
+                            <button type="button" className="def-badge" title="Show the open deficiencies"
+                              onClick={(e) => {
+                                const r = e.currentTarget.getBoundingClientRect();
+                                setPop((p) => (p?.unit === u.name ? null
+                                  : { unit: u.name, defs, x: Math.min(r.left, window.innerWidth - 380), y: r.bottom + 6 }));
+                              }}>
                               {defs.length} open
-                            </span>
+                            </button>
                           )}
                           {u.area}
                         </div>
@@ -176,6 +199,28 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
           </table>
         </div>
       </section>
+
+      {pop && (
+        <div className="def-pop" role="dialog" aria-label={`Open deficiencies for ${pop.unit}`}
+          style={{ left: Math.max(8, pop.x), top: Math.min(pop.y, window.innerHeight - 220) }}>
+          <div className="def-pop-head">
+            <b>{pop.unit}</b>
+            <button type="button" aria-label="Close" onClick={() => setPop(null)}>✕</button>
+          </div>
+          <ul>
+            {pop.defs.map((d, i) => (
+              <li key={`${d.number}-${i}`}>
+                <div className="def-pop-meta">
+                  #{d.number}{d.priority && <> · {d.priority}</>}
+                  {d.equipment && d.equipment !== pop.unit && <> · {d.equipment}</>}
+                  {d.contact && <> · {d.contact}</>}
+                </div>
+                <div>{d.text || "(no description)"}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
