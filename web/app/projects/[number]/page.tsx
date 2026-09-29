@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Header from "../../Header";
 import { pct } from "../../format";
 import { byTypeOrder } from "@/lib/typeOrder";
+import IssuesList from "./IssuesList";
 import ProjectHeader from "./ProjectHeader";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
@@ -21,6 +22,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   const issues = (results?.gap_flags ?? []).filter((g) => g.kind === "completed_but_missing");
   const eqHref = (type?: string) =>
     `/projects/${encodeURIComponent(p.id)}/equipment${type ? `?type=${encodeURIComponent(type)}` : ""}`;
+  // Group the issues by equipment type, in BuildingStart order (the flags carry the type's name).
+  const typeKeys = new Map((results?.types ?? []).map((t) => [t.name, t.key]));
+  const issueGroups = [...new Set(issues.map((g) => g.type))]
+    .map((name) => ({ name, key: typeKeys.get(name) ?? name }))
+    .sort(byTypeOrder)
+    .map(({ name, key }) => ({
+      type: name, href: eqHref(typeKeys.has(name) ? key : undefined),
+      items: issues.filter((g) => g.type === name).map((g) => ({ unit: g.unit, fields: g.fields })),
+    }));
 
   return (
     <>
@@ -72,11 +82,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               <div className="card" style={{ marginTop: 16, borderColor: "#f5c2c0" }}>
                 <b>Possible issues found ({issues.length})</b>
                 <p className="muted" style={{ margin: "4px 0 8px" }}>The unit is ticked Complete with required fields empty. Check these in BuildingStart.</p>
-                <ul style={{ margin: 0 }}>
-                  {issues.slice(0, 15).map((g, i) => (
-                    <li key={i}><b>{g.unit}</b> ({g.type}): Ticked Complete but missing: {g.fields.join(", ")}</li>
-                  ))}
-                </ul>
+                <IssuesList total={issues.length} groups={issueGroups} />
               </div>
             )}
 

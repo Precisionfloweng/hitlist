@@ -236,3 +236,10 @@ main.help { max-width: 860px; }
 .proj-pick { margin-top: 6px; max-height: 160px; overflow: auto; padding: 6px 8px; border: 1px solid var(--line);
   border-radius: 8px; background: #fafbfc; min-width: 240px; }
 .proj-pick label { display: flex; gap: 6px; align-items: center; font-size: 13px; padding: 2px 0; white-space: nowrap; }
+
+/* Overview: "Possible issues found", grouped by equipment type */
+.issue-group { margin-top: 10px; }
+.issue-type { font-weight: 700; font-size: 14px; }
+.issue-type a { color: var(--brand); }
+.issue-group ul { margin: 4px 0 0; padding-left: 20px; }
+.issue-group li { margin: 2px 0; }
