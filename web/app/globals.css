@@ -142,7 +142,7 @@ main.wide { max-width: none; }
 /* Units with an open deficiency (punch item) */
 .eq-grid tbody tr.has-def td { background: #fdeeee; }
 .eq-grid tbody tr.has-def:nth-child(even) td { background: #fae6e6; }
-.def-badge { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 999px; font-size: 11px;
+.def-badge { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 999px; font-size: 11px;
   font-weight: 700; background: var(--bad); color: #fff; vertical-align: 1px; cursor: help; }
 .eq-grid tbody tr:hover td { background: #ece3f8; }
 .eq-grid tbody tr:hover td.u { background: #ece3f8; }

@@ -144,16 +144,19 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
                 const done = u.required ? u.required_filled / u.required : 1;
                 return (
                   <tr key={u.path || u.name} className={defs.length ? "has-def" : undefined}>
-                    <td className="u" title={u.path}>
-                      <div className="u-name">
-                        {u.name}
-                        {defs.length > 0 && (
-                          <span className="def-badge" title={defs.map((d) => `#${d.number} ${d.priority}${d.equipment && d.equipment !== u.name ? ` (${d.equipment})` : ""}: ${d.text}`).join("\n")}>
-                            {defs.length} open
-                          </span>
-                        )}
-                      </div>
-                      {u.area && <div className="u-area">{u.area}</div>}
+                    <td className="u">
+                      <div className="u-name" title={u.path || u.name}>{u.name}</div>
+                      {/* The badge leads the second line so a long unit name can't push it out of view */}
+                      {(defs.length > 0 || u.area) && (
+                        <div className="u-area">
+                          {defs.length > 0 && (
+                            <span className="def-badge" title={defs.map((d) => `#${d.number} ${d.priority}${d.equipment && d.equipment !== u.name ? ` (${d.equipment})` : ""}: ${d.text}`).join("\n")}>
+                              {defs.length} open
+                            </span>
+                          )}
+                          {u.area}
+                        </div>
+                      )}
                     </td>
                     <td className="d">
                       <div className="d-num">{u.required_filled}/{u.required}</div>
