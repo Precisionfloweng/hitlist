@@ -42,7 +42,7 @@ export default async function HelpPage() {
         <section id="getting-around">
           <h2>Getting around</h2>
           <ul>
-            <li><b>All Projects</b> lists every active project. Tick <b>My projects</b> to see only the ones where you&apos;re the tech. Use the search box to find a project by number, name, tech or address.</li>
+            <li><b>All Projects</b> lists every active project. Tick <b>My projects</b> to see only the ones where you&apos;re the tech. Use the search box to find a project by number, name or tech.</li>
             <li>Click a project to open it. Each project has four tabs:
               <ul>
                 <li><b>Overview</b>: units fully complete, open and closed deficiencies, and a card for each equipment type. Click a card to jump to that type.</li>

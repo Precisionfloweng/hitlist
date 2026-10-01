@@ -17,7 +17,7 @@ export default function ProjectsTable({ rows, userName, customer = false, canSyn
     const s = q.trim().toLowerCase();
     return rows
       .filter((r) => (!mineOnly || !hasMine || r.mine) &&
-        (!s || [r.number, r.name, r.tech, r.address].some((v) => (v || "").toLowerCase().includes(s))))
+        (!s || [r.number, r.name, r.tech].some((v) => (v || "").toLowerCase().includes(s))))
       .sort((a, b) => a.number.localeCompare(b.number) * -1);
   }, [rows, q, mineOnly, hasMine]);
 
@@ -28,7 +28,7 @@ export default function ProjectsTable({ rows, userName, customer = false, canSyn
     <>
       <h1 className="page-title">{title}</h1>
       <div className="row" style={{ marginBottom: 12 }}>
-        <input placeholder="Search project #, name, tech or address" value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: 1, minWidth: 240 }} />
+        <input placeholder="Search project #, name or tech" value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: 1, minWidth: 240 }} />
         {!customer && <label className="row" style={{ gap: 6 }}>
           <input type="checkbox" checked={mineOnly} onChange={(e) => setMineOnly(e.target.checked)} /> My projects
         </label>}
