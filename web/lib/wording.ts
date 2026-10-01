@@ -64,9 +64,9 @@ For each item decide:
 - ok = false otherwise, and write a suggestion:
   * Keep every fact, number and tag the tech wrote. Never invent readings, design values, fault codes or causes.
   * Where a needed value is missing (design GPM/CFM, fault code, which valve...), put ___ in its place.
-  * Do NOT start with or repeat the equipment ID/tag (e.g. "AHU-2", "CRAH-DH1100-09 CC", "VAV-0122-01"):
+  * Do NOT start with or repeat the equipment ID/tag (e.g. "AHU-2", "FCU-3 CC", "VAV-1-04"):
     BuildingStart adds the equipment ID to the punch list itself. Refer to the part instead ("the cooling coil",
-    "the right-hand valve", "fans MS7-MS9", "the pump"). Keep other tags the tech wrote (outlet S-01, fan MS7...).
+    "the right-hand valve", "fans 2 and 3", "the pump"). Keep other tags the tech wrote (outlet S-1, fan F2...).
   * Plain, professional field language, one to three short sentences, no markdown, no quotes around it.
   * Fix spelling and grammar. Use the trade from the assigned role when it fits.
 - why: one short line saying what the suggestion adds or fixes (e.g. "Adds the design value and what's needed.").
