@@ -190,7 +190,8 @@ export async function removeProject(number: string) {
 }
 
 // ---- admin: users ------------------------------------------------------------------
-export type UserRow = { email: string; name: string; role: string; active: boolean; added: string; projects: string[] };
+export type UserRow = { email: string; name: string; role: string; active: boolean; added: string; projects: string[];
+  lastSeen: string };
 
 export async function listUsers(): Promise<UserRow[]> {
   const rows = await readTab("Users", true);
@@ -198,6 +199,7 @@ export async function listUsers(): Promise<UserRow[]> {
     email: u.email.trim().toLowerCase(), name: u.name, role: u.role || "tech",
     active: !["no", "false", "0"].includes((u.active || "").toLowerCase()), added: u.added,
     projects: (u.projects || "").split("|").map((x) => x.trim()).filter(Boolean),
+    lastSeen: (u.last_seen || "").slice(0, 10),
   })).sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -221,7 +223,7 @@ export async function saveUser(input: { email: string; name: string; role: strin
   const rec = { email, name: input.name.trim(), role: input.role, active: input.active ? "yes" : "no",
     added: existing?.added || new Date().toISOString().slice(0, 10),
     password_hash: existing?.password_hash || "",   // keep their password when an admin edits the row
-    projects: projects.join(" | ") };
+    projects: projects.join(" | "), last_seen: existing?.last_seen || "" };
   if (existing) await updateRow("Users", existing._row, rec);
   else await appendRows("Users", [rec]);
 }

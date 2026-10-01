@@ -4,8 +4,9 @@ import "server-only";
 import { createHash, randomInt } from "node:crypto";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies, headers } from "next/headers";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
-import { appendRows, ensureHeader, ensureTab, readTab, updateRow } from "./sheets";
+import { appendRows, ensureHeader, ensureTab, readTab, updateCell, updateRow } from "./sheets";
 import { checkPassword, hashPassword, passwordProblem } from "./password";
 
 // role "owner" in the Users tab = an admin who can't be removed, turned off or demoted from the site.
@@ -159,10 +160,34 @@ export async function currentUser(): Promise<User | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, key());
-    return await findUser(String(payload.email));
+    const row = await userRow(String(payload.email));
+    const user = row ? toUser(row) : null;
+    if (user && row) noteLastSeen(row);
+    return user;
   } catch {
     return null;
   }
+}
+
+/** Today's date in Central, e.g. "2026-10-01". */
+export const todayCentral = () =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date());
+
+let usersHeaderChecked = false;
+/** Record that this person used the app today (one sheet write per person per day, after the page is sent). */
+function noteLastSeen(row: Record<string, string> & { _row: number }) {
+  const today = todayCentral();
+  if ((row.last_seen || "").slice(0, 10) === today) return;
+  row.last_seen = today;                    // so other checks during this request don't write again
+  const write = async () => {
+    try {
+      if (!usersHeaderChecked) { await ensureHeader("Users"); usersHeaderChecked = true; }
+      await updateCell("Users", row._row, "last_seen", today);
+    } catch (e) {
+      console.error("last seen update failed", e);
+    }
+  };
+  try { after(write); } catch { void write(); }
 }
 
 export async function requireUser(): Promise<User> {

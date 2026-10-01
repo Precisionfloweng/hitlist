@@ -2,7 +2,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type U = { email: string; name: string; role: string; active: boolean; added: string; projects: string[] };
+type U = { email: string; name: string; role: string; active: boolean; added: string; projects: string[]; lastSeen?: string };
+
+/** "Today", "Yesterday", "Sep 28", or "Never", from a Central date like "2026-09-28". */
+function lastUsed(date?: string): string {
+  if (!date) return "Never";
+  const day = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(d);
+  const today = day(new Date()), yesterday = day(new Date(Date.now() - 86_400_000));
+  if (date === today) return "Today";
+  if (date === yesterday) return "Yesterday";
+  const d = new Date(`${date}T12:00:00`);
+  return d.toLocaleDateString([], { month: "short", day: "numeric", ...(date.slice(0, 4) !== today.slice(0, 4) ? { year: "numeric" } : {}) });
+}
 type Choice = { id: string; label: string };
 
 /** For a customer: tick the projects they may see. */
@@ -55,7 +66,7 @@ export default function AdminUsers({ initial, me, projects: choices }: { initial
       </div>
       <div className="scroll">
         <table>
-          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Access</th><th>Added</th><th></th></tr></thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Access</th><th>Last used</th><th>Added</th><th></th></tr></thead>
           <tbody>
             {adding && (
               <tr style={{ background: "#f3f7fb" }}>
@@ -65,6 +76,7 @@ export default function AdminUsers({ initial, me, projects: choices }: { initial
                   {adding.role === "customer" && <ProjectPicker value={adding.projects} choices={choices}
                     onChange={(v) => setAdding({ ...adding, projects: v })} />}</td>
                 <td><label className="row" style={{ gap: 6 }}><input type="checkbox" checked={welcome} onChange={(e) => setWelcome(e.target.checked)} /> Email them a welcome</label></td>
+                <td></td>
                 <td></td>
                 <td className="row" style={{ flexWrap: "nowrap" }}>
                   <button className="primary" disabled={busy === "new"} onClick={async () => {
@@ -96,6 +108,7 @@ export default function AdminUsers({ initial, me, projects: choices }: { initial
                       {u.active ? <span className="pill ok">On</span> : <span className="pill gray">Off</span>}
                     </label>
                   </td>
+                  <td>{lastUsed(u.lastSeen)}</td>
                   <td className="muted">{u.added}</td>
                   <td className="row" style={{ flexWrap: "nowrap" }}>
                     <button className="primary" disabled={!u.dirty || busy === u.original} onClick={async () => {
