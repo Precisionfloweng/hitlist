@@ -104,6 +104,14 @@ export default function AdminUsers({ initial, me, projects: choices }: { initial
                         setMsg({ text: `Saved ${u.name}`, ok: true });
                       }
                     }}>Save</button>
+                    <button disabled={busy === u.original || !u.active || u.dirty}
+                      title={!u.active ? "Turn their access on first" : u.dirty ? "Save first" : "Email them the sign-in and iPad instructions"}
+                      onClick={async () => {
+                        if (!confirm(`Send the welcome email to ${u.name} (${u.original})?`)) return;
+                        if (await send({ action: "welcome", original: u.original }, u.original)) {
+                          setMsg({ text: `Welcome email sent to ${u.name}`, ok: true });
+                        }
+                      }}>Send welcome</button>
                     {!self && !owner && (
                       <button className="danger" disabled={busy === u.original} onClick={async () => {
                         if (!confirm(`Remove ${u.name} (${u.original}) from the list? To just block sign-in, turn Access off instead.`)) return;
