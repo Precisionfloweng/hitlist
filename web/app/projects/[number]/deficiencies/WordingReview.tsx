@@ -67,11 +67,11 @@ export default function WordingReview({ project, items, initial, canReview }:
     try { localStorage.setItem(draftKey(project, d), v); } catch { /* storage unavailable */ }
   };
 
-  async function review() {
+  async function review(all = false) {
     setBusy(true); setError("");
     try {
       const r = await fetch("/api/wording", { method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ project }) });
+        body: JSON.stringify({ project, all }) });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) setError(data.error || "The wording review failed. Try again.");
       else setFile(data.wording);
@@ -89,8 +89,13 @@ export default function WordingReview({ project, items, initial, canReview }:
     <section className="wording">
       <div className="wording-bar">
         {canReview && (
-          <button className="primary" disabled={busy || (!never && pending.length === 0)} onClick={review}>
-            {busy ? "Reviewing…" : "✎ Review wording"}
+          <button className="primary" disabled={busy} onClick={() => {
+            // Nothing new to check: offer to review every open item again (e.g. after a late BuildingStart sync).
+            if (!never && pending.length === 0) {
+              if (confirm("Every open item has already been reviewed. Review them all again?")) review(true);
+            } else review();
+          }}>
+            {busy ? "Reviewing…" : !never && pending.length === 0 ? "✎ Review all again" : "✎ Review wording"}
           </button>
         )}
         <span className="muted">
@@ -108,7 +113,7 @@ export default function WordingReview({ project, items, initial, canReview }:
           <span className="pill wpill-new">{pending.length} new</span>
           <span>{pending.length} deficienc{pending.length === 1 ? "y was" : "ies were"} added or changed since the last review.</span>
           <span style={{ flex: 1 }} />
-          {canReview && <button className="primary small" disabled={busy} onClick={review}>{busy ? "Reviewing…" : "Review new items"}</button>}
+          {canReview && <button className="primary small" disabled={busy} onClick={() => review()}>{busy ? "Reviewing…" : "Review new items"}</button>}
         </div>
       )}
 

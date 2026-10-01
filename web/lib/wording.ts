@@ -83,10 +83,10 @@ async function askClaude(items: Deficiency[]): Promise<Omit<Review, "text">[]> {
   }));
 }
 
-/** Review the given open deficiencies (skipping any whose current wording is already reviewed) and save. */
-export async function reviewWording(project: string, items: Deficiency[]): Promise<WordingFile> {
+/** Review the open deficiencies and save. Normally skips wording already reviewed; `all` reviews everything again. */
+export async function reviewWording(project: string, items: Deficiency[], all = false): Promise<WordingFile> {
   const file = await loadWording(project);
-  const todo = items.filter((d) => d.open && d.text.trim() && file.items[d.number]?.text !== d.text);
+  const todo = items.filter((d) => d.open && d.text.trim() && (all || file.items[d.number]?.text !== d.text));
   const batches: Deficiency[][] = [];
   for (let i = 0; i < todo.length; i += BATCH) batches.push(todo.slice(i, i + BATCH));
   const answers = await Promise.all(batches.map(askClaude));         // batches run side by side
