@@ -3,7 +3,8 @@ import Header from "../../../Header";
 import ProjectHeader from "../ProjectHeader";
 import Breakdown from "./Breakdown";
 import DeficiencyList from "./DeficiencyList";
-import WordingReview from "./WordingReview";
+import WordingReview from "../WordingReview";
+import { deficiencyItems } from "@/lib/reviewItems";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
@@ -36,7 +37,7 @@ export default async function DeficienciesPage({ params }: { params: Promise<{ n
               <Breakdown title="All by status" rows={group("status")} />
             </div>
             {results && wording && (
-              <WordingReview project={p.id} items={results.deficiencies} initial={wording} canReview={canEdit(user)} />
+              <WordingReview project={p.id} kind="deficiencies" items={deficiencyItems(results.deficiencies)} initial={wording} canReview={canEdit(user)} />
             )}
             {results ? <DeficiencyList items={results.deficiencies} /> :
               <p className="muted">The full list appears after the next sync.</p>}

@@ -129,6 +129,7 @@ export default async function HelpPage() {
         <section id="notes">
           <h2>Notes</h2>
           <p>The <b>Notes</b> tab lists every note entered in BuildingStart for the project: <b>Project notes</b> (not tied to a unit) first, then <b>Notes by unit</b>. Notes update on each <b>Sync</b>. To add or change a note, do it in BuildingStart. Customers don&apos;t see notes.</p>
+          <p><b>Review wording</b> works on the Notes tab too, the same way as on Deficiencies: Claude flags notes that are unclear or have spelling or grammar problems and suggests clearer wording. <b>Copy</b> it into the note in BuildingStart, or press <b>Keep as is</b>.</p>
         </section>
 
         <section id="rules">

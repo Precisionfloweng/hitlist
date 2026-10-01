@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import type { Deficiency } from "@/lib/results";
+import type { Kind, ReviewItem } from "@/lib/reviewItems";
 import type { Review, WordingFile } from "@/lib/wording";
 
 type State = "flag" | "blank" | "good" | "updated" | "kept" | "new" | "changed";
@@ -15,7 +15,7 @@ function matches(text: string, suggestion: string): boolean {
   return new RegExp(`^${parts.join(".+?")}$`).test(norm(text));
 }
 
-function stateOf(d: Deficiency, r: Review | undefined): State {
+function stateOf(d: ReviewItem, r: Review | undefined): State {
   if (!r) return "new";
   if (r.text === d.text) return r.ok ? "good" : r.kept ? "kept" : "flag";
   if (d.text.includes(BLANK)) return "blank";
@@ -33,10 +33,13 @@ async function copyText(text: string) {
   }
 }
 
-const draftKey = (project: string, d: Deficiency) => `hl-wording:${project}:${d.number}:${d.text.length}`;
+const draftKey = (project: string, kind: Kind, d: ReviewItem) => `hl-wording:${kind}:${project}:${d.key}:${d.text.length}`;
 
-export default function WordingReview({ project, items, initial, canReview }:
-  { project: string; items: Deficiency[]; initial: WordingFile; canReview: boolean }) {
+/** "Review wording" for a project's open deficiencies or its notes (same layout, different words). */
+export default function WordingReview({ project, kind, items, initial, canReview }:
+  { project: string; kind: Kind; items: ReviewItem[]; initial: WordingFile; canReview: boolean }) {
+  const notes = kind === "notes";
+  const noun = (n: number) => (notes ? `note${n === 1 ? "" : "s"}` : `deficienc${n === 1 ? "y" : "ies"}`);
   const [file, setFile] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -44,8 +47,8 @@ export default function WordingReview({ project, items, initial, canReview }:
   const [copied, setCopied] = useState("");
   const [allGood, setAllGood] = useState(false);
 
-  const open = useMemo(() => items.filter((d) => d.open && d.text.trim()), [items]);
-  const rows = useMemo(() => open.map((d) => ({ d, r: file.items[d.number], s: stateOf(d, file.items[d.number]) })), [open, file]);
+  const open = useMemo(() => items.filter((d) => d.text.trim()), [items]);
+  const rows = useMemo(() => open.map((d) => ({ d, r: file.items[d.key], s: stateOf(d, file.items[d.key]) })), [open, file]);
   const flagged = rows.filter((x) => x.s === "flag" || x.s === "blank");
   const rank = (s: State) => (s === "updated" ? 0 : s === "kept" ? 1 : 2);
   const good = rows.filter((x) => x.s === "good" || x.s === "updated" || x.s === "kept")
@@ -57,22 +60,22 @@ export default function WordingReview({ project, items, initial, canReview }:
     const out: Record<string, string> = {};
     try {
       for (const { d } of rows) {
-        const v = localStorage.getItem(draftKey(project, d));
-        if (v !== null) out[d.number] = v;
+        const v = localStorage.getItem(draftKey(project, kind, d));
+        if (v !== null) out[d.key] = v;
       }
     } catch { /* storage unavailable */ }
     setDrafts(out);
-  }, [project, rows]);
-  const setDraft = (d: Deficiency, v: string) => {
-    setDrafts((x) => ({ ...x, [d.number]: v }));
-    try { localStorage.setItem(draftKey(project, d), v); } catch { /* storage unavailable */ }
+  }, [project, kind, rows]);
+  const setDraft = (d: ReviewItem, v: string) => {
+    setDrafts((x) => ({ ...x, [d.key]: v }));
+    try { localStorage.setItem(draftKey(project, kind, d), v); } catch { /* storage unavailable */ }
   };
 
   async function review(all = false) {
     setBusy(true); setError("");
     try {
       const r = await fetch("/api/wording", { method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ project, all }) });
+        body: JSON.stringify({ project, kind, all }) });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) setError(data.error || "The wording review failed. Try again.");
       else setFile(data.wording);
@@ -82,11 +85,11 @@ export default function WordingReview({ project, items, initial, canReview }:
     setBusy(false);
   }
 
-  async function keep(d: Deficiency, undo = false) {
+  async function keep(d: ReviewItem, undo = false) {
     setError("");
     try {
       const r = await fetch("/api/wording", { method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ project, keep: d.number, undo }) });
+        body: JSON.stringify({ project, kind, keep: d.key, undo }) });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) setError(data.error || "Couldn't save that. Try again.");
       else setFile(data.wording);
@@ -106,14 +109,14 @@ export default function WordingReview({ project, items, initial, canReview }:
           <button className="primary" disabled={busy} onClick={() => {
             // Nothing new to check: offer to review every open item again (e.g. after a late BuildingStart sync).
             if (!never && pending.length === 0) {
-              if (confirm("Every open item has already been reviewed. Review them all again?")) review(true);
+              if (confirm(`Every ${notes ? "note" : "open item"} has already been reviewed. Review them all again?`)) review(true);
             } else review();
           }}>
             {busy ? "Reviewing…" : !never && pending.length === 0 ? "✎ Review all again" : "✎ Review wording"}
           </button>
         )}
         <span className="muted">
-          {never ? "Claude checks each open deficiency and suggests clearer wording where it helps."
+          {never ? `Claude checks each ${notes ? "note" : "open deficiency"} and suggests clearer wording where it helps.`
             : <>Last reviewed {when} · {flagged.length > 0
               ? <b style={{ color: "var(--bad)" }}>{flagged.length} item{flagged.length === 1 ? "" : "s"}</b>
               : <b>0 items</b>} could be clearer · {good.length} read well</>}
@@ -125,20 +128,20 @@ export default function WordingReview({ project, items, initial, canReview }:
       {!never && pending.length > 0 && (
         <div className="wording-new">
           <span className="pill wpill-new">{pending.length} new</span>
-          <span>{pending.length} deficienc{pending.length === 1 ? "y was" : "ies were"} added or changed since the last review.</span>
+          <span>{pending.length} {noun(pending.length)} {pending.length === 1 ? "was" : "were"} added or changed since the last review.</span>
           <span style={{ flex: 1 }} />
           {canReview && <button className="primary small" disabled={busy} onClick={() => review()}>{busy ? "Reviewing…" : "Review new items"}</button>}
         </div>
       )}
 
       {flagged.map(({ d, r, s }) => {
-        const value = drafts[d.number] ?? (s === "blank" ? d.text : r!.suggestion);
+        const value = drafts[d.key] ?? (s === "blank" ? d.text : r!.suggestion);
         return (
-          <div key={d.number} className="witem">
+          <div key={d.key} className="witem">
             <div className="witem-head">
-              <b>#{d.number}</b> <b>{d.equipment}</b>
-              <span className={`pill ${d.priority === "High" ? "bad" : d.priority === "Medium" ? "warn" : "gray"}`}>{d.priority}</span>
-              <span className="muted">{d.role}</span>
+              {d.label && <b>{d.label}</b>} <b>{d.equipment}</b>
+              {d.priority && <span className={`pill ${d.priority === "High" ? "bad" : d.priority === "Medium" ? "warn" : "gray"}`}>{d.priority}</span>}
+              <span className="muted">{notes ? d.itemType : d.role}</span>
               {s === "blank" && <span className="pill warn">Updated, blank left in</span>}
             </div>
             <div className="wlab">Current</div>
@@ -151,9 +154,9 @@ export default function WordingReview({ project, items, initial, canReview }:
             <div className="wlab">Suggested</div>
             <div className="wrow">
               <textarea rows={2} value={value} onChange={(e) => setDraft(d, e.target.value)} />
-              <button className={copied === d.number ? "wcopied" : "primary"}
-                onClick={async () => { await copyText(value); setCopied(d.number); setTimeout(() => setCopied((c) => (c === d.number ? "" : c)), 2000); }}>
-                {copied === d.number ? "Copied ✓" : "Copy"}
+              <button className={copied === d.key ? "wcopied" : "primary"}
+                onClick={async () => { await copyText(value); setCopied(d.key); setTimeout(() => setCopied((c) => (c === d.key ? "" : c)), 2000); }}>
+                {copied === d.key ? "Copied ✓" : "Copy"}
               </button>
             </div>
             <div className="wwhy">
@@ -169,9 +172,9 @@ export default function WordingReview({ project, items, initial, canReview }:
         <>
           <div className="wlab" style={{ marginTop: 14 }}>Not reviewed yet</div>
           {pending.map(({ d, s }) => (
-            <div key={d.number} className="wline wline-new">
+            <div key={d.key} className="wline wline-new">
               <span className="pill wpill-new-soft">{s === "changed" ? "Changed" : "New"}</span>
-              <b>#{d.number}</b> {d.equipment} <span className="muted">· {d.text}</span>
+              {d.label && <b>{d.label}</b>} {d.equipment} <span className="muted wline-text">· {d.text}</span>
             </div>
           ))}
         </>
@@ -181,11 +184,11 @@ export default function WordingReview({ project, items, initial, canReview }:
         <>
           <div className="wlab" style={{ marginTop: 14 }}>Reads well</div>
           {(allGood ? good : good.slice(0, SHOW_GOOD)).map(({ d, s }) => (
-            <div key={d.number} className="wline">
+            <div key={d.key} className="wline">
               <span className="pill ok">✓</span>
               {s === "updated" && <span className="pill wpill-upd">Updated</span>}
-              {s === "kept" && <span className="pill gray" title={`Kept by ${file.items[d.number]?.kept?.by ?? ""}`}>Kept as is</span>}
-              <b>#{d.number}</b> {d.equipment} <span className="muted wline-text">· {d.text}</span>
+              {s === "kept" && <span className="pill gray" title={`Kept by ${file.items[d.key]?.kept?.by ?? ""}`}>Kept as is</span>}
+              {d.label && <b>{d.label}</b>} {d.equipment} <span className="muted wline-text">· {d.text}</span>
               {s === "kept" && canReview && <button className="linkish" onClick={() => keep(d, true)}>Undo</button>}
             </div>
           ))}

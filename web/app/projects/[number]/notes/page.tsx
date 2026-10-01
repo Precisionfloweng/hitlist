@@ -1,6 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import Header from "../../../Header";
 import ProjectHeader from "../ProjectHeader";
+import WordingReview from "../WordingReview";
+import { noteItems } from "@/lib/reviewItems";
+import { loadWording } from "@/lib/wording";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults, type Note } from "@/lib/results";
@@ -16,6 +19,7 @@ export default async function NotesPage({ params }: { params: Promise<{ number: 
   if (!data || !canSee(user, data.project.id)) notFound();
   const p = data.project;
   const notes = results?.notes ?? [];
+  const wording = notes.length ? await loadWording(p.id, "notes") : null;
   const general = notes.filter((n) => !n.path);
   const byUnit = new Map<string, Note[]>();
   for (const n of notes.filter((n) => n.path)) {
@@ -39,6 +43,7 @@ export default async function NotesPage({ params }: { params: Promise<{ number: 
           <div className="card muted">No notes in BuildingStart for this project.</div>
         ) : (
           <>
+            {wording && <WordingReview project={p.id} kind="notes" items={noteItems(notes)} initial={wording} canReview={canEdit(user)} />}
             {general.length > 0 && (
               <section className="card notes-card">
                 <h2>Project notes</h2>
