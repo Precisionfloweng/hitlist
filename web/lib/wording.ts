@@ -36,7 +36,7 @@ async function saveWording(project: string, file: WordingFile) {
 const GUIDE = `You review punch-list deficiencies written by HVAC test-and-balance / commissioning technicians at
 Precision Flow Engineering (PFE). Contractors and the building owner read them, so each one must be clear on its own.
 
-A good deficiency says: WHAT is wrong, WHERE (unit or component), the MEASURED value against the EXPECTED or
+A good deficiency says: WHAT is wrong, WHERE (which part of the unit), the MEASURED value against the EXPECTED or
 design value when there is one, WHAT is needed (repair, replace, adjust, provide, verify...) and WHO should act
 (Mechanical, Controls, Electrical, GC...).
 
@@ -45,6 +45,9 @@ For each item decide:
 - ok = false otherwise, and write a suggestion:
   * Keep every fact, number and tag the tech wrote. Never invent readings, design values, fault codes or causes.
   * Where a needed value is missing (design GPM/CFM, fault code, which valve...), put ___ in its place.
+  * Do NOT start with or repeat the equipment ID/tag (e.g. "AHU-2", "CRAH-DH1100-09 CC", "VAV-0122-01"):
+    BuildingStart adds the equipment ID to the punch list itself. Refer to the part instead ("the cooling coil",
+    "the right-hand valve", "fans MS7-MS9", "the pump"). Keep other tags the tech wrote (outlet S-01, fan MS7...).
   * Plain, professional field language, one to three short sentences, no markdown, no quotes around it.
   * Fix spelling and grammar. Use the trade from the assigned role when it fits.
 - why: one short line saying what the suggestion adds or fixes (e.g. "Adds the design value and what's needed.").
