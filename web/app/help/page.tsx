@@ -65,6 +65,7 @@ export default async function HelpPage() {
             <tr><td><span className="pill ok">✓ Complete</span></td><td>Done. The numbers on the site are now from this sync.</td></tr>
             <tr><td><span className="pill bad">Failed</span></td><td>Something went wrong; the reason is shown underneath. Press <b>Try again</b>. You and Rick also get an email.</td></tr>
             <tr><td className="error">The server has not started.</td><td>The server didn&apos;t pick the sync up within 2 minutes. It may be off or restarting. Let Rick know.</td></tr>
+            <tr><td><span className="pill warn">Server down</span></td><td>An orange banner at the top, <b>&ldquo;The server is currently down so the site is unable to sync,&rdquo;</b> means the server hasn&apos;t checked in for over 10 minutes. Everything already synced still shows; new syncs wait until it&apos;s back. The admins get an email.</td></tr>
           </tbody></table>
           <p><b>Last sync</b> shows how long ago the project was synced. Nothing updates on its own, so sync after you&apos;ve entered data in BuildingStart. Every Monday morning you get an email listing your projects and the days since each was last synced.</p>
         </section>

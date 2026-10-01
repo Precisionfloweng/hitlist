@@ -21,6 +21,8 @@ export const SCHEMA = {
   Deficiencies: ["project_number", "group", "value", "count", "updated_at"],
   History: ["project_number", "synced_at", "fields_pct", "units_pct", "units",
     "open_deficiencies", "open_high"],
+  // Server heartbeat: "server_last_seen" (worker, every 5 min) and "down_alert_sent_for" (website).
+  Status: ["name", "value"],
   // One row per sign-in (time in Central). Written by the website only.
   SignIns: ["signed_in_at", "email", "name", "role", "method", "device"],
 } as const;

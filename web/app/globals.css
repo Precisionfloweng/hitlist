@@ -288,3 +288,7 @@ main.help { max-width: 860px; }
 .wline-new { border-left: 4px solid #8e7cc3; }
 button.small { padding: 5px 12px; font-size: 14px; }
 button.linkish { border: 0; background: none; padding: 4px 2px; color: var(--muted); font-size: 13px; }
+
+/* Banner when the server hasn't checked in */
+.server-down { background: #fff4e5; border-bottom: 1px solid #f5d29a; color: #7a3e00; padding: 10px 24px; font-size: 14px; }
+.server-down .muted { color: #9a6a33; }

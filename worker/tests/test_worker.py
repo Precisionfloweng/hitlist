@@ -318,3 +318,11 @@ def test_customers_are_never_emailed_as_a_tech():
     store = make_store()
     store.append("Users", [{"email": "cust@example.com", "name": "Taylor Customer", "role": "customer", "active": "yes"}])
     assert store.email_for("Taylor") != "cust@example.com"
+
+
+def test_heartbeat_records_server_time():
+    store = make_store()
+    store.heartbeat()
+    store.heartbeat()                        # updates the same row, doesn't add another
+    rows = [r for r in store.rows("Status") if r["name"] == "server_last_seen"]
+    assert len(rows) == 1 and rows[0]["value"]

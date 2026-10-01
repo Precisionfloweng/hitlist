@@ -32,6 +32,9 @@ SCHEMA: dict[str, list[str]] = {
     "Deficiencies": ["project_number", "group", "value", "count", "updated_at"],
     "History": ["project_number", "synced_at", "fields_pct", "units_pct", "units",
                 "open_deficiencies", "open_high"],
+    # Server heartbeat: name = "server_last_seen" (written by the worker every few minutes) and
+    # "down_alert_sent_for" (the website's note that it already emailed about that outage).
+    "Status": ["name", "value"],
     # Written by the website: one row per sign-in (time in Central).
     "SignIns": ["signed_in_at", "email", "name", "role", "method", "device"],
 }
@@ -186,6 +189,19 @@ class HitlistStore:
         rows = [SCHEMA[tab]] + [self._to_row(tab, r) for r in keep] + [self._to_row(tab, r) for r in records]
         self.b.clear(tab)
         self.b.write(tab, 1, rows)
+
+    # ---- server heartbeat -------------------------------------------------------
+    def heartbeat(self) -> None:
+        """Record that the worker is running (the website warns when this gets old)."""
+        if "Status" not in self.b.tabs():
+            self.b.add_tab("Status")
+            self.b.write("Status", 1, [SCHEMA["Status"]])
+        stamp = now_iso()
+        row = next((r for r in self.rows("Status") if r.get("name") == "server_last_seen"), None)
+        if row:
+            self.update("Status", row["_row"], {"name": "server_last_seen", "value": stamp})
+        else:
+            self.append("Status", [{"name": "server_last_seen", "value": stamp}])
 
     # ---- projects ---------------------------------------------------------------
     # A project's key is its project_id; blank means "same as the project number". Two sites under

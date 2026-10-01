@@ -5,6 +5,7 @@ from __future__ import annotations
 import inspect
 import json
 import logging
+import threading
 import time
 from pathlib import Path
 from typing import Any, Callable
@@ -276,8 +277,22 @@ def recover_interrupted(store: HitlistStore) -> int:
     return n
 
 
+HEARTBEAT_SECONDS = 5 * 60
+
+
+def _heartbeat_loop(store: HitlistStore) -> None:
+    """Every 5 minutes, even while a long sync is running, note in the sheet that the server is up."""
+    while True:
+        try:
+            store.heartbeat()
+        except Exception:  # noqa: BLE001 - Google briefly unreachable; try again next time
+            log.warning("Could not record the server heartbeat", exc_info=True)
+        time.sleep(HEARTBEAT_SECONDS)
+
+
 def run_forever(store: HitlistStore, settings: Settings, mailer: Mailer) -> None:
     log.info("Worker started; checking the queue every %ss", settings.poll_seconds)
+    threading.Thread(target=_heartbeat_loop, args=(store,), daemon=True, name="heartbeat").start()
     try:
         if (n := recover_interrupted(store)):
             log.info("Closed %s sync(s) interrupted by the last restart", n)
