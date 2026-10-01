@@ -3,9 +3,9 @@
 import "server-only";
 import { createHash, randomInt } from "node:crypto";
 import { SignJWT, jwtVerify } from "jose";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { ensureHeader, readTab, updateRow } from "./sheets";
+import { appendRows, ensureHeader, ensureTab, readTab, updateRow } from "./sheets";
 import { checkPassword, hashPassword, passwordProblem } from "./password";
 
 // role "owner" in the Users tab = an admin who can't be removed, turned off or demoted from the site.
@@ -54,10 +54,34 @@ export async function findUser(email: string): Promise<User | null> {
   return u ? toUser(u) : null;
 }
 
-async function startSession(email: string) {
-  const token = await new SignJWT({ email }).setProtectedHeader({ alg: "HS256" })
+async function startSession(user: User, method: "password" | "emailed code") {
+  const token = await new SignJWT({ email: user.email }).setProtectedHeader({ alg: "HS256" })
     .setExpirationTime(`${SESSION_YEARS * 365}d`).sign(key());
   (await cookies()).set(SESSION, token, cookieOpts(SESSION_YEARS * 365 * 86400));
+  await logSignIn(user, method);
+}
+
+/** "iPad · Safari", "Windows · Chrome"… from the browser's user-agent string. */
+function deviceOf(ua: string): string {
+  const os = /iPad|Macintosh.*Mobile/.test(ua) ? "iPad" : /iPhone/.test(ua) ? "iPhone" : /Android/.test(ua) ? "Android"
+    : /Windows/.test(ua) ? "Windows" : /Mac OS X|Macintosh/.test(ua) ? "Mac" : "Other";
+  const browser = /Edg\//.test(ua) ? "Edge" : /CriOS|Chrome\//.test(ua) ? "Chrome" : /FxiOS|Firefox\//.test(ua) ? "Firefox"
+    : /Safari\//.test(ua) ? "Safari" : "Other";
+  return `${os} · ${browser}`;
+}
+
+/** Add a row to the SignIns tab. Never blocks signing in if the sheet can't be written. */
+async function logSignIn(user: User, method: string) {
+  try {
+    const at = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit",
+      day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date()).replace(",", "");
+    const ua = (await headers()).get("user-agent") || "";
+    await ensureTab("SignIns");
+    await appendRows("SignIns", [{ signed_in_at: at, email: user.email, name: user.name,
+      role: user.owner ? "owner" : user.role, method, device: deviceOf(ua) }]);
+  } catch (e) {
+    console.error("sign-in log failed", e);
+  }
 }
 
 // ---- password sign-in -----------------------------------------------------------------
@@ -76,7 +100,7 @@ export async function signInWithPassword(email: string, password: string): Promi
     return "wrong";
   }
   failures.delete(e);
-  await startSession(user.email);
+  await startSession(user, "password");
   return "ok";
 }
 
@@ -110,7 +134,7 @@ export async function finishSignIn(code: string): Promise<"ok" | "wrong" | "expi
   }
   const user = await findUser(payload.email);
   if (!user) return "expired";
-  await startSession(user.email);
+  await startSession(user, "emailed code");
   jar.delete(PENDING);
   return "ok";
 }

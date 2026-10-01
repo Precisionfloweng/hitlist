@@ -32,6 +32,8 @@ SCHEMA: dict[str, list[str]] = {
     "Deficiencies": ["project_number", "group", "value", "count", "updated_at"],
     "History": ["project_number", "synced_at", "fields_pct", "units_pct", "units",
                 "open_deficiencies", "open_high"],
+    # Written by the website: one row per sign-in (time in Central).
+    "SignIns": ["signed_in_at", "email", "name", "role", "method", "device"],
 }
 
 QUEUED, RUNNING, DONE, FAILED = "queued", "running", "done", "failed"
