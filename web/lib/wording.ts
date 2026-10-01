@@ -11,6 +11,7 @@ export type Review = {
   suggestion: string;    // rewritten text ("" when ok); ___ marks a value the tech must fill in
   why: string;           // one short line: what the rewrite adds or fixes
   other: string;         // a problem that isn't wording (e.g. assigned to own company with no contact), or ""
+  kept?: { by: string; at: string };   // someone chose to keep this wording as is
 };
 export type WordingFile = { reviewedAt: string; items: Record<string, Review> };
 
@@ -97,6 +98,17 @@ export async function reviewWording(project: string, items: Deficiency[], all = 
     }
   });
   file.reviewedAt = new Date().toISOString();
+  await saveWording(project, file);
+  return file;
+}
+
+/** "Keep as is" (or undo it) for one deficiency's current wording. Returns the updated file. */
+export async function setKept(project: string, number: string, text: string, by: string, keep: boolean): Promise<WordingFile> {
+  const file = await loadWording(project);
+  const r = file.items[number];
+  if (!r || r.text !== text) throw new Error("This item's wording has changed since it was reviewed. Review it again first.");
+  if (keep) r.kept = { by, at: new Date().toISOString() };
+  else delete r.kept;
   await saveWording(project, file);
   return file;
 }

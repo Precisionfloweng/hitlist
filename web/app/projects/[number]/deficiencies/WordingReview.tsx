@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Deficiency } from "@/lib/results";
 import type { Review, WordingFile } from "@/lib/wording";
 
-type State = "flag" | "blank" | "good" | "updated" | "new" | "changed";
+type State = "flag" | "blank" | "good" | "updated" | "kept" | "new" | "changed";
 const BLANK = "___";
 const SHOW_GOOD = 4;
 
@@ -17,7 +17,7 @@ function matches(text: string, suggestion: string): boolean {
 
 function stateOf(d: Deficiency, r: Review | undefined): State {
   if (!r) return "new";
-  if (r.text === d.text) return r.ok ? "good" : "flag";
+  if (r.text === d.text) return r.ok ? "good" : r.kept ? "kept" : "flag";
   if (d.text.includes(BLANK)) return "blank";
   if (matches(d.text, r.suggestion)) return "updated";
   return "changed";
@@ -47,8 +47,9 @@ export default function WordingReview({ project, items, initial, canReview }:
   const open = useMemo(() => items.filter((d) => d.open && d.text.trim()), [items]);
   const rows = useMemo(() => open.map((d) => ({ d, r: file.items[d.number], s: stateOf(d, file.items[d.number]) })), [open, file]);
   const flagged = rows.filter((x) => x.s === "flag" || x.s === "blank");
-  const good = rows.filter((x) => x.s === "good" || x.s === "updated")
-    .sort((a, b) => (a.s === "updated" ? 0 : 1) - (b.s === "updated" ? 0 : 1));
+  const rank = (s: State) => (s === "updated" ? 0 : s === "kept" ? 1 : 2);
+  const good = rows.filter((x) => x.s === "good" || x.s === "updated" || x.s === "kept")
+    .sort((a, b) => rank(a.s) - rank(b.s));
   const pending = rows.filter((x) => x.s === "new" || x.s === "changed");
 
   // Edits a tech made in a Suggested box are kept on this device until the wording changes in BuildingStart.
@@ -79,6 +80,19 @@ export default function WordingReview({ project, items, initial, canReview }:
       setError("Could not reach the website. Check your connection.");
     }
     setBusy(false);
+  }
+
+  async function keep(d: Deficiency, undo = false) {
+    setError("");
+    try {
+      const r = await fetch("/api/wording", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ project, keep: d.number, undo }) });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) setError(data.error || "Couldn't save that. Try again.");
+      else setFile(data.wording);
+    } catch {
+      setError("Could not reach the website. Check your connection.");
+    }
   }
 
   if (open.length === 0) return null;
@@ -128,7 +142,12 @@ export default function WordingReview({ project, items, initial, canReview }:
               {s === "blank" && <span className="pill warn">Updated, blank left in</span>}
             </div>
             <div className="wlab">Current</div>
-            <div className="worig">{d.text}</div>
+            <div className="wrow">
+              <div className="worig">{d.text}</div>
+              {canReview && s === "flag" && (
+                <button title="Keep the current wording and stop suggesting a change" onClick={() => keep(d)}>Keep as is</button>
+              )}
+            </div>
             <div className="wlab">Suggested</div>
             <div className="wrow">
               <textarea rows={2} value={value} onChange={(e) => setDraft(d, e.target.value)} />
@@ -165,7 +184,9 @@ export default function WordingReview({ project, items, initial, canReview }:
             <div key={d.number} className="wline">
               <span className="pill ok">✓</span>
               {s === "updated" && <span className="pill wpill-upd">Updated</span>}
-              <b>#{d.number}</b> {d.equipment} <span className="muted">· {d.text}</span>
+              {s === "kept" && <span className="pill gray" title={`Kept by ${file.items[d.number]?.kept?.by ?? ""}`}>Kept as is</span>}
+              <b>#{d.number}</b> {d.equipment} <span className="muted wline-text">· {d.text}</span>
+              {s === "kept" && canReview && <button className="linkish" onClick={() => keep(d, true)}>Undo</button>}
             </div>
           ))}
           {good.length > SHOW_GOOD && (
