@@ -46,8 +46,7 @@ export default function ProjectsTable({ rows, userName, customer = false, canSyn
               return (
                 <tr key={p.id}>
                   <td><Link href={`/projects/${encodeURIComponent(p.id)}`}>{p.number}</Link></td>
-                  <td><Link href={`/projects/${encodeURIComponent(p.id)}`}>{p.name}</Link>
-                    {p.address && <div className="muted" style={{ fontSize: 12 }}>{p.address}</div>}</td>
+                  <td><Link href={`/projects/${encodeURIComponent(p.id)}`}>{p.name}</Link></td>
                   <td>{p.tech}</td>
                   <td style={{ minWidth: 140 }}>
                     <div className="row" style={{ gap: 8, flexWrap: "nowrap" }}>

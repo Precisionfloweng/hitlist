@@ -26,7 +26,7 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
         <div>
           <h1>{p.number} · {p.name}</h1>
           <div className="muted phead-sub">
-            {[p.tech && `Tech: ${p.tech}`, p.address].filter(Boolean).join(" · ")}
+            {p.tech && `Tech: ${p.tech}`}
           </div>
         </div>
         <div className="row" style={{ alignItems: "flex-start" }}>

@@ -39,7 +39,7 @@ export default function AdminProjects({ initial }: { initial: Row[] }) {
       </div>
       <div className="scroll">
         <table>
-          <thead><tr><th>Project #</th><th>Project name</th><th>Tech</th><th>Date</th><th>Address</th><th>Status</th><th></th></tr></thead>
+          <thead><tr><th>Project #</th><th>Project name</th><th>Tech</th><th>Date</th><th>Status</th><th></th></tr></thead>
           <tbody>
             {adding && (
               <tr style={{ background: "#f3f7fb" }}>
@@ -47,7 +47,6 @@ export default function AdminProjects({ initial }: { initial: Row[] }) {
                 <td>{cell(adding.name, (v) => setAdding({ ...adding, name: v }), 220)}</td>
                 <td>{cell(adding.tech, (v) => setAdding({ ...adding, tech: v }), 110)}</td>
                 <td>{cell(adding.date, (v) => setAdding({ ...adding, date: v }), 140, "date")}</td>
-                <td>{cell(adding.address, (v) => setAdding({ ...adding, address: v }), 220)}</td>
                 <td>active</td>
                 <td className="row" style={{ flexWrap: "nowrap" }}>
                   <button className="primary" disabled={busy === "new"} onClick={async () => {
@@ -67,7 +66,6 @@ export default function AdminProjects({ initial }: { initial: Row[] }) {
                   {!!r.sharedWith?.length && <div className="muted" style={{ fontSize: 12 }}>Shares # with {r.sharedWith.join(", ")}</div>}</td>
                 <td>{cell(r.tech, (v) => set(i, "tech", v), 110)}</td>
                 <td>{cell(r.date, (v) => set(i, "date", v), 140, "date")}</td>
-                <td>{cell(r.address, (v) => set(i, "address", v), 220)}</td>
                 <td><select value={r.status} onChange={(e) => set(i, "status", e.target.value)}>
                   <option value="active">active</option><option value="archived">archived</option></select></td>
                 <td className="row" style={{ flexWrap: "nowrap" }}>
