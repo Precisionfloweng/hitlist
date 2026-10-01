@@ -34,7 +34,7 @@ SCHEMA: dict[str, list[str]] = {
                 "open_deficiencies", "open_high"],
     # Server heartbeat: name = "server_last_seen" (written by the worker every few minutes) and
     # "down_alert_sent_for" (the website's note that it already emailed about that outage).
-    "Status": ["name", "value"],
+    "Status": ["name", "value", "local_time"],
     # Written by the website: one row per sign-in (time in Central).
     "SignIns": ["signed_in_at", "email", "name", "role", "method", "device"],
 }
@@ -192,16 +192,19 @@ class HitlistStore:
 
     # ---- server heartbeat -------------------------------------------------------
     def heartbeat(self) -> None:
-        """Record that the worker is running (the website warns when this gets old)."""
+        """Record that the worker is running (the website warns when this gets old).
+        value is a timestamp with the server's UTC offset (for the website); local_time is for people."""
         if "Status" not in self.b.tabs():
             self.b.add_tab("Status")
-            self.b.write("Status", 1, [SCHEMA["Status"]])
-        stamp = now_iso()
+        self.b.write("Status", 1, [SCHEMA["Status"]])          # keeps the header current
+        now = datetime.now().astimezone()                        # the mini PC's own time zone (Central)
+        rec = {"name": "server_last_seen", "value": now.isoformat(timespec="seconds"),
+               "local_time": now.strftime("%b %d, %Y %I:%M %p").replace(" 0", " ")}
         row = next((r for r in self.rows("Status") if r.get("name") == "server_last_seen"), None)
         if row:
-            self.update("Status", row["_row"], {"name": "server_last_seen", "value": stamp})
+            self.update("Status", row["_row"], rec)
         else:
-            self.append("Status", [{"name": "server_last_seen", "value": stamp}])
+            self.append("Status", [rec])
 
     # ---- projects ---------------------------------------------------------------
     # A project's key is its project_id; blank means "same as the project number". Two sites under
