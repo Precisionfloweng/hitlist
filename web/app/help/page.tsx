@@ -123,6 +123,7 @@ export default async function HelpPage() {
         <section id="deficiencies">
           <h2>Deficiencies</h2>
           <p>The Deficiencies tab lists every punch item from BuildingStart, with breakdowns by priority, contractor role, assigned contact and status. Filter by open only, priority or contact. <b>Punch items</b> on the projects list is the total count, open and closed.</p>
+          <p><b>Review wording</b> (techs and admins) has Claude read each open deficiency and suggest clearer wording where it helps: what&apos;s wrong, where, measured vs. design, and what&apos;s needed. Edit the suggestion if needed (fill in any <b>___</b>), press <b>Copy</b>, and paste it into the deficiency in BuildingStart. After the next <b>Sync</b>, updated items move to <b>Reads well</b>. New or changed items show under <b>Not reviewed yet</b> until you review again.</p>
         </section>
 
         <section id="notes">

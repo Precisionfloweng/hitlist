@@ -3,9 +3,11 @@ import Header from "../../../Header";
 import ProjectHeader from "../ProjectHeader";
 import Breakdown from "./Breakdown";
 import DeficiencyList from "./DeficiencyList";
+import WordingReview from "./WordingReview";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
+import { loadWording } from "@/lib/wording";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +17,8 @@ export default async function DeficienciesPage({ params }: { params: Promise<{ n
   const [data, results] = await Promise.all([getProject(number), loadResults(number)]);
   if (!data || !canSee(user, data.project.id)) notFound();
   const { project: p, deficiencies } = data;
+  const staff = user.role !== "customer";
+  const wording = staff && results ? await loadWording(p.id) : null;
   const group = (g: string) => deficiencies.filter((d) => d.group === g)
     .map((d) => ({ value: d.value, count: Number(d.count) })).sort((a, b) => b.count - a.count);
 
@@ -31,6 +35,9 @@ export default async function DeficienciesPage({ params }: { params: Promise<{ n
               <Breakdown title="Open by assigned contact" rows={group("open_contact")} />
               <Breakdown title="All by status" rows={group("status")} />
             </div>
+            {results && wording && (
+              <WordingReview project={p.id} items={results.deficiencies} initial={wording} canReview={canEdit(user)} />
+            )}
             {results ? <DeficiencyList items={results.deficiencies} /> :
               <p className="muted">The full list appears after the next sync.</p>}
           </>
