@@ -36,7 +36,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
     <>
       <Header user={user} />
       <main>
-        <ProjectHeader user={{ customer: user.role === "customer", canSync: canEdit(user) }} project={p} tab="overview" missingRequired={summary?.missing_required} />
+        <ProjectHeader user={{ customer: user.role === "customer", canSync: canEdit(user) }} project={p} tab="overview" missingRequired={summary?.missing_required} notes={results?.notes?.length} />
         {p.lastSyncStatus.startsWith("failed") && <p className="error">The last sync failed: {p.lastSyncStatus.slice(8)}</p>}
 
         {p.lastSync ? (

@@ -13,9 +13,12 @@ export type Summary = { units: number; units_complete: number; required_fields: 
   missing_required: number; missing_optional: number; fields_pct: number; units_pct: number };
 export type Deficiency = { equipment: string; path: string; item_type: string; number: string; text: string;
   status: string; priority: string; role: string; contact: string; date_due: string; date_completed: string; open: boolean };
+/** A row of BuildingStart's Note sheet. Blank path = a general note for the whole project. */
+export type Note = { equipment: string; path: string; item_type: string; category: string; number: string; text: string;
+  reading: string; units: string; comments: string };
 export type Results = {
   project_number: string; generated_at: string; summary: Summary; types: TypeResult[];
-  untracked_sheets: Record<string, number>; deficiencies: Deficiency[];
+  untracked_sheets: Record<string, number>; deficiencies: Deficiency[]; notes?: Note[];
   gap_flags?: { type: string; unit: string; kind: string; fields: string[] }[]; warnings: string[];
 };
 

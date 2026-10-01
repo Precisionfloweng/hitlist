@@ -141,10 +141,16 @@ main.wide { max-width: none; }
 .eq-grid tbody tr:nth-child(even) td { background: #f1f4f8; }
 /* Units with an open deficiency (punch item) */
 .eq-grid tbody tr.has-def td { background: #fdeeee; }
+.eq-grid tbody tr.has-note td { background: #edf4fc; }
+.eq-grid tbody tr.has-note:nth-child(even) td { background: #e4eefa; }
 .eq-grid tbody tr.has-def:nth-child(even) td { background: #fae6e6; }
 .def-badge { display: inline-block; margin-right: 6px; padding: 0 6px !important; border: 0; border-radius: 999px;
   font-size: 11px; line-height: 16px; font-weight: 700; background: var(--bad); color: #fff; vertical-align: 1px;
   cursor: pointer; }
+.note-badge { display: inline-block; margin-right: 6px; padding: 0 6px !important; border: 0; border-radius: 999px;
+  font-size: 11px; line-height: 16px; font-weight: 700; background: #2f6fb3; color: #fff; vertical-align: 1px;
+  cursor: pointer; }
+.note-pop .def-pop-meta { color: #2f6fb3; }
 /* Tapped badge: the unit's open deficiencies */
 .def-pop { position: fixed; z-index: 3000; width: 370px; max-width: calc(100vw - 16px); max-height: 320px; overflow: auto;
   background: #fff; border: 1px solid #d5dae1; border-radius: 10px; box-shadow: 0 8px 24px rgba(16, 24, 40, .18);
@@ -185,6 +191,15 @@ h1.page-title { color: #1f4e79; }
 .ptab-count { font-size: 12px; font-weight: 700; background: #eef0f3; color: var(--muted); border-radius: 999px; padding: 1px 8px; }
 .ptabs a.on .ptab-count { background: #e3ecf5; color: var(--brand); }
 .ptab-count.red, .ptabs a.on .ptab-count.red { background: var(--bad-bg); color: var(--bad); }
+.ptab-count.blue, .ptabs a.on .ptab-count.blue { background: #e4eefa; color: #2f6fb3; }
+/* Notes tab */
+.notes-card { margin-bottom: 14px; }
+.notes-card h2 { margin: 0 0 8px; font-size: 18px; }
+.notes-unit { padding: 8px 0; border-top: 1px solid var(--line); }
+.notes-unit:first-of-type { border-top: 0; }
+.notes-path { font-size: 14px; }
+.notes-list { margin: 4px 0 0; padding-left: 20px; }
+.notes-list li { margin: 3px 0; white-space: pre-line; }
 .tile-link { color: inherit; display: block; }
 .tile-link:hover { text-decoration: none; }
 .tile-link .tile:hover { border-color: var(--brand); }

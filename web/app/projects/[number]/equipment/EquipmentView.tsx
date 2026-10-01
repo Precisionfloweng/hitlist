@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { loadLastType, saveLastType } from "@/lib/lastType";
-import type { Deficiency, TypeResult } from "@/lib/results";
+import type { Deficiency, Note, TypeResult } from "@/lib/results";
 import { byTypeOrder } from "@/lib/typeOrder";
 
 type Filter = "missing" | "all";
@@ -17,8 +17,8 @@ function Cell({ code, label }: { code: string; label: string }) {
   return <td className="ck na" title={tip}>·</td>;
 }
 
-export default function EquipmentView({ types, initialType, syncedAt, deficiencies = [] }:
-  { types: TypeResult[]; initialType?: string; syncedAt?: string; deficiencies?: Deficiency[] }) {
+export default function EquipmentView({ types, initialType, syncedAt, deficiencies = [], notes = [] }:
+  { types: TypeResult[]; initialType?: string; syncedAt?: string; deficiencies?: Deficiency[]; notes?: Note[] }) {
   // Open deficiencies per unit: its own, plus any on its sub-items (a coil's item also lights up its AHU).
   // Matched on the equipment path (segments trimmed), or the name if a unit's own path doesn't match.
   const openDefs = useMemo(() => {
@@ -33,16 +33,33 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
     }
     return (path: string, name: string) => byPath.get(norm(path || "").join("/")) || byName.get(name) || [];
   }, [deficiencies]);
+  const unitNotes = useMemo(() => {
+    const norm = (path: string) => path.split("/").map((x) => x.trim()).filter(Boolean);
+    const byPath = new Map<string, Note[]>(), byName = new Map<string, Note[]>();
+    const add = (m: Map<string, Note[]>, k: string, n: Note) => m.set(k, [...(m.get(k) ?? []), n]);
+    for (const n of notes) {
+      const segs = norm(n.path || "");
+      if (!segs.length) continue;                       // general project notes live on the Notes tab
+      for (let i = 1; i <= segs.length; i++) add(byPath, segs.slice(0, i).join("/"), n);
+      if (n.equipment) add(byName, n.equipment, n);
+    }
+    return (path: string, name: string) => byPath.get(norm(path || "").join("/")) || byName.get(name) || [];
+  }, [notes]);
   const sorted = useMemo(() => [...types].sort(byTypeOrder), [types]);
   const [key, setKey] = useState(() => sorted.find((t) => t.key === initialType)?.key ?? sorted[0]?.key);
   const [filter, setFilter] = useState<Filter>("all");
   const [q, setQ] = useState("");
   // Tapped "open" badge: its deficiencies in a small panel (iPads have no hover).
-  const [pop, setPop] = useState<{ unit: string; defs: Deficiency[]; x: number; y: number } | null>(null);
+  const [pop, setPop] = useState<{ unit: string; kind: "def" | "note"; defs: Deficiency[]; notes: Note[]; x: number; y: number } | null>(null);
+  const openPop = (e: React.MouseEvent<HTMLElement>, unit: string, kind: "def" | "note", defs: Deficiency[], ns: Note[]) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setPop((p) => (p?.unit === unit && p.kind === kind ? null
+      : { unit, kind, defs, notes: ns, x: Math.min(r.left, window.innerWidth - 380), y: r.bottom + 6 }));
+  };
   useEffect(() => {
     if (!pop) return;
     const close = (e: Event) => {
-      if (e.target instanceof Element && e.target.closest(".def-pop, .def-badge")) return;
+      if (e.target instanceof Element && e.target.closest(".def-pop, .def-badge, .note-badge")) return;
       setPop(null);
     };
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setPop(null); };
@@ -159,22 +176,25 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
             <tbody>
               {units.map((u) => {
                 const defs = openDefs(u.path, u.name);
+                const uNotes = unitNotes(u.path, u.name);
                 const done = u.required ? u.required_filled / u.required : 1;
                 return (
-                  <tr key={u.path || u.name} className={defs.length ? "has-def" : undefined}>
+                  <tr key={u.path || u.name} className={defs.length ? "has-def" : uNotes.length ? "has-note" : undefined}>
                     <td className="u">
                       <div className="u-name" title={u.path || u.name}>{u.name}</div>
                       {/* The badge leads the second line so a long unit name can't push it out of view */}
-                      {(defs.length > 0 || u.area) && (
+                      {(defs.length > 0 || uNotes.length > 0 || u.area) && (
                         <div className="u-area">
                           {defs.length > 0 && (
                             <button type="button" className="def-badge" title="Show the open deficiencies"
-                              onClick={(e) => {
-                                const r = e.currentTarget.getBoundingClientRect();
-                                setPop((p) => (p?.unit === u.name ? null
-                                  : { unit: u.name, defs, x: Math.min(r.left, window.innerWidth - 380), y: r.bottom + 6 }));
-                              }}>
+                              onClick={(e) => openPop(e, u.name, "def", defs, [])}>
                               {defs.length} open
+                            </button>
+                          )}
+                          {uNotes.length > 0 && (
+                            <button type="button" className="note-badge" title="Show the notes"
+                              onClick={(e) => openPop(e, u.name, "note", [], uNotes)}>
+                              {uNotes.length} note{uNotes.length === 1 ? "" : "s"}
                             </button>
                           )}
                           {u.area}
@@ -201,12 +221,28 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
       </section>
 
       {pop && (
-        <div className="def-pop" role="dialog" aria-label={`Open deficiencies for ${pop.unit}`}
+        <div className={`def-pop${pop.kind === "note" ? " note-pop" : ""}`} role="dialog"
+          aria-label={`${pop.kind === "note" ? "Notes" : "Open deficiencies"} for ${pop.unit}`}
           style={{ left: Math.max(8, pop.x), top: Math.min(pop.y, window.innerHeight - 220) }}>
           <div className="def-pop-head">
             <b>{pop.unit}</b>
             <button type="button" aria-label="Close" onClick={() => setPop(null)}>✕</button>
           </div>
+          {pop.kind === "note" ? (
+            <ul>
+              {pop.notes.map((n, i) => (
+                <li key={`n-${i}`}>
+                  {n.equipment && n.equipment !== pop.unit && <div className="def-pop-meta">{n.equipment}</div>}
+                  <div>{n.text}</div>
+                  {(n.reading || n.comments) && (
+                    <div className="muted" style={{ fontSize: 13 }}>
+                      {[n.reading && `${n.reading}${n.units ? ` ${n.units}` : ""}`, n.comments].filter(Boolean).join(" · ")}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
           <ul>
             {pop.defs.map((d, i) => (
               <li key={`${d.number}-${i}`}>
@@ -219,6 +255,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
               </li>
             ))}
           </ul>
+          )}
         </div>
       )}
     </div>

@@ -189,6 +189,7 @@ def check_project(export: Export, rules: RuleSet, project_number: str | None = N
     untracked = {n: len(s.rows) for n, s in export.equipment_sheets().items()
                  if n not in tracked_sheets and s.rows}
     deficiencies = [_clean_deficiency(d) for d in export.deficiencies]
+    notes = [n for n in (_clean_note(x) for x in export.notes) if n["text"]]
     return {
         "schema": 1,
         "project_number": project_number or str(export.project.get("Number") or "").strip() or None,
@@ -199,6 +200,7 @@ def check_project(export: Export, rules: RuleSet, project_number: str | None = N
         "untracked_sheets": untracked,
         "deficiencies": deficiencies,
         "deficiency_summary": summarize_deficiencies(deficiencies),
+        "notes": notes,
         "warnings": warnings,
     }
 
@@ -229,6 +231,16 @@ def _clean_deficiency(d: dict[str, Any]) -> dict[str, Any]:
         "role": g("Assigned Role") or "Unassigned", "contact": g("Assigned Contact") or "Unassigned",
         "date_due": g("Date due"), "date_completed": g("Date Completed"), "comments": g("Comments"),
         "open": status.lower() not in CLOSED_DEFICIENCY,
+    }
+
+
+def _clean_note(n: dict[str, Any]) -> dict[str, Any]:
+    """A row of the export's Note sheet. A blank path = a general note for the whole project."""
+    g = lambda k: (str(n.get(k)).strip() if n.get(k) not in (None, "") else "")  # noqa: E731
+    return {
+        "equipment": g("Equipment Name"), "path": g("Full Path"), "item_type": g("Item Type"),
+        "category": g("Category"), "number": g("No."), "text": g("Field details"),
+        "reading": g("Reading"), "units": g("Units"), "comments": g("Comments"),
     }
 
 

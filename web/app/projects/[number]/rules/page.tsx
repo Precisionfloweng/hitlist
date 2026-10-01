@@ -21,7 +21,7 @@ export default async function ProjectRulesPage({ params }: { params: Promise<{ n
     <>
       <Header user={user} />
       <main>
-        <ProjectHeader user={{ customer: false, canSync: canEdit(user) }} project={data.project} tab="rules" missingRequired={results?.summary.missing_required} rulesChanged={changed} />
+        <ProjectHeader user={{ customer: false, canSync: canEdit(user) }} project={data.project} tab="rules" missingRequired={results?.summary.missing_required} rulesChanged={changed} notes={results?.notes?.length} />
         <p className="muted" style={{ marginTop: 0 }}>
           What this project needs filled in. It starts from the <Link href="/rules">company default rules</Link>;
           anything you change here applies to this project only (highlighted blue), on its next sync.

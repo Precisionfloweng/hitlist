@@ -3,11 +3,11 @@ import RefreshButton from "../../RefreshButton";
 import { syncLabel } from "../../format";
 import type { Project } from "@/lib/data";
 
-export type ProjectTab = "overview" | "equipment" | "deficiencies" | "rules";
+export type ProjectTab = "overview" | "equipment" | "deficiencies" | "notes" | "rules";
 
 /** Title, sync status and the tabs shared by every page of a project. */
-export default function ProjectHeader({ project: p, tab, missingRequired, rulesChanged, user }:
-  { project: Project; tab: ProjectTab; missingRequired?: number | null; rulesChanged?: number;
+export default function ProjectHeader({ project: p, tab, missingRequired, rulesChanged, notes, user }:
+  { project: Project; tab: ProjectTab; missingRequired?: number | null; rulesChanged?: number; notes?: number;
     user: { customer: boolean; canSync: boolean } }) {
   const s = syncLabel(p.daysSinceSync);
   const base = `/projects/${encodeURIComponent(p.id)}`;
@@ -16,9 +16,11 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
     { key: "overview", label: "Overview", href: base },
     { key: "equipment", label: "Equipment checklist", href: `${base}/equipment` },
     { key: "deficiencies", label: "Deficiencies", href: `${base}/deficiencies`, count: p.openDeficiencies },
+    { key: "notes", label: "Notes", href: `${base}/notes`, count: notes },
     { key: "rules", label: "Rules", href: `${base}/rules`, count: rulesChanged },
   ];
-  const tabs = allTabs.filter((t) => !(user.customer && t.key === "rules"));   // customers don't see rules
+  // Customers don't see the rules or the techs' notes.
+  const tabs = allTabs.filter((t) => !(user.customer && (t.key === "rules" || t.key === "notes")));
   return (
     <div className="phead">
       <div className="muted"><Link href="/projects">← Projects</Link></div>
@@ -38,7 +40,7 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
         {tabs.map((t) => (
           <Link key={t.key} href={t.href} className={t.key === tab ? "on" : ""} aria-current={t.key === tab ? "page" : undefined}>
             {t.label}
-            {t.count ? <span className={`ptab-count${t.key === "deficiencies" ? " red" : ""}`}>{t.count}</span> : null}
+            {t.count ? <span className={`ptab-count${t.key === "deficiencies" ? " red" : t.key === "notes" ? " blue" : ""}`}>{t.count}</span> : null}
           </Link>
         ))}
       </nav>

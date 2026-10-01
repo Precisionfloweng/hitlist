@@ -28,6 +28,11 @@ def sample_export(tmp_path):
              "Mechanical Contractor", "Pat Example", "01/01/2026", ""],
             ["VAV-1", "VAV-1", "Terminal Unit", "0003", "Sensor reads 999", "Open", "Medium",
              "Controls Contractor", " ", "", ""]])
+    _sheet(wb, "Note",
+           ["Full Path", "Equipment Name", "Item Type", "Category", "No.", "Field details", "Reading", "Units", "Comments"],
+           [["", "", "", "", "0", "General note for the whole job", "", "", ""],
+            ["AHU-1/VAV-1", "VAV-1", "Terminal Unit", "", "0", "Access panel blocked by duct", "", "", ""],
+            ["AHU-2", "AHU-2", "Air Handling Unit", "", "0", "", "", "", ""]])
     _sheet(wb, "Air Handling Unit",
            ["Full Path", "Equipment Name", "Area", "Zone", "Unit Manufacturer", "Design Airflow",
             "Actual Airflow", "% Final Diff. ", "Drive Type", "Motor Sheave MFG",

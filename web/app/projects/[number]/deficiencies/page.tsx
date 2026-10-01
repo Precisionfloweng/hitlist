@@ -22,7 +22,7 @@ export default async function DeficienciesPage({ params }: { params: Promise<{ n
     <>
       <Header user={user} />
       <main>
-        <ProjectHeader user={{ customer: user.role === "customer", canSync: canEdit(user) }} project={p} tab="deficiencies" missingRequired={results?.summary.missing_required} />
+        <ProjectHeader user={{ customer: user.role === "customer", canSync: canEdit(user) }} project={p} tab="deficiencies" missingRequired={results?.summary.missing_required} notes={results?.notes?.length} />
         {p.lastSync ? (
           <>
             <div className="two">
