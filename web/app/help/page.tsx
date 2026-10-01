@@ -12,6 +12,7 @@ const SECTIONS = [
   ["special", "Special rules"],
   ["issues", "Possible issues found"],
   ["deficiencies", "Deficiencies"],
+  ["notes", "Notes"],
   ["rules", "Rules"],
   ["sharing", "Sharing and confidentiality"],
   ["ipad", "iPad Home Screen"],
@@ -43,11 +44,12 @@ export default async function HelpPage() {
           <h2>Getting around</h2>
           <ul>
             <li><b>All Projects</b> lists every active project. Tick <b>My projects</b> to see only the ones where you&apos;re the tech. Use the search box to find a project by number, name or tech.</li>
-            <li>Click a project to open it. Each project has four tabs:
+            <li>Click a project to open it. Each project has five tabs:
               <ul>
                 <li><b>Overview</b>: units fully complete, open and closed deficiencies, and a card for each equipment type. Click a card to jump to that type.</li>
                 <li><b>Equipment checklist</b>: every unit and field, marked done or missing.</li>
                 <li><b>Deficiencies</b>: the punch list, with breakdowns by priority, contractor and contact.</li>
+                <li><b>Notes</b>: the notes entered in BuildingStart. See <a href="#notes">Notes</a>.</li>
                 <li><b>Rules</b>: what this project checks. See <a href="#rules">Rules</a>.</li>
               </ul>
             </li>
@@ -81,7 +83,8 @@ export default async function HelpPage() {
             <li id="done"><b>Done</b> (for example 17/26) is required fields filled out of required fields for that unit. Optional fields aren&apos;t counted, so a unit can show 8/8 with a few <b>!</b> marks.</li>
             <li>A unit is <b>fully complete</b> when all its required fields are filled. The Overview counts these.</li>
             <li><b>All units</b> shows everything; <b>Needs data</b> shows only units with a required field missing.</li>
-            <li>A <b>light red row</b> with a red <b>“1 open”</b> tag means the unit has an open deficiency. This includes items on its sub-items; for example, an item on a coil also marks its AHU. Hover over the tag to see them.</li>
+            <li>A <b>light red row</b> with a red <b>“1 open”</b> tag means the unit has an open deficiency. This includes items on its sub-items; for example, an item on a coil also marks its AHU. Tap (or click) the tag to read them.</li>
+            <li>A <b>light blue row</b> with a blue <b>“1 note”</b> tag means the unit has a note in BuildingStart (again including its sub-items). Tap the tag to read it. A unit with both stays light red and shows both tags.</li>
             <li>Hover over (or press and hold) any mark to see the field name.</li>
           </ul>
         </section>
@@ -114,12 +117,17 @@ export default async function HelpPage() {
 
         <section id="issues">
           <h2>Possible issues found</h2>
-          <p>Shown on the Overview when a unit is <b>ticked Complete in BuildingStart</b> but still has required fields empty. Either fill in the fields, or untick Complete until the unit is really finished.</p>
+          <p>Shown on the Overview when a unit is <b>ticked Complete in BuildingStart</b> but still has required fields empty, grouped by equipment type. The first 15 are listed; press <b>Show all</b> for the rest. Either fill in the fields, or untick Complete until the unit is really finished.</p>
         </section>
 
         <section id="deficiencies">
           <h2>Deficiencies</h2>
           <p>The Deficiencies tab lists every punch item from BuildingStart, with breakdowns by priority, contractor role, assigned contact and status. Filter by open only, priority or contact. <b>Punch items</b> on the projects list is the total count, open and closed.</p>
+        </section>
+
+        <section id="notes">
+          <h2>Notes</h2>
+          <p>The <b>Notes</b> tab lists every note entered in BuildingStart for the project: <b>Project notes</b> (not tied to a unit) first, then <b>Notes by unit</b>. Notes update on each <b>Sync</b>. To add or change a note, do it in BuildingStart. Customers don&apos;t see notes.</p>
         </section>
 
         <section id="rules">
@@ -158,7 +166,8 @@ export default async function HelpPage() {
               <li><b>Projects</b> (<Link href="/admin">Admin → Project list</Link>): add a project with its BuildingStart number, name and tech. The tech name must match the person&apos;s name on the Users page for <b>My projects</b> to work.</li>
               <li><b>Archive vs delete</b>: <b>Archived</b> hides a project but keeps all its data. <b>Delete</b> removes it along with its sync results, history and project rules.</li>
               <li><b>Two sites on one contract</b> can share a project number, as long as the names differ. The server opens the BuildingStart project whose name matches best, so keep the Hitlist name close to the BuildingStart name.</li>
-              <li><b>Users</b> (<Link href="/admin/users">Admin → Users</Link>): add people with their work email. Tick <b>Email them a welcome</b> to send sign-in and iPad instructions. Roles: <b>Admin</b> (everything), <b>Tech</b> (projects, Sync, project rules), <b>Viewer</b> (read-only).</li>
+              <li><b>Users</b> (<Link href="/admin/users">Admin → Users</Link>): add people with their work email. Tick <b>Email them a welcome</b> to send sign-in and iPad instructions, or press <b>Send welcome</b> on anyone already listed. <b>Last used</b> shows the last day each person opened the app. Roles: <b>Admin</b> (everything), <b>Tech</b> (projects, Sync, project rules), <b>Viewer</b> (read-only), <b>Customer</b> (read-only, only the projects you pick).</li>
+              <li><b>Sign-in log</b>: every sign-in (who, when, password or emailed code, device) is recorded on the <b>SignIns</b> tab of the PFE Hitlist Data Google Sheet.</li>
               <li><b>Emails</b>: a failed sync emails the tech and Rick. The Monday summary goes to each tech and the admins. Successful syncs don&apos;t send email.</li>
               <li><b>&quot;Rules that didn&apos;t match this export&quot;</b> on an Overview means a sheet or column name in the Default Rules looks mistyped. Fix it on the Rules page and Sync.</li>
             </ul>
