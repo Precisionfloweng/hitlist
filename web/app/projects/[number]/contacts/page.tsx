@@ -23,7 +23,7 @@ export default async function ContactsPage({ params }: { params: Promise<{ numbe
       <main>
         <ProjectHeader user={{ customer: false, canSync: canEdit(user) }} project={p} tab="contacts"
           missingRequired={results?.summary.missing_required} notes={results?.notes?.length} />
-        <ContactsList project={p.id} subject={`${p.number} ${p.name} - Deficiency List`} initial={contacts} canEdit={canEdit(user)} />
+        <ContactsList project={p.id} subject={`${p.name} - TAB Deficiency List`} initial={contacts} canEdit={canEdit(user)} />
       </main>
     </>
   );
