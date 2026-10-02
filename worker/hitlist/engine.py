@@ -29,7 +29,7 @@ def is_missing(value: Any) -> bool:
     if value is None:
         return True
     if isinstance(value, bool):
-        return False
+        return not value              # a checkbox (BuildingStart's Completed): unticked counts as not filled
     text = str(value).strip()
     return text == "" or set(text) <= {"?", "`"}
 

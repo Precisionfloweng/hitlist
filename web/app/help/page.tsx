@@ -88,6 +88,7 @@ export default async function HelpPage() {
             <li><b>All units</b> shows everything; <b>Needs data</b> shows only units with a required field missing.</li>
             <li>A <b>light red row</b> with a red <b>“1 open”</b> tag means the unit has an open deficiency. This includes items on its sub-items; for example, an item on a coil also marks its AHU. Tap (or click) the tag to read them.</li>
             <li>A <b>light blue row</b> with a blue <b>“1 note”</b> tag means the unit has a note in BuildingStart (again including its sub-items). Tap the tag to read it. A unit with both stays light red and shows both tags.</li>
+            <li>The last column, <b>Completed</b>, shows whether the unit is ticked Completed in BuildingStart (✓) or not (<b>!</b>). It&apos;s optional, so it doesn&apos;t count toward Done or % complete.</li>
             <li>Hover over (or press and hold) any mark to see the field name.</li>
           </ul>
         </section>

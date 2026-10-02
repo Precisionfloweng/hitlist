@@ -18,7 +18,8 @@ def _unit(type_result, name):
 def test_missing_values():
     assert is_missing(None) and is_missing("") and is_missing("  ")
     assert is_missing("?") and is_missing("??") and is_missing("`")
-    assert not is_missing(0) and not is_missing("0") and not is_missing(False) and not is_missing("-")
+    assert not is_missing(0) and not is_missing("0") and not is_missing("-")
+    assert is_missing(False) and not is_missing(True)      # the Completed checkbox: unticked = not filled
 
 
 def test_reads_project_and_sheets(sample_export):

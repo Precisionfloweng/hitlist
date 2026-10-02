@@ -526,6 +526,14 @@
      ],
      "status": "required",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -1075,6 +1083,14 @@
      ],
      "status": "optional",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -1469,6 +1485,14 @@
      "label": "Speed Control Setting",
      "columns": [
       "Speed Control Setting"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
      ],
      "status": "optional",
      "when": null
@@ -1949,6 +1973,14 @@
      ],
      "status": "required",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -2253,6 +2285,14 @@
       "Amps"
      ],
      "status": "required",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
      "when": null
     }
    ]
@@ -2779,6 +2819,14 @@
      ],
      "status": "optional",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -3088,6 +3136,14 @@
      "columns": null,
      "status": "required",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -3381,6 +3437,14 @@
      ],
      "status": "optional",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -3525,6 +3589,14 @@
      "label": "Air Temp Design Delta T",
      "columns": [
       "Air Temp Design Delta T"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
      ],
      "status": "optional",
      "when": null
@@ -3695,6 +3767,14 @@
      ],
      "status": "optional",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -3765,6 +3845,14 @@
      "label": "% Diff",
      "columns": [
       "% Diff."
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
      ],
      "status": "optional",
      "when": null
@@ -3849,6 +3937,14 @@
      ],
      "status": "optional",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -3920,6 +4016,14 @@
      "columns": [
       "% DIff.",
       "% Diff."
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
      ],
      "status": "optional",
      "when": null
@@ -4219,6 +4323,14 @@
       "Motor HP"
      ],
      "status": "required",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
      "when": null
     }
    ]
@@ -4545,6 +4657,14 @@
      ],
      "status": "optional",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -4858,6 +4978,14 @@
      ],
      "status": "optional",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -5077,6 +5205,14 @@
      "columns": null,
      "status": "optional",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -5197,6 +5333,14 @@
       "Actual LWT"
      ],
      "status": "required",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
      "when": null
     }
    ]
@@ -5406,6 +5550,14 @@
       "Act. Airflow Diff."
      ],
      "status": "required",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
      "when": null
     }
    ]
@@ -5728,6 +5880,14 @@
      ],
      "status": "required",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -6005,6 +6165,14 @@
      ],
      "status": "required",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -6266,6 +6434,14 @@
      ],
      "status": "required",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -6447,6 +6623,14 @@
      ],
      "status": "required",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -6591,6 +6775,14 @@
       "Airflow Actual"
      ],
      "status": "required",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
      "when": null
     }
    ]
@@ -7193,6 +7385,14 @@
      ],
      "status": "required",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -7354,6 +7554,14 @@
      ],
      "status": "required",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -7386,6 +7594,14 @@
       "Filter Size - S1"
      ],
      "status": "required",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
      "when": null
     }
    ]
@@ -7501,6 +7717,14 @@
      ],
      "status": "optional",
      "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
+     ],
+     "status": "optional",
+     "when": null
     }
    ]
   },
@@ -7604,6 +7828,14 @@
      "label": "Location of Traverse",
      "columns": [
       "Location of Traverse"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
      ],
      "status": "optional",
      "when": null
@@ -7741,6 +7973,14 @@
      "label": "Coil Out PSI",
      "columns": [
       "Coil Out PSI"
+     ],
+     "status": "optional",
+     "when": null
+    },
+    {
+     "label": "Completed",
+     "columns": [
+      "Completed"
      ],
      "status": "optional",
      "when": null
