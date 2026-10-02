@@ -43,6 +43,11 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   The worker applies them per project (`store.apply_overrides`).
 - The "Electric Coil" sheet feeds two types: under a Terminal Unit = VAV electric heat, else EDH sub-item.
 
+## What's new
+- Every change a tech or admin would notice gets a plain-English entry in `web/content/whats-new.json`
+  (date, audience "all" or "admins", title, one-line text). The Monday email shows the last 30 days; the Help
+  page and Admin → What's new show the list. No client names in entries.
+
 ## Workflow
 - Rick chose to have changes pushed straight to `main`.
 - Run `python -m pytest` in `worker/` before pushing.

@@ -326,3 +326,19 @@ def test_heartbeat_records_server_time():
     store.heartbeat()                        # updates the same row, doesn't add another
     rows = [r for r in store.rows("Status") if r["name"] == "server_last_seen"]
     assert len(rows) == 1 and rows[0]["value"]
+
+
+def test_weekly_summary_whats_new(tmp_path):
+    store, s, mail = make_store(), settings(tmp_path), Mailer("app@example.com", "")
+    now = datetime(2026, 10, 5, 12, tzinfo=timezone.utc)
+    entries = [{"date": "2026-10-01", "audience": "all", "title": "New tab", "text": "Does a thing."},
+               {"date": "2026-10-02", "audience": "admins", "title": "Admin bit", "text": "Only admins."},
+               {"date": "2026-08-01", "audience": "all", "title": "Old news", "text": "Too old."}]
+    send_weekly_summary(store, s, mail, now=now, dry_run=True, whats_new=entries)
+    tech = next(m for m in mail.sent if m["To"] == "tech@example.com").get_body(("html",)).get_content()
+    boss = next(m for m in mail.sent if m["To"] == "boss@example.com").get_body(("html",)).get_content()
+    assert "New tab" in tech and "Admin bit" not in tech and "Old news" not in tech
+    assert "New tab" in boss and "Admin bit" in boss
+    mail2 = Mailer("app@example.com", "")
+    send_weekly_summary(store, s, mail2, now=now, dry_run=True, whats_new=[])
+    assert "New in Hitlist" not in mail2.sent[0].get_body(("html",)).get_content()

@@ -317,3 +317,7 @@ button.linkish { border: 0; background: none; padding: 4px 2px; color: var(--mut
 .ai-input { width: 100%; box-sizing: border-box; margin-top: 10px; font: inherit; border: 1px solid #b9c6d6; border-radius: 8px;
   padding: 10px 12px; resize: vertical; min-height: 96px; }
 .primary.ai-btn { background: linear-gradient(90deg, #6b4fbb, #8e7cc3); border-color: #6b4fbb; }
+
+/* Help: What's new */
+.whats-new { padding-left: 18px; }
+.whats-new li { margin: 6px 0; }

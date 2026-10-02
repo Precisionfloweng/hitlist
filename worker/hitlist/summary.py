@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import json
+import logging
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any
 
 from .config import Settings
@@ -96,8 +99,52 @@ def _body(intro: str, projects: list[dict[str, Any]], app_url: str, show_tech: b
     return html, intro + "\n\n" + _text(projects, app_url, show_tech)
 
 
+log = logging.getLogger(__name__)
+WHATS_NEW_DAYS = 30
+_LOCAL_WHATS_NEW = Path(__file__).resolve().parents[2] / "web" / "content" / "whats-new.json"
+
+
+def load_whats_new(settings: Settings) -> list[dict[str, str]]:
+    """The "What's new" list, from the website (always current) or else this server's copy of the repo."""
+    if settings.app_url and settings.worker_secret:
+        try:
+            import requests
+            r = requests.get(f"{settings.app_url.rstrip('/')}/api/worker/whats-new", timeout=20,
+                             headers={"x-worker-secret": settings.worker_secret})
+            if r.ok:
+                return list(r.json().get("entries", []))
+        except Exception:  # noqa: BLE001 - fall back to the local copy
+            log.warning("Could not fetch What's new from the website", exc_info=True)
+    try:
+        return json.loads(_LOCAL_WHATS_NEW.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def whats_new_block(entries: list[dict[str, str]], admin: bool, now: datetime | None = None) -> tuple[str, str]:
+    """HTML and text for "New in Hitlist" (last 30 days), or ("", "") when there's nothing new."""
+    since = ((now or datetime.now(timezone.utc)).astimezone() - timedelta(days=WHATS_NEW_DAYS)).date().isoformat()
+    items = sorted((e for e in entries if e.get("date", "") >= since and (admin or e.get("audience") == "all")),
+                   key=lambda e: e.get("date", ""), reverse=True)
+    if not items:
+        return "", ""
+    lis = "".join(
+        f'<li style="margin:0 0 6px"><b>{esc(e.get("title"))}</b>{" (admins)" if e.get("audience") == "admins" else ""}: '
+        f'{esc(e.get("text"))}</li>' for e in items)
+    html = (f'<div style="background:#f4f0fb;border:1px solid #d9cff0;border-radius:8px;padding:12px 16px;margin:0 0 18px">'
+            f'<div style="font-family:{FONT};font-size:15px;font-weight:bold;color:#4b3591;margin:0 0 6px">'
+            f'New in Hitlist (last 30 days)</div>'
+            f'<ul style="margin:0;padding-left:20px;font-family:{FONT};font-size:14px;line-height:1.45">{lis}</ul></div>')
+    text = "NEW IN HITLIST (last 30 days)\n" + "\n".join(f"- {e.get('title')}: {e.get('text')}" for e in items) + "\n\n"
+    return html, text
+
+
 def send_weekly_summary(store: HitlistStore, settings: Settings, mailer: Mailer,
-                        now: datetime | None = None, dry_run: bool = False) -> dict[str, int]:
+                        now: datetime | None = None, dry_run: bool = False,
+                        whats_new: list[dict[str, str]] | None = None) -> dict[str, int]:
+    entries = load_whats_new(settings) if whats_new is None else whats_new
+    new_tech, new_tech_text = whats_new_block(entries, admin=False, now=now)
+    new_admin, new_admin_text = whats_new_block(entries, admin=True, now=now)
     projects = active_projects(store, now)
     by_email: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for p in projects:
@@ -108,10 +155,10 @@ def send_weekly_summary(store: HitlistStore, settings: Settings, mailer: Mailer,
     intro = "Here are your projects and when each was last synced. Click a project to open it, and press Sync on any you've worked on this week."
     for email, mine in by_email.items():
         html, text = _body(intro, mine, settings.app_url, show_tech=False)
-        mailer.send([email], "Weekly Hitlist summary", html, dry_run, text=text)
+        mailer.send([email], "Weekly Hitlist summary", new_tech + html, dry_run, text=new_tech_text + text)
         sent[email] = len(mine)
     for email in admin_emails(store, settings):
         html, text = _body("All active projects, the longest since a sync first.", projects, settings.app_url, show_tech=True)
-        mailer.send([email], "Weekly Hitlist summary: all projects", html, dry_run, text=text)
+        mailer.send([email], "Weekly Hitlist summary: all projects", new_admin + html, dry_run, text=new_admin_text + text)
         sent[email] = len(projects)
     return sent

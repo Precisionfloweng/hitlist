@@ -1,0 +1,92 @@
+[
+ {
+  "date": "2026-10-02",
+  "audience": "all",
+  "title": "What's new in Hitlist",
+  "text": "The Monday email now starts with Hitlist changes from the last 30 days, and the Help page has a What's new section."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "admins",
+  "title": "Admin → What's new",
+  "text": "See every change, which ones go in Monday's email and to whom, and email yourself a preview."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
+  "title": "✨ AI Tools tab",
+  "text": "On each project, type, paste or dictate a rough deficiency or note (tap 🎤 on the iPad keyboard) and press Refine. Claude rewrites it the PFE way, ready to Copy into BuildingStart."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
+  "title": "Completed column on the checklist",
+  "text": "The last column shows whether each unit is ticked Completed in BuildingStart (✓) or not (!). It doesn't count toward Done or % complete."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
+  "title": "Project tolerances",
+  "text": "Enter the spec's ±% for AHUs, RTUs, fans, terminal units, outlets & inlets, pumps and coils on the Rules / Tol. tab. They show on the Overview and the AI uses them."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
+  "title": "\"Accepted\" deficiencies count as closed",
+  "text": "Items marked Accepted in BuildingStart now count as closed, like Fixed."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
+  "title": "Fan sub-items: no sheave on direct drive",
+  "text": "Motor Sheave MFG is no longer asked for on direct-drive fans."
+ },
+ {
+  "date": "2026-10-01",
+  "audience": "all",
+  "title": "AI Review on Deficiencies and Notes",
+  "text": "Press ✎ AI Review to have Claude flag unclear deficiencies or notes and suggest clearer wording. Copy it into BuildingStart, or press Keep as is."
+ },
+ {
+  "date": "2026-10-01",
+  "audience": "all",
+  "title": "Notes tab",
+  "text": "Every note from BuildingStart, project notes first, then by unit. Units with a note get a blue row and a \"1 note\" tag on the checklist; tap it to read."
+ },
+ {
+  "date": "2026-10-01",
+  "audience": "all",
+  "title": "Server down banner",
+  "text": "If the server stops, an orange banner says so and syncs wait until it's back."
+ },
+ {
+  "date": "2026-10-01",
+  "audience": "admins",
+  "title": "Users page: Send welcome and Last used",
+  "text": "Resend the welcome email to anyone on the list, see the last day each person opened the app, and every sign-in is logged on the SignIns tab of the Google Sheet."
+ },
+ {
+  "date": "2026-09-29",
+  "audience": "all",
+  "title": "Tap to read deficiencies on the checklist",
+  "text": "Tap the red \"1 open\" tag on a unit to read its open deficiencies (works on the iPad). The tag now sits under the unit name so long names can't hide it."
+ },
+ {
+  "date": "2026-09-29",
+  "audience": "all",
+  "title": "Possible issues grouped by equipment",
+  "text": "On the Overview, units ticked Completed with required fields empty are grouped by equipment type, with Show all."
+ },
+ {
+  "date": "2026-09-28",
+  "audience": "all",
+  "title": "More equipment types",
+  "text": "Heating coils, Coil Test, Pressure Sensors, Boilers, Duct Traverses, Face Velocity Tests and Autoflow Valves are now checked."
+ },
+ {
+  "date": "2026-09-28",
+  "audience": "all",
+  "title": "Last sync shows calendar days",
+  "text": "Last sync now reads Today, Yesterday or days ago by date, so last night's sync no longer shows as Today."
+ }
+]

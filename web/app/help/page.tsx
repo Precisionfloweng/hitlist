@@ -1,10 +1,12 @@
 import Link from "next/link";
 import Header from "../Header";
 import { requireStaff } from "@/lib/auth";
+import { whatsNew } from "@/lib/whatsNew";
 
 export const dynamic = "force-dynamic";
 
 const SECTIONS = [
+  ["whats-new", "What's new"],
   ["getting-around", "Getting around"],
   ["sync", "Syncing a project"],
   ["checklist", "Reading the equipment checklist"],
@@ -40,6 +42,16 @@ export default async function HelpPage() {
             {admin && <li><a href="#admin">For admins</a></li>}
           </ol>
         </nav>
+
+        <section id="whats-new">
+          <h2>What&apos;s new</h2>
+          <ul className="whats-new">
+            {whatsNew(admin).slice(0, 15).map((e, i) => (
+              <li key={i}><span className="muted">{new Date(`${e.date}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>{" "}
+                <b>{e.title}</b>{e.audience === "admins" && <span className="pill gray" style={{ marginLeft: 6 }}>Admins</span>}: {e.text}</li>
+            ))}
+          </ul>
+        </section>
 
         <section id="getting-around">
           <h2>Getting around</h2>
