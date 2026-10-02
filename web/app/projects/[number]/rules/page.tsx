@@ -9,6 +9,7 @@ import { loadRules } from "@/lib/rules";
 import { loadResults } from "@/lib/results";
 import { loadTolerances } from "@/lib/tolerances";
 import TolerancesCard from "./TolerancesCard";
+import { categoryOf, type ToleranceKey } from "@/lib/toleranceCats";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,12 @@ export default async function ProjectRulesPage({ params }: { params: Promise<{ n
   const number = decodeURIComponent((await params).number);
   const [data, rules, results, tol] = await Promise.all([getProject(number), loadRules(number), loadResults(number), loadTolerances(number)]);
   if (!data) notFound();
+  // Tolerance boxes only for equipment this project has (from its last sync, including untracked sheets
+  // like Supply Outlet); before a first sync, all of them.
+  const present = results ? [...new Set<ToleranceKey>([
+    ...results.types.filter((t) => t.units.length).flatMap((t) => [categoryOf(t.export_sheet), categoryOf(t.key)]),
+    ...Object.entries(results.untracked_sheets ?? {}).filter(([, n]) => n > 0).map(([sheet]) => categoryOf(sheet)),
+  ].filter((k): k is ToleranceKey => !!k))] : null;
   const changed = rules.types.reduce((n, t) => n + t.fields.filter((f) => f.status !== f.defaultStatus).length, 0);
 
   return (
@@ -29,7 +36,7 @@ export default async function ProjectRulesPage({ params }: { params: Promise<{ n
           anything you change here applies to this project only (highlighted blue), on its next sync.
           {changed > 0 && <> This project has <b>{changed}</b> field{changed === 1 ? "" : "s"} changed from the default.</>}
         </p>
-        <TolerancesCard project={data.project.id} initial={tol} canEdit={canEdit(user)} />
+        <TolerancesCard project={data.project.id} initial={tol} canEdit={canEdit(user)} present={present} />
         <RulesEditor types={rules.types} history={rules.history} canEdit={canEdit(user)} project={data.project.id} />
       </main>
     </>
