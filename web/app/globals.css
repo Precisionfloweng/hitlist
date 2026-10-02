@@ -141,8 +141,8 @@ main.wide { max-width: none; }
 .eq-grid tbody tr:nth-child(even) td { background: #f1f4f8; }
 /* Units with an open deficiency (punch item) */
 .eq-grid tbody tr.has-def td { background: #fdeeee; }
-.eq-grid tbody tr.has-note td { background: #edf4fc; }
-.eq-grid tbody tr.has-note:nth-child(even) td { background: #e4eefa; }
+.eq-grid tbody tr.has-note td { background: #d6e6f7; }
+.eq-grid tbody tr.has-note:nth-child(even) td { background: #cbdff4; }
 .eq-grid tbody tr.has-def:nth-child(even) td { background: #fae6e6; }
 .def-badge { display: inline-block; margin-right: 6px; padding: 0 6px !important; border: 0; border-radius: 999px;
   font-size: 11px; line-height: 16px; font-weight: 700; background: var(--bad); color: #fff; vertical-align: 1px;
