@@ -17,7 +17,7 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
     { key: "equipment", label: "Equipment checklist", href: `${base}/equipment` },
     { key: "deficiencies", label: "Deficiencies", href: `${base}/deficiencies`, count: p.openDeficiencies },
     { key: "notes", label: "Notes", href: `${base}/notes`, count: notes },
-    { key: "rules", label: "Rules", href: `${base}/rules`, count: rulesChanged },
+    { key: "rules", label: "Rules / Tol.", href: `${base}/rules`, count: rulesChanged },
     { key: "ai", label: "AI Tools", href: `${base}/ai` },
   ];
   // Customers don't see the rules or the techs' notes.
