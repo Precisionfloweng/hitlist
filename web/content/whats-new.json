@@ -2,6 +2,12 @@
  {
   "date": "2026-10-02",
   "audience": "all",
+  "title": "Hitlist desktop app",
+  "text": "Install Hitlist on your Windows computer from Chrome or Edge so it opens in its own window. Steps are on the Help page."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
   "title": "Tab menu on smaller screens",
   "text": "When a project's tabs don't fit on one line, like on an iPad held upright, they fold into one ☰ menu."
  },

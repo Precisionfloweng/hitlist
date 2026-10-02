@@ -196,6 +196,18 @@ export default async function HelpPage() {
           <p>Forgot your password? On the sign-in page, choose <b>Email me a code</b>. You can change your password any time by clicking your name in the top bar.</p>
         </section>
 
+        <section id="desktop">
+          <h2>Desktop app (Windows)</h2>
+          <p>Install Hitlist as an app on your computer. It opens in its own window with the Hitlist icon, like a regular program.</p>
+          <ol>
+            <li>Open this site in <b>Chrome</b> or <b>Edge</b> and sign in.</li>
+            <li><b>Chrome:</b> click <b>⋮</b> (top right), then <b>Cast, save, and share</b>, then <b>Install page as app…</b>, then <b>Install</b>.<br />
+              <b>Edge:</b> click <b>⋯</b> (top right), then <b>Apps</b>, then <b>Install this site as an app</b>, then <b>Install</b>.</li>
+            <li>When it asks, tick <b>Create desktop shortcut</b> and <b>Pin to taskbar</b> if you want them.</li>
+          </ol>
+          <p>If there&apos;s no desktop shortcut afterwards, open the Start menu, find <b>PFE Hitlist</b>, right-click it and choose <b>Pin to taskbar</b>, or drag it onto the desktop. A link dragged from the address bar works too, but shows the browser&apos;s icon instead of Hitlist&apos;s.</p>
+        </section>
+
         {admin && (
           <section id="admin">
             <h2>For admins</h2>
