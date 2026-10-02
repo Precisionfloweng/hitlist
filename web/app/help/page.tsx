@@ -68,6 +68,7 @@ export default async function HelpPage() {
                 <li><b>✨ AI Tools</b> (techs and admins): clean up a deficiency or note before you enter it. See <a href="#ai">AI Tools</a>.</li>
               </ul>
             </li>
+            <li>On a phone held upright, the top bar&apos;s links, your name and <b>Sign out</b> are under the <b>☰</b> button at the top right.</li>
             <li>When the tabs don&apos;t fit on one line (an iPad held upright, a phone), they fold into one <b>☰</b> button showing the tab you&apos;re on. Tap it to pick another tab.</li>
           </ul>
         </section>

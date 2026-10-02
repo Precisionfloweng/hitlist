@@ -353,3 +353,23 @@ button.linkish { border: 0; background: none; padding: 4px 2px; color: var(--mut
 .ptabs-drop a.on { border-bottom: 0; border-left-color: var(--brand); background: #f0f5fa; }
 .ptabs-drop a.ptab-ai.on { border-left-color: #8e7cc3; background: #f4f1fb; }
 .ptabs-drop a:hover { background: #f5f6f8; }
+
+/* Top bar: links fold into a ☰ menu on narrow screens */
+header.top .top-links { display: flex; gap: 20px; align-items: center; flex: 1; }
+header.top .top-burger { display: none; margin-left: auto; position: relative; }
+header.top .top-burger > button { background: transparent; border: 1px solid rgba(255,255,255,.5); color: #fff;
+  font-size: 20px; line-height: 1; padding: 6px 12px; }
+.top-drop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; min-width: 220px; background: #fff;
+  border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.18); padding: 6px;
+  display: flex; flex-direction: column; }
+header.top .top-drop a { color: var(--ink); opacity: 1; padding: 11px 14px; border-radius: 6px; font-weight: 600; }
+header.top .top-drop a:hover { background: #f5f6f8; text-decoration: none; }
+header.top .top-drop a.on { background: #f0f5fa; color: var(--brand); }
+.top-drop-sub { display: block; font-size: 12px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+.top-drop-sep { height: 1px; background: var(--line); margin: 6px 4px; }
+header.top .top-drop form button { width: 100%; text-align: left; color: var(--bad); border: 0; padding: 11px 14px; font-weight: 600; }
+header.top .top-drop form button:hover { background: #f5f6f8; }
+@media (max-width: 720px) {
+  header.top .top-links { display: none; }
+  header.top .top-burger { display: block; }
+}

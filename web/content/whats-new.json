@@ -2,6 +2,12 @@
  {
   "date": "2026-10-02",
   "audience": "all",
+  "title": "Menu button on phones",
+  "text": "On a phone held upright, the top bar's links, your name and Sign out are under the ☰ button at the top right."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
   "title": "Hitlist desktop app",
   "text": "Install Hitlist on your Windows computer from Chrome or Edge so it opens in its own window. Steps are on the Help page."
  },
