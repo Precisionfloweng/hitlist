@@ -7,13 +7,15 @@ import { canEdit, requireStaff } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadRules } from "@/lib/rules";
 import { loadResults } from "@/lib/results";
+import { loadTolerances } from "@/lib/tolerances";
+import TolerancesCard from "./TolerancesCard";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProjectRulesPage({ params }: { params: Promise<{ number: string }> }) {
   const user = await requireStaff();
   const number = decodeURIComponent((await params).number);
-  const [data, rules, results] = await Promise.all([getProject(number), loadRules(number), loadResults(number)]);
+  const [data, rules, results, tol] = await Promise.all([getProject(number), loadRules(number), loadResults(number), loadTolerances(number)]);
   if (!data) notFound();
   const changed = rules.types.reduce((n, t) => n + t.fields.filter((f) => f.status !== f.defaultStatus).length, 0);
 
@@ -27,6 +29,7 @@ export default async function ProjectRulesPage({ params }: { params: Promise<{ n
           anything you change here applies to this project only (highlighted blue), on its next sync.
           {changed > 0 && <> This project has <b>{changed}</b> field{changed === 1 ? "" : "s"} changed from the default.</>}
         </p>
+        <TolerancesCard project={data.project.id} initial={tol} canEdit={canEdit(user)} />
         <RulesEditor types={rules.types} history={rules.history} canEdit={canEdit(user)} project={data.project.id} />
       </main>
     </>

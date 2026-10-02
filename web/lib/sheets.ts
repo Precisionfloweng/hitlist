@@ -21,6 +21,8 @@ export const SCHEMA = {
   Deficiencies: ["project_number", "group", "value", "count", "updated_at"],
   History: ["project_number", "synced_at", "fields_pct", "units_pct", "units",
     "open_deficiencies", "open_high"],
+  // A project's tolerances (±%) by category, typed in on the project's Rules tab. Website only.
+  Tolerances: ["project_number", "category", "pct", "changed_by", "changed_at"],
   // Server heartbeat: "server_last_seen" (worker, every 5 min) and "down_alert_sent_for" (website).
   Status: ["name", "value", "local_time"],
   // One row per sign-in (time in Central). Written by the website only.

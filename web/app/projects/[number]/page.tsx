@@ -8,13 +8,15 @@ import ProjectHeader from "./ProjectHeader";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
+import { loadTolerances } from "@/lib/tolerances";
+import { TOLERANCE_CATS } from "@/lib/toleranceCats";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProjectPage({ params }: { params: Promise<{ number: string }> }) {
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
-  const [data, results] = await Promise.all([getProject(number), loadResults(number)]);
+  const [data, results, tol] = await Promise.all([getProject(number), loadResults(number), loadTolerances(number)]);
   if (!data || !canSee(user, data.project.id)) notFound();
   const { project: p } = data;
   const summary = results?.summary;
@@ -41,6 +43,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
 
         {p.lastSync ? (
           <>
+            {TOLERANCE_CATS.some((c) => tol[c.key]) && (
+              <div className="tol-line">
+                <b>Tolerances</b>{" "}
+                {TOLERANCE_CATS.filter((c) => tol[c.key]).map((c) => `${c.label} ±${tol[c.key]}%`).join(" · ")}
+              </div>
+            )}
             <div className="tiles">
               <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>

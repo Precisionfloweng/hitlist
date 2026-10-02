@@ -32,6 +32,8 @@ SCHEMA: dict[str, list[str]] = {
     "Deficiencies": ["project_number", "group", "value", "count", "updated_at"],
     "History": ["project_number", "synced_at", "fields_pct", "units_pct", "units",
                 "open_deficiencies", "open_high"],
+    # Written by the website: a project's tolerances (±%) by category.
+    "Tolerances": ["project_number", "category", "pct", "changed_by", "changed_at"],
     # Server heartbeat: name = "server_last_seen" (written by the worker every few minutes) and
     # "down_alert_sent_for" (the website's note that it already emailed about that outage).
     "Status": ["name", "value", "local_time"],

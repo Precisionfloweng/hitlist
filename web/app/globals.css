@@ -294,3 +294,26 @@ button.linkish { border: 0; background: none; padding: 4px 2px; color: var(--mut
 .server-down .muted { color: #9a6a33; }
 
 .breakdown-total td { border-top: 2px solid var(--line); border-bottom: 0; }
+
+/* Project tolerances */
+.tol-card { margin-bottom: 14px; }
+.tol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
+.tol-box { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.tol-input { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: var(--ink); }
+.tol-input input { width: 64px; text-align: center; }
+.tol-line { font-size: 14px; color: var(--muted); margin: 0 0 12px; }
+.tol-line b { color: var(--ink); margin-right: 6px; }
+
+/* AI Tools tab and page */
+.ptabs a.ptab-ai { color: #6b4fbb; }
+.ptabs a.ptab-ai.on { color: #6b4fbb; border-bottom-color: #8e7cc3; }
+.ai-spark-sm { margin-right: 4px; }
+.ai-tools { max-width: 900px; }
+.ai-card { margin-bottom: 14px; }
+.ai-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+.ai-spark { font-size: 24px; line-height: 1; }
+.ai-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.ai-unit { flex: 1; min-width: 240px; }
+.ai-input { width: 100%; box-sizing: border-box; margin-top: 10px; font: inherit; border: 1px solid #b9c6d6; border-radius: 8px;
+  padding: 10px 12px; resize: vertical; min-height: 96px; }
+.primary.ai-btn { background: linear-gradient(90deg, #6b4fbb, #8e7cc3); border-color: #6b4fbb; }

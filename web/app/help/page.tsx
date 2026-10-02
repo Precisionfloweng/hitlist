@@ -14,6 +14,7 @@ const SECTIONS = [
   ["deficiencies", "Deficiencies"],
   ["notes", "Notes"],
   ["rules", "Rules"],
+  ["ai", "AI Tools"],
   ["sharing", "Sharing and confidentiality"],
   ["ipad", "iPad Home Screen"],
 ] as const;
@@ -44,13 +45,14 @@ export default async function HelpPage() {
           <h2>Getting around</h2>
           <ul>
             <li><b>All Projects</b> lists every active project. Tick <b>My projects</b> to see only the ones where you&apos;re the tech. Use the search box to find a project by number, name or tech.</li>
-            <li>Click a project to open it. Each project has five tabs:
+            <li>Click a project to open it. Each project has these tabs:
               <ul>
                 <li><b>Overview</b>: units fully complete, open and closed deficiencies, and a card for each equipment type. Click a card to jump to that type.</li>
                 <li><b>Equipment checklist</b>: every unit and field, marked done or missing.</li>
                 <li><b>Deficiencies</b>: the punch list, with breakdowns by priority, contractor and contact.</li>
                 <li><b>Notes</b>: the notes entered in BuildingStart. See <a href="#notes">Notes</a>.</li>
-                <li><b>Rules</b>: what this project checks. See <a href="#rules">Rules</a>.</li>
+                <li><b>Rules</b>: what this project checks, and its tolerances. See <a href="#rules">Rules</a>.</li>
+                <li><b>✨ AI Tools</b> (techs and admins): clean up a deficiency or note before you enter it. See <a href="#ai">AI Tools</a>.</li>
               </ul>
             </li>
           </ul>
@@ -140,7 +142,13 @@ export default async function HelpPage() {
             <li><b>Default Rules</b> (top bar) are the company standard. Only admins can change them.</li>
             <li>A project&apos;s <b>Rules</b> tab lets anyone change a field for <b>that project only</b>. Changed fields are highlighted blue, with the default shown next to them and a <b>Reset</b> button. Every change is logged and can be undone.</li>
             <li>Rule changes show up on the project&apos;s next <b>Sync</b>.</li>
+            <li><b>Tolerances</b>: at the top of a project&apos;s Rules tab, enter the spec&apos;s ±% for AHUs, RTUs, fans, terminal units, outlets &amp; inlets, pumps and coils. Leave a box blank if the spec doesn&apos;t give one. Filled-in tolerances show on the Overview, and the AI uses them when wording deficiencies.</li>
           </ul>
+        </section>
+
+        <section id="ai">
+          <h2>AI Tools</h2>
+          <p>On a project&apos;s <b>✨ AI Tools</b> tab, choose <b>Deficiency</b> or <b>Note</b>, pick the unit if you like, and type, paste or dictate what you found (rough is fine; tap 🎤 on the iPad keyboard to talk). Press <b>Refine</b> and Claude rewrites it the PFE way, using the same rules as AI Review and the project&apos;s tolerances. Edit it if needed, fill in any <b>___</b>, press <b>Copy</b> and paste it into BuildingStart. Nothing you type there is saved.</p>
         </section>
 
         <section id="sharing">
