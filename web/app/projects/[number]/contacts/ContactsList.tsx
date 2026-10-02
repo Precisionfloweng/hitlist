@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
 
-type Contact = { id: string; name: string; company: string; trade: string; email: string;
+type Contact = { id: string; name: string; position: string; company: string; trade: string; email: string;
   onList: boolean; addedBy: string; addedAt: string };
-type Draft = { name: string; company: string; trade: string; email: string };
+type Draft = { name: string; position: string; company: string; trade: string; email: string };
 
-const EMPTY: Draft = { name: "", company: "", trade: "", email: "" };
+const EMPTY: Draft = { name: "", position: "", company: "", trade: "", email: "" };
 const TRADES = ["Owner", "GC", "Mechanical", "Controls", "Electrical", "Engineer", "Commissioning", "Architect"];
 
 function added(iso: string) {
@@ -75,6 +75,7 @@ export default function ContactsList({ project, initial, canEdit }: { project: s
           <b>Add a contact</b>
           <div className="contacts-form">
             {field(draft, setDraft, "name", "Name")}
+            {field(draft, setDraft, "position", "Position")}
             {field(draft, setDraft, "company", "Company")}
             {field(draft, setDraft, "trade", "Trade", { list: "contact-trades" })}
             {field(draft, setDraft, "email", "Email", { type: "email", required: true, autoCapitalize: "none" })}
@@ -91,13 +92,14 @@ export default function ContactsList({ project, initial, canEdit }: { project: s
         ) : (
           <table className="proj-table contacts-table">
             <thead>
-              <tr><th title="Included in Copy all emails">On list</th><th>Name</th><th>Company</th><th>Trade</th><th>Email</th><th>Added</th>{canEdit && <th />}</tr>
+              <tr><th title="Included in Copy all emails">On list</th><th>Name</th><th>Position</th><th>Company</th><th>Trade</th><th>Email</th><th>Added</th>{canEdit && <th />}</tr>
             </thead>
             <tbody>
               {list.map((c) => editing?.id === c.id ? (
                 <tr key={c.id} className="contacts-editing">
                   <td><input type="checkbox" checked={c.onList} disabled /></td>
                   <td>{field(editing.d, (d) => setEditing({ id: c.id, d }), "name", "Name")}</td>
+                  <td>{field(editing.d, (d) => setEditing({ id: c.id, d }), "position", "Position")}</td>
                   <td>{field(editing.d, (d) => setEditing({ id: c.id, d }), "company", "Company")}</td>
                   <td>{field(editing.d, (d) => setEditing({ id: c.id, d }), "trade", "Trade", { list: "contact-trades" })}</td>
                   <td>{field(editing.d, (d) => setEditing({ id: c.id, d }), "email", "Email", { type: "email", autoCapitalize: "none" })}</td>
@@ -112,6 +114,7 @@ export default function ContactsList({ project, initial, canEdit }: { project: s
                   <td><input type="checkbox" checked={c.onList} disabled={!canEdit || busy}
                     onChange={(e) => send({ action: "update", id: c.id, contact: { onList: e.target.checked } })} /></td>
                   <td>{c.name}</td>
+                  <td>{c.position}</td>
                   <td>{c.company}</td>
                   <td>{c.trade}</td>
                   <td><a href={`mailto:${c.email}`}>{c.email}</a></td>
@@ -125,7 +128,7 @@ export default function ContactsList({ project, initial, canEdit }: { project: s
                         </>
                       ) : (
                         <>
-                          <button disabled={busy} onClick={() => { setRemoving(null); setEditing({ id: c.id, d: { name: c.name, company: c.company, trade: c.trade, email: c.email } }); }}>Edit</button>
+                          <button disabled={busy} onClick={() => { setRemoving(null); setEditing({ id: c.id, d: { name: c.name, position: c.position, company: c.company, trade: c.trade, email: c.email } }); }}>Edit</button>
                           <button disabled={busy} onClick={() => { setEditing(null); setRemoving(c.id); }}>✕</button>
                         </>
                       )}

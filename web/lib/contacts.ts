@@ -5,13 +5,13 @@ import type { User } from "./auth";
 import { appendRows, deleteRow, ensureTab, readTab, updateRow, type Rec } from "./sheets";
 
 export type Contact = {
-  id: string; name: string; company: string; trade: string; email: string;
+  id: string; name: string; position: string; company: string; trade: string; email: string;
   onList: boolean; addedBy: string; addedAt: string;
 };
-export type ContactInput = { name?: string; company?: string; trade?: string; email?: string; onList?: boolean };
+export type ContactInput = { name?: string; position?: string; company?: string; trade?: string; email?: string; onList?: boolean };
 
 const toContact = (r: Rec): Contact => ({
-  id: r.id, name: r.name, company: r.company, trade: r.trade, email: r.email,
+  id: r.id, name: r.name, position: r.position ?? "", company: r.company, trade: r.trade, email: r.email,
   onList: r.on_list !== "no", addedBy: r.added_by, addedAt: r.added_at,
 });
 
@@ -34,7 +34,7 @@ function clean(input: ContactInput) {
   const email = (input.email ?? "").trim().replace(/^mailto:/i, "").replace(/^<|>$/g, "").toLowerCase();
   if (!/^[^\s@;,<>]+@[^\s@;,<>]+\.[a-z]{2,}$/i.test(email)) throw new Error("Enter a valid email address.");
   const t = (v?: string) => (v ?? "").trim().slice(0, 120);
-  return { name: t(input.name), company: t(input.company), trade: t(input.trade), email };
+  return { name: t(input.name), position: t(input.position), company: t(input.company), trade: t(input.trade), email };
 }
 
 export async function addContact(project: string, input: ContactInput, by: User): Promise<Contact[]> {
@@ -50,11 +50,12 @@ export async function addContact(project: string, input: ContactInput, by: User)
 }
 
 export async function updateContact(project: string, id: string, input: ContactInput): Promise<Contact[]> {
+  await ensureTab("Contacts");                  // keeps the header current (new columns are added at the end)
   const rows = await rowsFor(project, true);
   const row = rows.find((r) => r.id === id);
   if (!row) throw new Error("That contact was removed. Refresh the page.");
   const onlyToggle = input.email === undefined;
-  const c = onlyToggle ? { name: row.name, company: row.company, trade: row.trade, email: row.email } : clean(input);
+  const c = onlyToggle ? { name: row.name, position: row.position ?? "", company: row.company, trade: row.trade, email: row.email } : clean(input);
   if (!onlyToggle && rows.some((r) => r.id !== id && r.email.toLowerCase() === c.email)) {
     throw new Error(`${c.email} is already on this project's list.`);
   }

@@ -153,7 +153,7 @@ export default async function HelpPage() {
           <h2>Contacts</h2>
           <p>The <b>Contacts</b> tab keeps the project&apos;s email list for the deficiency list in one place, so you don&apos;t have to dig up the last email to find everyone. Techs and admins add, edit and remove contacts; customers don&apos;t see this tab.</p>
           <ul>
-            <li>When someone asks to be added, type their name, company, trade and email into <b>Add a contact</b>.</li>
+            <li>When someone asks to be added, type their name, position, company, trade and email into <b>Add a contact</b>.</li>
             <li><b>Copy all emails</b> copies every ticked email, separated by semicolons. Paste it into the To line of a new Outlook email.</li>
             <li>Untick <b>On list</b> to leave someone off for now without deleting them. <b>✕</b> removes them for good.</li>
             <li><b>Added</b> shows when each person joined the list, so you can see who&apos;s new since your last send.</li>
