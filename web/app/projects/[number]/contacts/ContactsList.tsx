@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Contact = { id: string; name: string; position: string; company: string; trade: string; email: string;
   onList: boolean; sendAs: "to" | "cc"; addedBy: string; addedAt: string };
@@ -27,7 +27,10 @@ export default function ContactsList({ project, subject, initial, canEdit }:
   const to = onList.filter((c) => c.sendAs !== "cc").map((c) => c.email);
   const cc = onList.filter((c) => c.sendAs === "cc").map((c) => c.email);
   // Opens a new email in the person's own mail app (sent from their account), To and Cc filled in.
-  const mailto = `mailto:${to.join(",")}?${cc.length ? `cc=${cc.join(",")}&` : ""}subject=${encodeURIComponent(subject)}`;
+  // Outlook on Windows wants semicolons between addresses; Apple Mail / Outlook on iPad use commas.
+  const [sep, setSep] = useState(",");
+  useEffect(() => { if (/Windows/i.test(navigator.userAgent)) setSep(";"); }, []);
+  const mailto = `mailto:${to.join(sep)}?${cc.length ? `cc=${cc.join(sep)}&` : ""}subject=${encodeURIComponent(subject)}`;
 
   async function send(body: Record<string, unknown>, done?: () => void) {
     setBusy(true); setMsg(null);
