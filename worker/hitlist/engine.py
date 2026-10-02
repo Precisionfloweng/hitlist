@@ -21,7 +21,7 @@ NA_ENTRIES = {"-", "--", "---", "–", "—", "na", "n/a", "nd", "n/d", "none"}
 
 NON_TYPE_SHEETS = {"Project", "Deficiency", "Note"}
 
-CLOSED_DEFICIENCY = {"fixed", "closed", "resolved", "complete", "completed", "void", "cancelled"}
+CLOSED_DEFICIENCY = {"fixed", "accepted", "closed", "resolved", "complete", "completed", "void", "cancelled"}
 
 
 def is_missing(value: Any) -> bool:

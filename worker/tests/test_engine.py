@@ -175,3 +175,9 @@ def test_notes_come_through(sample_export, sample_rules):
     notes = check_project(read_export(sample_export), load_rules(sample_rules))["notes"]
     assert [n["text"] for n in notes] == ["General note for the whole job", "Access panel blocked by duct"]  # blank dropped
     assert notes[0]["path"] == "" and notes[1]["path"] == "AHU-1/VAV-1"
+
+
+def test_accepted_deficiency_counts_as_closed():
+    from hitlist.engine import _clean_deficiency
+    assert _clean_deficiency({"Deficiency": "x", "Deficiency Status": "Accepted"})["open"] is False
+    assert _clean_deficiency({"Deficiency": "x", "Deficiency Status": "Open"})["open"] is True
