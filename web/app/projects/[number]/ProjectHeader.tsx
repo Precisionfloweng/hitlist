@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ProjectTabs from "./ProjectTabs";
 import RefreshButton from "../../RefreshButton";
 import { syncLabel } from "../../format";
 import type { Project } from "@/lib/data";
@@ -39,16 +40,7 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
           {user.canSync && <RefreshButton project={p.id} job={p.job} />}
         </div>
       </div>
-      <nav className="ptabs">
-        {tabs.map((t) => (
-          <Link key={t.key} href={t.href} className={`${t.key === tab ? "on" : ""}${t.key === "ai" ? " ptab-ai" : ""}`}
-            aria-current={t.key === tab ? "page" : undefined}>
-            {t.key === "ai" && <span className="ai-spark-sm" aria-hidden>✨</span>}
-            {t.label}
-            {t.count ? <span className={`ptab-count${t.key === "deficiencies" ? " red" : t.key === "notes" ? " blue" : ""}`}>{t.count}</span> : null}
-          </Link>
-        ))}
-      </nav>
+      <ProjectTabs tabs={tabs} active={tab} />
     </div>
   );
 }

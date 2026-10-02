@@ -335,3 +335,21 @@ button.linkish { border: 0; background: none; padding: 4px 2px; color: var(--mut
 .contacts-actions button { padding: 4px 10px; margin-left: 4px; }
 .contacts-off td { color: var(--muted); }
 .contacts-off a { color: var(--muted); }
+
+/* Project tabs fold into a ☰ menu when they don't fit on one line */
+.ptabs-wrap { position: relative; }
+.ptabs-measure { position: absolute; left: 0; top: 0; width: max-content; visibility: hidden; pointer-events: none;
+  overflow: visible; border: 0; margin: 0; }
+.ptab-m { padding: 10px 16px; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
+.ptabs-menu { overflow: visible; position: relative; padding-bottom: 8px; }
+.ptabs-toggle { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--brand);
+  background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 9px 14px; }
+.ptabs-burger { font-size: 18px; line-height: 1; }
+.ptabs-caret { color: var(--muted); font-size: 12px; }
+.ptabs-drop { position: absolute; top: calc(100% - 4px); left: 0; z-index: 30; min-width: 240px; background: #fff;
+  border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12); padding: 6px;
+  display: flex; flex-direction: column; }
+.ptabs-drop a { border-bottom: 0; border-left: 3px solid transparent; border-radius: 6px; margin: 0; padding: 11px 14px; }
+.ptabs-drop a.on { border-bottom: 0; border-left-color: var(--brand); background: #f0f5fa; }
+.ptabs-drop a.ptab-ai.on { border-left-color: #8e7cc3; background: #f4f1fb; }
+.ptabs-drop a:hover { background: #f5f6f8; }

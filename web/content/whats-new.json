@@ -2,6 +2,12 @@
  {
   "date": "2026-10-02",
   "audience": "all",
+  "title": "Tab menu on smaller screens",
+  "text": "When a project's tabs don't fit on one line, like on an iPad held upright, they fold into one ☰ menu."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
   "title": "Contacts tab",
   "text": "Each project has a Contacts tab to keep its deficiency-list email list. Each contact has a name, position, company, trade and email. Copy all emails copies everyone at once for Outlook."
  },
