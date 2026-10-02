@@ -5655,7 +5655,13 @@
       "Motor Sheave MFG"
      ],
      "status": "required",
-     "when": null
+     "when": [
+      {
+       "column": "Drive Type",
+       "label": "Drive Type",
+       "equals": "Belt Drive"
+      }
+     ]
     },
     {
      "label": "Design Volts",
