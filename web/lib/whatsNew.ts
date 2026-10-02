@@ -17,8 +17,14 @@ const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 /** The "New in Hitlist" box as it appears in the Monday email (same look as the server builds). */
 export function whatsNewEmailHtml(items: WhatsNew[]): string {
   if (!items.length) return "";
-  const lis = items.map((e) => `<li style="margin:0 0 6px"><b>${esc(e.title)}</b>${e.audience === "admins" ? " (admins)" : ""}: ${esc(e.text)}</li>`).join("");
-  return `<div style="background:#f4f0fb;border:1px solid #d9cff0;border-radius:8px;padding:12px 16px;margin:0 0 18px">` +
-    `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#4b3591;margin:0 0 6px">New in Hitlist (last 30 days)</div>` +
-    `<ul style="margin:0;padding-left:20px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45">${lis}</ul></div>`;
+  const F = "Arial,Helvetica,sans-serif";
+  const day = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const rows = items.map((e) =>
+    `<tr><td valign="top" style="padding:9px 12px 9px 0;border-top:1px solid #e3dcf3;font-family:${F};font-size:12px;color:#7a6aa8;white-space:nowrap;width:52px">${esc(day(e.date))}</td>` +
+    `<td valign="top" style="padding:9px 0;border-top:1px solid #e3dcf3;font-family:${F};font-size:14px;line-height:1.4;color:#1c2430"><b>${esc(e.title)}</b>` +
+    `${e.audience === "admins" ? ` <span style="font-size:11px;color:#7a6aa8">(admins)</span>` : ""}` +
+    `<br><span style="color:#475467">${esc(e.text)}</span></td></tr>`).join("");
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f4fd;border:1px solid #d9cff0;margin:0 0 18px">` +
+    `<tr><td style="padding:12px 16px 4px;font-family:${F};font-size:15px;font-weight:bold;color:#4b3591">New in Hitlist <span style="font-weight:normal;font-size:13px;color:#7a6aa8">(last 30 days)</span></td></tr>` +
+    `<tr><td style="padding:0 16px 6px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table></td></tr></table>`;
 }

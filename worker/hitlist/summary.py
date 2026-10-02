@@ -101,6 +101,7 @@ def _body(intro: str, projects: list[dict[str, Any]], app_url: str, show_tech: b
 
 log = logging.getLogger(__name__)
 WHATS_NEW_DAYS = 30
+ADMIN_TAG = ' <span style="font-size:11px;color:#7a6aa8">(admins)</span>'
 _LOCAL_WHATS_NEW = Path(__file__).resolve().parents[2] / "web" / "content" / "whats-new.json"
 
 
@@ -128,14 +129,26 @@ def whats_new_block(entries: list[dict[str, str]], admin: bool, now: datetime | 
                    key=lambda e: e.get("date", ""), reverse=True)
     if not items:
         return "", ""
-    lis = "".join(
-        f'<li style="margin:0 0 6px"><b>{esc(e.get("title"))}</b>{" (admins)" if e.get("audience") == "admins" else ""}: '
-        f'{esc(e.get("text"))}</li>' for e in items)
-    html = (f'<div style="background:#f4f0fb;border:1px solid #d9cff0;border-radius:8px;padding:12px 16px;margin:0 0 18px">'
-            f'<div style="font-family:{FONT};font-size:15px;font-weight:bold;color:#4b3591;margin:0 0 6px">'
-            f'New in Hitlist (last 30 days)</div>'
-            f'<ul style="margin:0;padding-left:20px;font-family:{FONT};font-size:14px;line-height:1.45">{lis}</ul></div>')
-    text = "NEW IN HITLIST (last 30 days)\n" + "\n".join(f"- {e.get('title')}: {e.get('text')}" for e in items) + "\n\n"
+    def day(d: str) -> str:
+        try:
+            return datetime.fromisoformat(d).strftime("%b %d").replace(" 0", " ")
+        except ValueError:
+            return d
+    rows = "".join(
+        f'<tr><td valign="top" style="padding:9px 12px 9px 0;border-top:1px solid #e3dcf3;font-family:{FONT};'
+        f'font-size:12px;color:#7a6aa8;white-space:nowrap;width:52px">{esc(day(e.get("date", "")))}</td>'
+        f'<td valign="top" style="padding:9px 0;border-top:1px solid #e3dcf3;font-family:{FONT};font-size:14px;'
+        f'line-height:1.4;color:#1c2430"><b>{esc(e.get("title"))}</b>'
+        f'{ADMIN_TAG if e.get("audience") == "admins" else ""}'
+        f'<br><span style="color:#475467">{esc(e.get("text"))}</span></td></tr>' for e in items)
+    html = (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+            f'style="background:#f7f4fd;border:1px solid #d9cff0;margin:0 0 18px">'
+            f'<tr><td style="padding:12px 16px 4px;font-family:{FONT};font-size:15px;font-weight:bold;color:#4b3591">'
+            f'New in Hitlist <span style="font-weight:normal;font-size:13px;color:#7a6aa8">(last 30 days)</span></td></tr>'
+            f'<tr><td style="padding:0 16px 6px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
+            f'{rows}</table></td></tr></table>')
+    text = "NEW IN HITLIST (last 30 days)\n" + "\n".join(
+        f"- {day(e.get('date', ''))}  {e.get('title')}: {e.get('text')}" for e in items) + "\n\n"
     return html, text
 
 
