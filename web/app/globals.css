@@ -331,6 +331,12 @@ button.linkish { border: 0; background: none; padding: 4px 2px; color: var(--mut
 .contacts-table td:first-child, .contacts-table th:first-child { text-align: center; width: 64px; }
 .contacts-table input[type=checkbox] { width: 18px; height: 18px; }
 .contacts-table .contacts-editing input:not([type=checkbox]) { width: 100%; min-width: 110px; }
+.tocc { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.tocc button { border: 0; border-radius: 0; padding: 4px 10px; font-size: 13px; font-weight: 600; color: var(--muted); background: #fff; }
+.tocc button + button { border-left: 1px solid var(--line); }
+.tocc button.on { background: var(--brand); color: #fff; opacity: 1; }
+.tocc button:disabled:not(.on) { opacity: .6; }
+.contacts-top .btn { text-decoration: none; }
 .contacts-actions { white-space: nowrap; text-align: right; }
 .contacts-actions button { padding: 4px 10px; margin-left: 4px; }
 .contacts-off td { color: var(--muted); }

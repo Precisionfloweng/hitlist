@@ -4,15 +4,27 @@ import { randomUUID } from "crypto";
 import type { User } from "./auth";
 import { appendRows, deleteRow, ensureTab, readTab, updateRow, type Rec } from "./sheets";
 
+/** Email domains of the company's own staff (from the Users tab), so new staff contacts start on Cc. */
+async function staffDomains(): Promise<Set<string>> {
+  const out = new Set<string>();
+  try {
+    for (const u of await readTab("Users")) {
+      const d = (u.email.split("@")[1] ?? "").toLowerCase();
+      if (u.role !== "customer" && d && !/^(gmail|googlemail|outlook|hotmail|live|yahoo|icloud|me|aol|msn)\./.test(d)) out.add(d);
+    }
+  } catch { /* no users tab */ }
+  return out;
+}
+
 export type Contact = {
   id: string; name: string; position: string; company: string; trade: string; email: string;
-  onList: boolean; addedBy: string; addedAt: string;
+  onList: boolean; sendAs: "to" | "cc"; addedBy: string; addedAt: string;
 };
-export type ContactInput = { name?: string; position?: string; company?: string; trade?: string; email?: string; onList?: boolean };
+export type ContactInput = { name?: string; position?: string; company?: string; trade?: string; email?: string; onList?: boolean; sendAs?: "to" | "cc" };
 
 const toContact = (r: Rec): Contact => ({
   id: r.id, name: r.name, position: r.position ?? "", company: r.company, trade: r.trade, email: r.email,
-  onList: r.on_list !== "no", addedBy: r.added_by, addedAt: r.added_at,
+  onList: r.on_list !== "no", sendAs: r.send_as === "cc" ? "cc" : "to", addedBy: r.added_by, addedAt: r.added_at,
 });
 
 const byCompany = (a: Contact, b: Contact) =>
@@ -44,6 +56,7 @@ export async function addContact(project: string, input: ContactInput, by: User)
   if (rows.some((r) => r.email.toLowerCase() === c.email)) throw new Error(`${c.email} is already on this project's list.`);
   await appendRows("Contacts", [{
     project_number: project, id: randomUUID().slice(0, 8), ...c, on_list: input.onList === false ? "no" : "yes",
+    send_as: input.sendAs ?? ((await staffDomains()).has(c.email.split("@")[1]) ? "cc" : "to"),
     added_by: by.name || by.email, added_at: new Date().toISOString().slice(0, 10),
   }]);
   return loadContacts(project, true);
@@ -60,7 +73,8 @@ export async function updateContact(project: string, id: string, input: ContactI
     throw new Error(`${c.email} is already on this project's list.`);
   }
   const onList = input.onList === undefined ? row.on_list !== "no" : input.onList;
-  await updateRow("Contacts", row._row, { ...row, ...c, on_list: onList ? "yes" : "no" });
+  const sendAs = input.sendAs ?? (row.send_as === "cc" ? "cc" : "to");
+  await updateRow("Contacts", row._row, { ...row, ...c, on_list: onList ? "yes" : "no", send_as: sendAs });
   return loadContacts(project, true);
 }
 

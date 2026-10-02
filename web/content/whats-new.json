@@ -2,6 +2,12 @@
  {
   "date": "2026-10-02",
   "audience": "all",
+  "title": "Contacts: To / Cc and New email",
+  "text": "Set each contact to To or Cc, then press New email to open an Outlook email with everyone filled in. It replaces Copy all emails."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
   "title": "Menu button on phones",
   "text": "On a phone held upright, the top bar's links, your name and Sign out are under the ☰ button at the top right."
  },

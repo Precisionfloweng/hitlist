@@ -156,9 +156,11 @@ export default async function HelpPage() {
           <p>The <b>Contacts</b> tab keeps the project&apos;s email list for the deficiency list in one place, so you don&apos;t have to dig up the last email to find everyone. Techs and admins add, edit and remove contacts; customers don&apos;t see this tab.</p>
           <ul>
             <li>When someone asks to be added, type their name, position, company, trade and email into <b>Add a contact</b>.</li>
-            <li><b>Copy all emails</b> copies every ticked email, separated by semicolons. Paste it into the To line of a new Outlook email.</li>
+            <li>Set each person to <b>To</b> or <b>Cc</b>. PFE staff start on <b>Cc</b>, everyone else on <b>To</b>; tap to switch.</li>
+            <li><b>✉ New email</b> opens a new email in your own mail app (Outlook) with everyone ticked on the To and Cc lines and the project in the subject. Attach the deficiency list and send it as usual. It goes out from your account and shows in your Sent Items.</li>
             <li>Untick <b>On list</b> to leave someone off for now without deleting them. <b>✕</b> removes them for good.</li>
             <li><b>Added</b> shows when each person joined the list, so you can see who&apos;s new since your last send.</li>
+            <li>On an iPad, set Outlook as your email app first: <b>Settings → Apps → Default Apps → Email</b>.</li>
           </ul>
         </section>
 
