@@ -63,6 +63,7 @@ export default async function HelpPage() {
                 <li><b>Equipment checklist</b>: every unit and field, marked done or missing.</li>
                 <li><b>Deficiencies</b>: the punch list, with breakdowns by priority, contractor and contact.</li>
                 <li><b>Notes</b>: the notes entered in BuildingStart. See <a href="#notes">Notes</a>.</li>
+                <li><b>Contacts</b>: who gets the deficiency list. See <a href="#contacts">Contacts</a>.</li>
                 <li><b>Rules</b>: what this project checks, and its tolerances. See <a href="#rules">Rules</a>.</li>
                 <li><b>✨ AI Tools</b> (techs and admins): clean up a deficiency or note before you enter it. See <a href="#ai">AI Tools</a>.</li>
               </ul>
@@ -146,6 +147,17 @@ export default async function HelpPage() {
           <h2>Notes</h2>
           <p>The <b>Notes</b> tab lists every note entered in BuildingStart for the project: <b>Project notes</b> (not tied to a unit) first, then <b>Notes by unit</b>. Notes update on each <b>Sync</b>. To add or change a note, do it in BuildingStart. Customers don&apos;t see notes.</p>
           <p><b>AI Review</b> works on the Notes tab too, the same way as on Deficiencies: Claude flags notes that are unclear or have spelling or grammar problems and suggests clearer wording. <b>Copy</b> it into the note in BuildingStart, or press <b>Keep as is</b>.</p>
+        </section>
+
+        <section id="contacts">
+          <h2>Contacts</h2>
+          <p>The <b>Contacts</b> tab keeps the project&apos;s email list for the deficiency list in one place, so you don&apos;t have to dig up the last email to find everyone. Techs and admins add, edit and remove contacts; customers don&apos;t see this tab.</p>
+          <ul>
+            <li>When someone asks to be added, type their name, company, trade and email into <b>Add a contact</b>.</li>
+            <li><b>Copy all emails</b> copies every ticked email, separated by semicolons. Paste it into the To line of a new Outlook email.</li>
+            <li>Untick <b>On list</b> to leave someone off for now without deleting them. <b>✕</b> removes them for good.</li>
+            <li><b>Added</b> shows when each person joined the list, so you can see who&apos;s new since your last send.</li>
+          </ul>
         </section>
 
         <section id="rules">

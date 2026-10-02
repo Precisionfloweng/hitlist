@@ -2,6 +2,12 @@
  {
   "date": "2026-10-02",
   "audience": "all",
+  "title": "Contacts tab",
+  "text": "Each project has a Contacts tab to keep its deficiency-list email list. Copy all emails copies everyone at once for Outlook."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
   "title": "What's new in Hitlist",
   "text": "The Monday email now starts with Hitlist changes from the last 30 days, and the Help page has a What's new section."
  },

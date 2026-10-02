@@ -3,7 +3,7 @@ import RefreshButton from "../../RefreshButton";
 import { syncLabel } from "../../format";
 import type { Project } from "@/lib/data";
 
-export type ProjectTab = "overview" | "equipment" | "deficiencies" | "notes" | "rules" | "ai";
+export type ProjectTab = "overview" | "equipment" | "deficiencies" | "notes" | "contacts" | "rules" | "ai";
 
 /** Title, sync status and the tabs shared by every page of a project. */
 export default function ProjectHeader({ project: p, tab, missingRequired, rulesChanged, notes, user }:
@@ -17,11 +17,12 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
     { key: "equipment", label: "Equipment checklist", href: `${base}/equipment` },
     { key: "deficiencies", label: "Deficiencies", href: `${base}/deficiencies`, count: p.openDeficiencies },
     { key: "notes", label: "Notes", href: `${base}/notes`, count: notes },
+    { key: "contacts", label: "Contacts", href: `${base}/contacts` },
     { key: "rules", label: "Rules / Tol.", href: `${base}/rules`, count: rulesChanged },
     { key: "ai", label: "AI Tools", href: `${base}/ai` },
   ];
-  // Customers don't see the rules or the techs' notes.
-  const tabs = allTabs.filter((t) => !(user.customer && (t.key === "rules" || t.key === "notes"))
+  // Customers don't see the rules, the techs' notes or the contact list.
+  const tabs = allTabs.filter((t) => !(user.customer && (t.key === "rules" || t.key === "notes" || t.key === "contacts"))
     && !(t.key === "ai" && !user.canSync));            // AI Tools: techs and admins only
   return (
     <div className="phead">

@@ -23,6 +23,9 @@ export const SCHEMA = {
     "open_deficiencies", "open_high"],
   // A project's tolerances (±%) by category, typed in on the project's Rules tab. Website only.
   Tolerances: ["project_number", "category", "pct", "changed_by", "changed_at"],
+  // A project's email list for sending the deficiency list, kept on the project's Contacts tab. Website only.
+  // on_list: "yes" = included in "Copy all emails".
+  Contacts: ["project_number", "id", "name", "company", "trade", "email", "on_list", "added_by", "added_at"],
   // Server heartbeat: "server_last_seen" (worker, every 5 min) and "down_alert_sent_for" (website).
   Status: ["name", "value", "local_time"],
   // One row per sign-in (time in Central). Written by the website only.
