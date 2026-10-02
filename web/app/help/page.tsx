@@ -124,13 +124,13 @@ export default async function HelpPage() {
         <section id="deficiencies">
           <h2>Deficiencies</h2>
           <p>The Deficiencies tab lists every punch item from BuildingStart, with breakdowns by priority, contractor role, assigned contact and status. Filter by open only, priority or contact. <b>Punch items</b> on the projects list is the total count, open and closed.</p>
-          <p><b>Review wording</b> (techs and admins) has Claude read each open deficiency and suggest clearer wording where it helps: what&apos;s wrong, where, measured vs. design, and what&apos;s needed. Edit the suggestion if needed (fill in any <b>___</b>), press <b>Copy</b>, and paste it into the deficiency in BuildingStart. After the next <b>Sync</b>, updated items move to <b>Reads well</b>. New or changed items show under <b>Not reviewed yet</b> until you review again. If you&apos;d rather keep the original wording, press <b>Keep as is</b>: the item moves to Reads well (tagged <b>Kept as is</b>, with <b>Undo</b>) and comes back only if its wording changes.</p>
+          <p><b>AI Review</b> (techs and admins) has Claude read each open deficiency and suggest clearer wording where it helps: what&apos;s wrong, where, measured vs. design, and what&apos;s needed. Edit the suggestion if needed (fill in any <b>___</b>), press <b>Copy</b>, and paste it into the deficiency in BuildingStart. After the next <b>Sync</b>, updated items move to <b>Reads well</b>. New or changed items show under <b>Not reviewed yet</b> until you review again. If you&apos;d rather keep the original wording, press <b>Keep as is</b>: the item moves to Reads well (tagged <b>Kept as is</b>, with <b>Undo</b>) and comes back only if its wording changes.</p>
         </section>
 
         <section id="notes">
           <h2>Notes</h2>
           <p>The <b>Notes</b> tab lists every note entered in BuildingStart for the project: <b>Project notes</b> (not tied to a unit) first, then <b>Notes by unit</b>. Notes update on each <b>Sync</b>. To add or change a note, do it in BuildingStart. Customers don&apos;t see notes.</p>
-          <p><b>Review wording</b> works on the Notes tab too, the same way as on Deficiencies: Claude flags notes that are unclear or have spelling or grammar problems and suggests clearer wording. <b>Copy</b> it into the note in BuildingStart, or press <b>Keep as is</b>.</p>
+          <p><b>AI Review</b> works on the Notes tab too, the same way as on Deficiencies: Claude flags notes that are unclear or have spelling or grammar problems and suggests clearer wording. <b>Copy</b> it into the note in BuildingStart, or press <b>Keep as is</b>.</p>
         </section>
 
         <section id="rules">

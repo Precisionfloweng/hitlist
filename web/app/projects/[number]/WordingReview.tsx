@@ -112,7 +112,7 @@ export default function WordingReview({ project, kind, items, initial, canReview
               if (confirm(`Every ${notes ? "note" : "open item"} has already been reviewed. Review them all again?`)) review(true);
             } else review();
           }}>
-            {busy ? "Reviewing…" : !never && pending.length === 0 ? "✎ Review all again" : "✎ Review wording"}
+            {busy ? "Reviewing…" : !never && pending.length === 0 ? "✎ AI Review again" : "✎ AI Review"}
           </button>
         )}
         <span className="muted">
