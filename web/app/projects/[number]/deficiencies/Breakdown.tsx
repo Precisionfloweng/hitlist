@@ -1,4 +1,6 @@
-export default function Breakdown({ title, rows }: { title: string; rows: { value: string; count: number }[] }) {
+export default function Breakdown({ title, rows, showTotal = false }:
+  { title: string; rows: { value: string; count: number }[]; showTotal?: boolean }) {
+  const total = rows.reduce((n, r) => n + r.count, 0);
   const max = Math.max(1, ...rows.map((r) => r.count));
   return (
     <div className="card">
@@ -10,6 +12,9 @@ export default function Breakdown({ title, rows }: { title: string; rows: { valu
               <td><div className="bar"><span style={{ width: `${(100 * r.count) / max}%` }} /></div></td>
               <td className="num" style={{ width: 50 }}>{r.count}</td></tr>
           ))}
+          {showTotal && (
+            <tr className="breakdown-total"><td><b>Total</b></td><td /><td className="num"><b>{total}</b></td></tr>
+          )}
         </tbody></table>
       )}
     </div>

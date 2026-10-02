@@ -34,7 +34,7 @@ export default async function DeficienciesPage({ params }: { params: Promise<{ n
               <Breakdown title="Open by priority" rows={group("open_priority")} />
               <Breakdown title="Open by contractor role" rows={group("open_role")} />
               <Breakdown title="Open by assigned contact" rows={group("open_contact")} />
-              <Breakdown title="All by status" rows={group("status")} />
+              <Breakdown title="All by status" rows={group("status")} showTotal />
             </div>
             {results && wording && (
               <WordingReview project={p.id} kind="deficiencies" items={deficiencyItems(results.deficiencies)} initial={wording} canReview={canEdit(user)} />

@@ -292,3 +292,5 @@ button.linkish { border: 0; background: none; padding: 4px 2px; color: var(--mut
 /* Banner when the server hasn't checked in */
 .server-down { background: #fff4e5; border-bottom: 1px solid #f5d29a; color: #7a3e00; padding: 10px 24px; font-size: 14px; }
 .server-down .muted { color: #9a6a33; }
+
+.breakdown-total td { border-top: 2px solid var(--line); border-bottom: 0; }
