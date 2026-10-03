@@ -342,3 +342,16 @@ def test_weekly_summary_whats_new(tmp_path):
     mail2 = Mailer("app@example.com", "")
     send_weekly_summary(store, s, mail2, now=now, dry_run=True, whats_new=[])
     assert "New in Hitlist" not in mail2.sent[0].get_body(("html",)).get_content()
+
+
+def test_weekly_summary_whats_new_shows_ten_then_a_link(tmp_path):
+    from hitlist.summary import whats_new_block
+    now = datetime(2026, 10, 5, 12, tzinfo=timezone.utc)
+    entries = [{"date": f"2026-10-{d:02d}", "audience": "all", "title": f"Change {d}", "text": "x"} for d in range(1, 5)] * 4
+    html, text = whats_new_block(entries, admin=False, now=now, app_url="https://site.example")
+    assert html.count("Change ") == 10 and "See all 16 changes in Hitlist" in html
+    assert 'href="https://site.example/help#whats-new"' in html and "...and 6 more: https://site.example/help#whats-new" in text
+    admin_html, _ = whats_new_block(entries, admin=True, now=now, app_url="https://site.example")
+    assert "https://site.example/admin/whats-new" in admin_html
+    few, _ = whats_new_block(entries[:3], admin=False, now=now, app_url="https://site.example")
+    assert "See all" not in few

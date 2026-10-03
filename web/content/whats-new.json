@@ -2,6 +2,12 @@
  {
   "date": "2026-10-03",
   "audience": "all",
+  "title": "Shorter Monday email",
+  "text": "The Monday email lists the 10 newest Hitlist changes, with a link to see the rest on the Help page."
+ },
+ {
+  "date": "2026-10-03",
+  "audience": "all",
   "title": "My projects stays on",
   "text": "The My projects tick on the projects list is remembered on each device, so it's still on when you come back."
  },

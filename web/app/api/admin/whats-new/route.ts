@@ -4,11 +4,12 @@ import { sendMail } from "@/lib/mail";
 import { RECENT_DAYS, whatsNew, whatsNewEmailHtml } from "@/lib/whatsNew";
 
 /** Email the signed-in admin a preview of the "New in Hitlist" part of the Monday email. */
-export async function POST() {
+export async function POST(req: Request) {
   const me = await currentUser();
   if (!me || me.role !== "admin") return NextResponse.json({ error: "Admins only" }, { status: 403 });
-  const tech = whatsNewEmailHtml(whatsNew(false, RECENT_DAYS));
-  const admin = whatsNewEmailHtml(whatsNew(true, RECENT_DAYS));
+  const site = new URL(req.url).origin;
+  const tech = whatsNewEmailHtml(whatsNew(false, RECENT_DAYS), site, false);
+  const admin = whatsNewEmailHtml(whatsNew(true, RECENT_DAYS), site, true);
   try {
     await sendMail(me.email, "Preview: New in Hitlist (Monday email)",
       `<p style="margin:0 0 10px"><b>What techs will see:</b></p>${tech || "<p>(nothing new in the last 30 days)</p>"}` +

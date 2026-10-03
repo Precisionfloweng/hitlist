@@ -122,8 +122,13 @@ def load_whats_new(settings: Settings) -> list[dict[str, str]]:
         return []
 
 
-def whats_new_block(entries: list[dict[str, str]], admin: bool, now: datetime | None = None) -> tuple[str, str]:
-    """HTML and text for "New in Hitlist" (last 30 days), or ("", "") when there's nothing new."""
+WHATS_NEW_SHOWN = 10        # the newest changes shown in the email; the rest are a link away
+
+
+def whats_new_block(entries: list[dict[str, str]], admin: bool, now: datetime | None = None,
+                    app_url: str = "") -> tuple[str, str]:
+    """HTML and text for "New in Hitlist" (last 30 days): the 10 newest, then a link to the full list.
+    ("", "") when there's nothing new."""
     since = ((now or datetime.now(timezone.utc)).astimezone() - timedelta(days=WHATS_NEW_DAYS)).date().isoformat()
     items = sorted((e for e in entries if e.get("date", "") >= since and (admin or e.get("audience") == "all")),
                    key=lambda e: e.get("date", ""), reverse=True)
@@ -134,13 +139,22 @@ def whats_new_block(entries: list[dict[str, str]], admin: bool, now: datetime | 
             return datetime.fromisoformat(d).strftime("%b %d").replace(" 0", " ")
         except ValueError:
             return d
+    shown, more = items[:WHATS_NEW_SHOWN], len(items) - WHATS_NEW_SHOWN
+    base = (app_url or "").rstrip("/")
+    full = f"{base}/admin/whats-new" if admin else f"{base}/help#whats-new"
     rows = "".join(
         f'<tr><td valign="top" style="padding:9px 12px 9px 0;border-top:1px solid #e3dcf3;font-family:{FONT};'
         f'font-size:12px;color:#7a6aa8;white-space:nowrap;width:52px">{esc(day(e.get("date", "")))}</td>'
         f'<td valign="top" style="padding:9px 0;border-top:1px solid #e3dcf3;font-family:{FONT};font-size:14px;'
         f'line-height:1.4;color:#1c2430"><b>{esc(e.get("title"))}</b>'
         f'{ADMIN_TAG if e.get("audience") == "admins" else ""}'
-        f'<br><span style="color:#475467">{esc(e.get("text"))}</span></td></tr>' for e in items)
+        f'<br><span style="color:#475467">{esc(e.get("text"))}</span></td></tr>' for e in shown)
+    if more > 0:
+        label = f"See all {len(items)} changes in Hitlist &rarr;"
+        link = (f'<a href="{esc(full)}" style="color:#4b3591;font-weight:bold;text-decoration:none">{label}</a>'
+                if base else f'<span style="color:#4b3591;font-weight:bold">+ {more} more on the Help page</span>')
+        rows += (f'<tr><td></td><td style="padding:10px 0 6px;border-top:1px solid #e3dcf3;font-family:{FONT};'
+                 f'font-size:14px">{link}</td></tr>')
     html = (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
             f'style="background:#f7f4fd;border:1px solid #d9cff0;margin:0 0 18px">'
             f'<tr><td style="padding:12px 16px 4px;font-family:{FONT};font-size:15px;font-weight:bold;color:#4b3591">'
@@ -148,7 +162,10 @@ def whats_new_block(entries: list[dict[str, str]], admin: bool, now: datetime | 
             f'<tr><td style="padding:0 16px 6px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
             f'{rows}</table></td></tr></table>')
     text = "NEW IN HITLIST (last 30 days)\n" + "\n".join(
-        f"- {day(e.get('date', ''))}  {e.get('title')}: {e.get('text')}" for e in items) + "\n\n"
+        f"- {day(e.get('date', ''))}  {e.get('title')}: {e.get('text')}" for e in shown)
+    if more > 0:
+        text += f"\n...and {more} more" + (f": {full}" if base else " on the Help page")
+    text += "\n\n"
     return html, text
 
 
@@ -156,8 +173,8 @@ def send_weekly_summary(store: HitlistStore, settings: Settings, mailer: Mailer,
                         now: datetime | None = None, dry_run: bool = False,
                         whats_new: list[dict[str, str]] | None = None) -> dict[str, int]:
     entries = load_whats_new(settings) if whats_new is None else whats_new
-    new_tech, new_tech_text = whats_new_block(entries, admin=False, now=now)
-    new_admin, new_admin_text = whats_new_block(entries, admin=True, now=now)
+    new_tech, new_tech_text = whats_new_block(entries, admin=False, now=now, app_url=settings.app_url)
+    new_admin, new_admin_text = whats_new_block(entries, admin=True, now=now, app_url=settings.app_url)
     projects = active_projects(store, now)
     by_email: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for p in projects:
