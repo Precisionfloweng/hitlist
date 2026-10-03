@@ -7,6 +7,7 @@ type Answer = { question: string; answer: string; found: boolean; sources: Sourc
   tolerances: Record<string, string> | null; at: string; by: string };
 type Job = { status: "queued" | "running" | "done" | "failed"; step: string; ahead: number } | null;
 type Info = { folder: string; updated: string; status: string; job: Job; found: Record<string, number> | null;
+  missing?: string[]; otherTypes?: Record<string, string[]>;
   files: number; pages: number; skipped: { name: string; category: string; reason: string }[]; history: Answer[] };
 
 const FOLDERS = ["Drawings and Specs", "Submittal", "TAB Plan", "ASIs and RFIs", "Change Orders"];
@@ -147,8 +148,17 @@ export default function DocsAsk({ project, units }: { project: string; units: st
               {info.found && (
                 <div className="docs-counts">
                   {FOLDERS.map((f) => (
-                    <span key={f} className={info.found![f] ? "" : "zero"}>{f} <b>{info.found![f] ?? 0}</b></span>
+                    <span key={f} className={info.found![f] ? "" : "zero"}
+                      title={info.missing?.includes(f) ? "There's no folder with this name in the project folder" : undefined}>
+                      {f} {info.missing?.includes(f) ? <i>no folder</i> : <b>{info.found![f] ?? 0}</b>}
+                    </span>
                   ))}
+                </div>
+              )}
+              {info.otherTypes && Object.keys(info.otherTypes).length > 0 && (
+                <div className="muted" style={{ fontSize: 13 }}>
+                  Not read (file types Hitlist can&apos;t read yet): {Object.entries(info.otherTypes)
+                    .map(([f, types]) => `${f}: ${types.join(", ")}`).join(" · ")}
                 </div>
               )}
               {info.updated && <div className="muted" style={{ fontSize: 13 }}>

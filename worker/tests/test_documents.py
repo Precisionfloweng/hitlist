@@ -270,3 +270,16 @@ def test_two_projects_on_one_job_get_their_own_site_folders(tmp_path, monkeypatc
         process_docs_job(store, st, next(j for j in store.rows("Queue") if j["id"] == job_id), dbx=dbx)
     assert store.project("99-005")["dropbox_path"].endswith("North Elementary")
     assert store.project("99-005-2")["dropbox_path"].endswith("South Elementary")
+
+
+def test_folder_names_that_differ_slightly_still_match_and_unread_types_are_reported():
+    dbx = FakeDbx()
+    base = "/techs/sam tech/99-006 sample annex"
+    for p in (base, f"{base}/02 - Submittals", f"{base}/Drawings & Specs", f"{base}/Contract"):
+        dbx.add_folder(p)
+    dbx.add_file(f"{base}/02 - Submittals/Fans.pdf", pdf_bytes(["Fan data"]))
+    dbx.add_file(f"{base}/Drawings & Specs/M-101.dwg", b"x")
+    m = update_documents(dbx, dbx.metadata(base), "99-006", None, lambda n, b: None)
+    assert m["found"]["Submittal"] == 1 and m["found"]["Drawings and Specs"] == 0
+    assert m["other_types"] == {"Drawings and Specs": [".dwg"]}
+    assert set(m["missing"]) == {"TAB Plan", "ASIs and RFIs", "Change Orders"}

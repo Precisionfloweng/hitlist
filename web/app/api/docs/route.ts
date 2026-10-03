@@ -22,7 +22,7 @@ export async function GET(req: Request) {
   const [job, manifest, history] = await Promise.all([docsJob(g.project.id), loadManifest(g.project.id), loadHistory(g.project.id)]);
   return NextResponse.json({
     folder: manifest?.folder.path || g.project.dropboxPath, updated: g.project.docsUpdated, status: g.project.docsStatus, job,
-    found: manifest?.found ?? null,
+    found: manifest?.found ?? null, missing: manifest?.missing ?? [], otherTypes: manifest?.other_types ?? {},
     files: manifest?.files.length ?? 0, pages: manifest?.files.reduce((n, f) => n + f.pages, 0) ?? 0,
     skipped: (manifest?.skipped ?? []).map((s) => ({ name: s.name, category: s.category, reason: s.reason })),
     history: history.slice(0, 20),

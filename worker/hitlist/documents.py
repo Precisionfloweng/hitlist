@@ -113,9 +113,29 @@ def find_project_folder(dbx: Dropbox, tech_root: str, number: str, name: str,
 STANDARD_FOLDERS = DOC_FOLDERS + ["Deficiency Reports", "Contract", "Field Notes", "Final Report"]
 
 
+def folder_key(name: str) -> str:
+    """A folder name reduced so small differences don't matter: "02 - Submittals", "Drawings & Specs",
+    "ASI's and RFI's" match "Submittal", "Drawings and Specs", "ASIs and RFIs"."""
+    t = name.lower().replace("&", " and ").replace("'", "")
+    t = re.sub(r"^[\s\d._-]+", "", t)                         # a leading number
+    words = [w[:-1] if len(w) > 3 and w.endswith("s") else w for w in re.findall(r"[a-z0-9]+", t)]
+    return " ".join(words)
+
+
+def match_folder(folders: list[dict], wanted: str) -> dict | None:
+    """The folder that is `wanted` (exact name, or the same apart from small differences)."""
+    key = folder_key(wanted)
+    exact = [f for f in folders if folder_key(f["name"]) == key]
+    if exact:
+        return exact[0]
+    words = set(key.split())
+    loose = [f for f in folders if words <= set(folder_key(f["name"]).split())]
+    return loose[0] if len(loose) == 1 else None
+
+
 def _is_project_level(dbx: Dropbox, folder: dict) -> bool:
-    names = {" ".join(f["name"].split()).lower() for f in dbx.folders(folder["path_lower"])}
-    return sum(s.lower() in names for s in STANDARD_FOLDERS) >= 2
+    subs = dbx.folders(folder["path_lower"])
+    return sum(match_folder(subs, s) is not None for s in STANDARD_FOLDERS) >= 2
 
 
 def documents_folder(dbx: Dropbox, folder: dict, name: str) -> dict:
@@ -144,7 +164,7 @@ def last_punch_list(dbx: Dropbox, folder: dict) -> dict | None:
     """The newest file in the project's Deficiency Reports folder (techs save each sent punch list there):
     {"name", "date"}; {} when the folder is empty; None when the project folder has no such folder.
     Only names and dates are read, never the files."""
-    sub = find_folder(dbx.folders(folder["path_lower"]), PUNCH_FOLDER)
+    sub = match_folder(dbx.folders(folder["path_lower"]), PUNCH_FOLDER)
     if not sub:
         return None
     files = [e for e in dbx.list_all(sub["path_lower"]) if e.get(".tag") == "file"]
@@ -237,19 +257,25 @@ def update_documents(dbx: Dropbox, folder: dict, project: str, previous: dict | 
     """Read the project's document folders and upload what changed. Returns the new manifest
     (also uploaded last, so the website never points at parts that aren't there yet)."""
     old = {f["id"]: f for f in (previous or {}).get("files", []) if f.get("parts")}
-    subs = {re.sub(r"\s+", " ", f["name"]).lower(): f for f in dbx.folders(folder["path_lower"])}
+    subs = dbx.folders(folder["path_lower"])
     files: list[dict] = []
     skipped: list[dict] = []
     found: dict[str, int] = {}
+    missing: list[str] = []                 # standard folders not in the project folder at all
+    other: dict[str, list[str]] = {}        # files of types that aren't read (.dwg, .zip, images...), by folder
     for category in DOC_FOLDERS:
-        sub = subs.get(category.lower())
+        sub = match_folder(subs, category)
         found[category] = 0
         if not sub:
+            missing.append(category)
             continue
         for e in sorted((e for e in dbx.list_all(sub["path_lower"]) if e.get(".tag") == "file"),
                         key=lambda e: e["path_lower"]):
             rel = e["path_display"][len(sub["path_display"]):].lstrip("/")
             if not e["name"].lower().endswith(READABLE):
+                ext = Path(e["name"]).suffix.lower() or "(no type)"
+                if ext not in other.setdefault(category, []):
+                    other[category].append(ext)
                 continue
             found[category] += 1
             entry = {"id": e["id"], "category": category, "name": e["name"], "path": rel,
@@ -283,7 +309,8 @@ def update_documents(dbx: Dropbox, folder: dict, project: str, previous: dict | 
             files.append({**entry, "pages": len(pages), "parts": parts})
     manifest = {"project": project, "folder": {"id": folder["id"], "path": folder.get("path_display", ""),
                                                "name": folder.get("name", "")},
-                "updated_at": now, "found": found, "files": files, "skipped": skipped}
+                "updated_at": now, "found": found, "missing": missing, "other_types": other,
+                "files": files, "skipped": skipped}
     step("Saving document index")
     upload("manifest", gz(manifest))
     return manifest
