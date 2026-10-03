@@ -468,3 +468,9 @@ header.top .top-drop form button { background: transparent; }
 .tol-value.none { font-weight: 400; font-size: 13px; color: var(--muted); }
 .tol-view .tol-item { padding: 5px 0; font-size: 14px; }
 .tol-view .tol-group-name { font-size: 15px; }
+
+/* Overview type cards: units complete on the left, % complete on the right */
+.tc-row { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+.tc-units { font-size: 11px; }
+.tc-pct { font-size: 18px; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; }
+.tc-pct.full { color: var(--ok); }

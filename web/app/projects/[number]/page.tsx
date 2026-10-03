@@ -84,9 +84,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                   const done = t.summary.units_complete, n = t.summary.units;
                   const pctDone = n ? (100 * done) / n : 0;
                   return (
-                    <Link key={t.key} href={eqHref(t.key)} className={`type-card${pctDone >= 100 ? " full" : ""}`} title={`${t.name}: ${done} of ${n} units fully complete`}>
+                    <Link key={t.key} href={eqHref(t.key)} className={`type-card${pctDone >= 100 ? " full" : ""}`} title={`${t.name}: ${done} of ${n} units fully complete, ${Math.round(t.summary.fields_pct)}% of required fields filled`}>
                       <span className="tc-name">{t.name}</span>
-                      <span className="tc-num"><b>{done}</b> / {n}</span>
+                      <span className="tc-row">
+                        <span className="tc-num"><b>{done}</b> / {n} <span className="tc-units">units</span></span>
+                        <span className={`tc-pct${t.summary.fields_pct >= 100 ? " full" : ""}`} title="Required fields filled for this equipment type (same as the Equipment checklist)">{Math.round(t.summary.fields_pct)}%</span>
+                      </span>
                       <span className={`tc-bar ${pctDone >= 100 ? "full" : ""}`}><span style={{ width: `${pctDone}%` }} /></span>
                     </Link>
                   );

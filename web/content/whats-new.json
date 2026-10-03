@@ -2,6 +2,12 @@
  {
   "date": "2026-10-03",
   "audience": "all",
+  "title": "% complete on Overview cards",
+  "text": "Each equipment type card on the Overview shows its % complete (required fields filled) next to the units fully complete."
+ },
+ {
+  "date": "2026-10-03",
+  "audience": "all",
   "title": "Tolerances on the Overview",
   "text": "The Overview's Tolerances section is now a full-size card, closed until you tap it, with each group's + and − values easy to read."
  },
