@@ -126,7 +126,7 @@ def connection_report(dbx: Dropbox, tech_folder: str) -> list[str]:
     acct = dbx.account()
     team = dbx.use_team_space(acct)
     out = [f"Connected to Dropbox as {acct.get('name', {}).get('display_name', '?')}"
-           f" ({'team account' if team else 'personal account'})."]
+           f" ({'team account' if team or acct.get('team') else 'personal account'})."]
     kind = (acct.get("account_type") or {}).get(".tag", "?")
     team_name = (acct.get("team") or {}).get("name", "")
     out.append(f"  Email: {acct.get('email', '?')} | Dropbox plan: {kind}"
@@ -143,7 +143,8 @@ def connection_report(dbx: Dropbox, tech_folder: str) -> list[str]:
             dbx.path_root = saved
     if not top:
         out.append("Dropbox shows this app an empty folder. That happens when the app was created with "
-                   "'App folder' access instead of 'Full Dropbox' (see Permission type on the app's Settings tab). "
+                   "'App folder' access instead of 'Full Dropbox' (an App folder app has an 'App folder name' row on its "
+                   "Settings tab). "
                    "Create a new app with Full Dropbox, then run: python -m hitlist dropbox-setup --relink")
         return out
     if not tech:
