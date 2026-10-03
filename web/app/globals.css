@@ -408,3 +408,14 @@ header.top .top-drop form button:hover { background: #f5f6f8; }
 .docs-history > summary { cursor: pointer; font-weight: 600; }
 .docs-hist-item { margin: 8px 0 0 4px; }
 .docs-hist-item > summary { cursor: pointer; }
+
+/* AI Tools: secondary buttons look raised and tinted, so they can't be mistaken for input boxes */
+.ai-tools button:not(.primary) {
+  background: linear-gradient(#ffffff, #e9f0f8); border: 1px solid #9fb3cc; color: var(--brand); font-weight: 600;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .14), inset 0 1px 0 #fff;
+}
+.ai-tools button:not(.primary):hover:not(:disabled) { background: linear-gradient(#f4f8fc, #dce7f3); border-color: var(--brand); }
+.ai-tools button:not(.primary):active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
+.ai-tools .seg button { background: #fff; border: 0; box-shadow: none; color: var(--ink); font-weight: 400; }
+.ai-tools .seg button.on { background: var(--brand); color: #fff; }
+.ai-tools button.primary { box-shadow: 0 1px 2px rgba(16, 24, 40, .2); }
