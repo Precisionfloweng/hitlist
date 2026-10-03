@@ -118,7 +118,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   return (
     <div className="card ai-card docs-card">
       <div className="ai-head">
-        <span className="ai-spark" aria-hidden>📄</span>
+        <span className="ai-spark" aria-hidden>✨</span>
         <div>
           <b>Ask the documents</b>
           <div className="muted" style={{ fontSize: 13 }}>

@@ -381,7 +381,7 @@ header.top .top-drop form button:hover { background: #f5f6f8; }
 }
 
 /* AI Tools: Ask the documents */
-.docs-card { border-top: 3px solid #2f6fb3; }
+.ai-card { border-top: 3px solid #2f6fb3; }
 .docs-status { background: #f6f8fb; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
 .docs-folder { font-weight: 600; word-break: break-word; }
 .docs-working { margin-top: 6px; color: #2f6fb3; font-weight: 600; }
