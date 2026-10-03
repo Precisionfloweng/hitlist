@@ -107,6 +107,9 @@ def read_pages(path: Path) -> list[str]:
     ext = path.suffix.lower()
     if ext == ".pdf":
         import pymupdf
+        # Many CAD-exported PDFs have small internal glitches MuPDF repairs on the fly; don't print each one.
+        pymupdf.TOOLS.mupdf_display_errors(False)
+        pymupdf.TOOLS.mupdf_display_warnings(False)
         with pymupdf.open(path) as doc:
             return [_clean(page.get_text("text")) for page in doc]
     if ext in (".xlsx", ".xlsm"):
