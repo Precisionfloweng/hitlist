@@ -61,7 +61,7 @@ cd C:\Hitlist\worker
 .venv\Scripts\activate
 python -m hitlist dropbox-setup
 ```
-   Paste the **App key**, then the **App secret** (from the app's Settings tab; the secret isn't shown as you type).
+   Paste the **App key**, then the **App secret** (from the app's Settings tab; click Show for the secret). Ctrl+V or right-click pastes.
    A Dropbox page opens: sign in with the PFE account, click **Allow**, copy the code it shows and paste it back.
    The key, secret and refresh token are saved in `.env`. The command then lists the technician folders and
    how many project folders each has. Run `python -m hitlist dropbox-test` any time to see that list again.

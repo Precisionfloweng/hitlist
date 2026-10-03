@@ -140,9 +140,20 @@ def main(argv: list[str] | None = None) -> int:
     return 1
 
 
+def _ask_token(label: str, current: str) -> str:
+    """Ask for a key or secret (pasted). Rejects blanks and stray characters, e.g. a paste that didn't go in."""
+    if current:
+        return current
+    while True:
+        v = input(f"{label}: ").strip()
+        if v and v.isalnum():
+            return v
+        print("  That doesn't look right (it should be letters and numbers only). Paste it again;"
+              " in this window right-click also pastes.")
+
+
 def _dropbox(args) -> int:
     """Connect the Dropbox app (the key goes into .env, never on screen) and list what it can see."""
-    import getpass
     import webbrowser
     from .config import Settings, load_dotenv
     from .dropbox import Dropbox, DropboxError, authorize_url, connection_report, exchange_code, set_env_values
@@ -151,8 +162,9 @@ def _dropbox(args) -> int:
     st = Settings.from_env(None)
     try:
         if args.cmd == "dropbox-setup" and (args.relink or not st.dropbox_refresh_token):
-            key = st.dropbox_app_key or input("Dropbox App key (Settings tab of the app): ").strip()
-            secret = st.dropbox_app_secret or getpass.getpass("Dropbox App secret (typing is hidden): ").strip()
+            # Plain input, not a hidden prompt: Windows' hidden prompt ignores Ctrl+V, so a pasted secret goes missing.
+            key = _ask_token("Dropbox App key (Settings tab of the app)", st.dropbox_app_key if not args.relink else "")
+            secret = _ask_token("Dropbox App secret (same tab, click Show)", st.dropbox_app_secret if not args.relink else "")
             url = authorize_url(key)
             print("\nOpening Dropbox. Sign in with the PFE account, click Continue, then Allow.")
             print(f"If no browser opens, copy this into one:\n  {url}\n")
