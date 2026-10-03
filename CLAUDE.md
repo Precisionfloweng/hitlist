@@ -24,7 +24,8 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   the server's .env (`hitlist dropbox-setup`). The team's shared folders are read from the team root (path root).
 - `hitlist/documents.py`: project folder = folder starting with the job number in a technician folder (or directly
   under the technicians folder), the name must clearly pick one when a number is shared (else it asks for Change folder), folders
-  linked to another project with the same number are skipped; reads only Drawings and Specs, Submittal, TAB Plan, ASIs and RFIs,
+  linked to another project with the same number are skipped; a job folder without the standard folders but with a
+  folder per site uses the site folder that clearly matches the Hitlist name (`documents_folder`, `best_by_name`); reads only Drawings and Specs, Submittal, TAB Plan, ASIs and RFIs,
   Change Orders; page text (PyMuPDF) sent gzipped in parts to `POST /api/worker/docs/{project}?part=`, manifest last.
   Unchanged files (Dropbox content hash) are skipped. Queue rows with kind "docs" are document updates; each sync
   queues one. Projects columns dropbox_id, dropbox_path (pasted path or found), docs_updated, docs_status.

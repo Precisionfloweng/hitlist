@@ -230,3 +230,43 @@ def test_refresh_punch_lists_links_projects_and_feeds_the_monday_email(tmp_path)
     msg = next(m for m in mail.sent if m["To"] == "tech@example.com")
     assert "Last punch list" in msg.get_body(("html",)).get_content()
     assert "Last punch list: 7 days ago" in msg.get_body(("plain",)).get_content()
+
+
+def test_job_folder_with_a_folder_per_site():
+    from hitlist.documents import documents_folder
+    dbx = FakeDbx()
+    job = "/techs/sam tech/99-005 sample district two schools"
+    for site in ("North Elementary", "South Elementary"):
+        dbx.add_folder(f"{job}/{site}")
+        for sub in ("Submittal", "Drawings and Specs", "Deficiency Reports"):
+            dbx.add_folder(f"{job}/{site}/{sub}")
+    dbx.add_folder(job)
+    folder = dbx.metadata(job)
+    assert documents_folder(dbx, folder, "Sample District South Elementary")["name"] == "South Elementary"
+    assert documents_folder(dbx, folder, "North Elementary")["name"] == "North Elementary"
+    with pytest.raises(DocsError, match="has a folder for each site"):
+        documents_folder(dbx, folder, "Something Else")
+    plain = dbx.metadata("/techs/alex tech/99-001 sample building")      # standard folders right inside
+    assert documents_folder(dbx, plain, "Sample Building") is plain or documents_folder(dbx, plain, "x")["id"] == plain["id"]
+
+
+def test_two_projects_on_one_job_get_their_own_site_folders(tmp_path, monkeypatch):
+    store = make_store()
+    job = "/techs/sam tech/99-005 sample district two schools"
+    dbx = FakeDbx()
+    for site in ("North Elementary", "South Elementary"):
+        dbx.add_folder(f"{job}/{site}")
+        for sub in ("Submittal", "Deficiency Reports"):
+            dbx.add_folder(f"{job}/{site}/{sub}")
+    dbx.add_folder(job)
+    store.append("Projects", [
+        {"project_number": "99-005", "name": "North Elementary", "status": "active", "dropbox_id": dbx.metadata(job)["id"]},
+        {"project_number": "99-005", "project_id": "99-005-2", "name": "South Elementary", "status": "active"}])
+    st = Settings(docs_dir=tmp_path, app_url="https://x.example", worker_secret="s" * 20, dropbox_app_key="k",
+                  dropbox_app_secret="s", dropbox_refresh_token="t", dropbox_tech_folder="Techs")
+    monkeypatch.setattr("hitlist.runner._docs_uploader", lambda s, n: (lambda part, body: None))
+    for key in ("99-005-2", "99-005"):          # the second site first, while the first still points at the job folder
+        job_id = store.request_refresh(key, "x", kind="docs")
+        process_docs_job(store, st, next(j for j in store.rows("Queue") if j["id"] == job_id), dbx=dbx)
+    assert store.project("99-005")["dropbox_path"].endswith("North Elementary")
+    assert store.project("99-005-2")["dropbox_path"].endswith("South Elementary")

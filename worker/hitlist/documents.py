@@ -44,6 +44,29 @@ def starts_with_number(folder_name: str, number: str) -> bool:
     return bool(number) and re.match(rf"^{re.escape(number.strip())}(?![0-9A-Za-z])", folder_name.strip(), re.I) is not None
 
 
+def _words(text: str) -> set[str]:
+    return set(re.findall(r"[a-z0-9]+", (text or "").lower()))
+
+
+def best_by_name(items: list[dict], name: str, label=lambda f: f["name"]) -> dict | None:
+    """The item whose name clearly matches `name`, or None when it isn't clear. Words every item shares
+    (the job name, "ES", "Elementary"...) are ignored, so "North Elementary" vs "South Elementary" is decided by
+    North/South. Falls back to overall similarity when no distinguishing word appears in the name."""
+    want = _words(name)
+    common = set.intersection(*(_words(label(f)) for f in items)) if items else set()
+    def score(f: dict) -> float:
+        own = _words(label(f)) - common
+        return len(own & want) / len(own) if own else 0.0
+    ranked = sorted(items, key=score, reverse=True)
+    if len(ranked) == 1:
+        return ranked[0]
+    if score(ranked[0]) > 0 and score(ranked[0]) > score(ranked[1]):
+        return ranked[0]
+    ranked = sorted(items, key=lambda f: similarity(label(f), name or ""), reverse=True)
+    best, second = similarity(label(ranked[0]), name or ""), similarity(label(ranked[1]), name or "")
+    return ranked[0] if best >= 0.35 and best - second >= 0.1 else None
+
+
 def folder_index(dbx: Dropbox, tech_root: str) -> list[dict]:
     """Every folder inside the technician folders, plus folders sitting directly under the technicians folder:
     the places a project folder can be. Listing this once lets many projects be matched cheaply."""
@@ -73,18 +96,44 @@ def pick_project_folder(index: list[dict], number: str, name: str, taken: set[st
     if len(free) == 1:
         return free[0]
     rest = lambda f: re.sub(rf"^{re.escape(number)}\W*", "", f["name"], flags=re.I)  # noqa: E731
-    ranked = sorted(free, key=lambda f: similarity(rest(f), name or ""), reverse=True)
-    best, second = similarity(rest(ranked[0]), name or ""), similarity(rest(ranked[1]), name or "")
-    if best < 0.35 or best - second < 0.1:
-        names = "; ".join(f["name"] for f in ranked[:6])
+    best = best_by_name(free, name, rest)
+    if best is None:
+        names = "; ".join(f["name"] for f in free[:6])
         raise DocsError(f"Several Dropbox folders start with {number} and the name doesn't clearly pick one "
                         f"({names}). Use Change folder on the AI Tools tab to choose.")
-    return ranked[0]
+    return best
 
 
 def find_project_folder(dbx: Dropbox, tech_root: str, number: str, name: str,
                         taken: set[str] | None = None) -> dict | None:
     return pick_project_folder(folder_index(dbx, tech_root), number, name, taken)
+
+
+# Folders every project folder has; two or more of them means "this is the project's document folder".
+STANDARD_FOLDERS = DOC_FOLDERS + ["Deficiency Reports", "Contract", "Field Notes", "Final Report"]
+
+
+def _is_project_level(dbx: Dropbox, folder: dict) -> bool:
+    names = {" ".join(f["name"].split()).lower() for f in dbx.folders(folder["path_lower"])}
+    return sum(s.lower() in names for s in STANDARD_FOLDERS) >= 2
+
+
+def documents_folder(dbx: Dropbox, folder: dict, name: str) -> dict:
+    """The folder that holds Drawings and Specs, Submittal, etc. Usually the job folder itself; when one job
+    number covers several sites, the job folder holds a folder per site and the standard folders are inside
+    those. Then the site folder whose name clearly matches the Hitlist name is used (one site: that one)."""
+    if _is_project_level(dbx, folder):
+        return folder
+    sites = [f for f in dbx.folders(folder["path_lower"]) if _is_project_level(dbx, f)]
+    if not sites:
+        return folder                                   # no standard folders anywhere yet: keep the job folder
+    if len(sites) == 1:
+        return sites[0]
+    best = best_by_name(sites, name)
+    if best is None:
+        raise DocsError(f"{folder['name']} has a folder for each site ({'; '.join(f['name'] for f in sites[:6])}) and the "
+                        f"project name doesn't clearly pick one. Use Change folder on the AI Tools tab to choose.")
+    return best
 
 
 # ---- last punch list sent -----------------------------------------------------------------

@@ -102,7 +102,7 @@ def queue_docs_update(store: HitlistStore, settings: Settings, number: str, by: 
 
 def process_docs_job(store: HitlistStore, settings: Settings, job: dict[str, str], dbx=None) -> None:
     """Find (or re-find) the project's Dropbox folder, read its documents and send the index to the website."""
-    from .documents import DocsError, dropbox_path_from, find_project_folder, update_documents
+    from .documents import DocsError, documents_folder, dropbox_path_from, find_project_folder, update_documents
     from .dropbox import Dropbox, DropboxError
 
     number = job["project_number"]
@@ -130,14 +130,14 @@ def process_docs_job(store: HitlistStore, settings: Settings, job: dict[str, str
                 raise DocsError(f"No Dropbox folder at {path}. Check the folder on the project's AI Tools tab.")
         if folder is None:
             real = project.get("project_number") or number
-            taken = {p["dropbox_id"] for p in store.rows("Projects")
-                     if p.get("dropbox_id") and p.get("project_number") == real and p["_row"] != project["_row"]}
+            taken = _taken_folders(dbx, store.rows("Projects"), project)
             folder = find_project_folder(dbx, settings.dropbox_tech_folder, real, project.get("name", ""), taken)
             if folder is None:
                 raise DocsError(f"No folder starting with {project.get('project_number') or number} in the "
                                 f"technician folders. Paste the folder on the project's AI Tools tab.")
         if folder.get(".tag") != "folder":
             raise DocsError("That Dropbox path is a file, not a folder.")
+        folder = documents_folder(dbx, folder, project.get("name", ""))
         store.update_project(number, dropbox_id=folder["id"], dropbox_path=folder.get("path_display", ""))
 
         settings.docs_dir.mkdir(parents=True, exist_ok=True)
@@ -164,6 +164,23 @@ def process_docs_job(store: HitlistStore, settings: Settings, job: dict[str, str
                 pass
 
 
+def _taken_folders(dbx, projects: list[dict[str, str]], project: dict[str, str]) -> set[str]:
+    """Folders already linked to the other projects with this job number. A shared job folder that holds one
+    folder per site doesn't count: each project then gets its own site folder inside it."""
+    from .documents import _is_project_level
+    from .dropbox import DropboxError
+    out = set()
+    for o in projects:
+        if o.get("dropbox_id") and o.get("project_number") == project.get("project_number") and o["_row"] != project["_row"]:
+            try:
+                if not _is_project_level(dbx, dbx.metadata(o["dropbox_id"])):
+                    continue
+            except DropboxError:
+                continue
+            out.add(o["dropbox_id"])
+    return out
+
+
 def _save_punch_list(store: HitlistStore, number: str, dbx, folder: dict) -> None:
     """Record the newest file in the project's Deficiency Reports folder (the last punch list sent)."""
     from .documents import last_punch_list
@@ -182,7 +199,7 @@ def refresh_punch_lists(store: HitlistStore, settings: Settings, dbx=None) -> in
     """Before the Monday email: check every active project's Deficiency Reports folder, so the date is current
     even if nobody synced. Projects not linked to a folder yet are matched by job number and name (and linked).
     Returns how many projects were checked. Problems are logged and skipped; the email still goes out."""
-    from .documents import DocsError, folder_index, pick_project_folder
+    from .documents import DocsError, documents_folder, folder_index, pick_project_folder
     from .dropbox import Dropbox, DropboxError
     if not settings.dropbox_ready:
         return 0
@@ -209,12 +226,14 @@ def refresh_punch_lists(store: HitlistStore, settings: Settings, dbx=None) -> in
             if folder is None:
                 if index is None:
                     index = folder_index(dbx, settings.dropbox_tech_folder)
-                taken = {o["dropbox_id"] for o in projects if o.get("dropbox_id") and
-                         o.get("project_number") == p["project_number"] and o["_row"] != p["_row"]}
+                taken = _taken_folders(dbx, projects, p)
                 folder = pick_project_folder(index, p["project_number"], p.get("name", ""), taken)
                 if folder is None:
                     continue
-                store.update_project(key, dropbox_id=folder["id"], dropbox_path=folder.get("path_display", ""))
+            site = documents_folder(dbx, folder, p.get("name", ""))
+            if site["id"] != p.get("dropbox_id"):
+                store.update_project(key, dropbox_id=site["id"], dropbox_path=site.get("path_display", ""))
+            folder = site
             _save_punch_list(store, key, dbx, folder)
             checked += 1
         except (DocsError, DropboxError) as exc:
