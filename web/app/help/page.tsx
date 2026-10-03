@@ -183,7 +183,7 @@ export default async function HelpPage() {
           <ul>
             <li>The first time, press <b>Update documents</b>. The server finds the folder by the job number in the technician folders (and by name when several projects share a number; if it can't tell, it asks you to pick) and reads the files; a big project can take several minutes. After that, every <b>Sync</b> also checks for new or changed files.</li>
             <li>If it picks the wrong folder (or can&apos;t find one), press <b>Change folder</b> and paste the folder&apos;s path from File Explorer or its dropbox.com link.</li>
-            <li>Type a question (for example <i>What is the design airflow on AHU-16?</i>) and press <b>Ask</b>, or use the quick buttons: <b>Tolerances</b>, <b>TAB requirements</b>, or <b>Design values</b> for a unit.</li>
+            <li>Type a question (for example <i>What is the design airflow on AHU-16?</i>) and press <b>Ask</b>, or use the quick buttons: <b>Tolerances</b>, <b>TAB requirements</b>, or <b>Design values</b> for a unit. Put a unit tag in the unit box to ask about just that unit; <b>Ask</b> uses it too.</li>
             <li>Every value comes with its source (<b>S1</b>, <b>S2</b>...): folder, file, page and file date, so you can check it. If the answer isn&apos;t in the documents it says so instead of guessing, and it points out when an ASI, RFI or change order changes a value.</li>
             <li>After <b>Tolerances</b>, <b>Fill in Tolerances</b> puts the numbers on the project&apos;s Rules / Tol. tab.</li>
             <li><b>Asked before</b> lists earlier questions and answers on the project, so you don&apos;t need to ask twice.</li>
