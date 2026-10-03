@@ -454,3 +454,5 @@ header.top .top-drop form button { background: transparent; }
 /* Equipment checklist: the project's tolerance for the selected kind of equipment */
 .eq-tol { margin-top: 6px; font-size: 14px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .eq-tol-item { background: #eef4fb; border: 1px solid #c9d8ea; color: #1f4e79; border-radius: 999px; padding: 1px 10px; font-weight: 600; font-size: 13px; }
+.docs-latest { margin-top: 14px; font-size: 13px; }
+.docs-latest + .docs-answer { margin-top: 6px; }

@@ -123,6 +123,9 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   }
 
   const ready = !!info && info.files > 0;
+  // The answer on show: the one just asked, or (coming back to the page) the latest saved one.
+  const shown = answer ?? info?.history[0] ?? null;
+  const older = (info?.history ?? []).filter((h) => h.at !== shown?.at);
   // A finished update that left no folder and no status means the server ran it as a normal sync (old server code).
   const staleServer = !!info && !info.folder && !info.status && info.job?.status === "done";
   const failed = info?.status.startsWith("failed:") ? info.status.slice(7).trim() : "";
@@ -227,14 +230,22 @@ export default function DocsAsk({ project, units }: { project: string; units: st
         </div>
       </div>
 
-      {answer && <AnswerView key={answer.at} a={answer} project={project} saved={answerSaved} onClose={() => removeAnswer(answer.at)} />}
+      {shown && (
+        <>
+          <div className="docs-latest muted">
+            {answer ? "Answer" : "Latest answer"} · {shown.by}, {when(shown.at)}
+            {!answer && <> · <b>{shown.question.split("\n")[0]}</b></>}
+          </div>
+          <AnswerView key={shown.at} a={shown} project={project} saved={!!answer && answerSaved} onClose={() => removeAnswer(shown.at)} />
+        </>
+      )}
 
-      {info && info.history.length > 0 && (
+      {older.length > 0 && (
         <details className="docs-history">
-          <summary>Asked before ({info.history.length})</summary>
-          {info.history.map((h, i) => (
-            <details key={i} className="docs-hist-item">
-              <summary>{h.question} <span className="muted">· {h.by}, {when(h.at)}</span></summary>
+          <summary>Asked before ({older.length})</summary>
+          {older.map((h) => (
+            <details key={h.at} className="docs-hist-item">
+              <summary>{h.question.split("\n")[0]} <span className="muted">· {h.by}, {when(h.at)}</span></summary>
               <AnswerView a={h} project={project} onClose={() => removeAnswer(h.at)} />
             </details>
           ))}
