@@ -106,6 +106,18 @@ def test_find_project_folder_picks_best_name_across_techs_and_loose_folders():
         find_project_folder(dbx, "Nope", "99-001", "x")
 
 
+def test_shared_number_needs_a_clear_name_match_and_skips_taken_folders():
+    dbx = FakeDbx()
+    with pytest.raises(DocsError, match="Several Dropbox folders start with 99-001"):
+        find_project_folder(dbx, "Techs", "99-001", "Something Else Entirely")
+    building = dbx.metadata("/techs/alex tech/99-001 sample building")["id"]
+    # the building folder belongs to the other project on this contract, so only the garage is left
+    assert find_project_folder(dbx, "Techs", "99-001", "Sample", taken={building})["name"] == "99-001 Sample Garage"
+    loose = dbx.metadata("/techs/99-002 loose job")["id"]
+    with pytest.raises(DocsError, match="already linked"):
+        find_project_folder(dbx, "Techs", "99-002", "Loose", taken={loose})
+
+
 def test_dropbox_path_from_pasted_text():
     assert dropbox_path_from(r"C:\Users\X\Co Dropbox\Techs\A\99-001 Job") == "/Techs/A/99-001 Job"
     assert dropbox_path_from("https://www.dropbox.com/home/Techs/A/99-001%20Job?preview=1") == "/Techs/A/99-001 Job"

@@ -44,9 +44,12 @@ def starts_with_number(folder_name: str, number: str) -> bool:
     return bool(number) and re.match(rf"^{re.escape(number.strip())}(?![0-9A-Za-z])", folder_name.strip(), re.I) is not None
 
 
-def find_project_folder(dbx: Dropbox, tech_root: str, number: str, name: str) -> dict | None:
+def find_project_folder(dbx: Dropbox, tech_root: str, number: str, name: str,
+                        taken: set[str] | None = None) -> dict | None:
     """Look in every technician folder (and directly under the technicians folder) for a folder starting
-    with the job number. With several, take the one whose name best matches the Hitlist name."""
+    with the job number. Job numbers can be shared by several projects on one contract, so with more than
+    one, the Hitlist name decides, but only when one folder clearly matches best; otherwise it stops and
+    lists them so someone picks with Change folder. Folders already linked to another project are skipped."""
     top = find_folder(dbx.folders(""), tech_root)
     if not top:
         raise DocsError(f"Couldn't find the '{tech_root}' folder in Dropbox")
@@ -56,10 +59,22 @@ def find_project_folder(dbx: Dropbox, tech_root: str, number: str, name: str) ->
             candidates.append(f)
         else:
             candidates += [c for c in dbx.folders(f["path_lower"]) if starts_with_number(c["name"], number)]
-    if not candidates:
+    free = [c for c in candidates if c["id"] not in (taken or set())]
+    if candidates and not free:
+        raise DocsError(f"The only folder starting with {number} ({candidates[0]['name']}) is already linked to the "
+                        f"other project with this number. If they share it, paste it with Change folder on the AI Tools tab.")
+    if not free:
         return None
+    if len(free) == 1:
+        return free[0]
     rest = lambda f: re.sub(rf"^{re.escape(number)}\W*", "", f["name"], flags=re.I)  # noqa: E731
-    return max(candidates, key=lambda f: similarity(rest(f), name or ""))
+    ranked = sorted(free, key=lambda f: similarity(rest(f), name or ""), reverse=True)
+    best, second = similarity(rest(ranked[0]), name or ""), similarity(rest(ranked[1]), name or "")
+    if best < 0.35 or best - second < 0.1:
+        names = "; ".join(f["name"] for f in ranked[:6])
+        raise DocsError(f"Several Dropbox folders start with {number} and the name doesn't clearly pick one "
+                        f"({names}). Use Change folder on the AI Tools tab to choose.")
+    return ranked[0]
 
 
 def dropbox_path_from(text: str) -> str:

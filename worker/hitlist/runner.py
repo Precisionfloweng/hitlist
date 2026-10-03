@@ -129,8 +129,10 @@ def process_docs_job(store: HitlistStore, settings: Settings, job: dict[str, str
             except DropboxError:
                 raise DocsError(f"No Dropbox folder at {path}. Check the folder on the project's AI Tools tab.")
         if folder is None:
-            folder = find_project_folder(dbx, settings.dropbox_tech_folder,
-                                         project.get("project_number") or number, project.get("name", ""))
+            real = project.get("project_number") or number
+            taken = {p["dropbox_id"] for p in store.rows("Projects")
+                     if p.get("dropbox_id") and p.get("project_number") == real and p["_row"] != project["_row"]}
+            folder = find_project_folder(dbx, settings.dropbox_tech_folder, real, project.get("name", ""), taken)
             if folder is None:
                 raise DocsError(f"No folder starting with {project.get('project_number') or number} in the "
                                 f"technician folders. Paste the folder on the project's AI Tools tab.")
