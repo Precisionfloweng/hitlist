@@ -181,7 +181,7 @@ export default async function HelpPage() {
           <h3>Ask the documents</h3>
           <p>Below Refine, <b>Ask the documents</b> answers questions from the project&apos;s Dropbox folder. It reads the <b>Drawings and Specs</b>, <b>Submittal</b>, <b>TAB Plan</b>, <b>ASIs and RFIs</b> and <b>Change Orders</b> folders; the other folders are left alone, and Hitlist can only read Dropbox, never change it.</p>
           <ul>
-            <li>The first time, press <b>Update documents</b>. The server finds the folder by the job number in the technician folders and reads the files; a big project can take several minutes. After that, every <b>Sync</b> also checks for new or changed files.</li>
+            <li>The first time, press <b>Update documents</b>. The server finds the folder by the job number in the technician folders (and by name when several projects share a number; if it can't tell, it asks you to pick) and reads the files; a big project can take several minutes. After that, every <b>Sync</b> also checks for new or changed files.</li>
             <li>If it picks the wrong folder (or can&apos;t find one), press <b>Change folder</b> and paste the folder&apos;s path from File Explorer or its dropbox.com link.</li>
             <li>Type a question (for example <i>What is the design airflow on AHU-16?</i>) and press <b>Ask</b>, or use the quick buttons: <b>Tolerances</b>, <b>TAB requirements</b>, or <b>Design values</b> for a unit.</li>
             <li>Every value comes with its source (<b>S1</b>, <b>S2</b>...): folder, file, page and file date, so you can check it. If the answer isn&apos;t in the documents it says so instead of guessing, and it points out when an ASI, RFI or change order changes a value.</li>

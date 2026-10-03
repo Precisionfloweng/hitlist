@@ -130,7 +130,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
       {info && (
         <div className="docs-status">
           <div className="docs-folder">
-            📁 {info.folder ? <span>{showPath(info.folder)}</span> : <span className="muted">No Dropbox folder linked yet. Update documents finds it by the job number.</span>}
+            📁 {info.folder ? <span>{showPath(info.folder)}</span> : <span className="muted">No Dropbox folder linked yet. Update documents finds it by job number and name.</span>}
           </div>
           {working ? (
             <div className="docs-working">⏳ {info.job!.status === "queued"
