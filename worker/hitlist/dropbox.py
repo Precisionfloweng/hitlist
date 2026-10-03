@@ -142,6 +142,7 @@ def connection_report(dbx: Dropbox, tech_folder: str) -> list[str]:
         else:
             dbx.path_root = saved
     if not top:
+        out += _diagnose(dbx, acct, tech_folder)
         out.append("Dropbox shows this app an empty folder. That happens when the app was created with "
                    "'App folder' access instead of 'Full Dropbox' (an App folder app has an 'App folder name' row on its "
                    "Settings tab). "
@@ -159,4 +160,32 @@ def connection_report(dbx: Dropbox, tech_folder: str) -> list[str]:
         total += len(projects)
         out.append(f"  {t['name']}: {len(projects)} folder(s)")
     out.append(f"{total} project folder(s) in all. Read-only: Hitlist can't change or delete anything in Dropbox.")
+    return out
+
+
+def _diagnose(dbx: Dropbox, acct: dict, tech_folder: str) -> list[str]:
+    """Detail for when the app sees nothing: how Dropbox describes the account's top level, and what each
+    way of looking at it returns (folder names are not printed, only counts)."""
+    info = acct.get("root_info", {})
+    out = [f"  Details: root type '{info.get('.tag')}', same root as home: {info.get('root_namespace_id') == info.get('home_namespace_id')}"]
+    tries = [("member view", None)]
+    if info.get("root_namespace_id"):
+        tries.append(("team view", {".tag": "root", "root": info["root_namespace_id"]}))
+    if info.get("home_namespace_id"):
+        tries.append(("own folder", {".tag": "namespace_id", "namespace_id": info["home_namespace_id"]}))
+    saved = dbx.path_root
+    for label, root in tries:
+        dbx.path_root = root
+        try:
+            items = dbx.list_folder("")
+            folders = sum(1 for e in items if e.get(".tag") == "folder")
+            out.append(f"  {label}: {folders} folder(s), {len(items) - folders} file(s)")
+        except DropboxError as e:
+            out.append(f"  {label}: error {str(e)[:160]}")
+        try:
+            dbx._post("files/get_metadata", {"path": "/" + tech_folder})
+            out.append(f"  {label}: '{tech_folder}' found by name")
+        except DropboxError as e:
+            out.append(f"  {label}: '{tech_folder}' not found ({'not_found' if 'not_found' in str(e) else str(e)[:120]})")
+    dbx.path_root = saved
     return out
