@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { canEdit, canSee, currentUser } from "@/lib/auth";
 import { docsJob, getProject, requestDocs, setDocsFolder } from "@/lib/data";
-import { askDocs, loadHistory, loadManifest, QUICK, type Mode } from "@/lib/docs";
+import { askDocs, loadHistory, loadManifest, QUICK, removeAnswer, type Mode } from "@/lib/docs";
 
 export const maxDuration = 60;
 
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as
-    { project?: string; action?: string; question?: string; mode?: string; unit?: string; path?: string };
+    { project?: string; action?: string; question?: string; mode?: string; unit?: string; path?: string; at?: string };
   const g = await gate(body.project ?? null);
   if ("error" in g) return g.error;
   const project = g.project.id;
@@ -46,6 +46,10 @@ export async function POST(req: Request) {
       await setDocsFolder(project, path);
       await requestDocs(project, g.user);
       return NextResponse.json({ ok: true });
+    }
+    if (body.action === "remove") {
+      if (!body.at) return NextResponse.json({ error: "Missing answer" }, { status: 400 });
+      return NextResponse.json({ ok: true, history: (await removeAnswer(project, body.at)).slice(0, 20) });
     }
     if (body.action === "ask") {
       const mode: Mode = (["tolerances", "tab", "design"] as const).find((m) => m === body.mode) ?? "ask";

@@ -39,7 +39,7 @@ function AnswerView({ a, project, onClose }: { a: Answer; project: string; onClo
   }
   return (
     <div className="docs-answer">
-      {onClose && <button type="button" className="ai-close" onClick={onClose} title="Close this answer (it stays under Asked before)" aria-label="Close answer">✕</button>}
+      {onClose && <button type="button" className="ai-close" onClick={onClose} title="Delete this answer" aria-label="Delete answer">✕</button>}
       <div className={`docs-answer-text${a.found ? "" : " notfound"}`}>{a.answer}</div>
       {tolText && (
         <div className="docs-tol">
@@ -104,6 +104,14 @@ export default function DocsAsk({ project, units }: { project: string; units: st
     } finally {
       setBusy("");
     }
+  }
+
+  /** Delete an answer for good: off the screen and out of Asked before. */
+  async function removeAnswer(at: string) {
+    if (answer?.at === at) setAnswer(null);
+    setInfo((i) => (i ? { ...i, history: i.history.filter((h) => h.at !== at) } : i));
+    const data = await post({ action: "remove", at }, "remove");
+    if (data?.history) setInfo((i) => (i ? { ...i, history: data.history } : i));
   }
 
   async function ask(mode: string) {
@@ -217,7 +225,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
         </div>
       </div>
 
-      {answer && <AnswerView a={answer} project={project} onClose={() => setAnswer(null)} />}
+      {answer && <AnswerView a={answer} project={project} onClose={() => removeAnswer(answer.at)} />}
 
       {info && info.history.length > 0 && (
         <details className="docs-history">
@@ -225,7 +233,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           {info.history.map((h, i) => (
             <details key={i} className="docs-hist-item">
               <summary>{h.question} <span className="muted">· {h.by}, {when(h.at)}</span></summary>
-              <AnswerView a={h} project={project} />
+              <AnswerView a={h} project={project} onClose={() => removeAnswer(h.at)} />
             </details>
           ))}
         </details>

@@ -279,11 +279,22 @@ export async function loadHistory(project: string): Promise<Answer[]> {
   try { return b ? (JSON.parse(b.toString("utf8")) as Answer[]) : []; } catch { return []; }
 }
 
-async function saveHistory(project: string, a: Answer) {
-  const list = [a, ...(await loadHistory(project))].slice(0, 50);
+async function writeHistory(project: string, list: Answer[]) {
   await put(historyPath(project), JSON.stringify(list), {
     access: "private", allowOverwrite: true, addRandomSuffix: false, contentType: "application/json",
   });
+}
+
+async function saveHistory(project: string, a: Answer) {
+  await writeHistory(project, [a, ...(await loadHistory(project))].slice(0, 50));
+}
+
+/** Remove one answer for good (it's identified by when it was asked). Returns the remaining list. */
+export async function removeAnswer(project: string, at: string): Promise<Answer[]> {
+  const list = await loadHistory(project);
+  const left = list.filter((a) => a.at !== at);
+  if (left.length !== list.length) await writeHistory(project, left);
+  return left;
 }
 
 /** Remove everything stored for a deleted project: document text, its file list and the question history. */

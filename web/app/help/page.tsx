@@ -187,7 +187,7 @@ export default async function HelpPage() {
             <li>Every value comes with its source (<b>S1</b>, <b>S2</b>...): folder, file, page and file date, so you can check it. If the answer isn&apos;t in the documents it says so instead of guessing, and it points out when an ASI, RFI or change order changes a value.</li>
             <li>After <b>Tolerances</b>, <b>Fill in Tolerances</b> puts the numbers (including different + and − values) on the project&apos;s Rules / Tol. tab.</li>
             <li>Sub-folders named like <b>Older versions</b>, <b>Old</b>, <b>Superseded</b> or <b>Archive</b> aren&apos;t read, so answers come from the current documents only.</li>
-            <li><b>Asked before</b> lists earlier questions and answers on the project, so you don&apos;t need to ask twice.</li>
+            <li><b>Asked before</b> lists earlier questions and answers on the project, so you don&apos;t need to ask twice. The <b>✕</b> in the corner of an answer deletes it for good.</li>
             <li>Scanned files with no text can&apos;t be read yet; they&apos;re listed under &quot;couldn&apos;t be read&quot;.</li>
           </ul>
         </section>
