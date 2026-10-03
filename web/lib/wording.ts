@@ -89,14 +89,15 @@ function payloadFor(kind: Kind, d: ReviewItem, tol: Tolerances) {
         priority: d.priority, assigned_role: d.role, assigned_contact: d.contact, text: d.text };
 }
 
-/** One call to Claude; returns the text of its reply. */
-export async function callClaude(system: string, user: string): Promise<string> {
+type Block = { type: string; text?: string; input?: Record<string, unknown> };
+
+async function request(body: Record<string, unknown>): Promise<Block[]> {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("The Anthropic API key isn't set on the website yet (ANTHROPIC_API_KEY in Vercel).");
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: 8000, system, messages: [{ role: "user", content: user }] }),
+    body: JSON.stringify({ model: MODEL, max_tokens: 8000, ...body }),
   });
   const data = await r.json().catch(() => ({}));
   if (!r.ok) {
@@ -104,7 +105,24 @@ export async function callClaude(system: string, user: string): Promise<string> 
     if (/credit balance/i.test(msg)) throw new Error("The Anthropic account is out of credit. Add credit in the Anthropic Console.");
     throw new Error(`The AI request failed: ${msg}`);
   }
-  return (data.content ?? []).map((c: { text?: string }) => c.text ?? "").join("");
+  return (data.content ?? []) as Block[];
+}
+
+/** One call to Claude; returns the text of its reply. */
+export async function callClaude(system: string, user: string): Promise<string> {
+  const blocks = await request({ system, messages: [{ role: "user", content: user }] });
+  return blocks.map((c) => c.text ?? "").join("");
+}
+
+/** One call where Claude must fill in a fixed form (a forced tool call), so the reply is always a proper object.
+ *  If it still answers in plain text, that text comes back as { text }. */
+export async function callClaudeForm(system: string, user: string, name: string, description: string,
+                                     schema: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const blocks = await request({ system, messages: [{ role: "user", content: user }],
+    tools: [{ name, description, input_schema: schema }], tool_choice: { type: "tool", name } });
+  const tool = blocks.find((b) => b.type === "tool_use" && b.input);
+  if (tool?.input) return tool.input;
+  return { text: blocks.map((c) => c.text ?? "").join("").trim() };
 }
 
 /** The first {...} object in a reply. */

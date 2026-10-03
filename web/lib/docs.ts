@@ -4,7 +4,7 @@
 import "server-only";
 import { gunzipSync } from "node:zlib";
 import { del, get, list, put } from "@vercel/blob";
-import { callClaude, parseObject } from "./wording";
+import { callClaudeForm } from "./wording";
 import { TOLERANCE_CATS, type Tolerances } from "./toleranceCats";
 
 export type DocFile = { id: string; category: string; name: string; path: string; modified: string;
@@ -150,13 +150,27 @@ Rules:
 - If excerpts disagree (submittal vs drawing schedule, or an ASI/RFI/change order revising a value), give both,
   say which document is newer from the file dates, and note that later ASIs/RFIs/change orders usually govern.
 - Start with the direct answer, then a few short supporting lines. Plain text, "-" bullets are fine, no headings.
-- "tolerances": only when the question is about TAB tolerances. Fill a category only when the documents give one
+- tolerances: only when the question is about TAB tolerances. Fill a category only when the documents give one
   ± percent that clearly applies to it (keys: ${TOLERANCE_CATS.map((c) => `${c.key} = ${c.label}`).join(", ")});
   value is the number only, e.g. "10". If plus and minus differ (e.g. +10%/-5%), leave that category out and
-  explain in the answer. Otherwise "tolerances": null.
+  explain in the answer. Otherwise leave tolerances out.
 
-Reply with ONLY a JSON object:
-{"answer": "...", "found": true|false, "sources": ["S1", ...], "tolerances": null | {"terminal": "10", ...}}`;
+Give your reply with the "answer" form.`;
+
+const FORM = {
+  type: "object",
+  properties: {
+    answer: { type: "string", description: "The answer for the tech, plain text, values cited like [S3]." },
+    found: { type: "boolean", description: "false when the documents don't contain the answer." },
+    sources: { type: "array", items: { type: "string" }, description: "Excerpt ids used, e.g. [\"S1\", \"S4\"]." },
+    tolerances: {
+      type: "object",
+      description: "Only for TAB tolerance questions: ± percent by equipment category, number only. Leave out otherwise.",
+      properties: Object.fromEntries(TOLERANCE_CATS.map((c) => [c.key, { type: "string", description: c.label }])),
+    },
+  },
+  required: ["answer", "found", "sources"],
+};
 
 export const QUICK: Record<Exclude<Mode, "ask">, (unit?: string) => string> = {
   tolerances: () => "What are the TAB tolerances (± percent of design) in the spec for each type of equipment: air handlers, rooftop units, fans, terminal units, outlets and inlets, pumps and coils?",
@@ -178,8 +192,10 @@ export async function askDocs(project: string, question: string, mode: Mode, by:
     name: p.file.name, page: p.page, modified: (p.file.modified || "").slice(0, 10) }));
   const excerpts = found.map((p, i) =>
     `=== [S${i + 1}] ${p.file.category} / ${p.file.path}, page ${p.page} (file dated ${sources[i].modified || "unknown"}) ===\n${p.text}`).join("\n\n");
-  const reply = await callClaude(GUIDE, `Question: ${question}\n\nExcerpts:\n\n${excerpts}`);
-  const r = parseObject(reply) as { answer?: string; found?: boolean; sources?: string[]; tolerances?: Record<string, unknown> | null };
+  const reply = await callClaudeForm(GUIDE, `Question: ${question}\n\nExcerpts:\n\n${excerpts}`, "answer",
+    "The answer to the tech's question, from the excerpts.", FORM);
+  const r = (typeof reply.text === "string" && reply.answer === undefined ? { answer: reply.text } : reply) as
+    { answer?: string; found?: boolean; sources?: string[]; tolerances?: Record<string, unknown> | null };
   const cited = new Set((r.sources ?? []).map(String));
   const answerText = String(r.answer ?? "").trim();
   for (const m of answerText.matchAll(/\[(S\d+)\]/g)) cited.add(m[1]);
