@@ -110,6 +110,8 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   }
 
   const ready = !!info && info.files > 0;
+  // A finished update that left no folder and no status means the server ran it as a normal sync (old server code).
+  const staleServer = !!info && !info.folder && !info.status && info.job?.status === "done";
   const failed = info?.status.startsWith("failed:") ? info.status.slice(7).trim() : "";
   const jobFailed = info?.job?.status === "failed" ? info.job.step : "";
 
@@ -130,7 +132,10 @@ export default function DocsAsk({ project, units }: { project: string; units: st
       {info && (
         <div className="docs-status">
           <div className="docs-folder">
-            📁 {info.folder ? <span>{showPath(info.folder)}</span> : <span className="muted">No Dropbox folder linked yet. Update documents finds it by job number and name.</span>}
+            📁 {info.folder ? <span>{showPath(info.folder)}</span>
+              : working ? <span className="muted">Looking for the project&apos;s Dropbox folder…</span>
+              : staleServer ? <span className="error">The update finished but no folder was linked: the server needs the latest update (git pull, pip install, restart the worker).</span>
+              : <span className="muted">No Dropbox folder linked yet. Update documents finds it by job number and name.</span>}
           </div>
           {working ? (
             <div className="docs-working">⏳ {info.job!.status === "queued"
