@@ -3,7 +3,7 @@
   "date": "2026-10-03",
   "audience": "all",
   "title": "% complete on Overview cards",
-  "text": "Each equipment type card on the Overview shows its % complete (required fields filled) next to the units fully complete."
+  "text": "Each equipment type card on the Overview shows its % complete (required fields filled), and a new Overall complete card shows the whole project's %."
  },
  {
   "date": "2026-10-03",

@@ -68,6 +68,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
             )}
             <div className="tiles">
               <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />
+              <Tile big={pct(summary ? summary.fields_pct : p.fieldsPct)} label="Overall complete"
+                title="Required fields filled across the whole project (same as Complete on the projects list)" />
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={results ? String(results.deficiencies.filter((d) => !d.open).length) : "–"} label="Closed deficiencies" /></Link>
               {user.role !== "customer" && (
