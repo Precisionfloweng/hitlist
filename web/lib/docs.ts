@@ -110,12 +110,52 @@ const FAVOR: Record<Mode, string[]> = {
   design: ["Submittal", "Drawings and Specs"],
 };
 
-export function findPages(pages: Page[], question: string, mode: Mode, maxChars = 110_000, maxPages = 30) {
+// Field shorthand: a word in the question also matches these (lower weight).
+const SYN: Record<string, string[]> = {
+  velocity: ["vel", "fpm"], area: ["ft2", "ft²", "sq ft", "sq. ft", "sqft"], airflow: ["cfm", "air vol", "air volume", "scfm"],
+  cfm: ["airflow", "air vol"], gpm: ["flow rate", "fluid flow", "gal/min", "water flow"], static: ["esp", "tsp", "in. wg", "in wg", "w.g."],
+  pressure: ["in. wg", "in wg", "psi", "head"], motor: ["hp", "bhp", "fla"], horsepower: ["hp", "bhp"],
+  outside: ["oa ", "outdoor air"], coil: ["chw", "hw coil", "cooling coil"], fan: ["fan wheel", "rpm"],
+};
+
+/** Words that sit next to the unit's tag (in the same schedule row) and are rare in the project: usually its
+ *  model number and manufacturer, which is how submittals name the unit instead of the engineer's tag. */
+function modelTerms(pages: Page[], tags: RegExp[], skip: Set<string>, df: (t: string) => number, N: number): string[] {
+  const near = new Map<string, number>();
+  const withTag = pages.filter((p) => tags.some((re) => { re.lastIndex = 0; return re.test(p.low); })).slice(0, 60);
+  for (const p of withTag) {
+    const lines = p.text.toLowerCase().split("\n");
+    lines.forEach((line, i) => {
+      if (!tags.some((re) => { re.lastIndex = 0; return re.test(line); })) return;
+      for (const l of lines.slice(i, i + 20)) {
+        for (const tok of l.match(/[a-z0-9][a-z0-9-]{2,}/g) ?? []) {
+          if (!/[a-z]/.test(tok) || STOP.has(tok) || skip.has(tok) || tags.some((re) => { re.lastIndex = 0; return re.test(tok); })) continue;
+          near.set(tok, (near.get(tok) ?? 0) + 1);
+        }
+      }
+    });
+  }
+  return [...near.keys()]
+    .map((t) => ({ t, d: df(t) }))
+    .filter((x) => x.d > 0 && x.d / N < 0.03)                // rare in the project = specific to this unit or model
+    .sort((a, b) => a.d - b.d || (near.get(b.t) ?? 0) - (near.get(a.t) ?? 0))
+    .slice(0, 8).map((x) => x.t);
+}
+
+export function findPages(pages: Page[], question: string, mode: Mode, maxChars = 140_000, maxPages = 40) {
+  const N = pages.length || 1;
+  const dfCache = new Map<string, number>();
+  const df = (t: string) => {
+    if (!dfCache.has(t)) dfCache.set(t, pages.reduce((n, p) => n + (p.low.includes(t) ? 1 : 0), 0));
+    return dfCache.get(t)!;
+  };
+  const idf = (t: string) => Math.log(1 + N / (1 + df(t)));
   const tags = tagPatterns(question);
   const words = [...new Set(question.toLowerCase().match(/[a-z][a-z0-9/-]{2,}|\d{2,}/g) ?? [])].filter((w) => !STOP.has(w));
-  const terms = [...new Set([...words, ...EXTRA[mode]])];
-  const df = new Map(terms.map((t) => [t, pages.reduce((n, p) => n + (p.low.includes(t) ? 1 : 0), 0)]));
-  const N = pages.length || 1;
+  const main = [...new Set([...words, ...EXTRA[mode]])];
+  const syn = [...new Set(words.flatMap((w) => SYN[w] ?? []))].filter((t) => !main.includes(t));
+  const models = tags.length ? modelTerms(pages, tags, new Set([...main, ...syn]), df, N) : [];
+
   const scored = pages.map((p) => {
     let s = 0;
     let tagHits = 0;
@@ -124,19 +164,28 @@ export function findPages(pages: Page[], question: string, mode: Mode, maxChars 
       const n = Math.min((p.low.match(re) ?? []).length, 6);
       if (n) { tagHits++; s += 12 + 3 * n; }
     }
-    for (const t of terms) {
-      if (!p.low.includes(t)) continue;
-      const idf = Math.log(1 + N / (1 + (df.get(t) ?? 0)));
-      s += idf * (EXTRA[mode].includes(t) ? 1.5 : 1);
-    }
-    if (tags.length && !tagHits) s *= 0.4;                    // asked about a unit: pages naming it come first
+    for (const t of main) if (p.low.includes(t)) s += idf(t) * (EXTRA[mode].includes(t) ? 1.5 : 1);
+    for (const t of syn) if (p.low.includes(t)) s += idf(t) * 0.7;
+    let modelHits = 0;
+    for (const t of models) if (p.low.includes(t)) { modelHits++; s += idf(t) * 1.2; }
+    if (modelHits >= 2 && p.file.category === "Submittal") s *= 1.3;
+    if (tags.length && !tagHits && !modelHits) s *= 0.4;      // asked about a unit: pages naming it (or its model) first
     if (FAVOR[mode].includes(p.file.category)) s *= 1.4;
     return { p, s };
   }).filter((x) => x.s > 0).sort((a, b) => b.s - a.s);
+
+  // A few of the best pages from every folder first, so one folder can't crowd out the others, then the rest by score.
+  const picked = new Set<Page>();
+  const byCat = new Map<string, { p: Page; s: number }[]>();
+  for (const x of scored) byCat.set(x.p.file.category, [...(byCat.get(x.p.file.category) ?? []), x]);
+  const top = scored[0]?.s ?? 0;
+  for (const list of byCat.values()) list.filter((x) => x.s >= top * 0.15).slice(0, 4).forEach((x) => picked.add(x.p));
+  const order = [...scored.filter((x) => picked.has(x.p)), ...scored.filter((x) => !picked.has(x.p))];
   const out: Page[] = [];
   let chars = 0;
-  for (const { p } of scored) {
-    if (out.length >= maxPages || chars + p.text.length > maxChars) break;
+  for (const { p } of order) {
+    if (out.length >= maxPages) break;
+    if (chars + p.text.length > maxChars) continue;
     out.push(p);
     chars += p.text.length;
   }
@@ -154,6 +203,9 @@ Rules:
 - Give every value with its unit, exactly as written, and cite the excerpt after it, e.g. "12,500 CFM [S3]".
 - If excerpts disagree (submittal vs drawing schedule, or an ASI/RFI/change order revising a value), give both,
   say which document is newer from the file dates, and note that later ASIs/RFIs/change orders usually govern.
+- Manufacturer submittals usually name units by model number, not the engineer's tag. If a schedule/drawing excerpt
+  gives the unit's model and a submittal excerpt shows that model, use the submittal's data for the unit (coil face
+  area, face velocity, fan curves, motor data...) and say which model you matched it by.
 - If the question names one unit, answer for that unit only (don't list other equipment); if its values aren't in
   the excerpts, say so.
 - Start with the direct answer, then a few short supporting lines. Plain text, "-" bullets are fine, no headings.
