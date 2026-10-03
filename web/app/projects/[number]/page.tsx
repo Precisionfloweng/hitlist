@@ -43,14 +43,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
 
         {p.lastSync ? (
           <>
-            {user.role !== "customer" && p.punchSent && (
-              <div className="tol-line">
-                <b>Last punch list sent</b>{" "}
-                {new Date(p.punchSent).toLocaleDateString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric", year: "numeric" })}
-                {" "}({syncLabel(daysSince(p.punchSent)).text.toLowerCase()})
-                {p.punchFile && <span className="muted"> · {p.punchFile}</span>}
-              </div>
-            )}
             {TOLERANCE_CATS.some((c) => tol[c.key]) && (
               <div className="tol-line">
                 <b>Tolerances</b>{" "}
@@ -61,6 +53,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={results ? String(results.deficiencies.filter((d) => !d.open).length) : "–"} label="Closed deficiencies" /></Link>
+              {user.role !== "customer" && (
+                <Tile big={p.punchSent ? new Date(p.punchSent).toLocaleDateString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric" })
+                  : p.dropboxPath ? "None yet" : "–"}
+                  label={p.punchSent ? `Last punch list sent · ${syncLabel(daysSince(p.punchSent)).text.toLowerCase()}` : "Last punch list sent"}
+                  title={p.punchFile ? `Newest file in Deficiency Reports: ${p.punchFile}` : "From the newest file in the project's Dropbox Deficiency Reports folder"} />
+              )}
             </div>
 
             {results && results.types.length > 0 && (
@@ -113,6 +111,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   );
 }
 
-function Tile({ big, label }: { big: string; label: string }) {
-  return <div className="card tile"><div className="big">{big}</div><div className="label">{label}</div></div>;
+function Tile({ big, label, title }: { big: string; label: string; title?: string }) {
+  return <div className="card tile" title={title}><div className="big">{big}</div><div className="label">{label}</div></div>;
 }
