@@ -231,7 +231,6 @@ export default async function HelpPage() {
               <li><b>Archive vs delete</b>: <b>Archived</b> hides a project but keeps all its data. <b>Delete</b> removes it along with its sync results, history and project rules.</li>
               <li><b>Two sites on one contract</b> can share a project number, as long as the names differ. The server opens the BuildingStart project whose name matches best, so keep the Hitlist name close to the BuildingStart name.</li>
               <li><b>Users</b> (<Link href="/admin/users">Admin → Users</Link>): add people with their work email. Tick <b>Email them a welcome</b> to send sign-in and iPad instructions, or press <b>Send welcome</b> on anyone already listed. <b>Last used</b> shows the last day each person opened the app. Roles: <b>Admin</b> (everything), <b>Tech</b> (projects, Sync, project rules), <b>Viewer</b> (read-only), <b>Customer</b> (read-only, only the projects you pick).</li>
-              <li><b>Sign-in log</b>: every sign-in (who, when, password or emailed code, device) is recorded on the <b>SignIns</b> tab of the PFE Hitlist Data Google Sheet.</li>
               <li><b>Emails</b>: a failed sync emails the tech and Rick. The Monday summary goes to each tech and the admins. Successful syncs don&apos;t send email.</li>
               <li><b>&quot;Rules that didn&apos;t match this export&quot;</b> on an Overview means a sheet or column name in the Default Rules looks mistyped. Fix it on the Rules page and Sync.</li>
             </ul>
