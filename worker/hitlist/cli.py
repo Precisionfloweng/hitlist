@@ -140,12 +140,15 @@ def main(argv: list[str] | None = None) -> int:
     return 1
 
 
-def _ask_token(label: str, current: str) -> str:
-    """Ask for a key or secret (pasted). Rejects blanks and stray characters, e.g. a paste that didn't go in."""
-    if current:
+def _ask_token(label: str, current: str, relink: bool = False) -> str:
+    """Ask for a key or secret (pasted). Rejects stray characters, e.g. a paste that didn't go in.
+    On --relink, Enter keeps the one already saved."""
+    if current and not relink:
         return current
     while True:
-        v = input(f"{label}: ").strip()
+        v = input(f"{label}{' (Enter = keep the saved one)' if current else ''}: ").strip()
+        if not v and current:
+            return current
         if v and v.isalnum():
             return v
         print("  That doesn't look right (it should be letters and numbers only). Paste it again;"
@@ -163,10 +166,11 @@ def _dropbox(args) -> int:
     try:
         if args.cmd == "dropbox-setup" and (args.relink or not st.dropbox_refresh_token):
             # Plain input, not a hidden prompt: Windows' hidden prompt ignores Ctrl+V, so a pasted secret goes missing.
-            key = _ask_token("Dropbox App key (Settings tab of the app)", st.dropbox_app_key if not args.relink else "")
-            secret = _ask_token("Dropbox App secret (same tab, click Show)", st.dropbox_app_secret if not args.relink else "")
-            url = authorize_url(key)
-            print("\nOpening Dropbox. Sign in with the PFE account, click Continue, then Allow.")
+            key = _ask_token("Dropbox App key (Settings tab of the app)", st.dropbox_app_key, args.relink)
+            secret = _ask_token("Dropbox App secret (same tab, click Show)", st.dropbox_app_secret, args.relink)
+            url = authorize_url(key, fresh_sign_in=args.relink)
+            print("\nOpening Dropbox. Sign in with the work (team) account, not a personal one,"
+                  " click Continue, then Allow.")
             print(f"If no browser opens, copy this into one:\n  {url}\n")
             webbrowser.open(url)
             code = input("Paste the code Dropbox shows you, then press Enter: ").strip()

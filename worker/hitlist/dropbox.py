@@ -22,9 +22,11 @@ class DropboxError(RuntimeError):
     pass
 
 
-def authorize_url(app_key: str) -> str:
-    """The page where the account owner clicks Allow; Dropbox then shows a code to paste back."""
-    return f"{AUTH_URL}?client_id={app_key}&response_type=code&token_access_type=offline"
+def authorize_url(app_key: str, fresh_sign_in: bool = False) -> str:
+    """The page where the account owner clicks Allow; Dropbox then shows a code to paste back.
+    fresh_sign_in makes Dropbox ask for the sign-in again, so the right account (work, not personal) is used."""
+    url = f"{AUTH_URL}?client_id={app_key}&response_type=code&token_access_type=offline"
+    return url + "&force_reauthentication=true" if fresh_sign_in else url
 
 
 def exchange_code(app_key: str, app_secret: str, code: str, session=None) -> str:
