@@ -5,6 +5,7 @@ import EquipmentView from "./EquipmentView";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
+import { loadTolerances } from "@/lib/tolerances";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,7 @@ export default async function EquipmentPage({ params, searchParams }:
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
   const { type } = await searchParams;
-  const [data, results] = await Promise.all([getProject(number), loadResults(number)]);
+  const [data, results, tol] = await Promise.all([getProject(number), loadResults(number), loadTolerances(number)]);
   if (!data || !canSee(user, data.project.id)) notFound();
   const p = data.project;
 
@@ -22,7 +23,7 @@ export default async function EquipmentPage({ params, searchParams }:
       <Header user={user} />
       <main className="wide">
         <ProjectHeader user={{ customer: user.role === "customer", canSync: canEdit(user) }} project={p} tab="equipment" missingRequired={results?.summary.missing_required} notes={results?.notes?.length} />
-        {results ? <EquipmentView types={results.types} initialType={type} syncedAt={results.generated_at} deficiencies={results.deficiencies} notes={user.role === "customer" ? [] : results.notes ?? []} /> : (
+        {results ? <EquipmentView types={results.types} initialType={type} syncedAt={results.generated_at} tolerances={tol} deficiencies={results.deficiencies} notes={user.role === "customer" ? [] : results.notes ?? []} /> : (
           <div className="card">No equipment results yet. Press <b>Sync</b> to pull this project from BuildingStart.</div>
         )}
       </main>

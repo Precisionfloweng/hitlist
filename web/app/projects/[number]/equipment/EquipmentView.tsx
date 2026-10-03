@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { categoriesFor, fmtTol, hasTol, TOLERANCE_CATS, type Tolerances } from "@/lib/toleranceCats";
 import { loadLastType, saveLastType } from "@/lib/lastType";
 import type { Deficiency, Note, TypeResult } from "@/lib/results";
 import { byTypeOrder } from "@/lib/typeOrder";
@@ -17,8 +18,9 @@ function Cell({ code, label }: { code: string; label: string }) {
   return <td className="ck na" title={tip}>·</td>;
 }
 
-export default function EquipmentView({ types, initialType, syncedAt, deficiencies = [], notes = [] }:
-  { types: TypeResult[]; initialType?: string; syncedAt?: string; deficiencies?: Deficiency[]; notes?: Note[] }) {
+export default function EquipmentView({ types, initialType, syncedAt, deficiencies = [], notes = [], tolerances = {} }:
+  { types: TypeResult[]; initialType?: string; syncedAt?: string; deficiencies?: Deficiency[]; notes?: Note[];
+    tolerances?: Tolerances }) {
   // Open deficiencies per unit: its own, plus any on its sub-items (a coil's item also lights up its AHU).
   // Matched on the equipment path (segments trimmed), or the name if a unit's own path doesn't match.
   const openDefs = useMemo(() => {
@@ -117,6 +119,15 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
               {t.summary.units_complete} of {t.summary.units} units complete · {missingReq} required field{missingReq === 1 ? "" : "s"} missing
               {syncedAt && <> · synced {new Date(syncedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</>}
             </div>
+            {(() => {   // the project's tolerances for this kind of equipment (Rules / Tol. tab)
+              const keys = [...new Set([...categoriesFor(t.export_sheet), ...categoriesFor(t.key)])].filter((k) => hasTol(tolerances[k]));
+              return keys.length > 0 && (
+                <div className="eq-tol"><b>Tolerance</b>{" "}
+                  {keys.map((k) => { const c = TOLERANCE_CATS.find((x) => x.key === k)!;
+                    return <span key={k} className="eq-tol-item">{keys.length > 1 || c.group === "ahu" || c.group === "terminal" ? `${c.label} ` : ""}{fmtTol(tolerances[k])}</span>; })}
+                </div>
+              );
+            })()}
           </div>
         </div>
 

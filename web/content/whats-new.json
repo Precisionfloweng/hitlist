@@ -2,6 +2,12 @@
  {
   "date": "2026-10-03",
   "audience": "all",
+  "title": "Tolerance on the checklist",
+  "text": "The Equipment checklist shows the project's tolerance for the selected kind of equipment under its name, when one is set."
+ },
+ {
+  "date": "2026-10-03",
+  "audience": "all",
   "title": "Old document versions skipped",
   "text": "Search the Documents no longer reads sub-folders like Older versions, Old, Superseded or Archive, so answers come from current documents."
  },

@@ -171,7 +171,7 @@ export default async function HelpPage() {
             <li><b>Default Rules</b> (top bar) are the company standard. Only admins can change them.</li>
             <li>A project&apos;s <b>Rules</b> tab lets anyone change a field for <b>that project only</b>. Changed fields are highlighted blue, with the default shown next to them and a <b>Reset</b> button. Every change is logged and can be undone.</li>
             <li>Rule changes show up on the project&apos;s next <b>Sync</b>.</li>
-            <li><b>Tolerances</b>: at the top of a project&apos;s Rules tab, enter the spec&apos;s tolerances as <b>+%</b> and <b>−%</b> of design, split the way specs usually do: AHUs/RTUs (supply, return, outside air), fans and outlets &amp; inlets (supply, return, exhaust), terminal units (max, min airflow), and water (pumps, coils, TU/FCU coils). Typing in + fills − to match; change − when the spec differs (e.g. +10 / −0). Leave a box blank if the spec doesn&apos;t give one. Filled-in tolerances show on the Overview, and the AI uses them when wording deficiencies.</li>
+            <li><b>Tolerances</b>: at the top of a project&apos;s Rules tab, enter the spec&apos;s tolerances as <b>+%</b> and <b>−%</b> of design, split the way specs usually do: AHUs/RTUs (supply, return, outside air), fans and outlets &amp; inlets (supply, return, exhaust), terminal units (max, min airflow), and water (pumps, coils, TU/FCU coils). Typing in + fills − to match; change − when the spec differs (e.g. +10 / −0). Leave a box blank if the spec doesn&apos;t give one. Filled-in tolerances show on the Overview and under each equipment type on the Equipment checklist, and the AI uses them when wording deficiencies.</li>
           </ul>
         </section>
 
