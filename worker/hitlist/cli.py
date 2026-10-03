@@ -9,6 +9,8 @@
     python -m hitlist weekly-summary [--dry-run]                send the Monday summary emails
     python -m hitlist publish NUMBER                            re-send a project's last results to the website
     python -m hitlist update-rules TYPE_KEY [--statuses]        copy a type's sheet/column links (and names) from the bundled rules
+    python -m hitlist dropbox-setup [--relink]                  connect the read-only Dropbox app (once), then test it
+    python -m hitlist dropbox-test                              show what the server can see in Dropbox
 """
 
 from __future__ import annotations
@@ -54,12 +56,17 @@ def main(argv: list[str] | None = None) -> int:
     pub.add_argument("number")
     w = sub.add_parser("weekly-summary")
     w.add_argument("--dry-run", action="store_true", help="build the emails but don't send them")
+    ds = sub.add_parser("dropbox-setup", help="Connect the read-only Dropbox app and test it")
+    ds.add_argument("--relink", action="store_true", help="approve the app again (new refresh token)")
+    sub.add_parser("dropbox-test", help="Show the technician and project folders the server can see")
     args = p.parse_args(argv)
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     if args.cmd == "check":
         return _check(args)
+    if args.cmd in ("dropbox-setup", "dropbox-test"):
+        return _dropbox(args)
 
     from .config import Settings
     from .mailer import Mailer
@@ -131,6 +138,37 @@ def main(argv: list[str] | None = None) -> int:
         print(("Would send" if args.dry_run else "Sent") + f" {len(sent)} email(s): {sent}")
         return 0
     return 1
+
+
+def _dropbox(args) -> int:
+    """Connect the Dropbox app (the key goes into .env, never on screen) and list what it can see."""
+    import getpass
+    import webbrowser
+    from .config import Settings, load_dotenv
+    from .dropbox import Dropbox, DropboxError, authorize_url, connection_report, exchange_code, set_env_values
+
+    load_dotenv(args.env)
+    st = Settings.from_env(None)
+    try:
+        if args.cmd == "dropbox-setup" and (args.relink or not st.dropbox_refresh_token):
+            key = st.dropbox_app_key or input("Dropbox App key (Settings tab of the app): ").strip()
+            secret = st.dropbox_app_secret or getpass.getpass("Dropbox App secret (typing is hidden): ").strip()
+            url = authorize_url(key)
+            print("\nOpening Dropbox. Sign in with the PFE account, click Continue, then Allow.")
+            print(f"If no browser opens, copy this into one:\n  {url}\n")
+            webbrowser.open(url)
+            code = input("Paste the code Dropbox shows you, then press Enter: ").strip()
+            token = exchange_code(key, secret, code)
+            set_env_values(args.env, {"DROPBOX_APP_KEY": key, "DROPBOX_APP_SECRET": secret, "DROPBOX_REFRESH_TOKEN": token})
+            print(f"Saved to {args.env}.\n")
+            st.dropbox_app_key, st.dropbox_app_secret, st.dropbox_refresh_token = key, secret, token
+        dbx = Dropbox(st.dropbox_app_key, st.dropbox_app_secret, st.dropbox_refresh_token)
+        for line in connection_report(dbx, st.dropbox_tech_folder):
+            print(line)
+        return 0
+    except DropboxError as e:
+        print(f"Dropbox problem: {e}")
+        return 1
 
 
 def _seed_dict():

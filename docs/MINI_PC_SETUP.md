@@ -52,6 +52,21 @@ restarts itself) and `Hitlist weekly summary` (Mondays 6:15 AM; output in `logs\
 
 Logs are in `C:\Hitlist\worker\logs\worker.log`.
 
+## 6. Dropbox (project documents, read-only)
+1. Create the app at dropbox.com/developers/apps: **Scoped access**, **Full Dropbox**. On its **Permissions**
+   tab tick only `files.metadata.read` and `files.content.read`, then **Submit**.
+2. On the server:
+```
+cd C:\Hitlist\worker
+.venv\Scripts\activate
+python -m hitlist dropbox-setup
+```
+   Paste the **App key**, then the **App secret** (from the app's Settings tab; the secret isn't shown as you type).
+   A Dropbox page opens: sign in with the PFE account, click **Allow**, copy the code it shows and paste it back.
+   The key, secret and refresh token are saved in `.env`. The command then lists the technician folders and
+   how many project folders each has. Run `python -m hitlist dropbox-test` any time to see that list again.
+3. If the technicians folder has another name, add `DROPBOX_TECH_FOLDER=Its Name` to `.env`.
+
 ## Updating later
 ```
 cd C:\Hitlist
