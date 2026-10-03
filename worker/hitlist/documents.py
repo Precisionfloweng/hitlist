@@ -34,6 +34,17 @@ MAX_PAGE_CHARS = 20_000
 MAX_FILE_MB = 400
 
 
+# Sub-folders holding superseded copies (an old spec next to the current one) aren't read, so answers only
+# come from current documents: "Older versions", "Old", "Superseded", "Archive", "Previous", "Void"...
+OLD_FOLDER = re.compile(r"^\W*(old(er)?( versions?| revisions?| docs?| files?)?|superseded|archived?|obsolete|"
+                        r"previous( versions?| revisions?)?|prior( versions?)?|void(ed)?|outdated)\W*$", re.I)
+
+
+def is_old_copy(rel_path: str) -> bool:
+    """True when any folder in the file's path (inside the document folder) is an old-versions folder."""
+    return any(OLD_FOLDER.match(part) for part in rel_path.split("/")[:-1])
+
+
 class DocsError(RuntimeError):
     pass
 
@@ -298,6 +309,8 @@ def update_documents(dbx: Dropbox, folder: dict, project: str, previous: dict | 
         for e in sorted((e for e in dbx.list_all(sub["path_lower"]) if e.get(".tag") == "file"),
                         key=lambda e: e["path_lower"]):
             rel = e["path_display"][len(sub["path_display"]):].lstrip("/")
+            if is_old_copy(rel):
+                continue
             if not e["name"].lower().endswith(READABLE):
                 ext = Path(e["name"]).suffix.lower() or "(no type)"
                 if ext not in other.setdefault(category, []):

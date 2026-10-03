@@ -34,6 +34,13 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Web `lib/docs.ts`: keyword/tag page search, only the best pages go to Claude; answers cite [S#] file+page;
   history in Blob docs-qa/. File names/contents are client data: never in the repo or tests.
 
+## Tolerances
+- `web/lib/toleranceCats.ts`: groups AHUs/RTUs (supply, return, OA), Fans and Outlets & Inlets (supply, return, exhaust),
+  Terminal Units (max, min), Water (pumps, coils, TU/FCU coils); each value has plus and minus. `categoriesFor(itemType,
+  unitName)` maps a unit to its categories (outlets by their BuildingStart page; fans by type and SF/RF/EF tag).
+  Tolerances tab rows: category, plus, minus (pct = old single ± value, still read; old category keys expand via LEGACY).
+- Document folders named Older versions / Old / Superseded / Archive / Previous / Void are skipped (`is_old_copy`).
+
 ## Project keys
 - Projects can share a number (two sites on one contract). Each project's key is `project_id`, blank
   meaning "same as project_number"; a second site gets e.g. "26-083-2". URLs, Queue.project_number,

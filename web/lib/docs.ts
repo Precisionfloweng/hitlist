@@ -5,7 +5,7 @@ import "server-only";
 import { gunzipSync } from "node:zlib";
 import { del, get, list, put } from "@vercel/blob";
 import { callClaudeForm } from "./wording";
-import { TOLERANCE_CATS, type Tolerances } from "./toleranceCats";
+import { normalizeTolerances, TOLERANCE_CATS, type Tolerances } from "./toleranceCats";
 
 export type DocFile = { id: string; category: string; name: string; path: string; modified: string;
   hash: string; size: number; pages: number; parts: string[] };
@@ -210,10 +210,11 @@ Rules:
 - If the question names one unit, answer for that unit only (don't list other equipment); if its values aren't in
   the excerpts, say so.
 - Start with the direct answer, then a few short supporting lines. Plain text, "-" bullets are fine, no headings.
-- tolerances: only when the question is about TAB tolerances. Fill a category only when the documents give one
-  ± percent that clearly applies to it (keys: ${TOLERANCE_CATS.map((c) => `${c.key} = ${c.label}`).join(", ")});
-  value is the number only, e.g. "10". If plus and minus differ (e.g. +10%/-5%), leave that category out and
-  explain in the answer. Otherwise leave tolerances out.
+- tolerances: only when the question is about TAB tolerances. Fill each category the documents clearly give a
+  tolerance for (keys: ${TOLERANCE_CATS.map((c) => `${c.key} = ${c.full}`).join("; ")}). Write the value as "10"
+  for ±10%, or "+10/-0" when plus and minus differ (e.g. supply +10%/-0%, exhaust 0/-10 is "0/-10"). One spec value
+  can fill several categories (e.g. "all air devices ±10%" fills supply, return and exhaust outlets). Leave out
+  categories the documents don't cover. Otherwise leave tolerances out.
 
 Give your reply with the "answer" form.`;
 
@@ -225,15 +226,15 @@ const FORM = {
     sources: { type: "array", items: { type: "string" }, description: "Excerpt ids used, e.g. [\"S1\", \"S4\"]." },
     tolerances: {
       type: "object",
-      description: "Only for TAB tolerance questions: ± percent by equipment category, number only. Leave out otherwise.",
-      properties: Object.fromEntries(TOLERANCE_CATS.map((c) => [c.key, { type: "string", description: c.label }])),
+      description: "Only for TAB tolerance questions: percent of design by category, \"10\" for ±10 or \"+10/-0\". Leave out otherwise.",
+      properties: Object.fromEntries(TOLERANCE_CATS.map((c) => [c.key, { type: "string", description: c.full }])),
     },
   },
   required: ["answer", "found", "sources"],
 };
 
 export const QUICK: Record<Exclude<Mode, "ask">, (unit?: string) => string> = {
-  tolerances: () => "What are the TAB tolerances (± percent of design) in the spec for each type of equipment: air handlers, rooftop units, fans, terminal units, outlets and inlets, pumps and coils?",
+  tolerances: () => "What are the TAB tolerances (plus and minus percent of design) in the spec for each kind of equipment: air handlers and rooftop units (supply, return and outside air), supply/return/exhaust fans, supply/return/exhaust outlets and inlets, terminal units (max and min airflow), pumps, coils and terminal-unit/FCU coils?",
   tab: () => "What does the spec require for testing, adjusting and balancing: what must be tested and reported, instrument and certification requirements, and anything unusual the TAB tech should know?",
   design: (unit) => `What are the design values for ${unit || "this unit"}: airflow (CFM), outside air, external/total static pressure, water flow (GPM), motor HP and anything else scheduled for it?`,
 };
@@ -261,11 +262,7 @@ export async function askDocs(project: string, question: string, mode: Mode, by:
   for (const m of answerText.matchAll(/\[(S\d+)\]/g)) cited.add(m[1]);
   let tolerances: Tolerances | null = null;
   if (r.tolerances && typeof r.tolerances === "object") {
-    const t: Tolerances = {};
-    for (const c of TOLERANCE_CATS) {
-      const v = String((r.tolerances as Record<string, unknown>)[c.key] ?? "").replace(/[^\d.]/g, "");
-      if (/^\d{1,2}(\.\d+)?$/.test(v)) t[c.key] = v;
-    }
+    const t = normalizeTolerances(r.tolerances as Record<string, unknown>);
     tolerances = Object.keys(t).length ? t : null;
   }
   const answer: Answer = { question, answer: answerText || "No answer came back. Try again.", found: r.found !== false,

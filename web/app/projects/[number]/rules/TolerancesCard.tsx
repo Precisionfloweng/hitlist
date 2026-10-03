@@ -1,46 +1,72 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TOLERANCE_CATS, type ToleranceKey, type Tolerances } from "@/lib/toleranceCats";
+import { TOLERANCE_GROUPS, type Tol, type ToleranceGroupKey, type Tolerances } from "@/lib/toleranceCats";
 
-/** The project's tolerances (±%), typed in by a tech. Blank = not set (not shown anywhere). */
+type Box = { plus: string; minus: string; linked: boolean };   // linked: − follows + until it's typed in
+const toBoxes = (t: Tolerances): Record<string, Box> => Object.fromEntries(Object.entries(t).map(([k, v]) =>
+  [k, { plus: v.plus, minus: v.minus, linked: v.plus === v.minus }]));
+const same = (a?: Box, b?: Tol) => (a?.plus ?? "") === (b?.plus ?? "") && (a?.minus ?? "") === (b?.minus ?? "");
+
+/** The project's tolerances from the spec: + and − percent per category. Blank = not specified. */
 export default function TolerancesCard({ project, initial, canEdit, present }:
-  { project: string; initial: Tolerances; canEdit: boolean; present: ToleranceKey[] | null }) {
-  // Only the equipment this project has (plus any category that already has a value, so it can be cleared).
-  const cats = TOLERANCE_CATS.filter((c) => !present || present.includes(c.key) || initial[c.key]);
+  { project: string; initial: Tolerances; canEdit: boolean; present: ToleranceGroupKey[] | null }) {
+  // Only the groups for equipment this project has (plus any group that already has a value, so it can be cleared).
+  const groups = TOLERANCE_GROUPS.filter((g) => !present || present.includes(g.key) || g.items.some((i) => initial[i.key]));
   const router = useRouter();
   const [saved, setSaved] = useState<Tolerances>(initial);
-  const [vals, setVals] = useState<Tolerances>(initial);
+  const [boxes, setBoxes] = useState<Record<string, Box>>(toBoxes(initial));
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
-  const dirty = cats.some((c) => (vals[c.key] ?? "") !== (saved[c.key] ?? ""));
+  const keys = groups.flatMap((g) => g.items.map((i) => i.key));
+  const dirty = keys.some((k) => !same(boxes[k], saved[k]));
+
+  const clean = (v: string) => v.replace(/[^\d.]/g, "");
+  function setPlus(k: string, v: string) {
+    const b = boxes[k] ?? { plus: "", minus: "", linked: true };
+    setBoxes({ ...boxes, [k]: { ...b, plus: clean(v), minus: b.linked ? clean(v) : b.minus } });
+  }
+  function setMinus(k: string, v: string) {
+    const b = boxes[k] ?? { plus: "", minus: "", linked: true };
+    setBoxes({ ...boxes, [k]: { ...b, minus: clean(v), linked: false } });
+  }
 
   async function save() {
     setBusy(true); setMsg(null);
+    const values = Object.fromEntries(keys.map((k) => [k, { plus: boxes[k]?.plus ?? "", minus: boxes[k]?.minus ?? "" }]));
     const r = await fetch("/api/tolerances", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ project, values: Object.fromEntries(cats.map((c) => [c.key, vals[c.key] ?? ""])) }) });
+      body: JSON.stringify({ project, values }) });
     const data = await r.json().catch(() => ({}));
     setBusy(false);
     if (!r.ok) { setMsg({ text: data.error || "Save failed", ok: false }); return; }
-    setSaved(data.tolerances); setVals(data.tolerances);
+    setSaved(data.tolerances); setBoxes(toBoxes(data.tolerances));
     setMsg({ text: "Saved", ok: true });
     router.refresh();
   }
 
-  if (cats.length === 0) return null;          // none of this equipment on the project
+  if (groups.length === 0) return null;          // none of this equipment on the project
   return (
     <div className="card tol-card">
       <div className="row" style={{ justifyContent: "space-between" }}>
         <b>Tolerances</b>
-        <span className="muted" style={{ fontSize: 13 }}>From the project spec, ± percent. Leave blank if not specified.</span>
+        <span className="muted" style={{ fontSize: 13 }}>From the project spec, percent of design. Type in + and − fills to match; change − if it differs (e.g. +10 / −0). Leave blank if not specified.</span>
       </div>
-      <div className="tol-grid">
-        {cats.map((c) => (
-          <label key={c.key} className="tol-box">
-            <span>{c.label}</span>
-            <span className="tol-input">±<input inputMode="decimal" value={vals[c.key] ?? ""} disabled={!canEdit}
-              onChange={(e) => setVals({ ...vals, [c.key]: e.target.value.replace(/[^\d.]/g, "") })} placeholder="–" />%</span>
-          </label>
+      <div className="tol-groups">
+        {groups.map((g) => (
+          <div key={g.key} className="tol-group">
+            <div className="tol-group-name">{g.label}</div>
+            {g.items.map((i) => (
+              <div key={i.key} className="tol-item">
+                <span className="tol-label">{i.label}</span>
+                <span className="tol-input">
+                  +<input inputMode="decimal" aria-label={`${g.label} ${i.label} plus percent`} value={boxes[i.key]?.plus ?? ""}
+                    disabled={!canEdit} placeholder="–" onChange={(e) => setPlus(i.key, e.target.value)} />
+                  −<input inputMode="decimal" aria-label={`${g.label} ${i.label} minus percent`} value={boxes[i.key]?.minus ?? ""}
+                    disabled={!canEdit} placeholder="–" onChange={(e) => setMinus(i.key, e.target.value)} />%
+                </span>
+              </div>
+            ))}
+          </div>
         ))}
       </div>
       {canEdit && (

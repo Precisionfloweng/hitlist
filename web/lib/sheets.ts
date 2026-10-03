@@ -26,8 +26,9 @@ export const SCHEMA = {
   Deficiencies: ["project_number", "group", "value", "count", "updated_at"],
   History: ["project_number", "synced_at", "fields_pct", "units_pct", "units",
     "open_deficiencies", "open_high"],
-  // A project's tolerances (±%) by category, typed in on the project's Rules tab. Website only.
-  Tolerances: ["project_number", "category", "pct", "changed_by", "changed_at"],
+  // A project's tolerances (+% / −%) by category, typed in on the project's Rules tab. Website only.
+  // pct = the single ± value (also how rows saved before the +/− split are read).
+  Tolerances: ["project_number", "category", "pct", "changed_by", "changed_at", "plus", "minus"],
   // A project's email list for sending the deficiency list, kept on the project's Contacts tab. Website only.
   // on_list: "yes" = included in the "New email" link; send_as: "to" or "cc".
   Contacts: ["project_number", "id", "name", "company", "trade", "email", "on_list", "added_by", "added_at", "position", "send_as"],

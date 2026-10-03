@@ -295,3 +295,16 @@ def test_same_job_folder_in_several_tech_folders_prefers_the_projects_tech():
     assert pick_project_folder(index, "99-007", "Sample Twin Schools", tech="Alex Tech")["path_lower"].startswith("/techs/alex tech")
     with pytest.raises(DocsError, match="alex tech / 99-007 Sample Twin Schools"):
         pick_project_folder(index, "99-007", "Sample Twin Schools", tech="Someone Else")
+
+
+def test_old_versions_folders_are_skipped():
+    from hitlist.documents import is_old_copy
+    assert is_old_copy("Older versions/Spec Vol II.pdf") and is_old_copy("Specs/Superseded/M-101.pdf")
+    assert is_old_copy("OLD/x.pdf") and is_old_copy("Archive/x.pdf") and is_old_copy("Previous Revisions/x.pdf")
+    assert not is_old_copy("Spec Vol II.pdf") and not is_old_copy("Holder Details/x.pdf") and not is_old_copy("Gold Line/x.pdf")
+    dbx = FakeDbx()
+    base = "/techs/alex tech/99-001 sample building/submittal/older versions"
+    dbx.add_folder(base)
+    dbx.add_file(f"{base}/AHU Submittal rev0.pdf", pdf_bytes(["old"]))
+    m = update_documents(dbx, dbx.metadata("/techs/alex tech/99-001 sample building"), "99-001", None, lambda n, b: None)
+    assert "AHU Submittal rev0.pdf" not in {f["name"] for f in m["files"]}

@@ -1,6 +1,18 @@
 [
  {
   "date": "2026-10-03",
+  "audience": "all",
+  "title": "Old document versions skipped",
+  "text": "Search the Documents no longer reads sub-folders like Older versions, Old, Superseded or Archive, so answers come from current documents."
+ },
+ {
+  "date": "2026-10-03",
+  "audience": "all",
+  "title": "Tolerances with + and −",
+  "text": "Tolerances are split by supply, return, exhaust and outside air (and max/min, pumps, coils), each with its own + and − percent. Values already entered carried over."
+ },
+ {
+  "date": "2026-10-03",
   "audience": "admins",
   "title": "Deleting a project removes everything",
   "text": "Deleting a project now also removes its contacts, tolerances, AI suggestions and stored document text and questions. Dropbox itself is never touched."

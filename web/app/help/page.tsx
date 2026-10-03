@@ -171,7 +171,7 @@ export default async function HelpPage() {
             <li><b>Default Rules</b> (top bar) are the company standard. Only admins can change them.</li>
             <li>A project&apos;s <b>Rules</b> tab lets anyone change a field for <b>that project only</b>. Changed fields are highlighted blue, with the default shown next to them and a <b>Reset</b> button. Every change is logged and can be undone.</li>
             <li>Rule changes show up on the project&apos;s next <b>Sync</b>.</li>
-            <li><b>Tolerances</b>: at the top of a project&apos;s Rules tab, enter the spec&apos;s ±% for AHUs, RTUs, fans, terminal units, outlets &amp; inlets, pumps and coils. Leave a box blank if the spec doesn&apos;t give one. Filled-in tolerances show on the Overview, and the AI uses them when wording deficiencies.</li>
+            <li><b>Tolerances</b>: at the top of a project&apos;s Rules tab, enter the spec&apos;s tolerances as <b>+%</b> and <b>−%</b> of design, split the way specs usually do: AHUs/RTUs (supply, return, outside air), fans and outlets &amp; inlets (supply, return, exhaust), terminal units (max, min airflow), and water (pumps, coils, TU/FCU coils). Typing in + fills − to match; change − when the spec differs (e.g. +10 / −0). Leave a box blank if the spec doesn&apos;t give one. Filled-in tolerances show on the Overview, and the AI uses them when wording deficiencies.</li>
           </ul>
         </section>
 
@@ -185,7 +185,8 @@ export default async function HelpPage() {
             <li>Hitlist prefers the folder inside the project&apos;s tech&apos;s own Dropbox folder. If it picks the wrong folder (or can&apos;t find one), press <b>Set folder</b> and paste the folder&apos;s path from File Explorer or its dropbox.com link.</li>
             <li>Type a question (for example <i>What is the design airflow on AHU-16?</i>) and press <b>Ask</b>, or use the quick buttons: <b>Tolerances</b>, <b>TAB requirements</b>, or <b>Design values</b> for a unit. Put a unit tag in the unit box to ask about just that unit; <b>Ask</b> uses it too.</li>
             <li>Every value comes with its source (<b>S1</b>, <b>S2</b>...): folder, file, page and file date, so you can check it. If the answer isn&apos;t in the documents it says so instead of guessing, and it points out when an ASI, RFI or change order changes a value.</li>
-            <li>After <b>Tolerances</b>, <b>Fill in Tolerances</b> puts the numbers on the project&apos;s Rules / Tol. tab.</li>
+            <li>After <b>Tolerances</b>, <b>Fill in Tolerances</b> puts the numbers (including different + and − values) on the project&apos;s Rules / Tol. tab.</li>
+            <li>Sub-folders named like <b>Older versions</b>, <b>Old</b>, <b>Superseded</b> or <b>Archive</b> aren&apos;t read, so answers come from the current documents only.</li>
             <li><b>Asked before</b> lists earlier questions and answers on the project, so you don&apos;t need to ask twice.</li>
             <li>Scanned files with no text can&apos;t be read yet; they&apos;re listed under &quot;couldn&apos;t be read&quot;.</li>
           </ul>

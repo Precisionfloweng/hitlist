@@ -1,18 +1,17 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { fmtTol, normalizeTolerances, TOLERANCE_CATS } from "@/lib/toleranceCats";
 
 type Source = { id: string; category: string; path: string; name: string; page: number; modified: string };
 type Answer = { question: string; answer: string; found: boolean; sources: Source[];
-  tolerances: Record<string, string> | null; at: string; by: string };
+  tolerances: Record<string, unknown> | null; at: string; by: string };
 type Job = { status: "queued" | "running" | "done" | "failed"; step: string; ahead: number } | null;
 type Info = { folder: string; updated: string; status: string; job: Job; found: Record<string, number> | null;
   missing?: string[]; otherTypes?: Record<string, string[]>;
   files: number; pages: number; skipped: { name: string; category: string; reason: string }[]; history: Answer[] };
 
 const FOLDERS = ["Drawings and Specs", "Submittal", "TAB Plan", "ASIs and RFIs", "Change Orders"];
-const TOL_LABELS: Record<string, string> = { ahu: "AHUs", rtu: "RTUs", fans: "Fans", terminal: "Terminal Units",
-  outlets: "Outlets & Inlets", pumps: "Pumps", coils: "Coils" };
 
 const when = (iso: string) => {
   const d = new Date(iso);
@@ -28,10 +27,12 @@ const showPath = (p: string) => p.split("/").filter(Boolean).join(" / ");
 function AnswerView({ a, project }: { a: Answer; project: string }) {
   const router = useRouter();
   const [tolMsg, setTolMsg] = useState("");
+  const tol = normalizeTolerances(a.tolerances);   // also reads answers saved before tolerances had + and −
+  const tolText = TOLERANCE_CATS.filter((c) => tol[c.key]).map((c) => `${c.full} ${fmtTol(tol[c.key])}`).join(" · ");
   async function fillTolerances() {
     setTolMsg("Saving…");
     const r = await fetch("/api/tolerances", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ project, values: a.tolerances }) });
+      body: JSON.stringify({ project, values: tol }) });
     const data = await r.json().catch(() => ({}));
     setTolMsg(r.ok ? "Saved to the Rules / Tol. tab ✓" : data.error || "Couldn't save");
     if (r.ok) router.refresh();
@@ -39,9 +40,9 @@ function AnswerView({ a, project }: { a: Answer; project: string }) {
   return (
     <div className="docs-answer">
       <div className={`docs-answer-text${a.found ? "" : " notfound"}`}>{a.answer}</div>
-      {a.tolerances && (
+      {tolText && (
         <div className="docs-tol">
-          <span>Tolerances found: {Object.entries(a.tolerances).map(([k, v]) => `${TOL_LABELS[k] ?? k} ±${v}%`).join(" · ")}</span>
+          <span>Tolerances found: {tolText}</span>
           {tolMsg ? <span className={tolMsg.includes("✓") ? "pill ok" : "muted"}>{tolMsg}</span>
             : <button className="primary" onClick={fillTolerances}>Fill in Tolerances</button>}
         </div>

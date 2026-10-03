@@ -9,7 +9,7 @@ import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { daysSince, getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
 import { loadTolerances } from "@/lib/tolerances";
-import { TOLERANCE_CATS } from "@/lib/toleranceCats";
+import { toleranceSummary } from "@/lib/toleranceCats";
 
 export const dynamic = "force-dynamic";
 
@@ -43,10 +43,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
 
         {p.lastSync ? (
           <>
-            {TOLERANCE_CATS.some((c) => tol[c.key]) && (
+            {toleranceSummary(tol).length > 0 && (
               <div className="tol-line">
-                <b>Tolerances</b>{" "}
-                {TOLERANCE_CATS.filter((c) => tol[c.key]).map((c) => `${c.label} ±${tol[c.key]}%`).join(" · ")}
+                <b>Tolerances</b>
+                {toleranceSummary(tol).map((g) => <span key={g.group} className="tol-line-group">{g.group}: {g.text}</span>)}
               </div>
             )}
             <div className="tiles">

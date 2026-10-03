@@ -48,7 +48,7 @@ For each note decide:
   * Do NOT start with or repeat the equipment ID/tag of the unit the note is on: BuildingStart shows it already.
   * Plain, professional language, complete sentences, no markdown, no quotes around it. Keep line breaks in lists.
   * If the item has a "tolerance" and the note's own numbers show a reading outside it, you may say so
-    ("outside the ±5% tolerance"). Never mention a tolerance that isn't given.
+    ("outside the +10/−0% tolerance"). Never mention a tolerance that isn't given.
 - why: one short line saying what the suggestion fixes (e.g. "Clearer sentence; spells out the abbreviation.").
 - other: "" (leave empty).
 
@@ -72,8 +72,8 @@ For each item decide:
     "the right-hand valve", "fans 2 and 3", "the pump"). Keep other tags the tech wrote (outlet S-1, fan F2...).
   * Plain, professional field language, one to three short sentences, no markdown, no quotes around it.
   * Fix spelling and grammar. Use the trade from the assigned role when it fits.
-  * If the item has a "tolerance" (the project's spec, e.g. "±5% (Terminal Units)") and the tech's own numbers
-    show a reading outside it, say so ("outside the ±5% tolerance"). Never mention a tolerance that isn't given.
+  * If the item has a "tolerance" (the project's spec for that kind of unit, e.g. "Outlets & Inlets – Supply +10/−0%") and the tech's own numbers
+    show a reading outside it, say so ("outside the +10/−0% tolerance"). Never mention a tolerance that isn't given.
 - why: one short line saying what the suggestion adds or fixes (e.g. "Adds the design value and what's needed.").
 - other: only for a problem that isn't the wording, e.g. "Assigned to your own company with no contact." Otherwise "".
 
@@ -81,8 +81,7 @@ Reply with ONLY a JSON array, one object per item, in the same order:
 [{"number": "...", "ok": true|false, "suggestion": "...", "why": "...", "other": "..."}]`;
 
 function payloadFor(kind: Kind, d: ReviewItem, tol: Tolerances) {
-  const t = toleranceFor(d.itemType, tol);
-  const tolerance = t ? `±${t.pct}% (${t.label})` : undefined;
+  const tolerance = toleranceFor(d.itemType, tol, d.equipment) ?? undefined;
   return kind === "notes"
     ? { number: d.key, equipment: d.equipment, equipment_type: d.itemType, path: d.path, tolerance, text: d.text }
     : { number: d.key, equipment: d.equipment, equipment_type: d.itemType, path: d.path, tolerance,
