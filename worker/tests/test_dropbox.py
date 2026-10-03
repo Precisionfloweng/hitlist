@@ -67,3 +67,10 @@ def test_set_env_values_replaces_and_appends(tmp_path):
     env.write_text("# comment\nA=1\nDROPBOX_APP_KEY=old\n", encoding="utf-8")
     set_env_values(env, {"DROPBOX_APP_KEY": "new", "DROPBOX_REFRESH_TOKEN": "t"})
     assert env.read_text(encoding="utf-8") == "# comment\nA=1\nDROPBOX_APP_KEY=new\nDROPBOX_REFRESH_TOKEN=t\n"
+
+
+def test_report_explains_an_empty_app_folder():
+    fake = FakeDropbox()
+    fake.tree = {}
+    lines = connection_report(Dropbox("k", "s", "r", session=fake), "Techs")
+    assert "'App folder' access instead of 'Full Dropbox'" in lines[-1]

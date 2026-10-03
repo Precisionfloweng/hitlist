@@ -127,6 +127,19 @@ def connection_report(dbx: Dropbox, tech_folder: str) -> list[str]:
            f" ({'team account' if team else 'personal account'})."]
     top = dbx.folders("")
     tech = find_folder(top, tech_folder)
+    if not tech and dbx.path_root:            # also try the member's own view of Dropbox
+        saved, dbx.path_root = dbx.path_root, None
+        own = dbx.folders("")
+        tech = find_folder(own, tech_folder)
+        if tech or not top:
+            top = own
+        else:
+            dbx.path_root = saved
+    if not top:
+        out.append("Dropbox shows this app an empty folder. That happens when the app was created with "
+                   "'App folder' access instead of 'Full Dropbox' (see Permission type on the app's Settings tab). "
+                   "Create a new app with Full Dropbox, then run: python -m hitlist dropbox-setup --relink")
+        return out
     if not tech:
         out.append(f"Couldn't find a folder named '{tech_folder}' at the top level. Top-level folders seen: "
                    + (", ".join(e["name"] for e in top) or "(none)"))
