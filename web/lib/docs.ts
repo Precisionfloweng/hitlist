@@ -215,6 +215,10 @@ Rules:
   for ±10%, or "+10/-0" when plus and minus differ (e.g. supply +10%/-0%, exhaust 0/-10 is "0/-10"). One spec value
   can fill several categories (e.g. "all air devices ±10%" fills supply, return and exhaust outlets). Leave out
   categories the documents don't cover. Otherwise leave tolerances out.
+  Read the direction exactly: "0 to plus 10 percent", "plus 10, minus 0" or "+10%/-0%" is "+10/-0" (nothing allowed
+  below design); "minus 10 to 0" is "0/-10"; only "plus or minus 10" / "±10" is "10". Never turn a one-sided range
+  into ±. If the tolerance depends on size (e.g. up to 5,000 cfm one value, above it another), fill the category with
+  the value for units above the size limit and state both in the answer, so the tech can adjust smaller units.
 
 Give your reply with the "answer" form.`;
 
