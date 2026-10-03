@@ -456,3 +456,15 @@ header.top .top-drop form button { background: transparent; }
 .eq-tol-item { background: #eef4fb; border: 1px solid #c9d8ea; color: #1f4e79; border-radius: 999px; padding: 1px 10px; font-weight: 600; font-size: 13px; }
 .docs-latest { margin-top: 14px; font-size: 13px; }
 .docs-latest + .docs-answer { margin-top: 6px; }
+
+/* Overview: tolerances, collapsed until tapped */
+.tol-view { margin-bottom: 14px; }
+.tol-view > summary { cursor: pointer; list-style: none; font-size: 16px; }
+.tol-view > summary::-webkit-details-marker { display: none; }
+.tol-view > summary::before { content: "▸"; display: inline-block; width: 18px; color: var(--brand); transition: transform .15s; }
+.tol-view[open] > summary::before { transform: rotate(90deg); }
+.tol-view[open] > summary .muted { display: none; }
+.tol-value { font-weight: 700; font-size: 16px; color: var(--ink); }
+.tol-value.none { font-weight: 400; font-size: 13px; color: var(--muted); }
+.tol-view .tol-item { padding: 5px 0; font-size: 14px; }
+.tol-view .tol-group-name { font-size: 15px; }

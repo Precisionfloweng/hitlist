@@ -9,7 +9,7 @@ import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { daysSince, getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
 import { loadTolerances } from "@/lib/tolerances";
-import { toleranceSummary } from "@/lib/toleranceCats";
+import { fmtTol, hasTol, TOLERANCE_GROUPS, toleranceSummary } from "@/lib/toleranceCats";
 
 export const dynamic = "force-dynamic";
 
@@ -44,10 +44,27 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
         {p.lastSync ? (
           <>
             {toleranceSummary(tol).length > 0 && (
-              <div className="tol-line">
-                <b>Tolerances</b>
-                {toleranceSummary(tol).map((g) => <span key={g.group} className="tol-line-group">{g.group}: {g.text}</span>)}
-              </div>
+              <details className="card tol-view">
+                <summary>
+                  <b>Tolerances</b>
+                  <span className="muted"> · from the spec ({TOLERANCE_GROUPS.filter((g) => g.items.some((i) => hasTol(tol[i.key]))).length} groups set) · tap to show</span>
+                </summary>
+                <div className="tol-groups">
+                  {TOLERANCE_GROUPS.filter((g) => g.items.some((i) => hasTol(tol[i.key]))).map((g) => (
+                    <div key={g.key} className="tol-group">
+                      <div className="tol-group-name">{g.label}</div>
+                      {g.items.map((i) => (
+                        <div key={i.key} className="tol-item">
+                          <span className="tol-label">{i.label}</span>
+                          <span className={`tol-value${hasTol(tol[i.key]) ? "" : " none"}`}>{hasTol(tol[i.key]) ? fmtTol(tol[i.key]) : "not set"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+                {user.role !== "customer" && <div className="muted" style={{ fontSize: 13, marginTop: 8 }}>
+                  Change them on the <Link href={`/projects/${encodeURIComponent(p.id)}/rules`}>Rules / Tol.</Link> tab.</div>}
+              </details>
             )}
             <div className="tiles">
               <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />

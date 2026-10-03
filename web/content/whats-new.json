@@ -2,6 +2,12 @@
  {
   "date": "2026-10-03",
   "audience": "all",
+  "title": "Tolerances on the Overview",
+  "text": "The Overview's Tolerances section is now a full-size card, closed until you tap it, with each group's + and − values easy to read."
+ },
+ {
+  "date": "2026-10-03",
+  "audience": "all",
   "title": "Tolerances saved automatically",
   "text": "When Search the Documents finds the spec's tolerances, they're saved to the project right away, with no extra button to press."
  },
