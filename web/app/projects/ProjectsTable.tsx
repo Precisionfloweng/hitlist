@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import RefreshButton from "../RefreshButton";
 import { pct, syncLabel } from "../format";
 import type { Project } from "@/lib/data";
@@ -10,7 +10,15 @@ type Row = Project & { mine: boolean };
 export default function ProjectsTable({ rows, userName, customer = false, canSync = true }:
   { rows: Row[]; userName: string; customer?: boolean; canSync?: boolean }) {
   const [q, setQ] = useState("");
-  const [mineOnly, setMineOnly] = useState(false);
+  const [mineOnly, setMineOnlyState] = useState(false);
+  // Remember the "My projects" tick on this device, so it's still on after opening a project and coming back.
+  useEffect(() => {
+    try { if (localStorage.getItem("hitlist.myProjects") === "1") setMineOnlyState(true); } catch { /* storage blocked */ }
+  }, []);
+  const setMineOnly = (on: boolean) => {
+    setMineOnlyState(on);
+    try { localStorage.setItem("hitlist.myProjects", on ? "1" : "0"); } catch { /* storage blocked */ }
+  };
   // Someone who isn't the tech on any project (e.g. the owner) still sees everything with My projects ticked.
   const hasMine = rows.some((r) => r.mine);
   const shown = useMemo(() => {
