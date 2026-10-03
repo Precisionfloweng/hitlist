@@ -1,6 +1,8 @@
 import "server-only";
 import { appendRows, deleteRow, deleteRows, ensureHeader, readTab, readTabs, updateRow, type Rec } from "./sheets";
 import { deleteResults } from "./results";
+import { deleteProjectDocs } from "./docs";
+import { deleteWording } from "./wording";
 import type { User } from "./auth";
 
 export type Project = {
@@ -181,19 +183,21 @@ export async function saveProject(input: ProjectInput, originalKey?: string): Pr
   return projectId || input.number;
 }
 
-/** Delete a project and everything kept for it: results file, dashboard, deficiency and
- *  history rows, and its project rules. (Archiving is the way to hide a project but keep it.) */
+/** Delete a project and everything kept for it: results file, dashboard, deficiency, history, project rules,
+ *  tolerances, contacts and queue rows, its Dropbox document text and question history, and its AI Review
+ *  suggestions. (The server clears its own local copies within the hour.) Archiving hides a project but keeps it. */
 export async function removeProject(number: string) {
   const rows = await readTab("Projects", true);
   const p = rows.find((r) => keyOf(r) === number);
   if (!p) return;
-  const tabs = ["Dashboard", "Deficiencies", "History", "ProjectRules"] as const;
+  const tabs = ["Dashboard", "Deficiencies", "History", "ProjectRules", "Tolerances", "Contacts", "Queue"] as const;
   for (const tab of tabs) {
     let recs: Rec[] = [];
     try { recs = await readTab(tab, true); } catch { continue; }   // e.g. ProjectRules not created yet
     await deleteRows(tab, recs.filter((r) => r.project_number === number).map((r) => r._row));
   }
   await deleteResults(number);
+  await Promise.all([deleteProjectDocs(number), deleteWording(number)]);
   await deleteRow("Projects", p._row);
 }
 

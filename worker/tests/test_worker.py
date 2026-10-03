@@ -365,3 +365,19 @@ def test_weekly_summary_shows_possible_issues(tmp_path):
     msg = next(m for m in mail.sent if m["To"] == "tech@example.com")
     assert "Possible issues" in msg.get_body(("html",)).get_content()
     assert "Possible issues: 3" in msg.get_body(("plain",)).get_content()
+
+
+def test_cleanup_removes_local_files_of_deleted_projects(tmp_path):
+    from hitlist.runner import cleanup_deleted
+    store = make_store()
+    s = Settings(results_dir=tmp_path / "results", docs_dir=tmp_path / "docs", export_dir=tmp_path / "exports")
+    for d in (s.results_dir, s.docs_dir):
+        d.mkdir()
+        (d / "99-001.json").write_text("{}")
+        (d / "99-999.json").write_text("{}")
+    (s.export_dir / "99-001").mkdir(parents=True)
+    (s.export_dir / "99-999").mkdir()
+    removed = cleanup_deleted(store, s)
+    assert len(removed) == 3
+    assert (s.results_dir / "99-001.json").exists() and not (s.docs_dir / "99-999.json").exists()
+    assert (s.export_dir / "99-001").exists() and not (s.export_dir / "99-999").exists()

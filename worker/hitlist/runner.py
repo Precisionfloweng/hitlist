@@ -457,21 +457,56 @@ def recover_interrupted(store: HitlistStore) -> int:
 
 
 HEARTBEAT_SECONDS = 5 * 60
+CLEANUP_EVERY = 12                     # heartbeats (about once an hour)
 
 
-def _heartbeat_loop(store: HitlistStore) -> None:
-    """Every 5 minutes, even while a long sync is running, note in the sheet that the server is up."""
+def cleanup_deleted(store: HitlistStore, settings: Settings) -> list[str]:
+    """Remove the server's local copies for projects deleted on the website: results files, the document
+    file lists and the downloaded BuildingStart exports. Returns what was removed."""
+    import shutil
+    from .store import project_key
+    keys = {project_key(p) for p in store.rows("Projects")}
+    if not keys:
+        return []                      # never wipe everything because the sheet came back empty
+    safe = lambda k: k.replace("/", "_")  # noqa: E731
+    keep = {safe(k) for k in keys}
+    removed = []
+    for folder in (settings.results_dir, settings.docs_dir):
+        for f in (folder.glob("*.json") if folder.exists() else []):
+            if f.stem not in keep:
+                f.unlink(missing_ok=True)
+                removed.append(str(f))
+    if settings.export_dir.exists():
+        for d in settings.export_dir.iterdir():
+            if d.is_dir() and d.name not in keep:
+                shutil.rmtree(d, ignore_errors=True)
+                removed.append(str(d))
+    if removed:
+        log.info("Removed local files of deleted projects: %s", ", ".join(removed))
+    return removed
+
+
+def _heartbeat_loop(store: HitlistStore, settings: Settings | None = None) -> None:
+    """Every 5 minutes, even while a long sync is running, note in the sheet that the server is up.
+    About once an hour, also clear local files of deleted projects."""
+    n = 0
     while True:
         try:
             store.heartbeat()
         except Exception:  # noqa: BLE001 - Google briefly unreachable; try again next time
             log.warning("Could not record the server heartbeat", exc_info=True)
+        if settings is not None and n % CLEANUP_EVERY == 0:
+            try:
+                cleanup_deleted(store, settings)
+            except Exception:  # noqa: BLE001
+                log.warning("Could not clear files of deleted projects", exc_info=True)
+        n += 1
         time.sleep(HEARTBEAT_SECONDS)
 
 
 def run_forever(store: HitlistStore, settings: Settings, mailer: Mailer) -> None:
     log.info("Worker started; checking the queue every %ss", settings.poll_seconds)
-    threading.Thread(target=_heartbeat_loop, args=(store,), daemon=True, name="heartbeat").start()
+    threading.Thread(target=_heartbeat_loop, args=(store, settings), daemon=True, name="heartbeat").start()
     try:
         store.setup()                       # adds any new columns/tabs after an update
     except Exception:  # noqa: BLE001

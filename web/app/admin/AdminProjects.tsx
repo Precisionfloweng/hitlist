@@ -76,7 +76,7 @@ export default function AdminProjects({ initial }: { initial: Row[] }) {
                     }
                   }}>Save</button>
                   <button className="danger" disabled={busy === r.original} onClick={async () => {
-                    if (!confirm(`Delete ${r.number} ${r.name} for good?\n\nThis also deletes its sync results, history and project rules. To hide it but keep its data, set its status to Archived instead.`)) return;
+                    if (!confirm(`Delete ${r.number} ${r.name} for good?\n\nThis also deletes everything Hitlist keeps for it: sync results, history, project rules, tolerances, contacts, AI Review suggestions, and the Dropbox document text and questions (Dropbox itself isn't touched). To hide it but keep its data, set its status to Archived instead.`)) return;
                     if (await send({ action: "delete", original: r.original }, r.original)) setRows((rs) => rs.filter((_, j) => j !== i));
                   }}>Delete</button>
                 </td>

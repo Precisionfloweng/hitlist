@@ -2,7 +2,7 @@
 // for deficiencies, one for notes) in the private Blob store, keyed by item, so each wording is reviewed (and paid
 // for) only once.
 import "server-only";
-import { get, put } from "@vercel/blob";
+import { del, get, put } from "@vercel/blob";
 import type { Kind, ReviewItem } from "./reviewItems";
 import { toleranceFor, type Tolerances } from "./toleranceCats";
 
@@ -196,4 +196,11 @@ If existing_on_this_unit has an item that already says the same thing, set other
     `${kind === "notes" ? "Note" : "Deficiency"} to refine:\n${JSON.stringify([payload], null, 1)}`);
   const p = parseArray(reply)[0] ?? {};
   return { suggestion: String(p.suggestion || text).trim(), why: String(p.why ?? "").trim(), other: String(p.other ?? "").trim() };
+}
+
+/** Remove a deleted project's AI Review suggestions (deficiencies and notes). */
+export async function deleteWording(project: string) {
+  for (const kind of ["deficiencies", "notes"] as Kind[]) {
+    try { await del(pathFor(project, kind)); } catch { /* none */ }
+  }
 }

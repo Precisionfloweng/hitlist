@@ -288,3 +288,19 @@ async function saveHistory(project: string, a: Answer) {
     access: "private", allowOverwrite: true, addRandomSuffix: false, contentType: "application/json",
   });
 }
+
+/** Remove everything stored for a deleted project: document text, its file list and the question history. */
+export async function deleteProjectDocs(project: string) {
+  const urls: string[] = [];
+  let cursor: string | undefined;
+  try {
+    do {
+      const page = await list({ prefix: dir(project), cursor, limit: 1000 });
+      urls.push(...page.blobs.map((b) => b.url));
+      cursor = page.hasMore ? page.cursor : undefined;
+    } while (cursor);
+    if (urls.length) await del(urls);
+  } catch { /* nothing stored */ }
+  try { await del(historyPath(project)); } catch { /* none */ }
+  cache.delete(project);
+}

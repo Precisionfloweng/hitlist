@@ -1,6 +1,12 @@
 [
  {
   "date": "2026-10-03",
+  "audience": "admins",
+  "title": "Deleting a project removes everything",
+  "text": "Deleting a project now also removes its contacts, tolerances, AI suggestions and stored document text and questions. Dropbox itself is never touched."
+ },
+ {
+  "date": "2026-10-03",
   "audience": "all",
   "title": "Card colors",
   "text": "Every card has a thin blue bar on top; equipment type cards turn green when that type is 100% complete."
