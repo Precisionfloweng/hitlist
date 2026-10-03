@@ -121,7 +121,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
       <div className="ai-head">
         <span className="ai-spark" aria-hidden>✨</span>
         <div>
-          <b>Ask the documents</b>
+          <b>Search the Documents</b>
           <div className="muted" style={{ fontSize: 13 }}>
             Answers come from this project&apos;s Dropbox folder (specs, submittals, drawings, TAB plan, ASIs/RFIs,
             change orders), with the file and page for each value.

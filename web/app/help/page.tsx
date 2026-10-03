@@ -178,8 +178,8 @@ export default async function HelpPage() {
         <section id="ai">
           <h2>AI Tools</h2>
           <p>On a project&apos;s <b>✨ AI Tools</b> tab, choose <b>Deficiency</b> or <b>Note</b>, pick the unit if you like, and type, paste or dictate what you found (rough is fine; tap 🎤 on the iPad keyboard to talk). Press <b>Refine</b> and Claude rewrites it the PFE way, using the same rules as AI Review and the project&apos;s tolerances. Edit it if needed, fill in any <b>___</b>, press <b>Copy</b> and paste it into BuildingStart. Nothing you type there is saved.</p>
-          <h3>Ask the documents</h3>
-          <p>Below Refine, <b>Ask the documents</b> answers questions from the project&apos;s Dropbox folder. It reads the <b>Drawings and Specs</b>, <b>Submittal</b>, <b>TAB Plan</b>, <b>ASIs and RFIs</b> and <b>Change Orders</b> folders; the other folders are left alone, and Hitlist can only read Dropbox, never change it.</p>
+          <h3>Search the Documents</h3>
+          <p>Below Refine, <b>Search the Documents</b> answers questions from the project&apos;s Dropbox folder. It reads the <b>Drawings and Specs</b>, <b>Submittal</b>, <b>TAB Plan</b>, <b>ASIs and RFIs</b> and <b>Change Orders</b> folders; the other folders are left alone, and Hitlist can only read Dropbox, never change it.</p>
           <ul>
             <li>The first time, press <b>Find documents</b> (once files have been read, the button becomes <b>Update documents</b>). The server finds the folder by the job number in the technician folders (and by name when several projects share a number; if it can't tell, it asks you to pick) and reads the files; a big project can take several minutes. After that, every <b>Sync</b> also checks for new or changed files.</li>
             <li>If it picks the wrong folder (or can&apos;t find one), press <b>Change folder</b> and paste the folder&apos;s path from File Explorer or its dropbox.com link.</li>

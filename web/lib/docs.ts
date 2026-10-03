@@ -1,4 +1,4 @@
-// "Ask the documents": a project's Dropbox documents (specs, submittals, drawings, TAB plan, ASIs/RFIs,
+// "Search the Documents": a project's Dropbox documents (specs, submittals, drawings, TAB plan, ASIs/RFIs,
 // change orders) as page text, sent by the server. A question finds the best-matching pages and only
 // those go to Claude, which answers with the file and page for each value.
 import "server-only";
