@@ -135,7 +135,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
             📁 {info.folder ? <span>{showPath(info.folder)}</span>
               : working ? <span className="muted">Looking for the project&apos;s Dropbox folder…</span>
               : staleServer ? <span className="error">The update finished but no folder was linked: the server needs the latest update (git pull, pip install, restart the worker).</span>
-              : <span className="muted">No Dropbox folder linked yet. Update documents finds it by job number and name.</span>}
+              : <span className="muted">No Dropbox folder linked yet. Find documents looks for it by job number and name.</span>}
           </div>
           {working ? (
             <div className="docs-working">⏳ {info.job!.status === "queued"
@@ -165,7 +165,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           )}
           <div className="row" style={{ marginTop: 8 }}>
             <button disabled={!!busy || !!working} onClick={async () => { if (await post({ action: "update" }, "update")) load(); }}>
-              {busy === "update" ? "Asking the server…" : "⟳ Update documents"}
+              {busy === "update" ? "Asking the server…" : ready ? "⟳ Update documents" : "🔍 Find documents"}
             </button>
             <button disabled={!!busy || !!working} onClick={() => { setChanging(!changing); setPath(""); }}>
               {info.folder ? "Change folder" : "Set folder"}
@@ -200,7 +200,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           <button className="primary ai-btn" disabled={!ready || !!busy || !question.trim()} onClick={() => ask("ask")}>
             {busy === "ask" ? "Reading the documents…" : "Ask"}
           </button>
-          {!ready && info && !working && <span className="muted" style={{ fontSize: 13 }}>Press Update documents to read this project&apos;s files first.</span>}
+          {!ready && info && !working && <span className="muted" style={{ fontSize: 13 }}>Press Find documents to read this project&apos;s files first.</span>}
           {error && <span className="error">{error}</span>}
         </div>
       </div>
