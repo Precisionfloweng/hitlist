@@ -32,7 +32,7 @@ export default async function HelpPage() {
         <p className="lead">
           Hitlist reads each project&apos;s BuildingStart export and shows what&apos;s been filled in, what&apos;s still
           missing, and the open punch items. It only <b>reads</b> BuildingStart. To change anything you see here, update
-          it in BuildingStart and press <b>Sync</b>.
+          it in BuildingStart and press <b>Sync</b> on the Hitlist project.
         </p>
 
         <nav className="help-toc card">
