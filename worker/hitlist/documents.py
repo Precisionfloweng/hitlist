@@ -40,7 +40,7 @@ class DocsError(RuntimeError):
 
 # ---- finding the project's folder ---------------------------------------------------------
 def starts_with_number(folder_name: str, number: str) -> bool:
-    """'26-001 Some Job' starts with 26-001; '26-0012 Other' does not."""
+    """'99-001 Some Job' starts with 99-001; '99-0012 Other' does not."""
     return bool(number) and re.match(rf"^{re.escape(number.strip())}(?![0-9A-Za-z])", folder_name.strip(), re.I) is not None
 
 
