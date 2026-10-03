@@ -2,6 +2,12 @@
  {
   "date": "2026-10-03",
   "audience": "all",
+  "title": "Tolerances saved automatically",
+  "text": "When Search the Documents finds the spec's tolerances, they're saved to the project right away, with no extra button to press."
+ },
+ {
+  "date": "2026-10-03",
+  "audience": "all",
   "title": "Tolerance on the checklist",
   "text": "The Equipment checklist shows the project's tolerance for the selected kind of equipment under its name, when one is set."
  },

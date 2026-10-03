@@ -24,9 +24,9 @@ const fileDate = (s: string) => {
 };
 const showPath = (p: string) => p.split("/").filter(Boolean).join(" / ");
 
-function AnswerView({ a, project, onClose }: { a: Answer; project: string; onClose?: () => void }) {
+function AnswerView({ a, project, onClose, saved = false }: { a: Answer; project: string; onClose?: () => void; saved?: boolean }) {
   const router = useRouter();
-  const [tolMsg, setTolMsg] = useState("");
+  const [tolMsg, setTolMsg] = useState(saved ? "Saved to the Rules / Tol. tab ✓" : "");
   const tol = normalizeTolerances(a.tolerances);   // also reads answers saved before tolerances had + and −
   const tolText = TOLERANCE_CATS.filter((c) => tol[c.key]).map((c) => `${c.full} ${fmtTol(tol[c.key])}`).join(" · ");
   async function fillTolerances() {
@@ -45,7 +45,7 @@ function AnswerView({ a, project, onClose }: { a: Answer; project: string; onClo
         <div className="docs-tol">
           <span>Tolerances found: {tolText}</span>
           {tolMsg ? <span className={tolMsg.includes("✓") ? "pill ok" : "muted"}>{tolMsg}</span>
-            : <button className="primary" onClick={fillTolerances}>Fill in Tolerances</button>}
+            : <button className="primary" onClick={fillTolerances}>Use these tolerances</button>}
         </div>
       )}
       {a.sources.length > 0 && (
@@ -68,6 +68,8 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   const [busy, setBusy] = useState<string>("");
   const [error, setError] = useState("");
   const [answer, setAnswer] = useState<Answer | null>(null);
+  const [answerSaved, setAnswerSaved] = useState(false);       // its tolerances were saved automatically
+  const router = useRouter();
   const [changing, setChanging] = useState(false);
   const [path, setPath] = useState("");
 
@@ -117,7 +119,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   async function ask(mode: string) {
     setAnswer(null);
     const data = await post({ action: "ask", mode, question, unit }, mode);
-    if (data?.answer) { setAnswer(data.answer); load(); }
+    if (data?.answer) { setAnswer(data.answer); setAnswerSaved(!!data.tolerancesSaved); load(); if (data.tolerancesSaved) router.refresh(); }
   }
 
   const ready = !!info && info.files > 0;
@@ -225,7 +227,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
         </div>
       </div>
 
-      {answer && <AnswerView a={answer} project={project} onClose={() => removeAnswer(answer.at)} />}
+      {answer && <AnswerView key={answer.at} a={answer} project={project} saved={answerSaved} onClose={() => removeAnswer(answer.at)} />}
 
       {info && info.history.length > 0 && (
         <details className="docs-history">

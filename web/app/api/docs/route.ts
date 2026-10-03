@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { canEdit, canSee, currentUser } from "@/lib/auth";
 import { docsJob, getProject, requestDocs, setDocsFolder } from "@/lib/data";
+import { saveTolerances } from "@/lib/tolerances";
 import { askDocs, loadHistory, loadManifest, QUICK, removeAnswer, type Mode } from "@/lib/docs";
 
 export const maxDuration = 60;
@@ -61,7 +62,14 @@ export async function POST(req: Request) {
           ? `${typed}\n(This question is about ${unit} only; answer for that unit.)` : typed;
       if (!question) return NextResponse.json({ error: "Type a question first." }, { status: 400 });
       if (question.length > 1500) return NextResponse.json({ error: "That question is too long." }, { status: 400 });
-      return NextResponse.json({ ok: true, answer: await askDocs(project, question, mode, g.user.name || g.user.email) });
+      const answer = await askDocs(project, question, mode, g.user.name || g.user.email);
+      // Tolerances found in the spec go straight onto the project (Rules / Tol. tab, Overview, checklist, AI).
+      let tolerancesSaved = false;
+      if (answer.tolerances && Object.keys(answer.tolerances).length) {
+        await saveTolerances(project, answer.tolerances, g.user);
+        tolerancesSaved = true;
+      }
+      return NextResponse.json({ ok: true, answer, tolerancesSaved });
     }
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });
   } catch (e) {
