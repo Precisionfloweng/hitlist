@@ -67,7 +67,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                   const done = t.summary.units_complete, n = t.summary.units;
                   const pctDone = n ? (100 * done) / n : 0;
                   return (
-                    <Link key={t.key} href={eqHref(t.key)} className="type-card" title={`${t.name}: ${done} of ${n} units fully complete`}>
+                    <Link key={t.key} href={eqHref(t.key)} className={`type-card${pctDone >= 100 ? " full" : ""}`} title={`${t.name}: ${done} of ${n} units fully complete`}>
                       <span className="tc-name">{t.name}</span>
                       <span className="tc-num"><b>{done}</b> / {n}</span>
                       <span className={`tc-bar ${pctDone >= 100 ? "full" : ""}`}><span style={{ width: `${pctDone}%` }} /></span>

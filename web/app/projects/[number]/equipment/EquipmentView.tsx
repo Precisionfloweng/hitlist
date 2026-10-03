@@ -129,7 +129,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
             const open = x.units.filter((u) => u.required_filled < u.required).length;
             return (
               <li key={x.key}>
-                <button className={x.key === t.key ? "on" : ""} onClick={() => pick(x.key)}>
+                <button className={`${x.key === t.key ? "on" : ""}${!open && x.units.length ? " full" : ""}`} onClick={() => pick(x.key)}>
                   <span className="eq-name">{x.name}</span>
                   <span className="eq-pct">{Math.round(x.summary.fields_pct)}%</span>
                   <span className="bar"><span style={{ width: `${x.summary.fields_pct}%` }} /></span>

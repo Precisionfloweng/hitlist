@@ -2,6 +2,12 @@
  {
   "date": "2026-10-03",
   "audience": "all",
+  "title": "Card colors",
+  "text": "Every card has a thin blue bar on top; equipment type cards turn green when that type is 100% complete."
+ },
+ {
+  "date": "2026-10-03",
+  "audience": "all",
   "title": "Clearer buttons",
   "text": "Buttons across Hitlist now look raised and tinted, so they're easy to tell apart from input boxes."
  },

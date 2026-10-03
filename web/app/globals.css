@@ -383,7 +383,7 @@ header.top .top-drop form button:hover { background: #f5f6f8; }
 }
 
 /* AI Tools: Ask the documents */
-.ai-card { border-top: 3px solid #2f6fb3; }
+
 .docs-status { background: #f6f8fb; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
 .docs-folder { font-weight: 600; word-break: break-word; }
 .docs-working { margin-top: 6px; color: #2f6fb3; font-weight: 600; }
@@ -426,3 +426,10 @@ header.top .top-drop form button:hover { background: #f5f6f8; }
 button.linkish, .def-pop-head button { font-weight: 400; }
 header.top button:hover:not(:disabled) { border-color: rgba(255, 255, 255, .85); }
 header.top .top-drop form button { background: transparent; }
+
+/* Thin blue bar on top of every card; equipment cards turn green when the type is 100% complete */
+.card, .type-card, .eq-types li button { border-top: 3px solid #2f6fb3; }
+.type-card:hover, .eq-types li button:hover:not(.on) { border-top-color: #2f6fb3; }
+.type-card.full, .type-card.full:hover, .eq-types li button.full, .eq-types li button.full:hover { border-top-color: #4cbb75; }
+.eq-types li button.on { border-top-color: #2f6fb3; }
+.eq-types li button.on.full { border-top-color: #4cbb75; }
