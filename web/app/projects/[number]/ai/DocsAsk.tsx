@@ -175,7 +175,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           )}
           <div className="row" style={{ marginTop: 8 }}>
             <button disabled={!!busy || !!working} onClick={async () => { if (await post({ action: "update" }, "update")) load(); }}>
-              {busy === "update" ? "Asking the server…" : ready ? "⟳ Update documents" : "🔍 Find documents"}
+              {busy === "update" ? "Asking the server…" : ready ? "🔄 Update documents" : "🔍 Find documents"}
             </button>
             <button disabled={!!busy || !!working} onClick={() => { setChanging(!changing); setPath(""); }}>
               {info.folder ? "Change folder" : "Set folder"}
