@@ -92,7 +92,7 @@ def _where(folder: dict) -> str:
 
 
 def _techs_match(folder_tech: str, tech: str) -> bool:
-    """Hitlist's tech ("Jon" or "Jon Smith") against a technician folder name ("Jon Smith")."""
+    """Hitlist's tech ("Sam" or "Sam Tech") against a technician folder name ("Sam Tech")."""
     a, b = _words(folder_tech), _words(tech)
     return bool(a and b) and (b <= a or a <= b)
 
