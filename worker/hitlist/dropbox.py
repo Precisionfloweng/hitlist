@@ -83,7 +83,9 @@ class Dropbox:
         member's own folder. Returns True for a team account."""
         info = (account or self.account()).get("root_info", {})
         root, home = info.get("root_namespace_id"), info.get("home_namespace_id")
-        if info.get(".tag") == "team" and root and root != home:
+        # Some teams report root type "user" yet still keep the shared folders at a separate top level,
+        # so go by the IDs: a different root than the member's own folder means "look from the team's top".
+        if root and root != home:
             self.path_root = {".tag": "root", "root": root}
             return True
         return False

@@ -74,3 +74,17 @@ def test_report_explains_an_empty_app_folder():
     fake.tree = {}
     lines = connection_report(Dropbox("k", "s", "r", session=fake), "Techs")
     assert "'App folder' access instead of 'Full Dropbox'" in lines[-1]
+
+
+def test_team_view_used_when_root_differs_even_if_type_says_user():
+    fake = FakeDropbox()
+    orig = fake.post
+
+    def post(url, **kw):
+        r = orig(url, **kw)
+        if url.endswith("users/get_current_account"):
+            r._data["root_info"][".tag"] = "user"
+        return r
+    fake.post = post
+    lines = connection_report(Dropbox("k", "s", "r", session=fake), "techs")
+    assert "Found 'Techs' with 2 technician folder(s):" in lines
