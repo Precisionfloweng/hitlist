@@ -6,7 +6,7 @@ import { deleteWording } from "./wording";
 import type { User } from "./auth";
 
 export type Project = {
-  id: string;          // key used in links and storage: usually the number; "26-083-2" for a second site on 26-083
+  id: string;          // key used in links and storage: usually the number; "99-083-2" for a second site on 99-083
   sharedWith: string[];// names of other projects with the same number
   number: string; name: string; tech: string; date: string; address: string; status: string;
   lastSync: string; lastSyncStatus: string; daysSinceSync: number | null;
@@ -151,18 +151,28 @@ export async function requestRefresh(number: string, by: User): Promise<"queued"
 // ---- admin: project list ------------------------------------------------------------
 export type ProjectInput = { number: string; name: string; tech: string; date: string; address: string; status: string };
 
+/** Thrown when a project number is already on the list and the admin hasn't confirmed it's a second site. */
+export class SharedNumberError extends Error {
+  constructor(public number: string, public names: string[]) {
+    super(`${number} is already on the list: ${names.join("; ")}. Is this a second site on the same contract?`);
+  }
+}
+
 /** Add or edit a project. `originalKey` is the key of the row being edited. Returns the project's key.
- *  A number already in use is allowed (two sites on one contract) as long as the name differs;
- *  the new project then gets its own key, e.g. "26-083-2". */
-export async function saveProject(input: ProjectInput, originalKey?: string): Promise<string> {
+ *  A number already in use is only allowed when the admin confirms it's another site on the same contract
+ *  (`secondSite`) and the name differs; the new project then gets its own key, e.g. "99-083-2". */
+export async function saveProject(input: ProjectInput, originalKey?: string, secondSite = false): Promise<string> {
   await ensureHeader("Projects");
   const rows = await readTab("Projects", true);
   const existing = originalKey ? rows.find((r) => keyOf(r) === originalKey) : undefined;
-  const others = rows.filter((r) => r !== existing);
-  const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
-  if (others.some((r) => r.project_number === input.number && same(r.name, input.name))) {
-    throw new Error(`Project ${input.number} ${input.name} already exists`);
-  }
+  const others = rows.filter((r) => r !== existing && r.status !== "deleted");
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");     // capitals, spaces, punctuation ignored
+  const sameNumber = (r: Rec) => norm(r.project_number) === norm(input.number);
+  const dup = others.find((r) => sameNumber(r) && norm(r.name) === norm(input.name));
+  if (dup) throw new Error(`${dup.project_number} ${dup.name} is already on the list.`);
+  const numberIsNew = !existing || norm(existing.project_number) !== norm(input.number);
+  const sharing = others.filter(sameNumber);
+  if (numberIsNew && sharing.length && !secondSite) throw new SharedNumberError(input.number, sharing.map((r) => r.name));
   let projectId = existing?.project_id || "";
   if (existing && !projectId && existing.project_number !== input.number) {
     projectId = existing.project_number;   // number changed: keep the old key so its data stays attached

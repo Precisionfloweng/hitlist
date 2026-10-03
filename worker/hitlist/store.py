@@ -217,7 +217,7 @@ class HitlistStore:
 
     # ---- projects ---------------------------------------------------------------
     # A project's key is its project_id; blank means "same as the project number". Two sites under
-    # one contract can share a number, so the second gets e.g. "26-083-2". Everything the web app
+    # one contract can share a number, so the second gets e.g. "99-083-2". Everything the web app
     # and worker store per project (Queue, Dashboard, results files...) uses this key.
     def project(self, key: str) -> dict[str, str] | None:
         return next((p for p in self.rows("Projects") if project_key(p) == key), None)

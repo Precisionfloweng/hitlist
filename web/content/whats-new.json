@@ -1,6 +1,12 @@
 [
  {
   "date": "2026-10-03",
+  "audience": "admins",
+  "title": "No duplicate projects",
+  "text": "Adding a project whose number is already on the list now asks if it's a second site on the same contract; the same number and name can't be added twice."
+ },
+ {
+  "date": "2026-10-03",
   "audience": "all",
   "title": "% complete on Overview cards",
   "text": "Each equipment type card on the Overview shows its % complete (required fields filled), and a new Overall complete card shows the whole project's %."

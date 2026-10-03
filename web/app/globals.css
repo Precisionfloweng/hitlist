@@ -474,3 +474,4 @@ header.top .top-drop form button { background: transparent; }
 .tc-units { font-size: 11px; }
 .tc-pct { font-size: 18px; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; }
 .tc-pct.full { color: var(--ok); }
+.confirm-box { border-top-color: #e0a100; background: #fffaf0; margin-bottom: 10px; }
