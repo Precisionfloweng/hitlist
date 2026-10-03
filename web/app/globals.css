@@ -443,3 +443,10 @@ header.top .top-drop form button { background: transparent; }
 .tol-item .tol-input input { width: 46px; text-align: center; padding: 4px 4px; margin: 0 4px 0 2px; }
 .tol-line-group { margin-left: 12px; white-space: normal; }
 .tol-line-group + .tol-line-group::before { content: "·"; margin-right: 12px; color: var(--line); }
+
+/* ✕ in the top right of an AI answer box */
+.docs-answer, .ai-result { position: relative; }
+.ai-tools button.ai-close { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; padding: 0; border-radius: 999px;
+  font-size: 14px; line-height: 1; color: var(--muted); background: #fff; border: 1px solid var(--line); box-shadow: none; }
+.ai-tools button.ai-close:hover { color: var(--bad); border-color: var(--bad); background: #fff; }
+.docs-answer-text, .ai-result .wlab { padding-right: 36px; }

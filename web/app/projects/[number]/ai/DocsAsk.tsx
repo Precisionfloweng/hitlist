@@ -24,7 +24,7 @@ const fileDate = (s: string) => {
 };
 const showPath = (p: string) => p.split("/").filter(Boolean).join(" / ");
 
-function AnswerView({ a, project }: { a: Answer; project: string }) {
+function AnswerView({ a, project, onClose }: { a: Answer; project: string; onClose?: () => void }) {
   const router = useRouter();
   const [tolMsg, setTolMsg] = useState("");
   const tol = normalizeTolerances(a.tolerances);   // also reads answers saved before tolerances had + and −
@@ -39,6 +39,7 @@ function AnswerView({ a, project }: { a: Answer; project: string }) {
   }
   return (
     <div className="docs-answer">
+      {onClose && <button type="button" className="ai-close" onClick={onClose} title="Close this answer (it stays under Asked before)" aria-label="Close answer">✕</button>}
       <div className={`docs-answer-text${a.found ? "" : " notfound"}`}>{a.answer}</div>
       {tolText && (
         <div className="docs-tol">
@@ -216,7 +217,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
         </div>
       </div>
 
-      {answer && <AnswerView a={answer} project={project} />}
+      {answer && <AnswerView a={answer} project={project} onClose={() => setAnswer(null)} />}
 
       {info && info.history.length > 0 && (
         <details className="docs-history">

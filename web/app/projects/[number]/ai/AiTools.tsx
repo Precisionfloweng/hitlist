@@ -80,7 +80,8 @@ export default function AiTools({ project, units }: { project: string; units: Un
       </div>
 
       {result && (
-        <div className="card ai-card">
+        <div className="card ai-card ai-result">
+          <button type="button" className="ai-close" onClick={() => { setResult(null); setOut(""); }} title="Close" aria-label="Close">✕</button>
           <div className="wlab">Refined</div>
           <div className="wrow">
             <textarea rows={3} value={out} onChange={(e) => setOut(e.target.value)} />
