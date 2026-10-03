@@ -127,6 +127,10 @@ def connection_report(dbx: Dropbox, tech_folder: str) -> list[str]:
     team = dbx.use_team_space(acct)
     out = [f"Connected to Dropbox as {acct.get('name', {}).get('display_name', '?')}"
            f" ({'team account' if team else 'personal account'})."]
+    kind = (acct.get("account_type") or {}).get(".tag", "?")
+    team_name = (acct.get("team") or {}).get("name", "")
+    out.append(f"  Email: {acct.get('email', '?')} | Dropbox plan: {kind}"
+               + (f" | Team: {team_name}" if team_name else " | Not part of a team"))
     top = dbx.folders("")
     tech = find_folder(top, tech_folder)
     if not tech and dbx.path_root:            # also try the member's own view of Dropbox
