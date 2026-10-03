@@ -16,6 +16,7 @@ import requests
 AUTH_URL = "https://www.dropbox.com/oauth2/authorize"
 TOKEN_URL = "https://api.dropboxapi.com/oauth2/token"
 API = "https://api.dropboxapi.com/2"
+CONTENT = "https://content.dropboxapi.com/2"
 
 
 class DropboxError(RuntimeError):
@@ -98,6 +99,33 @@ class Dropbox:
             data = self._post("files/list_folder/continue", {"cursor": data["cursor"]})
             entries += data.get("entries", [])
         return entries
+
+    def list_all(self, path: str) -> list[dict]:
+        """Every file and folder under a folder, at any depth."""
+        data = self._post("files/list_folder", {"path": path, "recursive": True, "include_deleted": False})
+        entries = list(data.get("entries", []))
+        while data.get("has_more"):
+            data = self._post("files/list_folder/continue", {"cursor": data["cursor"]})
+            entries += data.get("entries", [])
+        return entries
+
+    def metadata(self, path: str) -> dict:
+        """A file or folder by path or id ("id:..."). Raises DropboxError if it isn't there."""
+        return self._post("files/get_metadata", {"path": path})
+
+    def download(self, path: str, dest: Path) -> Path:
+        """Save a file (by path or id) to dest, streaming so big drawing sets don't fill memory."""
+        headers = {"Authorization": f"Bearer {self._token()}", "Dropbox-API-Arg": json.dumps({"path": path})}
+        if self.path_root:
+            headers["Dropbox-API-Path-Root"] = json.dumps(self.path_root)
+        with self.s.post(CONTENT + "/files/download", headers=headers, stream=True, timeout=600) as r:
+            if r.status_code != 200:
+                raise DropboxError(f"Dropbox download failed ({r.status_code}): {r.text[:200]}")
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            with open(dest, "wb") as f:
+                for chunk in r.iter_content(1 << 20):
+                    f.write(chunk)
+        return dest
 
     def folders(self, path: str) -> list[dict]:
         return sorted((e for e in self.list_folder(path) if e.get(".tag") == "folder"),

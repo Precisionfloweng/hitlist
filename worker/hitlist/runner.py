@@ -56,6 +56,9 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
     job = store.next_job()
     if job is None:
         return False
+    if job.get("kind") == "docs":
+        process_docs_job(store, settings, job)
+        return True
     export_fn = export_fn or default_export_fn(settings)
     number = job["project_number"]
     store.set_job(job, status=RUNNING, started_at=now_iso(), message="Starting")
@@ -79,7 +82,100 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
     store.set_job(job, status=DONE, finished_at=now_iso(), message="ok")
     if results.get("website_problem"):
         _email_website_problem(settings, mailer, job, project, results["website_problem"])
+    queue_docs_update(store, settings, number, job.get("requested_by", ""))
     return True
+
+
+# ---- project documents (Dropbox) ------------------------------------------------------------
+def queue_docs_update(store: HitlistStore, settings: Settings, number: str, by: str) -> None:
+    """After a sync, also check the project's Dropbox documents (only changed files are read).
+    It goes in the queue, so other people's waiting syncs still run first."""
+    if not settings.dropbox_ready:
+        return
+    try:
+        if not any(j.get("kind") == "docs" and j["project_number"] == number and j["status"] == "queued"
+                   for j in store.rows("Queue")):
+            store.request_refresh(number, by or "server", kind="docs")
+    except Exception:  # noqa: BLE001 - never fail a finished sync over this
+        log.warning("Could not queue the document update for %s", number, exc_info=True)
+
+
+def process_docs_job(store: HitlistStore, settings: Settings, job: dict[str, str], dbx=None) -> None:
+    """Find (or re-find) the project's Dropbox folder, read its documents and send the index to the website."""
+    from .documents import DocsError, dropbox_path_from, find_project_folder, update_documents
+    from .dropbox import Dropbox, DropboxError
+
+    number = job["project_number"]
+    store.set_job(job, status=RUNNING, started_at=now_iso(), message="Looking for the Dropbox folder")
+    step = _stepper(store, job)
+    project = store.project(number)
+    try:
+        if project is None:
+            raise DocsError(f"Project {number} is not on the Projects list")
+        if not settings.dropbox_ready:
+            raise DocsError("Dropbox isn't set up on the server yet (python -m hitlist dropbox-setup)")
+        dbx = dbx or Dropbox(settings.dropbox_app_key, settings.dropbox_app_secret, settings.dropbox_refresh_token)
+        dbx.use_team_space()
+        folder = None
+        if project.get("dropbox_id"):
+            try:
+                folder = dbx.metadata(project["dropbox_id"])
+            except DropboxError:
+                folder = None                       # moved out of reach or deleted: look again below
+        if folder is None and project.get("dropbox_path", "").strip():
+            path = dropbox_path_from(project["dropbox_path"])
+            try:
+                folder = dbx.metadata(path)
+            except DropboxError:
+                raise DocsError(f"No Dropbox folder at {path}. Check the folder on the project's AI Tools tab.")
+        if folder is None:
+            folder = find_project_folder(dbx, settings.dropbox_tech_folder,
+                                         project.get("project_number") or number, project.get("name", ""))
+            if folder is None:
+                raise DocsError(f"No folder starting with {project.get('project_number') or number} in the "
+                                f"technician folders. Paste the folder on the project's AI Tools tab.")
+        if folder.get(".tag") != "folder":
+            raise DocsError("That Dropbox path is a file, not a folder.")
+        store.update_project(number, dropbox_id=folder["id"], dropbox_path=folder.get("path_display", ""))
+
+        settings.docs_dir.mkdir(parents=True, exist_ok=True)
+        local = settings.docs_dir / f"{number}.json"
+        previous = json.loads(local.read_text(encoding="utf-8")) if local.exists() else None
+        if previous and previous.get("folder", {}).get("id") != folder["id"]:
+            previous = None                         # a different folder now: read everything again
+        manifest = update_documents(dbx, folder, number, previous, _docs_uploader(settings, number), step,
+                                    now=now_iso())
+        local.write_text(json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
+        n = len(manifest["files"])
+        status = f"ok: {n} file{'s' if n != 1 else ''}" + (f", {len(manifest['skipped'])} skipped" if manifest["skipped"] else "")
+        store.update_project(number, docs_updated=now_iso(), docs_status=status)
+        store.set_job(job, status=DONE, finished_at=now_iso(), message="ok")
+    except Exception as exc:  # noqa: BLE001 - reported on the website; the worker keeps going
+        log.exception("Document update for %s failed", number)
+        message = str(exc) if isinstance(exc, (DocsError, DropboxError)) else f"Something went wrong ({type(exc).__name__})"
+        store.set_job(job, status=FAILED, finished_at=now_iso(), message=message[:500])
+        if project is not None:
+            try:
+                store.update_project(number, docs_status=f"failed: {message[:150]}")
+            except Exception:  # noqa: BLE001
+                pass
+
+
+def _docs_uploader(settings: Settings, number: str):
+    """Send one gzipped part of the document index to the website (stored in Vercel Blob)."""
+    import requests
+    url = app_url(settings)
+    if not url or not settings.worker_secret:
+        from .documents import DocsError
+        raise DocsError("APP_URL / WORKER_SECRET aren't set in the server's .env")
+
+    def upload(part: str, body: bytes) -> None:
+        r = requests.post(f"{url}/api/worker/docs/{number}", params={"part": part}, data=body, timeout=180,
+                          headers={"x-worker-secret": settings.worker_secret, "content-type": "application/gzip"})
+        if not r.ok:
+            from .documents import DocsError
+            raise DocsError(f"The website didn't accept the document index ({r.status_code}): {r.text[:150]}")
+    return upload
 
 
 def friendly_error(exc: BaseException, step: str = "") -> str:
@@ -293,6 +389,10 @@ def _heartbeat_loop(store: HitlistStore) -> None:
 def run_forever(store: HitlistStore, settings: Settings, mailer: Mailer) -> None:
     log.info("Worker started; checking the queue every %ss", settings.poll_seconds)
     threading.Thread(target=_heartbeat_loop, args=(store,), daemon=True, name="heartbeat").start()
+    try:
+        store.setup()                       # adds any new columns/tabs after an update
+    except Exception:  # noqa: BLE001
+        log.exception("Could not check the sheet's tabs and columns")
     try:
         if (n := recover_interrupted(store)):
             log.info("Closed %s sync(s) interrupted by the last restart", n)

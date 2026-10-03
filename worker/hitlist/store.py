@@ -15,7 +15,9 @@ from urllib.parse import quote
 SCHEMA: dict[str, list[str]] = {
     "Projects": ["project_number", "name", "tech", "date", "address", "status", "buildingstart_url",
                  "last_sync", "last_sync_status", "fields_pct", "units_pct", "units",
-                 "open_deficiencies", "open_high", "gap_flags", "project_id"],
+                 "open_deficiencies", "open_high", "gap_flags", "project_id",
+                 # Dropbox project folder (found by the server, or pasted on the website) and the document index
+                 "dropbox_id", "dropbox_path", "docs_updated", "docs_status"],
     # projects: for role "customer", the project keys they may see (" | " separated)
     "Users": ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
     "Rules": ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
@@ -24,8 +26,9 @@ SCHEMA: dict[str, list[str]] = {
                     "project_number"],
     # One project's differences from the default rules (status only). Blank status = use the default.
     "ProjectRules": ["project_number", "type_key", "field", "status", "changed_by", "changed_at"],
+    # kind: blank = sync from BuildingStart, "docs" = update the project's documents from Dropbox
     "Queue": ["id", "project_number", "requested_by", "requested_at", "status",
-              "started_at", "finished_at", "message"],
+              "started_at", "finished_at", "message", "kind"],
     "Dashboard": ["project_number", "type", "units", "units_complete", "required_fields",
                   "required_filled", "missing_required", "missing_optional", "fields_pct",
                   "units_pct", "updated_at"],
@@ -225,11 +228,11 @@ class HitlistStore:
         self.update("Projects", p["_row"], p)
 
     # ---- queue ------------------------------------------------------------------
-    def request_refresh(self, project_number: str, requested_by: str) -> str:
+    def request_refresh(self, project_number: str, requested_by: str, kind: str = "") -> str:
         job_id = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
         self.append("Queue", [{"id": job_id, "project_number": project_number,
                                "requested_by": requested_by, "requested_at": now_iso(),
-                               "status": QUEUED}])
+                               "status": QUEUED, "kind": kind}])
         return job_id
 
     def next_job(self) -> dict[str, str] | None:

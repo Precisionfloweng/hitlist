@@ -66,6 +66,11 @@ python -m hitlist dropbox-setup
    The key, secret and refresh token are saved in `.env`. The command then lists the technician folders and
    how many project folders each has. Run `python -m hitlist dropbox-test` any time to see that list again.
 3. If the technicians folder has another name, add `DROPBOX_TECH_FOLDER=Its Name` to `.env`.
+4. Install the PDF reader the document feature uses (once): `pip install -e ".[browser]"` (same folder, venv active).
+5. Try one project: `python -m hitlist docs 99-001` (a real project number). It finds the project's folder,
+   reads the Drawings and Specs, Submittal, TAB Plan, ASIs and RFIs and Change Orders folders, and sends the text
+   to the website. After that, each Sync queues a document update (only new or changed files are read), and the
+   AI Tools tab has an Update documents button. The last index per project is kept in `worker\docs\`.
 
 ## Updating later
 ```

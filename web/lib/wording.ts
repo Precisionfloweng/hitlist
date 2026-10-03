@@ -90,7 +90,7 @@ function payloadFor(kind: Kind, d: ReviewItem, tol: Tolerances) {
 }
 
 /** One call to Claude; returns the text of its reply. */
-async function callClaude(system: string, user: string): Promise<string> {
+export async function callClaude(system: string, user: string): Promise<string> {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("The Anthropic API key isn't set on the website yet (ANTHROPIC_API_KEY in Vercel).");
   const r = await fetch("https://api.anthropic.com/v1/messages", {
@@ -105,6 +105,13 @@ async function callClaude(system: string, user: string): Promise<string> {
     throw new Error(`The AI request failed: ${msg}`);
   }
   return (data.content ?? []).map((c: { text?: string }) => c.text ?? "").join("");
+}
+
+/** The first {...} object in a reply. */
+export function parseObject(text: string): Record<string, unknown> {
+  const start = text.indexOf("{"), end = text.lastIndexOf("}");
+  if (start < 0 || end < start) throw new Error("The AI reply came back in an unexpected format. Try again.");
+  return JSON.parse(text.slice(start, end + 1)) as Record<string, unknown>;
 }
 
 function parseArray(text: string): Partial<Review>[] {

@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Header from "../../../Header";
 import ProjectHeader from "../ProjectHeader";
 import AiTools from "./AiTools";
+import DocsAsk from "./DocsAsk";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
@@ -27,6 +28,9 @@ export default async function AiToolsPage({ params }: { params: Promise<{ number
         <ProjectHeader user={{ customer: false, canSync: true }} project={p} tab="ai"
           missingRequired={results?.summary.missing_required} notes={results?.notes?.length} />
         <AiTools project={p.id} units={units} />
+        <section className="ai-tools">
+          <DocsAsk project={p.id} units={[...new Set(units.map((u) => u.name))]} />
+        </section>
       </main>
     </>
   );

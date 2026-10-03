@@ -65,7 +65,7 @@ export default async function HelpPage() {
                 <li><b>Notes</b>: the notes entered in BuildingStart. See <a href="#notes">Notes</a>.</li>
                 <li><b>Contacts</b>: who gets the deficiency list. See <a href="#contacts">Contacts</a>.</li>
                 <li><b>Rules</b>: what this project checks, and its tolerances. See <a href="#rules">Rules</a>.</li>
-                <li><b>✨ AI Tools</b> (techs and admins): clean up a deficiency or note before you enter it. See <a href="#ai">AI Tools</a>.</li>
+                <li><b>✨ AI Tools</b> (techs and admins): clean up a deficiency or note before you enter it, and ask questions about the project&apos;s specs and submittals. See <a href="#ai">AI Tools</a>.</li>
               </ul>
             </li>
             <li>On a phone held upright, the top bar&apos;s links, your name and <b>Sign out</b> are under the <b>☰</b> button at the top right.</li>
@@ -178,6 +178,17 @@ export default async function HelpPage() {
         <section id="ai">
           <h2>AI Tools</h2>
           <p>On a project&apos;s <b>✨ AI Tools</b> tab, choose <b>Deficiency</b> or <b>Note</b>, pick the unit if you like, and type, paste or dictate what you found (rough is fine; tap 🎤 on the iPad keyboard to talk). Press <b>Refine</b> and Claude rewrites it the PFE way, using the same rules as AI Review and the project&apos;s tolerances. Edit it if needed, fill in any <b>___</b>, press <b>Copy</b> and paste it into BuildingStart. Nothing you type there is saved.</p>
+          <h3>Ask the documents</h3>
+          <p>Below Refine, <b>Ask the documents</b> answers questions from the project&apos;s Dropbox folder. It reads the <b>Drawings and Specs</b>, <b>Submittal</b>, <b>TAB Plan</b>, <b>ASIs and RFIs</b> and <b>Change Orders</b> folders; the other folders are left alone, and Hitlist can only read Dropbox, never change it.</p>
+          <ul>
+            <li>The first time, press <b>Update documents</b>. The server finds the folder by the job number in the technician folders and reads the files; a big project can take several minutes. After that, every <b>Sync</b> also checks for new or changed files.</li>
+            <li>If it picks the wrong folder (or can&apos;t find one), press <b>Change folder</b> and paste the folder&apos;s path from File Explorer or its dropbox.com link.</li>
+            <li>Type a question (for example <i>What is the design airflow on AHU-16?</i>) and press <b>Ask</b>, or use the quick buttons: <b>Tolerances</b>, <b>TAB requirements</b>, or <b>Design values</b> for a unit.</li>
+            <li>Every value comes with its source (<b>S1</b>, <b>S2</b>...): folder, file, page and file date, so you can check it. If the answer isn&apos;t in the documents it says so instead of guessing, and it points out when an ASI, RFI or change order changes a value.</li>
+            <li>After <b>Tolerances</b>, <b>Fill in Tolerances</b> puts the numbers on the project&apos;s Rules / Tol. tab.</li>
+            <li><b>Asked before</b> lists earlier questions and answers on the project, so you don&apos;t need to ask twice.</li>
+            <li>Scanned files with no text can&apos;t be read yet; they&apos;re listed under &quot;couldn&apos;t be read&quot;.</li>
+          </ul>
         </section>
 
         <section id="sharing">

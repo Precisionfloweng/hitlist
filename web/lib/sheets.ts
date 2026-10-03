@@ -5,7 +5,9 @@ import { JWT } from "google-auth-library";
 export const SCHEMA = {
   Projects: ["project_number", "name", "tech", "date", "address", "status", "buildingstart_url",
     "last_sync", "last_sync_status", "fields_pct", "units_pct", "units",
-    "open_deficiencies", "open_high", "gap_flags", "project_id"],
+    "open_deficiencies", "open_high", "gap_flags", "project_id",
+    // Dropbox project folder and document index (written by the server; dropbox_path can be pasted on AI Tools)
+    "dropbox_id", "dropbox_path", "docs_updated", "docs_status"],
   // projects: for role "customer", the project keys they may see (" | " separated)
   // last_seen: date (Central) the person last opened the app, updated at most once a day.
   Users: ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
@@ -14,8 +16,9 @@ export const SCHEMA = {
   RuleHistory: ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status", "project_number"],
   // One project's differences from the default rules (status only). Blank status = use the default.
   ProjectRules: ["project_number", "type_key", "field", "status", "changed_by", "changed_at"],
+  // kind: blank = BuildingStart sync, "docs" = read the project's Dropbox documents
   Queue: ["id", "project_number", "requested_by", "requested_at", "status",
-    "started_at", "finished_at", "message"],
+    "started_at", "finished_at", "message", "kind"],
   Dashboard: ["project_number", "type", "units", "units_complete", "required_fields",
     "required_filled", "missing_required", "missing_optional", "fields_pct", "units_pct", "updated_at"],
   Deficiencies: ["project_number", "group", "value", "count", "updated_at"],

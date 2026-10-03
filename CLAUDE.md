@@ -19,6 +19,17 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - `web/` Next.js on Vercel (Hobby now, Pro before rollout). Sign-in with emailed 6-digit codes.
 - Refresh is manual (button); weekly summary email shows days since last sync.
 
+## Project documents (Dropbox)
+- Read-only Dropbox app ("Full Dropbox", files.metadata.read + files.content.read); key/secret/refresh token only in
+  the server's .env (`hitlist dropbox-setup`). The team's shared folders are read from the team root (path root).
+- `hitlist/documents.py`: project folder = folder starting with the job number in a technician folder (or directly
+  under the technicians folder), best name match; reads only Drawings and Specs, Submittal, TAB Plan, ASIs and RFIs,
+  Change Orders; page text (PyMuPDF) sent gzipped in parts to `POST /api/worker/docs/{project}?part=`, manifest last.
+  Unchanged files (Dropbox content hash) are skipped. Queue rows with kind "docs" are document updates; each sync
+  queues one. Projects columns dropbox_id, dropbox_path (pasted path or found), docs_updated, docs_status.
+- Web `lib/docs.ts`: keyword/tag page search, only the best pages go to Claude; answers cite [S#] file+page;
+  history in Blob docs-qa/. File names/contents are client data: never in the repo or tests.
+
 ## Project keys
 - Projects can share a number (two sites on one contract). Each project's key is `project_id`, blank
   meaning "same as project_number"; a second site gets e.g. "26-083-2". URLs, Queue.project_number,

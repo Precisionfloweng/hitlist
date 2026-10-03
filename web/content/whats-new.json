@@ -2,6 +2,12 @@
  {
   "date": "2026-10-02",
   "audience": "all",
+  "title": "Ask the documents",
+  "text": "AI Tools can now answer questions from the project's Dropbox specs, submittals, drawings and ASIs, with the file and page for each value. Tolerances can be filled in with one click."
+ },
+ {
+  "date": "2026-10-02",
+  "audience": "all",
   "title": "Contacts: To / Cc and New email",
   "text": "Set each contact to To or Cc, then press New email to open an Outlook email with everyone filled in. It replaces Copy all emails."
  },

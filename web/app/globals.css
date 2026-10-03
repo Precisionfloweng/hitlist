@@ -379,3 +379,32 @@ header.top .top-drop form button:hover { background: #f5f6f8; }
   header.top .top-links { display: none; }
   header.top .top-burger { display: block; }
 }
+
+/* AI Tools: Ask the documents */
+.docs-card { border-top: 3px solid #2f6fb3; }
+.docs-status { background: #f6f8fb; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+.docs-folder { font-weight: 600; word-break: break-word; }
+.docs-working { margin-top: 6px; color: #2f6fb3; font-weight: 600; }
+.docs-counts { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+.docs-counts span { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: 13px; }
+.docs-counts span.zero { color: var(--muted); }
+.docs-counts span b { margin-left: 4px; }
+.docs-skipped { margin-top: 6px; font-size: 13px; }
+.docs-skipped ul { margin: 6px 0 0; padding-left: 18px; }
+.docs-change { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.docs-change input { flex: 1; min-width: 240px; }
+.docs-quick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.docs-design { display: inline-flex; gap: 6px; flex: 1; min-width: 260px; }
+.docs-design input { flex: 1; min-width: 120px; }
+.docs-answer { margin-top: 14px; border: 1px solid #c9d8ea; background: #f7fafd; border-radius: 10px; padding: 12px 14px; }
+.docs-answer-text { white-space: pre-wrap; line-height: 1.5; }
+.docs-answer-text.notfound { color: #7a3e00; }
+.docs-tol { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 10px; padding: 8px 10px;
+  background: #fff; border: 1px dashed #8e7cc3; border-radius: 8px; font-size: 14px; }
+.docs-sources { margin: 10px 0 0; padding-left: 0; list-style: none; font-size: 13px; border-top: 1px solid #dde6f0; padding-top: 8px; }
+.docs-sources li { padding: 2px 0; word-break: break-word; }
+.docs-sources b { display: inline-block; min-width: 30px; color: #2f6fb3; }
+.docs-history { margin-top: 14px; }
+.docs-history > summary { cursor: pointer; font-weight: 600; }
+.docs-hist-item { margin: 8px 0 0 4px; }
+.docs-hist-item > summary { cursor: pointer; }

@@ -11,6 +11,7 @@
     python -m hitlist update-rules TYPE_KEY [--statuses]        copy a type's sheet/column links (and names) from the bundled rules
     python -m hitlist dropbox-setup [--relink]                  connect the read-only Dropbox app (once), then test it
     python -m hitlist dropbox-test                              show what the server can see in Dropbox
+    python -m hitlist docs NUMBER                               read a project's Dropbox documents now
 """
 
 from __future__ import annotations
@@ -59,6 +60,8 @@ def main(argv: list[str] | None = None) -> int:
     ds = sub.add_parser("dropbox-setup", help="Connect the read-only Dropbox app and test it")
     ds.add_argument("--relink", action="store_true", help="approve the app again (new refresh token)")
     sub.add_parser("dropbox-test", help="Show the technician and project folders the server can see")
+    dc = sub.add_parser("docs", help="Read a project's Dropbox documents now and send them to the website")
+    dc.add_argument("number")
     args = p.parse_args(argv)
 
     if hasattr(sys.stdout, "reconfigure"):
@@ -131,6 +134,15 @@ def main(argv: list[str] | None = None) -> int:
         while process_next(store, settings, mailer):
             n += 1
         print(f"Handled {n} refresh request(s).")
+        return 0
+    if args.cmd == "docs":
+        from .runner import process_docs_job
+        store.setup()                       # make sure the new Projects/Queue columns exist
+        job_id = store.request_refresh(args.number, "server", kind="docs")
+        job = next(j for j in store.rows("Queue") if j["id"] == job_id)
+        process_docs_job(store, settings, job)
+        p = store.project(args.number) or {}
+        print(f"Folder: {p.get('dropbox_path', '(none)')}\nResult: {p.get('docs_status', '')}")
         return 0
     if args.cmd == "weekly-summary":
         from .summary import send_weekly_summary

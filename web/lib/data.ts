@@ -12,6 +12,7 @@ export type Project = {
   openDeficiencies: number | null; openHigh: number | null; gapFlags: number | null;
   punchItems: number | null;   // all deficiencies, open and closed
   queue: "queued" | "running" | null; job: SyncJob | null; row: number;
+  dropboxPath: string; docsUpdated: string; docsStatus: string;
 };
 
 /** The latest refresh request for a project, as the Refresh button shows it. */
@@ -32,11 +33,15 @@ function isActive(q: Rec, now = Date.now()) {
   return q.status === "running" && now - Date.parse(q.started_at || q.requested_at) < STALE_RUNNING_MS;
 }
 
-export function jobFor(number: string, queue: Rec[]): SyncJob | null {
-  const mine = queue.filter((q) => q.project_number === number)
+/** Sync jobs only: document updates ("docs") have their own status on AI Tools. */
+const isSync = (q: Rec) => !q.kind;
+
+export function jobFor(number: string, queue: Rec[], kind: "" | "docs" = ""): SyncJob | null {
+  const mine = queue.filter((q) => q.project_number === number && (kind ? q.kind === kind : isSync(q)))
     .sort((a, b) => a.requested_at.localeCompare(b.requested_at));
   const last = mine[mine.length - 1];
   if (!last) return null;
+  // The server runs syncs and document updates one at a time, so count both as "ahead".
   const queued = queue.filter((q) => q.status === "queued").sort((a, b) => a.requested_at.localeCompare(b.requested_at));
   const running = queue.some((q) => q.status === "running" && isActive(q));
   const ahead = last.status === "queued" ? queued.findIndex((q) => q.id === last.id) + (running ? 1 : 0) : 0;
@@ -80,7 +85,7 @@ function punchTotals(defs: Rec[]): Map<string, number> {
 
 function toProject(p: Rec, queue: Rec[], punch?: Map<string, number>, all: Rec[] = []): Project {
   const key = keyOf(p);
-  const pending = queue.filter((q) => q.project_number === key && isActive(q));
+  const pending = queue.filter((q) => q.project_number === key && isSync(q) && isActive(q));
   return {
     id: key,
     sharedWith: all.filter((o) => o.project_number === p.project_number && keyOf(o) !== key).map((o) => o.name),
@@ -93,6 +98,7 @@ function toProject(p: Rec, queue: Rec[], punch?: Map<string, number>, all: Rec[]
     queue: pending.some((q) => q.status === "running") ? "running" : pending.length ? "queued" : null,
     job: jobFor(key, queue),
     row: p._row,
+    dropboxPath: p.dropbox_path || "", docsUpdated: p.docs_updated || "", docsStatus: p.docs_status || "",
   };
 }
 
@@ -128,7 +134,7 @@ export async function requestRefresh(number: string, by: User): Promise<"queued"
   // `number` is the project's key; the Queue's project_number column holds that key.
   const { Projects, Queue } = await readTabs(["Projects", "Queue"], true);
   if (!Projects.some((p) => keyOf(p) === number)) return "missing";
-  if (Queue.some((q) => q.project_number === number && isActive(q))) {
+  if (Queue.some((q) => q.project_number === number && isSync(q) && isActive(q))) {
     return "already";
   }
   const now = new Date();
@@ -232,4 +238,31 @@ export async function removeUser(email: string) {
   const rows = await readTab("Users", true);
   const u = rows.find((r) => r.email.trim().toLowerCase() === email.trim().toLowerCase());
   if (u) await deleteRow("Users", u._row);
+}
+
+// ---- project documents (Dropbox) -------------------------------------------------------
+/** The latest document update for a project (queued, running with its step, done or failed). */
+export async function docsJob(number: string): Promise<SyncJob | null> {
+  return jobFor(number, await readTab("Queue", true), "docs");
+}
+
+/** Ask the server to read the project's Dropbox documents (only changed files are read). */
+export async function requestDocs(number: string, by: User): Promise<"queued" | "already" | "missing"> {
+  const { Projects, Queue } = await readTabs(["Projects", "Queue"], true);
+  if (!Projects.some((p) => keyOf(p) === number)) return "missing";
+  if (Queue.some((q) => q.project_number === number && q.kind === "docs" && isActive(q))) return "already";
+  await ensureHeader("Queue");
+  const now = new Date();
+  const id = now.toISOString().replace(/\D/g, "").slice(0, 17) + String(Math.floor(Math.random() * 1000)).padStart(3, "0");
+  await appendRows("Queue", [{ id, project_number: number, requested_by: by.email,
+    requested_at: now.toISOString().replace(/\.\d+Z$/, "+00:00"), status: "queued", kind: "docs" }]);
+  return "queued";
+}
+
+/** Point the project at a different Dropbox folder (pasted path or link); the server resolves it next update. */
+export async function setDocsFolder(number: string, path: string): Promise<void> {
+  await ensureHeader("Projects");
+  const p = (await readTab("Projects", true)).find((r) => keyOf(r) === number);
+  if (!p) throw new Error("Project not found");
+  await updateRow("Projects", p._row, { ...p, dropbox_path: path.trim(), dropbox_id: "", docs_status: "" });
 }

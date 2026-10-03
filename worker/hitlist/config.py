@@ -45,6 +45,11 @@ class Settings:
     dropbox_app_secret: str = ""
     dropbox_refresh_token: str = ""
     dropbox_tech_folder: str = "PFE - Technician"   # top-level folder holding each technician's project folders
+    docs_dir: Path = Path("docs")                    # last document index per project (to skip unchanged files)
+
+    @property
+    def dropbox_ready(self) -> bool:
+        return bool(self.dropbox_app_key and self.dropbox_app_secret and self.dropbox_refresh_token)
     export_timeout_minutes: int = 30
 
     @classmethod
@@ -73,5 +78,6 @@ class Settings:
             dropbox_app_secret=e("DROPBOX_APP_SECRET", ""),
             dropbox_refresh_token=e("DROPBOX_REFRESH_TOKEN", ""),
             dropbox_tech_folder=e("DROPBOX_TECH_FOLDER", "PFE - Technician"),
+            docs_dir=Path(e("DOCS_DIR", "docs")),
             export_timeout_minutes=int(e("EXPORT_TIMEOUT_MINUTES", "30")),
         )
