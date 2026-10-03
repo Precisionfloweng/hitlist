@@ -84,6 +84,11 @@ const ESC = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 /** Equipment tags in the question (AHU-16, ahu 16, VAV 2-04...), as patterns matching how documents write them. */
 export function tagPatterns(q: string): RegExp[] {
   const out: RegExp[] = [];
+  // Whole tags exactly as typed (AHU-B2-01, VAV-2-04): letters and digits joined by dashes/dots.
+  for (const m of q.matchAll(/\b[A-Za-z]+[\s-]?[A-Za-z]*\d[\w]*(?:[-.][\w]+)+\b/g)) {
+    const parts = m[0].toLowerCase().split(/[\s.-]+/).map(ESC);
+    out.push(new RegExp(`(?<![a-z0-9])${parts.join("[\\s.-]?")}(?![a-z0-9])`, "g"));
+  }
   for (const m of q.matchAll(/\b([A-Za-z]{1,6})[\s-]?(\d{1,4}[A-Za-z]?(?:[-.]\d{1,3}[A-Za-z]?)*)\b/g)) {
     const [, letters, num] = m;
     if (letters !== letters.toUpperCase() && !EQUIP.has(letters.toLowerCase())) continue;
@@ -149,6 +154,8 @@ Rules:
 - Give every value with its unit, exactly as written, and cite the excerpt after it, e.g. "12,500 CFM [S3]".
 - If excerpts disagree (submittal vs drawing schedule, or an ASI/RFI/change order revising a value), give both,
   say which document is newer from the file dates, and note that later ASIs/RFIs/change orders usually govern.
+- If the question names one unit, answer for that unit only (don't list other equipment); if its values aren't in
+  the excerpts, say so.
 - Start with the direct answer, then a few short supporting lines. Plain text, "-" bullets are fine, no headings.
 - tolerances: only when the question is about TAB tolerances. Fill a category only when the documents give one
   ± percent that clearly applies to it (keys: ${TOLERANCE_CATS.map((c) => `${c.key} = ${c.label}`).join(", ")});

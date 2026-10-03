@@ -49,7 +49,12 @@ export async function POST(req: Request) {
     }
     if (body.action === "ask") {
       const mode: Mode = (["tolerances", "tab", "design"] as const).find((m) => m === body.mode) ?? "ask";
-      const question = mode === "ask" ? (body.question ?? "").trim() : QUICK[mode](body.unit?.trim());
+      const unit = (body.unit ?? "").trim().slice(0, 80);
+      const typed = (body.question ?? "").trim();
+      // A unit in the unit box goes with a typed question too, unless the question already names it.
+      const question = mode !== "ask" ? QUICK[mode](unit) : !typed ? "" :
+        unit && !typed.toLowerCase().includes(unit.toLowerCase())
+          ? `${typed}\n(This question is about ${unit} only; answer for that unit.)` : typed;
       if (!question) return NextResponse.json({ error: "Type a question first." }, { status: 400 });
       if (question.length > 1500) return NextResponse.json({ error: "That question is too long." }, { status: 400 });
       return NextResponse.json({ ok: true, answer: await askDocs(project, question, mode, g.user.name || g.user.email) });

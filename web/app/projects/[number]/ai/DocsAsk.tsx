@@ -189,7 +189,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           <button disabled={!ready || !!busy} onClick={() => ask("tolerances")}>{busy === "tolerances" ? "Reading…" : "Tolerances"}</button>
           <button disabled={!ready || !!busy} onClick={() => ask("tab")}>{busy === "tab" ? "Reading…" : "TAB requirements"}</button>
           <span className="docs-design">
-            <input list="docs-units" value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="Unit, e.g. AHU-16" />
+            <input list="docs-units" value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="Unit (optional, used by Ask and Design values)" />
             <datalist id="docs-units">{units.map((u) => <option key={u} value={u} />)}</datalist>
             <button disabled={!ready || !!busy || !unit.trim()} onClick={() => ask("design")}>{busy === "design" ? "Reading…" : "Design values"}</button>
           </span>
