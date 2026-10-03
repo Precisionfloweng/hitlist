@@ -81,32 +81,58 @@ def folder_index(dbx: Dropbox, tech_root: str) -> list[dict]:
     return out
 
 
-def pick_project_folder(index: list[dict], number: str, name: str, taken: set[str] | None = None) -> dict | None:
-    """The project's folder: the one starting with the job number. Job numbers can be shared by several projects
-    on one contract, so with more than one the Hitlist name decides, but only when one folder clearly matches
-    best; otherwise it stops and lists them so someone picks with Change folder. Folders already linked to
-    another project with this number are skipped."""
-    candidates = [f for f in index if starts_with_number(f["name"], number)]
+def _tech_of(folder: dict) -> str:
+    """The technician folder a project folder sits in ("" when it sits directly under the technicians folder)."""
+    parts = [p for p in folder.get("path_display", "").split("/") if p]
+    return parts[-2] if len(parts) >= 3 else ""
+
+
+def _where(folder: dict) -> str:
+    return f"{_tech_of(folder)} / {folder['name']}" if _tech_of(folder) else folder["name"]
+
+
+def _techs_match(folder_tech: str, tech: str) -> bool:
+    """Hitlist's tech ("Jon" or "Jon Smith") against a technician folder name ("Jon Smith")."""
+    a, b = _words(folder_tech), _words(tech)
+    return bool(a and b) and (b <= a or a <= b)
+
+
+def pick_project_folder(index: list[dict], number: str, name: str, taken: set[str] | None = None,
+                        tech: str = "") -> dict | None:
+    """The project's folder: the one starting with the job number. With more than one, the folder in the
+    project's tech's own folder wins (copies of a job often sit in several techs' folders); then the Hitlist
+    name decides (several projects can share a job number), but only when one clearly matches best; otherwise
+    it stops and lists them so someone picks with Set folder. Folders already linked to another project with
+    this number are skipped; the same folder seen twice counts once."""
+    seen: dict[str, dict] = {}
+    for f in index:
+        if starts_with_number(f["name"], number):
+            seen.setdefault(f["id"], f)
+    candidates = list(seen.values())
     free = [c for c in candidates if c["id"] not in (taken or set())]
     if candidates and not free:
-        raise DocsError(f"The only folder starting with {number} ({candidates[0]['name']}) is already linked to the "
-                        f"other project with this number. If they share it, paste it with Change folder on the AI Tools tab.")
+        raise DocsError(f"The only folder starting with {number} ({_where(candidates[0])}) is already linked to the "
+                        f"other project with this number. If they share it, choose it with Set folder on the AI Tools tab.")
     if not free:
         return None
     if len(free) == 1:
         return free[0]
+    mine = [f for f in free if tech and _techs_match(_tech_of(f), tech)]
+    if len(mine) == 1:
+        return mine[0]
+    pool = mine or free
     rest = lambda f: re.sub(rf"^{re.escape(number)}\W*", "", f["name"], flags=re.I)  # noqa: E731
-    best = best_by_name(free, name, rest)
+    best = best_by_name(pool, name, rest)
     if best is None:
-        names = "; ".join(f["name"] for f in free[:6])
-        raise DocsError(f"Several Dropbox folders start with {number} and the name doesn't clearly pick one "
-                        f"({names}). Use Change folder on the AI Tools tab to choose.")
+        names = "; ".join(_where(f) for f in pool[:6])
+        raise DocsError(f"Several Dropbox folders start with {number} and Hitlist can't tell which is this project's "
+                        f"({names}). Choose it with Set folder on the AI Tools tab.")
     return best
 
 
 def find_project_folder(dbx: Dropbox, tech_root: str, number: str, name: str,
-                        taken: set[str] | None = None) -> dict | None:
-    return pick_project_folder(folder_index(dbx, tech_root), number, name, taken)
+                        taken: set[str] | None = None, tech: str = "") -> dict | None:
+    return pick_project_folder(folder_index(dbx, tech_root), number, name, taken, tech)
 
 
 # Folders every project folder has; two or more of them means "this is the project's document folder".
@@ -152,7 +178,7 @@ def documents_folder(dbx: Dropbox, folder: dict, name: str) -> dict:
     best = best_by_name(sites, name)
     if best is None:
         raise DocsError(f"{folder['name']} has a folder for each site ({'; '.join(f['name'] for f in sites[:6])}) and the "
-                        f"project name doesn't clearly pick one. Use Change folder on the AI Tools tab to choose.")
+                        f"project name doesn't clearly pick one. Choose it with Set folder on the AI Tools tab.")
     return best
 
 

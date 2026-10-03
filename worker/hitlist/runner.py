@@ -127,14 +127,15 @@ def process_docs_job(store: HitlistStore, settings: Settings, job: dict[str, str
             try:
                 folder = dbx.metadata(path)
             except DropboxError:
-                raise DocsError(f"No Dropbox folder at {path}. Check the folder on the project's AI Tools tab.")
+                raise DocsError(f"No Dropbox folder at {path}. Choose it with Set folder on the project's AI Tools tab.")
         if folder is None:
             real = project.get("project_number") or number
             taken = _taken_folders(dbx, store.rows("Projects"), project)
-            folder = find_project_folder(dbx, settings.dropbox_tech_folder, real, project.get("name", ""), taken)
+            folder = find_project_folder(dbx, settings.dropbox_tech_folder, real, project.get("name", ""), taken,
+                                         project.get("tech", ""))
             if folder is None:
                 raise DocsError(f"No folder starting with {project.get('project_number') or number} in the "
-                                f"technician folders. Paste the folder on the project's AI Tools tab.")
+                                f"technician folders. Choose it with Set folder on the project's AI Tools tab.")
         if folder.get(".tag") != "folder":
             raise DocsError("That Dropbox path is a file, not a folder.")
         folder = documents_folder(dbx, folder, project.get("name", ""))
@@ -227,7 +228,7 @@ def refresh_punch_lists(store: HitlistStore, settings: Settings, dbx=None) -> in
                 if index is None:
                     index = folder_index(dbx, settings.dropbox_tech_folder)
                 taken = _taken_folders(dbx, projects, p)
-                folder = pick_project_folder(index, p["project_number"], p.get("name", ""), taken)
+                folder = pick_project_folder(index, p["project_number"], p.get("name", ""), taken, p.get("tech", ""))
                 if folder is None:
                     continue
             site = documents_folder(dbx, folder, p.get("name", ""))

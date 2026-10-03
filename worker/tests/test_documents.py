@@ -283,3 +283,15 @@ def test_folder_names_that_differ_slightly_still_match_and_unread_types_are_repo
     assert m["found"]["Submittal"] == 1 and m["found"]["Drawings and Specs"] == 0
     assert m["other_types"] == {"Drawings and Specs": [".dwg"]}
     assert set(m["missing"]) == {"TAB Plan", "ASIs and RFIs", "Change Orders"}
+
+
+def test_same_job_folder_in_several_tech_folders_prefers_the_projects_tech():
+    from hitlist.documents import pick_project_folder
+    dbx = FakeDbx()
+    for t in ("alex tech", "sam tech"):
+        dbx.add_folder(f"/techs/{t}/99-007 Sample Twin Schools")
+    index = [f for f in dbx.items.values() if f[".tag"] == "folder"]
+    assert pick_project_folder(index, "99-007", "Sample Twin Schools", tech="Sam")["path_lower"].startswith("/techs/sam tech")
+    assert pick_project_folder(index, "99-007", "Sample Twin Schools", tech="Alex Tech")["path_lower"].startswith("/techs/alex tech")
+    with pytest.raises(DocsError, match="alex tech / 99-007 Sample Twin Schools"):
+        pick_project_folder(index, "99-007", "Sample Twin Schools", tech="Someone Else")

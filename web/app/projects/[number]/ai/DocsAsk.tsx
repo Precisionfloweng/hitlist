@@ -178,7 +178,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
               {busy === "update" ? "Asking the server…" : ready ? "🔄 Update documents" : "🔍 Find documents"}
             </button>
             <button disabled={!!busy || !!working} onClick={() => { setChanging(!changing); setPath(""); }}>
-              {info.folder ? "Change folder" : "Set folder"}
+              Set folder
             </button>
           </div>
           {changing && (
