@@ -26,9 +26,11 @@ h2 { font-size: 18px; margin: 24px 0 10px; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
 .muted { color: var(--muted); }
 .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-button, .btn { font: inherit; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line);
-  background: #fff; color: var(--ink); cursor: pointer; }
-button.primary, .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+/* Plain buttons look raised and tinted so they can't be mistaken for input boxes; primary ones are solid blue. */
+button, .btn { font: inherit; font-weight: 600; padding: 7px 14px; border-radius: 8px; border: 1px solid #9fb3cc;
+  background: linear-gradient(#ffffff, #e9f0f8); color: var(--brand); cursor: pointer;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .14), inset 0 1px 0 #fff; }
+button.primary, .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); box-shadow: 0 1px 2px rgba(16, 24, 40, .2); }
 button:disabled { opacity: .55; cursor: default; }
 button.danger { color: var(--bad); }
 input, select { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
@@ -409,13 +411,18 @@ header.top .top-drop form button:hover { background: #f5f6f8; }
 .docs-hist-item { margin: 8px 0 0 4px; }
 .docs-hist-item > summary { cursor: pointer; }
 
-/* AI Tools: secondary buttons look raised and tinted, so they can't be mistaken for input boxes */
-.ai-tools button:not(.primary) {
-  background: linear-gradient(#ffffff, #e9f0f8); border: 1px solid #9fb3cc; color: var(--brand); font-weight: 600;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, .14), inset 0 1px 0 #fff;
-}
-.ai-tools button:not(.primary):hover:not(:disabled) { background: linear-gradient(#f4f8fc, #dce7f3); border-color: var(--brand); }
-.ai-tools button:not(.primary):active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
-.ai-tools .seg button { background: #fff; border: 0; box-shadow: none; color: var(--ink); font-weight: 400; }
-.ai-tools .seg button.on { background: var(--brand); color: #fff; }
-.ai-tools button.primary { box-shadow: 0 1px 2px rgba(16, 24, 40, .2); }
+/* Button hover/press, and the button-shaped things that keep their own flat look
+   (equipment cards, count tags, switches, link-style buttons, the top bar). */
+:where(button, .btn):not(.primary):hover:not(:disabled) { background-image: linear-gradient(#f4f8fc, #dce7f3); border-color: var(--brand); }
+:where(button, .btn):active:not(:disabled) { transform: translateY(1px); }
+:is(.eq-types li button, .def-badge, .note-badge, .seg button, .tocc button, .def-pop-head button, button.linkish,
+    header.top button, button.on, .wcopied, .ptabs-toggle) { box-shadow: none; }
+:is(.eq-types li button, .def-badge, .note-badge, .seg button, .tocc button, .def-pop-head button, button.linkish,
+    header.top button, button.on, .wcopied):hover:not(:disabled) { background-image: none; }
+:is(.eq-types li button, .def-badge, .note-badge, .tocc button, .def-pop-head button, button.linkish):active { transform: none; }
+.eq-types li button { color: var(--ink); font-weight: 400; }
+.seg button { background: #fff; color: var(--ink); font-weight: 400; }
+.seg button.on { background: var(--brand); color: #fff; }
+button.linkish, .def-pop-head button { font-weight: 400; }
+header.top button:hover:not(:disabled) { border-color: rgba(255, 255, 255, .85); }
+header.top .top-drop form button { background: transparent; }

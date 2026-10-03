@@ -2,6 +2,12 @@
  {
   "date": "2026-10-03",
   "audience": "all",
+  "title": "Clearer buttons",
+  "text": "Buttons across Hitlist now look raised and tinted, so they're easy to tell apart from input boxes."
+ },
+ {
+  "date": "2026-10-03",
+  "audience": "all",
   "title": "Last punch list sent",
   "text": "Hitlist shows when each project's last punch list went out, from the newest file in its Dropbox Deficiency Reports folder: on the Overview and in the Monday email."
  },
