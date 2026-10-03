@@ -2,13 +2,14 @@ import Header from "../../Header";
 import AdminNav from "../AdminNav";
 import PreviewButton from "./PreviewButton";
 import { requireAdmin } from "@/lib/auth";
-import { RECENT_DAYS, whatsNew } from "@/lib/whatsNew";
+import { EMAIL_SHOWN, whatsNew } from "@/lib/whatsNew";
 
 export const dynamic = "force-dynamic";
 
 export default async function WhatsNewAdmin() {
   const user = await requireAdmin();
-  const recent = new Set(whatsNew(true, RECENT_DAYS));
+  // In Monday's email: the newest 10 for techs, and the newest 10 for admins (which can include admin-only items).
+  const recent = new Set([...whatsNew(false).slice(0, EMAIL_SHOWN), ...whatsNew(true).slice(0, EMAIL_SHOWN)]);
   const all = whatsNew(true);
   return (
     <>
@@ -17,7 +18,7 @@ export default async function WhatsNewAdmin() {
         <h1>Admin</h1>
         <AdminNav on="whats-new" />
         <p className="muted">
-          Changes to Hitlist, written as they&apos;re added. Each Monday email starts with everything from the last {RECENT_DAYS} days
+          Changes to Hitlist, written as they&apos;re added. Each Monday email starts with the {EMAIL_SHOWN} newest
           (the <b>In Monday&apos;s email</b> ones). Items marked <b>Admins only</b> go only to admins. Techs see the list on the Help page too.
         </p>
         <PreviewButton />

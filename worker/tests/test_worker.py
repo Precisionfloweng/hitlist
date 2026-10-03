@@ -337,7 +337,7 @@ def test_weekly_summary_whats_new(tmp_path):
     send_weekly_summary(store, s, mail, now=now, dry_run=True, whats_new=entries)
     tech = next(m for m in mail.sent if m["To"] == "tech@example.com").get_body(("html",)).get_content()
     boss = next(m for m in mail.sent if m["To"] == "boss@example.com").get_body(("html",)).get_content()
-    assert "New tab" in tech and "Admin bit" not in tech and "Old news" not in tech
+    assert "New tab" in tech and "Admin bit" not in tech and "Old news" in tech     # newest 10, however old
     assert "New tab" in boss and "Admin bit" in boss
     mail2 = Mailer("app@example.com", "")
     send_weekly_summary(store, s, mail2, now=now, dry_run=True, whats_new=[])
@@ -355,3 +355,13 @@ def test_weekly_summary_whats_new_shows_ten_then_a_link(tmp_path):
     assert "https://site.example/admin/whats-new" in admin_html
     few, _ = whats_new_block(entries[:3], admin=False, now=now, app_url="https://site.example")
     assert "See all" not in few
+
+
+def test_weekly_summary_shows_possible_issues(tmp_path):
+    store, s, mail = make_store(), settings(tmp_path), Mailer("app@example.com", "")
+    now = datetime(2026, 10, 5, 12, tzinfo=timezone.utc)
+    store.update_project("99-001", last_sync=(now - timedelta(days=2)).isoformat(), gap_flags="3")
+    send_weekly_summary(store, s, mail, now=now, dry_run=True, whats_new=[])
+    msg = next(m for m in mail.sent if m["To"] == "tech@example.com")
+    assert "Possible issues" in msg.get_body(("html",)).get_content()
+    assert "Possible issues: 3" in msg.get_body(("plain",)).get_content()

@@ -57,7 +57,7 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 
 ## What's new
 - Every change a tech or admin would notice gets a plain-English entry in `web/content/whats-new.json`
-  (date, audience "all" or "admins", title, one-line text). The Monday email shows the last 30 days; the Help
+  (date, audience "all" or "admins", title, one-line text). The Monday email shows the 10 newest (link to the rest); the Help
   page and Admin → What's new show the list. No client names in entries.
 
 ## Workflow

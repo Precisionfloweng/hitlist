@@ -4,7 +4,6 @@ import entries from "@/content/whats-new.json";
 
 export type WhatsNew = { date: string; audience: "all" | "admins"; title: string; text: string };
 export const ALL: WhatsNew[] = (entries as WhatsNew[]).slice().sort((a, b) => b.date.localeCompare(a.date));
-export const RECENT_DAYS = 30;
 
 /** Newest first; admins-only entries left out for everyone else. `days` limits to the last N days. */
 export function whatsNew(isAdmin: boolean, days?: number): WhatsNew[] {
@@ -33,6 +32,6 @@ export function whatsNewEmailHtml(all: WhatsNew[], site = "", admin = false): st
       `<a href="${esc(site.replace(/\/$/, ""))}${admin ? "/admin/whats-new" : "/help#whats-new"}" style="color:#4b3591;font-weight:bold;text-decoration:none">` +
       `See all ${all.length} changes in Hitlist &rarr;</a></td></tr>` : "");
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f4fd;border:1px solid #d9cff0;margin:0 0 18px">` +
-    `<tr><td style="padding:12px 16px 4px;font-family:${F};font-size:15px;font-weight:bold;color:#4b3591">New in Hitlist <span style="font-weight:normal;font-size:13px;color:#7a6aa8">(last 30 days)</span></td></tr>` +
+    `<tr><td style="padding:12px 16px 4px;font-family:${F};font-size:15px;font-weight:bold;color:#4b3591">New in Hitlist <span style="font-weight:normal;font-size:13px;color:#7a6aa8">(latest changes)</span></td></tr>` +
     `<tr><td style="padding:0 16px 6px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table></td></tr></table>`;
 }

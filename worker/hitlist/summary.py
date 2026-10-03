@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -60,7 +60,7 @@ def _table(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str
         align = "left" if i == 0 else "center"
         return (f'align="{align}" style="text-align:{align};padding:8px 10px;background:{BRAND};color:#ffffff;'
                 f'font-family:{FONT};font-size:13px;font-weight:bold"')
-    cols = ["Project", *(["Tech"] if show_tech else []), "Last sync", "Complete", "Open deficiencies"]
+    cols = ["Project", *(["Tech"] if show_tech else []), "Last sync", "Complete", "Open deficiencies", "Possible issues"]
     head = "<tr>" + "".join(f"<th {th(i)}>{c}</th>" for i, c in enumerate(cols)) + "</tr>"
     rows = []
     for i, p in enumerate(projects):
@@ -76,10 +76,28 @@ def _table(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str
         name = f'<a href="{esc(url)}" style="color:{BRAND};font-weight:bold;text-decoration:none">{name}</a>' if url else f"<b>{name}</b>"
         when = when_text(p["days"])
         when = f'<span style="color:#b42318;font-weight:bold">{when}</span>' if stale else when
-        cells = [name, *([esc(p.get("tech"))] if show_tech else []), when, _pct(p), esc(p.get("open_deficiencies") or 0)]
+        cells = [name, *([esc(p.get("tech"))] if show_tech else []), when, _pct(p), esc(p.get("open_deficiencies") or 0),
+                 _issues(p)]
         rows.append("<tr>" + "".join(f"<td {td(n)}>{c}</td>" for n, c in enumerate(cells)) + "</tr>")
     return ('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
             'style="border-collapse:collapse;border:1px solid #e3e6eb">' + head + "".join(rows) + "</table>")
+
+
+def _issue_count(p: dict[str, Any]) -> int | None:
+    """Units ticked Completed in BuildingStart with required fields still empty (from the last sync)."""
+    if not p.get("last_sync"):
+        return None
+    try:
+        return int(float(p.get("gap_flags") or 0))
+    except (TypeError, ValueError):
+        return 0
+
+
+def _issues(p: dict[str, Any]) -> str:
+    n = _issue_count(p)
+    if n is None:
+        return "–"
+    return f'<span style="color:#b54708;font-weight:bold">{n}</span>' if n else "0"
 
 
 def _text(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str:
@@ -88,19 +106,21 @@ def _text(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str:
         tech = f" ({p.get('tech')})" if show_tech and p.get("tech") else ""
         out.append(f"{p['project_number']} {p['name']}{tech}\n"
                    f"   Last sync: {when_text(p['days'])} | Complete: {_pct(p)} | "
-                   f"Open deficiencies: {p.get('open_deficiencies') or 0}"
+                   f"Open deficiencies: {p.get('open_deficiencies') or 0} | "
+                   f"Possible issues: {'-' if _issue_count(p) is None else _issue_count(p)}"
                    + (f"\n   {_link(app_url, p)}" if app_url else ""))
     return "\n\n".join(out)
 
 
 def _body(intro: str, projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> tuple[str, str]:
     html = (f"<p style=\"margin:0 0 14px\">{intro}</p>" + _table(projects, app_url, show_tech)
-            + f'<p style="margin:14px 0 0;font-size:12px;color:{MUTED}">Red means 7 or more days since the last sync.</p>')
+            + f'<p style="margin:14px 0 0;font-size:12px;color:{MUTED}">Red means 7 or more days since the last sync. '
+              f'Possible issues are units ticked Completed in BuildingStart with required fields still empty '
+              f'(listed on the project\'s Overview).</p>')
     return html, intro + "\n\n" + _text(projects, app_url, show_tech)
 
 
 log = logging.getLogger(__name__)
-WHATS_NEW_DAYS = 30
 ADMIN_TAG = ' <span style="font-size:11px;color:#7a6aa8">(admins)</span>'
 _LOCAL_WHATS_NEW = Path(__file__).resolve().parents[2] / "web" / "content" / "whats-new.json"
 
@@ -127,10 +147,9 @@ WHATS_NEW_SHOWN = 10        # the newest changes shown in the email; the rest ar
 
 def whats_new_block(entries: list[dict[str, str]], admin: bool, now: datetime | None = None,
                     app_url: str = "") -> tuple[str, str]:
-    """HTML and text for "New in Hitlist" (last 30 days): the 10 newest, then a link to the full list.
-    ("", "") when there's nothing new."""
-    since = ((now or datetime.now(timezone.utc)).astimezone() - timedelta(days=WHATS_NEW_DAYS)).date().isoformat()
-    items = sorted((e for e in entries if e.get("date", "") >= since and (admin or e.get("audience") == "all")),
+    """HTML and text for "New in Hitlist": the 10 newest changes (however old), then a link to the full list.
+    ("", "") when there are none."""
+    items = sorted((e for e in entries if admin or e.get("audience") == "all"),
                    key=lambda e: e.get("date", ""), reverse=True)
     if not items:
         return "", ""
@@ -158,10 +177,10 @@ def whats_new_block(entries: list[dict[str, str]], admin: bool, now: datetime | 
     html = (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
             f'style="background:#f7f4fd;border:1px solid #d9cff0;margin:0 0 18px">'
             f'<tr><td style="padding:12px 16px 4px;font-family:{FONT};font-size:15px;font-weight:bold;color:#4b3591">'
-            f'New in Hitlist <span style="font-weight:normal;font-size:13px;color:#7a6aa8">(last 30 days)</span></td></tr>'
+            f'New in Hitlist <span style="font-weight:normal;font-size:13px;color:#7a6aa8">(latest changes)</span></td></tr>'
             f'<tr><td style="padding:0 16px 6px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
             f'{rows}</table></td></tr></table>')
-    text = "NEW IN HITLIST (last 30 days)\n" + "\n".join(
+    text = "NEW IN HITLIST (latest changes)\n" + "\n".join(
         f"- {day(e.get('date', ''))}  {e.get('title')}: {e.get('text')}" for e in shown)
     if more > 0:
         text += f"\n...and {more} more" + (f": {full}" if base else " on the Help page")
