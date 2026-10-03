@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "../../Header";
-import { pct } from "../../format";
+import { pct, syncLabel } from "../../format";
 import { byTypeOrder } from "@/lib/typeOrder";
 import IssuesList from "./IssuesList";
 import ProjectHeader from "./ProjectHeader";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
-import { getProject } from "@/lib/data";
+import { daysSince, getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
 import { loadTolerances } from "@/lib/tolerances";
 import { TOLERANCE_CATS } from "@/lib/toleranceCats";
@@ -43,6 +43,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
 
         {p.lastSync ? (
           <>
+            {user.role !== "customer" && p.punchSent && (
+              <div className="tol-line">
+                <b>Last punch list sent</b>{" "}
+                {new Date(p.punchSent).toLocaleDateString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric", year: "numeric" })}
+                {" "}({syncLabel(daysSince(p.punchSent)).text.toLowerCase()})
+                {p.punchFile && <span className="muted"> · {p.punchFile}</span>}
+              </div>
+            )}
             {TOLERANCE_CATS.some((c) => tol[c.key]) && (
               <div className="tol-line">
                 <b>Tolerances</b>{" "}

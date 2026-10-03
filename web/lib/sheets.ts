@@ -7,7 +7,9 @@ export const SCHEMA = {
     "last_sync", "last_sync_status", "fields_pct", "units_pct", "units",
     "open_deficiencies", "open_high", "gap_flags", "project_id",
     // Dropbox project folder and document index (written by the server; dropbox_path can be pasted on AI Tools)
-    "dropbox_id", "dropbox_path", "docs_updated", "docs_status"],
+    "dropbox_id", "dropbox_path", "docs_updated", "docs_status",
+    // newest file in the project's Dropbox "Deficiency Reports" folder = last punch list sent (server)
+    "punch_sent", "punch_file"],
   // projects: for role "customer", the project keys they may see (" | " separated)
   // last_seen: date (Central) the person last opened the app, updated at most once a day.
   Users: ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],

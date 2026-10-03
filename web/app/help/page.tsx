@@ -59,7 +59,7 @@ export default async function HelpPage() {
             <li><b>All Projects</b> lists every active project. Tick <b>My projects</b> to see only the ones where you&apos;re the tech. Use the search box to find a project by number, name or tech.</li>
             <li>Click a project to open it. Each project has these tabs:
               <ul>
-                <li><b>Overview</b>: units fully complete, open and closed deficiencies, and a card for each equipment type. Click a card to jump to that type.</li>
+                <li><b>Overview</b>: units fully complete, open and closed deficiencies, and a card for each equipment type. Click a card to jump to that type. It also shows when the <b>last punch list was sent</b>: the newest file in the project&apos;s Dropbox <b>Deficiency Reports</b> folder (checked on each sync and before the Monday email), so keep saving each sent punch list there.</li>
                 <li><b>Equipment checklist</b>: every unit and field, marked done or missing.</li>
                 <li><b>Deficiencies</b>: the punch list, with breakdowns by priority, contractor and contact.</li>
                 <li><b>Notes</b>: the notes entered in BuildingStart. See <a href="#notes">Notes</a>.</li>

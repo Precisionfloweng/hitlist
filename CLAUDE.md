@@ -28,6 +28,8 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   Change Orders; page text (PyMuPDF) sent gzipped in parts to `POST /api/worker/docs/{project}?part=`, manifest last.
   Unchanged files (Dropbox content hash) are skipped. Queue rows with kind "docs" are document updates; each sync
   queues one. Projects columns dropbox_id, dropbox_path (pasted path or found), docs_updated, docs_status.
+- Last punch list sent = newest file (client_modified) in the project's "Deficiency Reports" folder (names/dates only):
+  Projects punch_sent/punch_file, updated by docs jobs and by `refresh_punch_lists` right before the Monday email.
 - Web `lib/docs.ts`: keyword/tag page search, only the best pages go to Claude; answers cite [S#] file+page;
   history in Blob docs-qa/. File names/contents are client data: never in the repo or tests.
 

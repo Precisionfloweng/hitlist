@@ -44,21 +44,26 @@ def starts_with_number(folder_name: str, number: str) -> bool:
     return bool(number) and re.match(rf"^{re.escape(number.strip())}(?![0-9A-Za-z])", folder_name.strip(), re.I) is not None
 
 
-def find_project_folder(dbx: Dropbox, tech_root: str, number: str, name: str,
-                        taken: set[str] | None = None) -> dict | None:
-    """Look in every technician folder (and directly under the technicians folder) for a folder starting
-    with the job number. Job numbers can be shared by several projects on one contract, so with more than
-    one, the Hitlist name decides, but only when one folder clearly matches best; otherwise it stops and
-    lists them so someone picks with Change folder. Folders already linked to another project are skipped."""
+def folder_index(dbx: Dropbox, tech_root: str) -> list[dict]:
+    """Every folder inside the technician folders, plus folders sitting directly under the technicians folder:
+    the places a project folder can be. Listing this once lets many projects be matched cheaply."""
     top = find_folder(dbx.folders(""), tech_root)
     if not top:
         raise DocsError(f"Couldn't find the '{tech_root}' folder in Dropbox")
-    candidates: list[dict] = []
+    out: list[dict] = []
     for f in dbx.folders(top["path_lower"]):
-        if starts_with_number(f["name"], number):
-            candidates.append(f)
-        else:
-            candidates += [c for c in dbx.folders(f["path_lower"]) if starts_with_number(c["name"], number)]
+        out.append(f)
+        if not SKIP_TECH_FOLDERS.match(f["name"]) and not re.match(r"^\d{2}-\d", f["name"]):
+            out += dbx.folders(f["path_lower"])
+    return out
+
+
+def pick_project_folder(index: list[dict], number: str, name: str, taken: set[str] | None = None) -> dict | None:
+    """The project's folder: the one starting with the job number. Job numbers can be shared by several projects
+    on one contract, so with more than one the Hitlist name decides, but only when one folder clearly matches
+    best; otherwise it stops and lists them so someone picks with Change folder. Folders already linked to
+    another project with this number are skipped."""
+    candidates = [f for f in index if starts_with_number(f["name"], number)]
     free = [c for c in candidates if c["id"] not in (taken or set())]
     if candidates and not free:
         raise DocsError(f"The only folder starting with {number} ({candidates[0]['name']}) is already linked to the "
@@ -75,6 +80,30 @@ def find_project_folder(dbx: Dropbox, tech_root: str, number: str, name: str,
         raise DocsError(f"Several Dropbox folders start with {number} and the name doesn't clearly pick one "
                         f"({names}). Use Change folder on the AI Tools tab to choose.")
     return ranked[0]
+
+
+def find_project_folder(dbx: Dropbox, tech_root: str, number: str, name: str,
+                        taken: set[str] | None = None) -> dict | None:
+    return pick_project_folder(folder_index(dbx, tech_root), number, name, taken)
+
+
+# ---- last punch list sent -----------------------------------------------------------------
+PUNCH_FOLDER = "Deficiency Reports"
+
+
+def last_punch_list(dbx: Dropbox, folder: dict) -> dict | None:
+    """The newest file in the project's Deficiency Reports folder (techs save each sent punch list there):
+    {"name", "date"}; {} when the folder is empty; None when the project folder has no such folder.
+    Only names and dates are read, never the files."""
+    sub = find_folder(dbx.folders(folder["path_lower"]), PUNCH_FOLDER)
+    if not sub:
+        return None
+    files = [e for e in dbx.list_all(sub["path_lower"]) if e.get(".tag") == "file"]
+    if not files:
+        return {}
+    when = lambda e: e.get("client_modified") or e.get("server_modified") or ""  # noqa: E731
+    newest = max(files, key=when)
+    return {"name": newest["name"], "date": when(newest)}
 
 
 def dropbox_path_from(text: str) -> str:

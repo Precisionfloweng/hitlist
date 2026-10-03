@@ -33,7 +33,8 @@ def active_projects(store: HitlistStore, now: datetime | None = None) -> list[di
     for p in store.rows("Projects"):
         if p.get("status", "").lower() in ("archived", "deleted"):
             continue
-        out.append({**p, "days": days_since(p.get("last_sync", ""), now)})
+        out.append({**p, "days": days_since(p.get("last_sync", ""), now),
+                    "punch_days": days_since(p.get("punch_sent", ""), now)})
     # Never-synced first, then the stalest.
     return sorted(out, key=lambda p: (p["days"] is not None, -(p["days"] or 0)))
 
@@ -60,7 +61,8 @@ def _table(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str
         align = "left" if i == 0 else "center"
         return (f'align="{align}" style="text-align:{align};padding:8px 10px;background:{BRAND};color:#ffffff;'
                 f'font-family:{FONT};font-size:13px;font-weight:bold"')
-    cols = ["Project", *(["Tech"] if show_tech else []), "Last sync", "Complete", "Open deficiencies", "Possible issues"]
+    cols = ["Project", *(["Tech"] if show_tech else []), "Last sync", "Complete", "Open deficiencies", "Possible issues",
+            "Last punch list"]
     head = "<tr>" + "".join(f"<th {th(i)}>{c}</th>" for i, c in enumerate(cols)) + "</tr>"
     rows = []
     for i, p in enumerate(projects):
@@ -77,10 +79,18 @@ def _table(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str
         when = when_text(p["days"])
         when = f'<span style="color:#b42318;font-weight:bold">{when}</span>' if stale else when
         cells = [name, *([esc(p.get("tech"))] if show_tech else []), when, _pct(p), esc(p.get("open_deficiencies") or 0),
-                 _issues(p)]
+                 _issues(p), esc(punch_text(p))]
         rows.append("<tr>" + "".join(f"<td {td(n)}>{c}</td>" for n, c in enumerate(cells)) + "</tr>")
     return ('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
             'style="border-collapse:collapse;border:1px solid #e3e6eb">' + head + "".join(rows) + "</table>")
+
+
+def punch_text(p: dict[str, Any]) -> str:
+    """When the last punch list was sent: the newest file in the project's Dropbox Deficiency Reports folder."""
+    if not p.get("punch_sent"):
+        return "None yet" if p.get("dropbox_id") else "–"
+    d = p.get("punch_days")
+    return "–" if d is None else when_text(d)
 
 
 def _issue_count(p: dict[str, Any]) -> int | None:
@@ -107,7 +117,8 @@ def _text(projects: list[dict[str, Any]], app_url: str, show_tech: bool) -> str:
         out.append(f"{p['project_number']} {p['name']}{tech}\n"
                    f"   Last sync: {when_text(p['days'])} | Complete: {_pct(p)} | "
                    f"Open deficiencies: {p.get('open_deficiencies') or 0} | "
-                   f"Possible issues: {'-' if _issue_count(p) is None else _issue_count(p)}"
+                   f"Possible issues: {'-' if _issue_count(p) is None else _issue_count(p)} | "
+                   f"Last punch list: {punch_text(p)}"
                    + (f"\n   {_link(app_url, p)}" if app_url else ""))
     return "\n\n".join(out)
 
@@ -116,7 +127,8 @@ def _body(intro: str, projects: list[dict[str, Any]], app_url: str, show_tech: b
     html = (f"<p style=\"margin:0 0 14px\">{intro}</p>" + _table(projects, app_url, show_tech)
             + f'<p style="margin:14px 0 0;font-size:12px;color:{MUTED}">Red means 7 or more days since the last sync. '
               f'Possible issues are units ticked Completed in BuildingStart with required fields still empty '
-              f'(listed on the project\'s Overview).</p>')
+              f'(listed on the project\'s Overview). Last punch list is the newest file in the project\'s Dropbox '
+              f'Deficiency Reports folder.</p>')
     return html, intro + "\n\n" + _text(projects, app_url, show_tech)
 
 
@@ -191,6 +203,10 @@ def whats_new_block(entries: list[dict[str, str]], admin: bool, now: datetime | 
 def send_weekly_summary(store: HitlistStore, settings: Settings, mailer: Mailer,
                         now: datetime | None = None, dry_run: bool = False,
                         whats_new: list[dict[str, str]] | None = None) -> dict[str, int]:
+    if not dry_run:
+        from .runner import refresh_punch_lists
+        n = refresh_punch_lists(store, settings)
+        log.info("Checked the last punch list for %s project(s)", n)
     entries = load_whats_new(settings) if whats_new is None else whats_new
     new_tech, new_tech_text = whats_new_block(entries, admin=False, now=now, app_url=settings.app_url)
     new_admin, new_admin_text = whats_new_block(entries, admin=True, now=now, app_url=settings.app_url)

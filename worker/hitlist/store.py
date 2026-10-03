@@ -17,7 +17,9 @@ SCHEMA: dict[str, list[str]] = {
                  "last_sync", "last_sync_status", "fields_pct", "units_pct", "units",
                  "open_deficiencies", "open_high", "gap_flags", "project_id",
                  # Dropbox project folder (found by the server, or pasted on the website) and the document index
-                 "dropbox_id", "dropbox_path", "docs_updated", "docs_status"],
+                 "dropbox_id", "dropbox_path", "docs_updated", "docs_status",
+                 # newest file in the project's Dropbox "Deficiency Reports" folder = last punch list sent
+                 "punch_sent", "punch_file"],
     # projects: for role "customer", the project keys they may see (" | " separated)
     "Users": ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
     "Rules": ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",

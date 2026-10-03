@@ -191,3 +191,42 @@ def test_docs_job_without_a_folder_explains(tmp_path):
     process_docs_job(store, st, job, dbx=FakeDbx())
     assert store.rows("Queue")[-1]["status"] == "failed"
     assert "No folder starting with 99-777" in store.project("99-777")["docs_status"]
+
+
+def test_last_punch_list_is_the_newest_file_in_deficiency_reports():
+    from hitlist.documents import last_punch_list
+    dbx = FakeDbx()
+    folder = dbx.metadata("/techs/alex tech/99-001 sample building")
+    assert last_punch_list(dbx, folder) is None                       # no Deficiency Reports folder
+    dbx.add_folder("/techs/alex tech/99-001 sample building/deficiency reports")
+    assert last_punch_list(dbx, folder) == {}                          # folder but nothing sent yet
+    base = "/techs/alex tech/99-001 sample building/deficiency reports"
+    dbx.add_file(f"{base}/Punch 1.pdf", b"a")
+    dbx.items[f"{base}/punch 1.pdf"]["client_modified"] = "2026-09-14T15:00:00Z"
+    dbx.add_folder(f"{base}/old")
+    dbx.add_file(f"{base}/old/Punch 2.pdf", b"b")
+    dbx.items[f"{base}/old/punch 2.pdf"]["client_modified"] = "2026-09-28T15:00:00Z"
+    assert last_punch_list(dbx, folder) == {"name": "Punch 2.pdf", "date": "2026-09-28T15:00:00Z"}
+
+
+def test_refresh_punch_lists_links_projects_and_feeds_the_monday_email(tmp_path):
+    from datetime import datetime, timezone
+    from hitlist.mailer import Mailer
+    from hitlist.runner import refresh_punch_lists
+    from hitlist.summary import send_weekly_summary
+    store = make_store()
+    st = Settings(dropbox_app_key="k", dropbox_app_secret="s", dropbox_refresh_token="t", dropbox_tech_folder="Techs")
+    dbx = FakeDbx()
+    base = "/techs/alex tech/99-001 sample building/deficiency reports"
+    dbx.add_folder(base)
+    dbx.add_file(f"{base}/Punch.pdf", b"a")
+    dbx.items[f"{base}/punch.pdf"]["client_modified"] = "2026-09-28T15:00:00Z"
+    assert refresh_punch_lists(store, st, dbx=dbx) == 1
+    p = store.project("99-001")
+    assert p["dropbox_path"].endswith("99-001 sample building") and p["punch_sent"] == "2026-09-28T15:00:00Z"
+    store.update_project("99-001", last_sync="2026-10-04T12:00:00+00:00")
+    mail = Mailer("app@example.com", "")
+    send_weekly_summary(store, st, mail, now=datetime(2026, 10, 5, 12, tzinfo=timezone.utc), dry_run=True, whats_new=[])
+    msg = next(m for m in mail.sent if m["To"] == "tech@example.com")
+    assert "Last punch list" in msg.get_body(("html",)).get_content()
+    assert "Last punch list: 7 days ago" in msg.get_body(("plain",)).get_content()

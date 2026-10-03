@@ -148,6 +148,7 @@ def process_docs_job(store: HitlistStore, settings: Settings, job: dict[str, str
         manifest = update_documents(dbx, folder, number, previous, _docs_uploader(settings, number), step,
                                     now=now_iso())
         local.write_text(json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
+        _save_punch_list(store, number, dbx, folder)
         n = len(manifest["files"])
         status = f"ok: {n} file{'s' if n != 1 else ''}" + (f", {len(manifest['skipped'])} skipped" if manifest["skipped"] else "")
         store.update_project(number, docs_updated=now_iso(), docs_status=status)
@@ -161,6 +162,66 @@ def process_docs_job(store: HitlistStore, settings: Settings, job: dict[str, str
                 store.update_project(number, docs_status=f"failed: {message[:150]}")
             except Exception:  # noqa: BLE001
                 pass
+
+
+def _save_punch_list(store: HitlistStore, number: str, dbx, folder: dict) -> None:
+    """Record the newest file in the project's Deficiency Reports folder (the last punch list sent)."""
+    from .documents import last_punch_list
+    try:
+        punch = last_punch_list(dbx, folder)
+    except Exception:  # noqa: BLE001 - never fail the document update over this
+        log.warning("Could not check the Deficiency Reports folder for %s", number, exc_info=True)
+        return
+    p = store.project(number) or {}
+    new = {"punch_sent": (punch or {}).get("date", ""), "punch_file": (punch or {}).get("name", "")}
+    if any(p.get(k, "") != v for k, v in new.items()):
+        store.update_project(number, **new)
+
+
+def refresh_punch_lists(store: HitlistStore, settings: Settings, dbx=None) -> int:
+    """Before the Monday email: check every active project's Deficiency Reports folder, so the date is current
+    even if nobody synced. Projects not linked to a folder yet are matched by job number and name (and linked).
+    Returns how many projects were checked. Problems are logged and skipped; the email still goes out."""
+    from .documents import DocsError, folder_index, pick_project_folder
+    from .dropbox import Dropbox, DropboxError
+    if not settings.dropbox_ready:
+        return 0
+    try:
+        dbx = dbx or Dropbox(settings.dropbox_app_key, settings.dropbox_app_secret, settings.dropbox_refresh_token)
+        dbx.use_team_space()
+        index = None
+        projects = store.rows("Projects")
+    except Exception:  # noqa: BLE001
+        log.warning("Could not reach Dropbox for the punch list dates", exc_info=True)
+        return 0
+    checked = 0
+    for p in projects:
+        if p.get("status", "").lower() in ("archived", "deleted"):
+            continue
+        key = p.get("project_id") or p["project_number"]
+        try:
+            folder = None
+            if p.get("dropbox_id"):
+                try:
+                    folder = dbx.metadata(p["dropbox_id"])
+                except DropboxError:
+                    folder = None
+            if folder is None:
+                if index is None:
+                    index = folder_index(dbx, settings.dropbox_tech_folder)
+                taken = {o["dropbox_id"] for o in projects if o.get("dropbox_id") and
+                         o.get("project_number") == p["project_number"] and o["_row"] != p["_row"]}
+                folder = pick_project_folder(index, p["project_number"], p.get("name", ""), taken)
+                if folder is None:
+                    continue
+                store.update_project(key, dropbox_id=folder["id"], dropbox_path=folder.get("path_display", ""))
+            _save_punch_list(store, key, dbx, folder)
+            checked += 1
+        except (DocsError, DropboxError) as exc:
+            log.info("Punch list date skipped for %s: %s", key, exc)
+        except Exception:  # noqa: BLE001
+            log.warning("Punch list date failed for %s", key, exc_info=True)
+    return checked
 
 
 def _docs_uploader(settings: Settings, number: str):

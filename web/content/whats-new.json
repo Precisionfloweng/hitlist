@@ -2,6 +2,12 @@
  {
   "date": "2026-10-03",
   "audience": "all",
+  "title": "Last punch list sent",
+  "text": "Hitlist shows when each project's last punch list went out, from the newest file in its Dropbox Deficiency Reports folder: on the Overview and in the Monday email."
+ },
+ {
+  "date": "2026-10-03",
+  "audience": "all",
   "title": "Monday email: shorter, with possible issues",
   "text": "The Monday email lists the 10 newest Hitlist changes (link to the rest) and shows each project's Possible issues count."
  },

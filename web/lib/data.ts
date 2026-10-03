@@ -13,6 +13,7 @@ export type Project = {
   punchItems: number | null;   // all deficiencies, open and closed
   queue: "queued" | "running" | null; job: SyncJob | null; row: number;
   dropboxPath: string; docsUpdated: string; docsStatus: string;
+  punchSent: string; punchFile: string;   // newest file in the Dropbox Deficiency Reports folder
 };
 
 /** The latest refresh request for a project, as the Refresh button shows it. */
@@ -99,6 +100,7 @@ function toProject(p: Rec, queue: Rec[], punch?: Map<string, number>, all: Rec[]
     job: jobFor(key, queue),
     row: p._row,
     dropboxPath: p.dropbox_path || "", docsUpdated: p.docs_updated || "", docsStatus: p.docs_status || "",
+    punchSent: p.punch_sent || "", punchFile: p.punch_file || "",
   };
 }
 
