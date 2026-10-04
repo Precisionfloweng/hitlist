@@ -582,7 +582,7 @@ header.top .top-drop form button { background: transparent; }
 
 /* Contacts: Add a contact as a bar across the top of the list's box. */
 .contacts-add-bar { display: grid; grid-template-columns: auto repeat(5, minmax(0, 1fr)) auto; gap: 8px; align-items: center;
-  padding: 12px 14px; border-bottom: 1px solid #c9d8ea; }
+  padding: 12px 14px; border-bottom: 3px solid #2f6fb3; }
 .contacts-add-bar b { white-space: nowrap; margin-right: 4px; }
 .contacts-add-bar input { min-width: 0; }
 @media (max-width: 900px) { .contacts-add-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); } .contacts-add-bar b { grid-column: 1 / -1; } }
