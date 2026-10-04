@@ -43,9 +43,8 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   else a table per type named in the question (columns picked from the question's words, floor/level filter on
   Area/Zone/path), and always the Hitlist progress per type counted in code. Tolerance checks are calculated in
   `lib/tolCheck.ts` (Design/Actual airflow and water pairs → category → % off, OUTSIDE/within; amps via a per-sheet AMP_MAP: motor
-  amps flagged when the highest phase is above design (design × "Number of Motors/Fans" on AHU/RTU/MAU fan arrays);
-  heater amps (EDH, unit heater elements) fixed ±10%, phase furthest from design; a unit heater with a heater design
-  uses its Amps 1-3 for the heater only), shown as a check column
+  amps flagged when the highest phase is above design (design × "Number of Motors/Fans", else "Fan Wall Array" 3x3 → 9, on AHU/RTU/MAU);
+  heater amps (EDH, unit heaters: electric heat only, no motor amps) fixed ±10%, phase furthest from design), shown as a check column
   plus a TOLERANCE CHECK summary; the AI must not recalculate. AI Tools "Suggestions" also runs `lib/reports.ts`
   (Out of tolerance, What's left to do) in code via POST /api/docs action "report"; not saved. The answer form has a hidden "working" field. Over 60k chars → TRUNCATED, the AI
   asks to narrow it. `checkValues` cross-checks against the results (shown on the AI Tools card).

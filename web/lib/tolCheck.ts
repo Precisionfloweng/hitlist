@@ -93,7 +93,8 @@ export function nearness(c: PairCheck): number {
 
 // ---- amps -------------------------------------------------------------------------------------------------
 // Motor amps: flagged when the highest actual phase is above design by any amount. When a unit has several motors
-// (a fan array: "Number of Motors/Fans"), design = per-motor amps × motors, since the reading is the total.
+// (a fan array: "Number of Motors/Fans", or else "Fan Wall Array" like 3x3), design = per-motor amps × motors,
+// since the reading is the total.
 // Heater amps (electric heat, unit heater elements): always ±10% of design; the phase furthest from design is used.
 export type AmpCheck = { label: string; heater: boolean; design: number; perMotor: number | null; motors: number;
   actual: number | null; pct: number | null; over: boolean | null };
@@ -118,10 +119,19 @@ const AMP_MAP: Record<string, AmpDef[]> = {
   watersourceheatpump: [{ label: "Amps", design: "Amps", actual: ["Amps T1"] }],
   hydronicpump: [{ label: "Motor Amps", design: "Motor F.L. Amps", actual: T123("Motor Amps T") }],
   coolingtower: [{ label: "Motor Amps", design: "Motor F.L. Amps", actual: ["Actual Amps T1"] }],
-  unitheater: [{ label: "Motor Amps", design: "Motor Amps", actual: T123("Amps ") },
-    { label: "Heater Amps", design: "Dsgn. Amps", actual: T123("Amps "), heater: true }],
+  // Unit heaters: only electric heat is read (no motor amps are taken on these).
+  unitheater: [{ label: "Heater Amps", design: "Dsgn. Amps", actual: T123("Amps "), heater: true }],
   electriccoil: [{ label: "Heater Amps", design: "EDH Design Amps", actual: T123("EDH Act. Amps "), heater: true }],
 };
+
+/** Motors in a fan wall from the "Fan Wall Array" field: "3x3" / "3 X 3" / "2×4" = rows × columns, or a plain count. */
+export function arrayCount(v: unknown): number | null {
+  if (typeof v === "number") return v > 0 ? v : null;
+  const t = String(v ?? "").trim();
+  const m = /^(\d+)\s*[x×*]\s*(\d+)$/i.exec(t);
+  if (m) return Number(m[1]) * Number(m[2]);
+  return /^\d+$/.test(t) && Number(t) > 0 ? Number(t) : null;
+}
 
 export function ampChecksFor(sheet: string): AmpDef[] {
   return AMP_MAP[norm(sheet)] ?? [];
@@ -131,11 +141,7 @@ export function ampChecksFor(sheet: string): AmpDef[] {
 export function checkAmps(sheet: string, v: Record<string, unknown>): AmpCheck[] {
   const byNorm = new Map(Object.entries(v).map(([h, x]) => [norm(h), x]));
   const out: AmpCheck[] = [];
-  const defs = ampChecksFor(sheet);
-  // A unit heater has one set of amp readings: with a heater design (electric heat) they're the heater's, else the motor's.
-  const heaterDesigned = defs.some((m) => m.heater && (num(byNorm.get(norm(m.design))) ?? 0) > 0);
-  for (const m of defs) {
-    if (!m.heater && heaterDesigned && defs.some((d) => d.heater && d.actual.join() === m.actual.join())) continue;
+  for (const m of ampChecksFor(sheet)) {
     const base = num(byNorm.get(norm(m.design)));
     if (base === null || base <= 0) continue;
     const readings = m.actual.map((a) => num(byNorm.get(norm(a)))).filter((x): x is number => x !== null);
@@ -146,7 +152,8 @@ export function checkAmps(sheet: string, v: Record<string, unknown>): AmpCheck[]
         over: pct === null ? null : Math.abs(pct) > 10 + 1e-9 });
       continue;
     }
-    const counted = (m.count ?? []).map((c) => num(byNorm.get(norm(c)))).find((n) => n !== null && n !== undefined);
+    const counted = (m.count ?? []).map((c) => num(byNorm.get(norm(c)))).find((n) => n !== null && n !== undefined)
+      ?? (m.count ? arrayCount(byNorm.get(norm("Fan Wall Array"))) : null);
     const motors = counted && counted > 1 ? Math.round(counted) : 1;
     const design = Math.round(base * motors * 100) / 100;
     const actual = readings.length ? Math.max(...readings) : null;
