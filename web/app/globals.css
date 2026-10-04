@@ -475,3 +475,14 @@ header.top .top-drop form button { background: transparent; }
 .tc-pct { font-size: 18px; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; }
 .tc-pct.full { color: var(--ok); }
 .confirm-box { border-top-color: #e0a100; background: #fffaf0; margin-bottom: 10px; }
+
+/* Selected equipment/rules card: pale blue with a thicker blue border (lighter than solid navy) */
+.eq-types li button.on { background: #e8f1fb; color: var(--ink); border: 2px solid #2f6fb3; border-top: 3px solid #2f6fb3;
+  padding: 7px 9px !important; box-shadow: 0 2px 6px rgba(47, 111, 179, .18); }
+.eq-types li button.on.full { border-top-color: #4cbb75; }
+.eq-types li button.on .eq-name { color: #1f4e79; font-weight: 700; }
+.eq-types li button.on .eq-pct, .eq-types li button.on .eq-sub { color: var(--muted); }
+.eq-types li button.on .bar { background: #cfdcec; }
+.eq-types li button.on .bar > span { background: var(--brand); }
+.eq-types li button.on .eq-changed { color: #6b4fbb; }
+.eq-types li button.on:hover { border-color: #2f6fb3; }

@@ -1,5 +1,11 @@
 [
  {
+  "date": "2026-10-04",
+  "audience": "all",
+  "title": "Lighter selected card",
+  "text": "The selected equipment type card on the checklist and rules pages is now pale blue with a blue border instead of solid navy, so its progress bar is easier to read."
+ },
+ {
   "date": "2026-10-03",
   "audience": "admins",
   "title": "No duplicate projects",
