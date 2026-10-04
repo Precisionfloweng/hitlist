@@ -2,6 +2,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fmtTol, normalizeTolerances, TOLERANCE_CATS } from "@/lib/toleranceCats";
+import type { LeftReport, ToleranceReport } from "@/lib/reports";
+import ReportView from "./ReportView";
 
 type Source = { id: string; category: string; path: string; name: string; page: number; modified: string };
 type Answer = { question: string; answer: string; found: boolean; sources: Source[];
@@ -71,6 +73,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   const [busy, setBusy] = useState<string>("");
   const [error, setError] = useState("");
   const [answer, setAnswer] = useState<Answer | null>(null);
+  const [report, setReport] = useState<ToleranceReport | LeftReport | null>(null);   // Out of tolerance / What's left
   const [answerSaved, setAnswerSaved] = useState(false);       // its tolerances were saved automatically
   const router = useRouter();
   const [changing, setChanging] = useState(false);
@@ -120,9 +123,22 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   }
 
   async function ask(mode: string) {
-    setAnswer(null);
+    setAnswer(null); setReport(null);
     const data = await post({ action: "ask", mode, question, unit }, mode);
     if (data?.answer) { setAnswer(data.answer); setAnswerSaved(!!data.tolerancesSaved); load(); if (data.tolerancesSaved) router.refresh(); }
+  }
+
+  /** A pick from the Suggestions list. */
+  async function suggest(v: string) {
+    if (!v) return;
+    if (v === "design" && !unit.trim()) { setError("Put a unit in the unit box first, then pick Design values."); return; }
+    if (v === "tolerance" || v === "left") {
+      setAnswer(null); setReport(null);
+      const data = await post({ action: "report", mode: v }, v);
+      if (data?.report) setReport(data.report);
+      return;
+    }
+    ask(v);
   }
 
   const ready = !!info && info.files > 0;
@@ -224,12 +240,18 @@ export default function DocsAsk({ project, units }: { project: string; units: st
 
       <div className="docs-ask">
         <div className="docs-quick">
-          <button disabled={!ready || !!busy} onClick={() => ask("tolerances")}>{busy === "tolerances" ? "Reading…" : "Tolerances"}</button>
-          <button disabled={!ready || !!busy} onClick={() => ask("tab")}>{busy === "tab" ? "Reading…" : "TAB requirements"}</button>
+          <select className="docs-suggest" value="" disabled={!!busy || !info} onChange={(e) => suggest(e.target.value)}
+            aria-label="Suggestions">
+            <option value="">{busy && busy !== "ask" && busy !== "remove" && busy !== "update" && busy !== "folder" ? "Working…" : "Suggestions"}</option>
+            <option value="tolerances" disabled={!ready}>Tolerances (from the spec)</option>
+            <option value="tab" disabled={!ready}>TAB requirements</option>
+            <option value="design" disabled={!canAsk}>Design values for the unit</option>
+            <option value="tolerance" disabled={!bs || bs.units === 0}>Out of tolerance</option>
+            <option value="left">What&apos;s left to do</option>
+          </select>
           <span className="docs-design">
             <input list="docs-units" value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="Unit (optional, used by Ask and Design values)" />
             <datalist id="docs-units">{units.map((u) => <option key={u} value={u} />)}</datalist>
-            <button disabled={!canAsk || !!busy || !unit.trim()} onClick={() => ask("design")}>{busy === "design" ? "Reading…" : "Design values"}</button>
           </span>
         </div>
         <textarea className="ai-input" rows={3} value={question} onChange={(e) => setQuestion(e.target.value)}
@@ -243,7 +265,9 @@ export default function DocsAsk({ project, units }: { project: string; units: st
         </div>
       </div>
 
-      {shown && (
+      {report && <ReportView report={report} project={project} onClose={() => setReport(null)} />}
+
+      {shown && !report && (
         <>
           <div className="docs-latest muted">
             {answer ? "Answer" : "Latest question"} · {shown.by}, {when(shown.at)}

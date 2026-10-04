@@ -4,6 +4,7 @@ import { docsJob, getProject, requestDocs, setDocsFolder } from "@/lib/data";
 import { loadTolerancesWithDefaults, saveTolerances } from "@/lib/tolerances";
 import { checkValues, loadValues } from "@/lib/bsvalues";
 import { loadResults } from "@/lib/results";
+import { leftReport, toleranceReport } from "@/lib/reports";
 import { askDocs, loadHistory, loadManifest, QUICK, removeAnswer, type Mode } from "@/lib/docs";
 
 export const maxDuration = 60;
@@ -56,6 +57,17 @@ export async function POST(req: Request) {
     if (body.action === "remove") {
       if (!body.at) return NextResponse.json({ error: "Missing answer" }, { status: 400 });
       return NextResponse.json({ ok: true, history: (await removeAnswer(project, body.at)).slice(0, 20) });
+    }
+    if (body.action === "report") {           // Out of tolerance / What's left to do: worked out in code, not saved
+      const results = await loadResults(project);
+      if (body.mode === "left") {
+        if (!results) return NextResponse.json({ error: "Sync the project first." }, { status: 400 });
+        return NextResponse.json({ ok: true, report: leftReport(results) });
+      }
+      const values = await loadValues(project);
+      if (!values) return NextResponse.json({ error: "This project's BuildingStart data hasn't arrived yet. Press Sync, then try again." }, { status: 400 });
+      const { tol } = await loadTolerancesWithDefaults(project);
+      return NextResponse.json({ ok: true, report: toleranceReport(values, results, tol) });
     }
     if (body.action === "ask") {
       const mode: Mode = (["tolerances", "tab", "design"] as const).find((m) => m === body.mode) ?? "ask";

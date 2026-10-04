@@ -385,6 +385,21 @@ header.top .top-drop form button:hover { background: #f5f6f8; }
 /* AI Tools: Ask the documents */
 
 .docs-status { background: #f6f8fb; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+.docs-suggest { min-width: 200px; font-weight: 600; }
+.report-head { font-size: 16px; margin-bottom: 6px; padding-right: 36px; }
+.report-sum { font-weight: 700; margin-bottom: 10px; }
+.report-sum.bad { color: #b42318; }
+.report-sum.good { color: #1a7f37; }
+.report-group { margin-top: 12px; }
+.report-group-name { font-weight: 700; margin-bottom: 4px; }
+.report-table { width: 100%; font-size: 14px; }
+.report-table td.bad { color: #b42318; font-weight: 700; }
+.report-more { margin-top: 6px; font-size: 14px; }
+.report-more summary, .report-type summary { cursor: pointer; }
+.report-more ul, .report-type ul { margin: 6px 0 6px 18px; padding: 0; }
+.report-type { padding: 6px 0; border-top: 1px solid var(--line, #e5e7eb); font-size: 14px; }
+.report-type.done { color: var(--muted); }
+.report-type-body { padding: 6px 0 4px 18px; display: grid; gap: 6px; }
 .docs-bs { font-size: 13px; margin-top: 4px; }
 .docs-bs.problem { color: #9a3412; }
 .docs-folder { font-weight: 600; word-break: break-word; }
