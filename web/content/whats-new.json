@@ -2,6 +2,12 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "Overview headings",
+  "text": "The project Overview now has \"Project summary\" and \"Equipment\" headings, and each equipment card's bar matches its percentage."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "Design values by source",
   "text": "Suggestions → Design values now lets you pick BuildingStart, Drawings, Submittals, or Compare all (a side-by-side table that flags mismatches), including the unit's coils."
  },

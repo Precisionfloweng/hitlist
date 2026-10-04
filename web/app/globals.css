@@ -220,6 +220,9 @@ th.ctr, td.ctr { text-align: center; }
 /* Overview: smaller summary tiles, then one small card per equipment type */
 .tiles .tile { padding: 12px; }
 .tiles .tile .big { font-size: 24px; }
+.ov-head { font-size: 17px; font-weight: 700; margin: 18px 0 8px; padding-bottom: 6px; border-bottom: 2px solid #d5deea; }
+.ov-head span { font-weight: 400; color: var(--muted); font-size: 14px; }
+.ov-head + .type-cards { margin-top: 0; }
 .type-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 12px; }
 .type-card { display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; background: #fff; color: var(--ink);
   border: 1px solid #d5dae1; border-radius: 8px; box-shadow: 0 1px 2px rgba(16, 24, 40, .06);

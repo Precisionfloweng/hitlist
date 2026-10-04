@@ -74,6 +74,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                 </details>
               );
             })()}
+            <div className="ov-head">Project summary</div>
             <div className="tiles">
               <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />
               <Tile big={pct(summary ? summary.fields_pct : p.fieldsPct)} label="Overall complete"
@@ -88,6 +89,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               )}
             </div>
 
+            {results && results.types.length > 0 && <div className="ov-head">Equipment <span>· {results.types.length} type{results.types.length === 1 ? "" : "s"} · tap a card for its checklist</span></div>}
             {results && results.types.length > 0 && (
               <div className="type-cards">
                 {[...results.types].sort(byTypeOrder).map((t) => {
