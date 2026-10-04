@@ -38,7 +38,8 @@ function Tolerance({ r, project }: { r: ToleranceReport; project: string }) {
       {r.groups.map((g) => (
         <div key={g.sheet} className="report-group">
           <div className="report-group-name">{g.sheet}
-            <span className="muted"> · {g.rows.length ? `${plural(g.rows.length, "unit")} outside` : "none outside"}, {plural(g.checked, "unit")} checked</span>
+            <span className="muted"> · {!g.checked ? "no readings to check yet"
+              : !g.rows.length ? "all passed" : `${g.rows.length} flagged · ${g.checked - g.rows.length} passed`}</span>
           </div>
           {g.rows.length > 0 && (
             <table className="report-table">
