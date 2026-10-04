@@ -32,26 +32,28 @@ function Tolerance({ r, project }: { r: ToleranceReport; project: string }) {
         <span className="muted"> · from BuildingStart data synced {day(r.synced)}</span>
       </div>
       <div className={`report-sum${r.outside ? " bad" : " good"}`}>
-        {r.outside ? `${plural(r.outside, "reading")} outside tolerance` : "✓ Nothing outside tolerance"}
+        {r.outside ? `${plural(r.outside, "unit")} with readings outside tolerance` : "✓ Nothing outside tolerance"}
         <span className="muted"> · {plural(r.checked, "unit")} checked{r.unchecked ? ` · ${r.unchecked.toLocaleString()} can't be checked yet` : ""}</span>
       </div>
       {r.groups.map((g) => (
         <div key={g.sheet} className="report-group">
           <div className="report-group-name">{g.sheet}
-            <span className="muted"> · {g.rows.length ? `${g.rows.length} outside` : "none outside"}, {plural(g.checked, "unit")} checked</span>
+            <span className="muted"> · {g.rows.length ? `${plural(g.rows.length, "unit")} outside` : "none outside"}, {plural(g.checked, "unit")} checked</span>
           </div>
           {g.rows.length > 0 && (
             <table className="report-table">
               <thead><tr><th>Unit</th><th>Reading</th><th>Design</th><th>Actual</th><th>% of design</th><th>Allowed</th></tr></thead>
               <tbody>
-                {g.rows.map((x, i) => (
-                  <tr key={i}>
-                    <td><UnitLink project={project} unit={x.unit} typeKey={x.typeKey} /></td>
-                    <td>{x.reading}</td><td>{x.design.toLocaleString()}</td><td>{x.actual.toLocaleString()}</td>
-                    <td className="bad">{x.pct}</td>
-                    <td>{x.allowed}{x.isDefault && <span className="muted"> (default)</span>}</td>
+                {g.rows.flatMap((x) => x.items.map((it, i) => (
+                  <tr key={`${x.unit}-${i}`} className={i === 0 ? "unit-first" : "unit-more"}>
+                    {i === 0 && <td rowSpan={x.items.length}><UnitLink project={project} unit={x.unit} typeKey={x.typeKey} /></td>}
+                    <td>{it.reading}</td>
+                    <td>{it.design.toLocaleString()}{it.kind === "amps" && " A"}</td>
+                    <td>{it.actual.toLocaleString()}{it.kind === "amps" && " A"}</td>
+                    <td className="bad">{it.pct}</td>
+                    <td>{it.allowed}{it.isDefault && <span className="muted"> (default)</span>}</td>
                   </tr>
-                ))}
+                )))}
               </tbody>
             </table>
           )}

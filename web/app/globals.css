@@ -393,6 +393,8 @@ header.top .top-drop form button:hover { background: #f5f6f8; }
 .report-group { margin-top: 12px; }
 .report-group-name { font-weight: 700; margin-bottom: 4px; }
 .report-table { width: 100%; font-size: 14px; }
+.report-table tr.unit-more td { border-top: none; }
+.report-table td[rowspan] { vertical-align: top; font-weight: 600; }
 .report-table td.bad { color: #b42318; font-weight: 700; }
 .report-more { margin-top: 6px; font-size: 14px; }
 .report-more summary, .report-type summary { cursor: pointer; }

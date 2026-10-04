@@ -42,7 +42,8 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Web `lib/bsvalues.ts`: `bsExcerpts` gives [B#] excerpts: named units (all fields + missing required fields),
   else a table per type named in the question (columns picked from the question's words, floor/level filter on
   Area/Zone/path), and always the Hitlist progress per type counted in code. Tolerance checks are calculated in
-  `lib/tolCheck.ts` (Design/Actual airflow and water pairs → category → % off, OUTSIDE/within), shown as a check column
+  `lib/tolCheck.ts` (Design/Actual airflow and water pairs → category → % off, OUTSIDE/within; amps via a per-sheet AMP_MAP,
+  flagged when the highest actual phase is above design by any amount), shown as a check column
   plus a TOLERANCE CHECK summary; the AI must not recalculate. AI Tools "Suggestions" also runs `lib/reports.ts`
   (Out of tolerance, What's left to do) in code via POST /api/docs action "report"; not saved. The answer form has a hidden "working" field. Over 60k chars → TRUNCATED, the AI
   asks to narrow it. `checkValues` cross-checks against the results (shown on the AI Tools card).

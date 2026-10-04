@@ -1,7 +1,8 @@
 // Out-of-tolerance check, done in code (exact) rather than by the AI: for each Design/Actual pair on a unit
 // (e.g. "Design Max Airflow" / "Actual Max Airflow"), percent off = (actual − design) / design × 100, against the
 // project's tolerance for that kind of reading (or the company default). Only airflow and water-flow pairs
-// have tolerances; temperatures, pressures, volts etc. are not checked.
+// have tolerances; motor and heater amps are flagged when above design by any amount (see the end);
+// temperatures, pressures, volts etc. are not checked.
 import { categoriesFor, fmtTol, type Tol, type Tolerances } from "./toleranceCats";
 
 export type Pair = { name: string; design: string; actual: string; water: boolean };
@@ -88,4 +89,54 @@ export function nearness(c: PairCheck): number {
   if (c.pct === null) return 0;
   const limit = Number(c.pct >= 0 ? c.tol.plus : c.tol.minus);
   return limit > 0 ? Math.abs(c.pct) / limit : c.pct === 0 ? 0 : Infinity;
+}
+
+// ---- motor (and electric heat) amps: flagged when the highest actual reading is above design by any amount ----
+export type AmpCheck = { label: string; design: number; actual: number | null; over: boolean | null };
+
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+const T123 = (prefix: string) => [1, 2, 3].map((n) => `${prefix}${n}`);
+/** BuildingStart names the amp columns differently on each sheet, so each sheet has its own map
+ *  (design column, actual columns; the highest actual is compared). Keys and columns are compared without
+ *  case, spaces or punctuation. */
+const AMP_MAP: Record<string, { label: string; design: string; actual: string[] }[]> = {
+  airhandlingunit: [{ label: "Motor Amps", design: "Amps", actual: T123("Motor Amps T") }],
+  rooftopunit: [{ label: "Motor Amps", design: "Amps", actual: T123("Motor Amps T") }],
+  makeupairunit: [{ label: "Motor Amps", design: "Amps", actual: ["Motor Amps T1"] }],
+  fanunit: [{ label: "Motor Amps", design: "Motor FL Amps", actual: T123("Motor Amps T") }],
+  toiletexhaustfan: [{ label: "Motor Amps", design: "Motor FL Amps", actual: ["Motor Amps T1"] }],
+  airapparatusfan: [{ label: "Motor Amps", design: "Motor FL Amps", actual: T123("Motor Amps T") }],
+  fancoil: [{ label: "Motor Amps", design: "Motor FL Amps", actual: T123("Motor Amps T") }],
+  splitsystem: [{ label: "Motor Amps", design: "Motor FL Amps", actual: T123("Motor Amps T") }],
+  ductlesssplitsystem: [{ label: "Motor Amps", design: "Motor FL Amps", actual: ["Amps"] }],
+  watersourceheatpump: [{ label: "Amps", design: "Amps", actual: ["Amps T1"] }],
+  hydronicpump: [{ label: "Motor Amps", design: "Motor F.L. Amps", actual: T123("Motor Amps T") }],
+  coolingtower: [{ label: "Motor Amps", design: "Motor F.L. Amps", actual: ["Actual Amps T1"] }],
+  unitheater: [{ label: "Motor Amps", design: "Motor Amps", actual: T123("Amps ") },
+    { label: "Heater Amps", design: "Dsgn. Amps", actual: T123("Amps ") }],
+  electriccoil: [{ label: "Heater Amps", design: "EDH Design Amps", actual: T123("EDH Act. Amps ") }],
+};
+
+export function ampChecksFor(sheet: string): { label: string; design: string; actual: string[] }[] {
+  return AMP_MAP[norm(sheet)] ?? [];
+}
+
+/** Check a unit's amps. Left out when the design isn't a number above 0. */
+export function checkAmps(sheet: string, v: Record<string, unknown>): AmpCheck[] {
+  const byNorm = new Map(Object.entries(v).map(([h, x]) => [norm(h), x]));
+  const out: AmpCheck[] = [];
+  for (const m of ampChecksFor(sheet)) {
+    const design = num(byNorm.get(norm(m.design)));
+    if (design === null || design <= 0) continue;
+    const readings = m.actual.map((a) => num(byNorm.get(norm(a)))).filter((x): x is number => x !== null);
+    const actual = readings.length ? Math.max(...readings) : null;
+    out.push({ label: m.label, design, actual, over: actual === null ? null : actual > design + 1e-9 });
+  }
+  return out;
+}
+
+/** "15.1 A, over design 14.2 A" / "13.8 A, within design 14.2 A" / "no reading". */
+export function describeAmps(c: AmpCheck): string {
+  if (c.actual === null) return "no reading";
+  return `${c.actual} A, ${c.over ? "OVER DESIGN" : "within"} ${c.design} A`;
 }

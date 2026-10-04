@@ -6,8 +6,10 @@ import "server-only";
 import { gunzipSync } from "node:zlib";
 import { del, get, put } from "@vercel/blob";
 import type { Results, TypeResult } from "./results";
+import { toleranceReport } from "./reports";
 import { categoriesFor, fmtTol, TOLERANCE_CATS, type Tolerances } from "./toleranceCats";
-import { checkUnit, describe, fmtPct, nearness, tolerancePairs, tolRange, type PairCheck } from "./tolCheck";
+import { ampChecksFor, checkAmps, checkUnit, describe, describeAmps, fmtPct, nearness, tolerancePairs, tolRange,
+  type PairCheck } from "./tolCheck";
 
 export type BsValue = string | number | boolean;
 export type BsUnit = { name: string; path: string; v: Record<string, BsValue> };
@@ -109,6 +111,7 @@ const COL_SYN: Record<string, string[]> = {
   size: ["size"], filter: ["filter"], completed: ["completed"], design: ["design", "des"], actual: ["actual", "act"],
 };
 
+const AMP_Q = /\bamps?\b|amperage|motor|fla\b|full load/;
 const TOL_Q = /toleran|outside|within|out of spec|off design|% off|percent off|over design|under design|too high|too low/;
 const show = (v: BsValue) => (typeof v === "boolean" ? (v ? "yes" : "no") : String(v));
 const ESC = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -235,6 +238,7 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
       r ? (miss.length ? `Hitlist: required fields still missing: ${miss.join(", ")}` : "Hitlist: all required fields filled in") : "",
       tl ? `Project tolerance: ${tl}` : "",
       ...checks.map((c) => `Tolerance check (calculated by Hitlist): ${c.pair}: design ${c.design}, actual ${c.actual ?? "not entered"} = ${describe(c)}`),
+      ...checkAmps(sheet.sheet, unit.v).map((c) => `Amps check (calculated by Hitlist; flagged if the highest actual is above design): ${c.label}: ${describeAmps(c)}`),
     ].filter(Boolean).join("\n");
     add(`BuildingStart – ${unit.name}`, text);
   }
@@ -258,6 +262,10 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
       cols = [...cols, ...pairs.flatMap((p) => [p.design, p.actual]).filter((c, i, a) => !cols.includes(c) && a.indexOf(c) === i)];
       const checks = new Map(units.map((u) => [u, checkUnit(s.sheet, u.name, u.v, pairs, tol)]));
       const checkCols = pairs.filter((p) => units.some((u) => checks.get(u)!.some((c) => c.pair === p.name))).map((p) => p.name);
+      // Amps (above design by any amount) when the question is about amps, motors or tolerances.
+      const ampDefs = AMP_Q.test(q) || TOL_Q.test(q) ? ampChecksFor(s.sheet) : [];
+      const amps = new Map(units.map((u) => [u, ampDefs.length ? checkAmps(s.sheet, u.v) : []]));
+      const ampCols = ampDefs.map((d) => d.label).filter((l) => units.some((u) => amps.get(u)!.some((c) => c.label === l)));
       const summary = checkCols.map((name) => {
         const list = units.flatMap((u) => checks.get(u)!.filter((c) => c.pair === name).map((c) => ({ u, c })));
         const read = list.filter((x) => x.c.pct !== null);
@@ -269,8 +277,16 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
           `\n  Outside: ${out.length ? out.map(fmt).join("; ") : "none"}` +
           (close.length ? `\n  Closest to the limit but within: ${close.map(fmt).join("; ")}` : "");
       });
+      for (const label of ampCols) {
+        const list = units.flatMap((u) => amps.get(u)!.filter((c) => c.label === label).map((c) => ({ u, c })));
+        const read = list.filter((x) => x.c.actual !== null);
+        const over = read.filter((x) => x.c.over);
+        summary.push(`- ${label} (flagged if the highest actual is above design by any amount): ${read.length} with a reading, ` +
+          `${over.length} OVER DESIGN, ${list.length - read.length} with no actual yet.` +
+          `\n  Over design: ${over.length ? over.map((x) => `${x.u.name} ${x.c.actual} A (design ${x.c.design} A)`).join("; ") : "none"}`);
+      }
       const tl = tolLine(s.sheet, "", tol);
-      const head = `${s.sheet}: ${units.length} unit${units.length === 1 ? "" : "s"}${locNote}. Columns: Unit | ${[...cols, ...checkCols.map((n) => `${n} check`)].join(" | ")}` +
+      const head = `${s.sheet}: ${units.length} unit${units.length === 1 ? "" : "s"}${locNote}. Columns: Unit | ${[...cols, ...checkCols.map((n) => `${n} check`), ...ampCols.map((n) => `${n} check`)].join(" | ")}` +
         (tl ? `\nProject tolerance: ${tl}` : "") +
         (summary.length ? `\nTOLERANCE CHECK, calculated by Hitlist for all ${units.length} units listed here (use these results; don't recalculate):\n${summary.join("\n")}` : "") +
         `\n"?" = BuildingStart can't calculate it yet; blank = not entered.`;
@@ -279,7 +295,8 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
       for (const u of units) {
         const cks = checks.get(u)!;
         const row = [u.name, ...cols.map((c) => (u.v[c] === undefined ? "" : show(u.v[c]))),
-          ...checkCols.map((n) => { const c = cks.find((x) => x.pair === n); return c ? describe(c) : ""; })].join(" | ");
+          ...checkCols.map((n) => { const c = cks.find((x) => x.pair === n); return c ? describe(c) : ""; }),
+          ...ampCols.map((n) => { const c = amps.get(u)!.find((x) => x.label === n); return c ? describeAmps(c) : ""; })].join(" | ");
         if (chars + size + row.length > MAX_CHARS) { tooBig = true; break; }
         rows.push(row);
         size += row.length + 1;
@@ -287,6 +304,23 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
       const cut = rows.length < units.length ? `\nTRUNCATED: only the first ${rows.length} of ${units.length} units fit.` : "";
       add(`BuildingStart – ${s.sheet}${locNote ? ` (${loc!.label})` : ""}`, `${head}\n${rows.join("\n")}${cut}`);
     }
+  }
+
+  // 2b. Tolerance or amps question that names no unit or type: Hitlist's check across all equipment.
+  if (!tagged.length && !typeSheets.length && values && (TOL_Q.test(q) || AMP_Q.test(q))) {
+    const r = toleranceReport(values, results, tol);
+    const ampsOnly = AMP_Q.test(q) && !TOL_Q.test(q);
+    const lines = [`OUT OF TOLERANCE, calculated by Hitlist across all equipment (use as given; don't recalculate). ` +
+      `Airflow/water: percent of design vs the allowed range. Amps: flagged when the highest actual is above design.`];
+    for (const g of r.groups) {
+      const rows = g.rows.map((x) => ({ ...x, items: x.items.filter((i) => !ampsOnly || i.kind === "amps") })).filter((x) => x.items.length);
+      lines.push(`${g.sheet}: ${g.checked} units checked, ${rows.length} with readings outside${g.unchecked.length ? `, ${g.unchecked.length} can't be checked yet (no actual reading)` : ""}`);
+      for (const x of rows) lines.push(`  ${x.unit}: ${x.items.map((i) => i.kind === "amps"
+        ? `${i.reading} ${i.actual} A over design ${i.design} A` : `${i.reading} ${i.pct} of design (design ${i.design}, actual ${i.actual}, allowed ${i.allowed})`).join("; ")}`);
+    }
+    let text = lines.join("\n");
+    if (chars + text.length > MAX_CHARS) { text = text.slice(0, Math.max(0, MAX_CHARS - chars)) + "\nTRUNCATED"; tooBig = true; }
+    add("BuildingStart – out of tolerance", text);
   }
 
   // 3. Always: the Hitlist progress per type (what's complete and what's left).

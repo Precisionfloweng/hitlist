@@ -3,7 +3,7 @@
   "date": "2026-10-04",
   "audience": "all",
   "title": "Suggestions: Out of tolerance and What's left",
-  "text": "Search the Documents has a Suggestions list. New in it: Out of tolerance (every reading outside the project's tolerances, as percent of design) and What's left to do (unfinished units by type), worked out straight from the last sync."
+  "text": "Search the Documents has a Suggestions list. New in it: Out of tolerance (airflow and water flow outside the project's tolerances as percent of design, and motor or heater amps above design, grouped by unit) and What's left to do (unfinished units by type)."
  },
  {
   "date": "2026-10-04",

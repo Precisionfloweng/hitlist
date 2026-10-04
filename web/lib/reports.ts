@@ -4,14 +4,17 @@
 import type { BsValues } from "./bsvalues";
 import type { Results } from "./results";
 import type { Tolerances } from "./toleranceCats";
-import { checkUnit, fmtPct, tolerancePairs, tolRange } from "./tolCheck";
+import { ampChecksFor, checkAmps, checkUnit, fmtPct, tolerancePairs, tolRange } from "./tolCheck";
 import { byTypeOrder } from "./typeOrder";
 
-export type OutRow = { unit: string; typeKey: string | null; reading: string; design: number; actual: number;
+/** One reading outside tolerance (flow: % of design vs the allowed range; amps: above design by any amount). */
+export type OutItem = { reading: string; design: number; actual: number; kind: "flow" | "amps";
   pct: string; allowed: string; isDefault: boolean };
+/** One unit, with everything on it that's out of tolerance together. */
+export type OutRow = { unit: string; typeKey: string | null; items: OutItem[] };
 export type OutGroup = { sheet: string; checked: number; rows: OutRow[];
   unchecked: { unit: string; typeKey: string | null; readings: string[] }[] };
-export type ToleranceReport = { kind: "tolerance"; synced: string; groups: OutGroup[]; outside: number; checked: number; unchecked: number };
+export type ToleranceReport = { kind: "tolerance"; synced: string; groups: OutGroup[]; outside: number; checked: number; unchecked: number };   // outside = units
 
 export type LeftGroup = { key: string; name: string; units: number; complete: number; notStarted: string[];
   partly: { unit: string; missing: string[] }[]; topMissing: { field: string; units: number }[] };
@@ -35,20 +38,23 @@ export function toleranceReport(values: BsValues, results: Results | null, tol: 
   const groups: OutGroup[] = [];
   for (const s of values.sheets) {
     const pairs = tolerancePairs(s.headers);
-    if (!pairs.length) continue;
+    if (!pairs.length && !ampChecksFor(s.sheet).length) continue;
     const g: OutGroup = { sheet: s.sheet, checked: 0, rows: [], unchecked: [] };
     for (const u of s.units) {
-      const checks = checkUnit(s.sheet, u.name, u.v, pairs, tol);
-      if (!checks.length) continue;
+      const flows = checkUnit(s.sheet, u.name, u.v, pairs, tol);
+      const amps = checkAmps(s.sheet, u.v);
+      if (!flows.length && !amps.length) continue;
       const typeKey = typeOf(s.sheet, u.path, u.name);
-      const missing = checks.filter((c) => c.pct === null).map((c) => c.pair);
+      const missing = [...flows.filter((c) => c.pct === null).map((c) => c.pair), ...amps.filter((c) => c.actual === null).map((c) => c.label)];
       if (missing.length) g.unchecked.push({ unit: u.name, typeKey, readings: missing });
-      if (checks.some((c) => c.pct !== null)) g.checked++;
-      for (const c of checks) {
-        if (!c.outside) continue;
-        g.rows.push({ unit: u.name, typeKey, reading: c.pair, design: c.design, actual: c.actual!,
-          pct: fmtPct(c.pct!, c.tol), allowed: tolRange(c.tol), isDefault: !!c.tol.isDefault });
-      }
+      if (flows.some((c) => c.pct !== null) || amps.some((c) => c.actual !== null)) g.checked++;
+      const items: OutItem[] = [
+        ...flows.filter((c) => c.outside).map((c) => ({ reading: c.pair, design: c.design, actual: c.actual!, kind: "flow" as const,
+          pct: fmtPct(c.pct!, c.tol), allowed: tolRange(c.tol), isDefault: !!c.tol.isDefault })),
+        ...amps.filter((c) => c.over).map((c) => ({ reading: c.label, design: c.design, actual: c.actual!, kind: "amps" as const,
+          pct: `${Math.round((c.actual! / c.design) * 100)}%`, allowed: "not above design", isDefault: false })),
+      ];
+      if (items.length) g.rows.push({ unit: u.name, typeKey, items });
     }
     if (g.checked || g.unchecked.length) groups.push(g);
   }
