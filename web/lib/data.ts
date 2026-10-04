@@ -64,7 +64,7 @@ export function jobFor(number: string, queue: Rec[], kind: "" | "docs" = ""): Sy
 
 /** Always reads the Queue tab fresh (no cache), for the live status on the Refresh button. */
 export async function syncStatus(number: string): Promise<SyncJob | null> {
-  return jobFor(number, await readTab("Queue", true));
+  return jobFor(number, await readTab("Queue", 3_000));   // a few seconds old is fine: several Sync buttons poll at once
 }
 
 const num = (v: string) => (v === "" || v === undefined ? null : Number(v));

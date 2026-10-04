@@ -158,15 +158,27 @@ export async function signOut() {
 export async function currentUser(): Promise<User | null> {
   const token = (await cookies()).get(SESSION)?.value;
   if (!token) return null;
+  let email: string;
   try {
-    const { payload } = await jwtVerify(token, key());
-    const row = await userRow(String(payload.email));
-    const user = row ? toUser(row) : null;
-    if (user && row) noteLastSeen(row);
-    return user;
+    email = String((await jwtVerify(token, key())).payload.email);
   } catch {
-    return null;
+    return null;                       // not signed in (or the cookie is no good)
   }
+  // Signed in. If the Users tab can't be read right now (Google busy), say so rather than "sign in again".
+  let row;
+  try {
+    row = await userRow(email);
+  } catch (e) {
+    console.error("Users lookup failed", e);
+    throw new SheetsBusyError();
+  }
+  const user = row ? toUser(row) : null;
+  if (user && row) noteLastSeen(row);
+  return user;
+}
+
+export class SheetsBusyError extends Error {
+  constructor() { super("Google Sheets is busy right now. Wait a few seconds and try again."); }
 }
 
 /** Today's date in Central, e.g. "2026-10-01". */

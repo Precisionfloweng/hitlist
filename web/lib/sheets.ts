@@ -68,15 +68,24 @@ function auth(): JWT {
   return client;
 }
 
+/** Google allows about 60 reads a minute; when it says "too many" (429) or has a hiccup (5xx), wait and retry. */
 async function call(path: string, init: { method?: string; body?: unknown; query?: Record<string, string> } = {}) {
   const url = new URL(API + sheetId() + path);
   for (const [k, v] of Object.entries(init.query ?? {})) url.searchParams.set(k, v);
-  const res = await auth().request({
-    url: url.toString(),
-    method: (init.method ?? "GET") as "GET",
-    data: init.body,
-  });
-  return res.data as Record<string, unknown>;
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const res = await auth().request({
+        url: url.toString(),
+        method: (init.method ?? "GET") as "GET",
+        data: init.body,
+      });
+      return res.data as Record<string, unknown>;
+    } catch (e) {
+      const status = (e as { response?: { status?: number } }).response?.status ?? 0;
+      if (attempt >= 3 || !(status === 429 || status >= 500)) throw e;
+      await new Promise((r) => setTimeout(r, 1500 * 2 ** attempt + Math.random() * 500));   // 1.5 s, 3 s, 6 s
+    }
+  }
 }
 
 const rangeFor = (tab: string, a1 = "") => encodeURIComponent(`'${tab}'${a1 ? "!" + a1 : ""}`);
@@ -102,12 +111,14 @@ export function invalidate(...tabs: Tab[]) {
 }
 
 /** Read several tabs in one API call. */
-export async function readTabs<T extends Tab>(tabs: T[], fresh = false): Promise<Record<T, Rec[]>> {
+/** fresh: true = always read; a number = accept a copy up to that many ms old. */
+export async function readTabs<T extends Tab>(tabs: T[], fresh: boolean | number = false): Promise<Record<T, Rec[]>> {
   const now = Date.now();
   const out = {} as Record<T, Rec[]>;
+  const maxAge = fresh === true ? -1 : typeof fresh === "number" ? fresh : TTL_MS;
   const need = tabs.filter((t) => {
     const hit = cache.get(t);
-    if (!fresh && hit && now - hit.at < TTL_MS) {
+    if (hit && now - hit.at < maxAge) {
       out[t] = hit.data;
       return false;
     }
@@ -126,7 +137,7 @@ export async function readTabs<T extends Tab>(tabs: T[], fresh = false): Promise
   return out;
 }
 
-export async function readTab(tab: Tab, fresh = false): Promise<Rec[]> {
+export async function readTab(tab: Tab, fresh: boolean | number = false): Promise<Rec[]> {
   return (await readTabs([tab], fresh))[tab];
 }
 
