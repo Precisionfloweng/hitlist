@@ -391,6 +391,7 @@ select.docs-suggest { min-width: 190px; font-weight: 600; color: var(--brand); c
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%231f4e79' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center,
     linear-gradient(#ffffff, #e9f0f8);
   box-shadow: 0 1px 2px rgba(16, 24, 40, .14), inset 0 1px 0 #fff; }
+.docs-design input.need-unit { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(31, 78, 121, .25); background: #f4f8fd; }
 select.docs-suggest:hover { border-color: var(--brand); }
 select.docs-suggest:disabled { opacity: .55; cursor: default; }
 select.docs-suggest option { color: var(--ink); font-weight: 400; }

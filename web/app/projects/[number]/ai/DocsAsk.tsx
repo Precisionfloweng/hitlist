@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fmtTol, normalizeTolerances, TOLERANCE_CATS } from "@/lib/toleranceCats";
 import type { LeftReport, ToleranceReport } from "@/lib/reports";
@@ -73,6 +73,8 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   const [busy, setBusy] = useState<string>("");
   const [error, setError] = useState("");
   const [answer, setAnswer] = useState<Answer | null>(null);
+  const unitBox = useRef<HTMLInputElement>(null);
+  const [needUnit, setNeedUnit] = useState(false);          // Design values picked with no unit: the box lights up
   const [report, setReport] = useState<ToleranceReport | LeftReport | null>(null);   // Out of tolerance / What's left
   const [answerSaved, setAnswerSaved] = useState(false);       // its tolerances were saved automatically
   const router = useRouter();
@@ -131,7 +133,8 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   /** A pick from the Suggestions list. */
   async function suggest(v: string) {
     if (!v) return;
-    if (v === "design" && !unit.trim()) { setError("Put a unit in the unit box first, then pick Design values."); return; }
+    if (v === "design" && !unit.trim()) { setError(""); setNeedUnit(true); unitBox.current?.focus(); return; }
+    setNeedUnit(false);
     if (v === "tolerance" || v === "left") {
       setAnswer(null); setReport(null);
       const data = await post({ action: "report", mode: v }, v);
@@ -250,7 +253,10 @@ export default function DocsAsk({ project, units }: { project: string; units: st
             <option value="left">What&apos;s left to do</option>
           </select>
           <span className="docs-design">
-            <input list="docs-units" value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="Unit (optional, used by Ask and Design values)" />
+            <input ref={unitBox} list="docs-units" value={unit} className={needUnit ? "need-unit" : undefined}
+              onChange={(e) => setUnit(e.target.value)} onBlur={() => { if (!unit.trim()) setNeedUnit(false); }}
+              onKeyDown={(e) => { if (e.key === "Enter" && needUnit && unit.trim()) { e.preventDefault(); setNeedUnit(false); ask("design"); } }}
+              placeholder={needUnit ? "Type or pick the unit, then press Enter for its design values" : "Unit (optional, used by Ask and Design values)"} />
             <datalist id="docs-units">{units.map((u) => <option key={u} value={u} />)}</datalist>
           </span>
         </div>
