@@ -144,7 +144,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
                   <span className="eq-name">{x.name}</span>
                   <span className="eq-pct">{Math.round(x.summary.fields_pct)}%</span>
                   <span className="bar"><span style={{ width: `${x.summary.fields_pct}%` }} /></span>
-                  <span className="eq-sub">{open ? `${open} of ${x.units.length} need data` : `All ${x.units.length} complete`}</span>
+                  <span className="eq-sub">{open ? `${open} of ${x.units.length} need data` : `✓ All ${x.units.length} complete`}</span>
                 </button>
               </li>
             );

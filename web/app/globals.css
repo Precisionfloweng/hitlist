@@ -486,3 +486,10 @@ header.top .top-drop form button { background: transparent; }
 .eq-types li button.on .bar > span { background: var(--brand); }
 .eq-types li button.on .eq-changed { color: #6b4fbb; }
 .eq-types li button.on:hover { border-color: #2f6fb3; }
+
+/* Finished equipment types: green bar, green %, green "✓ All N complete" (also when selected) */
+.eq-types li button.full .bar > span, .eq-types li button.on.full .bar > span { background: #2e9e5b; }
+.eq-types li button.full .eq-pct, .eq-types li button.on.full .eq-pct { color: #1e8a4c; font-weight: 700; }
+.eq-types li button.full .eq-sub, .eq-types li button.on.full .eq-sub { color: #1e8a4c; font-weight: 600; }
+.tc-bar.full > span { background: #2e9e5b; }
+.tc-pct.full { color: #1e8a4c; }
