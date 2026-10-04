@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { canEdit, canSee, currentUser } from "@/lib/auth";
 import { loadResults } from "@/lib/results";
 import { deficiencyItems, noteItems, type Kind } from "@/lib/reviewItems";
-import { loadTolerances } from "@/lib/tolerances";
+import { loadTolerancesWithDefaults } from "@/lib/tolerances";
 import { reviewWording, setKept } from "@/lib/wording";
 
 export const maxDuration = 60;     // a big project's review can take ~30 seconds
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       if (!d) return NextResponse.json({ error: "Item not found" }, { status: 404 });
       return NextResponse.json({ ok: true, wording: await setKept(project, kind, keep, d.text, user.name, !undo) });
     }
-    const file = await reviewWording(project, kind, items, !!all, await loadTolerances(project));
+    const file = await reviewWording(project, kind, items, !!all, (await loadTolerancesWithDefaults(project)).tol);
     return NextResponse.json({ ok: true, wording: file });
   } catch (e) {
     console.error("wording review failed", e);

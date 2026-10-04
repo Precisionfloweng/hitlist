@@ -7,7 +7,8 @@ type Source = { id: string; category: string; path: string; name: string; page: 
 type Answer = { question: string; answer: string; found: boolean; sources: Source[];
   tolerances: Record<string, unknown> | null; at: string; by: string };
 type Job = { status: "queued" | "running" | "done" | "failed"; step: string; ahead: number } | null;
-type Info = { folder: string; updated: string; status: string; job: Job; found: Record<string, number> | null;
+type BsCheck = { units: number; values: number; types: number; synced: string; missing: number; ok: boolean; problem: string };
+type Info = { buildingStart?: BsCheck; folder: string; updated: string; status: string; job: Job; found: Record<string, number> | null;
   missing?: string[]; otherTypes?: Record<string, string[]>;
   files: number; pages: number; skipped: { name: string; category: string; reason: string }[]; history: Answer[] };
 
@@ -51,7 +52,9 @@ function AnswerView({ a, project, onClose, saved = false }: { a: Answer; project
       {a.sources.length > 0 && (
         <ul className="docs-sources">
           {a.sources.map((s) => (
-            <li key={s.id}><b>{s.id}</b> {s.category} / {s.path} <span className="muted">· page {s.page}{s.modified && ` · ${fileDate(s.modified)}`}</span></li>
+            s.category === "BuildingStart"
+              ? <li key={s.id}><b>{s.id}</b> {s.name} <span className="muted">· BuildingStart data{s.modified && `, synced ${fileDate(s.modified)}`}</span></li>
+              : <li key={s.id}><b>{s.id}</b> {s.category} / {s.path} <span className="muted">· page {s.page}{s.modified && ` · ${fileDate(s.modified)}`}</span></li>
           ))}
         </ul>
       )}
@@ -123,6 +126,8 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   }
 
   const ready = !!info && info.files > 0;
+  const bs = info?.buildingStart;
+  const canAsk = ready || (!!bs && bs.units > 0);           // typed questions also work from the BuildingStart data alone
   // The answer on show: the one just asked, or (coming back to the page) the latest saved one.
   const shown = answer ?? info?.history[0] ?? null;
   const older = (info?.history ?? []).filter((h) => h.at !== shown?.at);
@@ -139,7 +144,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           <b>Search the Documents</b>
           <div className="muted" style={{ fontSize: 13 }}>
             Answers come from this project&apos;s Dropbox folder (specs, submittals, drawings, TAB plan, ASIs/RFIs,
-            change orders), with the file and page for each value.
+            change orders) and its BuildingStart data from the last sync, with the source for each value.
           </div>
         </div>
       </div>
@@ -188,6 +193,14 @@ export default function DocsAsk({ project, units }: { project: string; units: st
               )}
             </>
           )}
+          {bs && (
+            <div className={`docs-bs${bs.ok ? "" : " problem"}`}>
+              <b>BuildingStart data:</b>{" "}
+              {bs.units > 0 && <>{bs.units.toLocaleString()} units in {bs.types} type{bs.types === 1 ? "" : "s"}, {bs.values.toLocaleString()} values
+                {bs.synced && <> · synced {fileDate(bs.synced.slice(0, 10))}</>}{bs.ok && " ✓"}</>}
+              {bs.problem && <span>{bs.units > 0 ? " · " : ""}{bs.problem}</span>}
+            </div>
+          )}
           <div className="row" style={{ marginTop: 8 }}>
             <button disabled={!!busy || !!working} onClick={async () => { if (await post({ action: "update" }, "update")) load(); }}>
               {busy === "update" ? "Asking the server…" : ready ? "🔄 Update documents" : "🔍 Find documents"}
@@ -216,16 +229,16 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           <span className="docs-design">
             <input list="docs-units" value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="Unit (optional, used by Ask and Design values)" />
             <datalist id="docs-units">{units.map((u) => <option key={u} value={u} />)}</datalist>
-            <button disabled={!ready || !!busy || !unit.trim()} onClick={() => ask("design")}>{busy === "design" ? "Reading…" : "Design values"}</button>
+            <button disabled={!canAsk || !!busy || !unit.trim()} onClick={() => ask("design")}>{busy === "design" ? "Reading…" : "Design values"}</button>
           </span>
         </div>
         <textarea className="ai-input" rows={3} value={question} onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Ask anything, e.g. What is the design airflow on AHU-16? Which VAVs have hot water reheat? What's the outside air for RTU-2?" />
+          placeholder="Ask anything, e.g. Does the design CFM entered for AHU-16 match the submittal? How many VAVs are left on floor 3? Which pumps still need amps?" />
         <div className="row" style={{ marginTop: 8 }}>
-          <button className="primary ai-btn" disabled={!ready || !!busy || !question.trim()} onClick={() => ask("ask")}>
-            {busy === "ask" ? "Reading the documents…" : "Ask"}
+          <button className="primary ai-btn" disabled={!canAsk || !!busy || !question.trim()} onClick={() => ask("ask")}>
+            {busy === "ask" ? "Reading…" : "Ask"}
           </button>
-          {!ready && info && !working && <span className="muted" style={{ fontSize: 13 }}>Press Find documents to read this project&apos;s files first.</span>}
+          {!canAsk && info && !working && <span className="muted" style={{ fontSize: 13 }}>Press Find documents to read this project&apos;s files first.</span>}
           {error && <span className="error">{error}</span>}
         </div>
       </div>

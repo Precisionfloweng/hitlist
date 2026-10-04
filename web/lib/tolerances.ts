@@ -2,7 +2,8 @@
 import "server-only";
 import type { User } from "./auth";
 import { appendRows, deleteRows, ensureHeader, ensureTab, readTab, updateRows } from "./sheets";
-import { fmtTol, isToleranceKey, LEGACY, parseTol, TOLERANCE_CATS, type Tol, type Tolerances } from "./toleranceCats";
+import { defaultTolerance } from "./settings";
+import { fmtTol, isToleranceKey, LEGACY, parseTol, TOLERANCE_CATS, withDefaults, type Tol, type Tolerances } from "./toleranceCats";
 
 const num = /^\d{1,2}(\.\d+)?$/;
 
@@ -31,6 +32,12 @@ export async function loadTolerances(project: string): Promise<Tolerances> {
   } catch {
     return {};                      // tab not created yet
   }
+}
+
+/** Every category: the project's value, or the company default (marked isDefault) where it hasn't set one. */
+export async function loadTolerancesWithDefaults(project: string): Promise<{ tol: Tolerances; def: Tol }> {
+  const [tol, def] = await Promise.all([loadTolerances(project), defaultTolerance()]);
+  return { tol: withDefaults(tol, def), def };
 }
 
 /** Save the boxes shown for one project. A key with both boxes blank removes that value; a blank box takes

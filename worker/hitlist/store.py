@@ -19,7 +19,9 @@ SCHEMA: dict[str, list[str]] = {
                  # Dropbox project folder (found by the server, or pasted on the website) and the document index
                  "dropbox_id", "dropbox_path", "docs_updated", "docs_status",
                  # newest file in the project's Dropbox "Deficiency Reports" folder = last punch list sent
-                 "punch_sent", "punch_file"],
+                 "punch_sent", "punch_file",
+                 # the BuildingStart values sent to the website for Search the Documents (date, and "ok: N units..." or the problem)
+                 "values_updated", "values_status"],
     # projects: for role "customer", the project keys they may see (" | " separated)
     "Users": ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
     "Rules": ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
@@ -41,6 +43,8 @@ SCHEMA: dict[str, list[str]] = {
     "Tolerances": ["project_number", "category", "pct", "changed_by", "changed_at", "plus", "minus"],
     # Written by the website: a project's email list for the deficiency list (on_list "yes"/"no").
     "Contacts": ["project_number", "id", "name", "company", "trade", "email", "on_list", "added_by", "added_at", "position", "send_as"],
+    # Written by the website (Admin -> Settings): company-wide settings, e.g. default_tol_plus / default_tol_minus.
+    "Settings": ["setting", "value", "changed_by", "changed_at"],
     # Server heartbeat: name = "server_last_seen" (written by the worker every few minutes) and
     # "down_alert_sent_for" (the website's note that it already emailed about that outage).
     "Status": ["name", "value", "local_time"],

@@ -2,6 +2,7 @@ import "server-only";
 import { appendRows, deleteRow, deleteRows, ensureHeader, readTab, readTabs, updateRow, type Rec } from "./sheets";
 import { deleteResults } from "./results";
 import { deleteProjectDocs } from "./docs";
+import { deleteValues } from "./bsvalues";
 import { deleteWording } from "./wording";
 import type { User } from "./auth";
 
@@ -16,6 +17,7 @@ export type Project = {
   queue: "queued" | "running" | null; job: SyncJob | null; row: number;
   dropboxPath: string; docsUpdated: string; docsStatus: string;
   punchSent: string; punchFile: string;   // newest file in the Dropbox Deficiency Reports folder
+  valuesUpdated: string; valuesStatus: string;   // BuildingStart values sent for Search the Documents
 };
 
 /** The latest refresh request for a project, as the Refresh button shows it. */
@@ -103,6 +105,7 @@ function toProject(p: Rec, queue: Rec[], punch?: Map<string, number>, all: Rec[]
     row: p._row,
     dropboxPath: p.dropbox_path || "", docsUpdated: p.docs_updated || "", docsStatus: p.docs_status || "",
     punchSent: p.punch_sent || "", punchFile: p.punch_file || "",
+    valuesUpdated: p.values_updated || "", valuesStatus: p.values_status || "",
   };
 }
 
@@ -207,7 +210,7 @@ export async function removeProject(number: string) {
     await deleteRows(tab, recs.filter((r) => r.project_number === number).map((r) => r._row));
   }
   await deleteResults(number);
-  await Promise.all([deleteProjectDocs(number), deleteWording(number)]);
+  await Promise.all([deleteProjectDocs(number), deleteWording(number), deleteValues(number)]);
   await deleteRow("Projects", p._row);
 }
 

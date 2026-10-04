@@ -12,6 +12,7 @@
     python -m hitlist dropbox-setup [--relink]                  connect the read-only Dropbox app (once), then test it
     python -m hitlist dropbox-test                              show what the server can see in Dropbox
     python -m hitlist docs NUMBER                               read a project's Dropbox documents now
+    python -m hitlist values NUMBER                             re-send a project's BuildingStart values (last export) and check them
 """
 
 from __future__ import annotations
@@ -62,6 +63,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("dropbox-test", help="Show the technician and project folders the server can see")
     dc = sub.add_parser("docs", help="Read a project's Dropbox documents now and send them to the website")
     dc.add_argument("number")
+    va = sub.add_parser("values", help="Re-send a project's BuildingStart values from its last export and check them")
+    va.add_argument("number")
     args = p.parse_args(argv)
 
     if hasattr(sys.stdout, "reconfigure"):
@@ -144,6 +147,8 @@ def main(argv: list[str] | None = None) -> int:
         p = store.project(args.number) or {}
         print(f"Folder: {p.get('dropbox_path', '(none)')}\nResult: {p.get('docs_status', '')}")
         return 0
+    if args.cmd == "values":
+        return _values(store, settings, args.number)
     if args.cmd == "weekly-summary":
         from .summary import send_weekly_summary
         sent = send_weekly_summary(store, settings, mailer, dry_run=args.dry_run)
@@ -232,4 +237,28 @@ def _check(args) -> int:
         print(f"  note: {w}")
     for g in results.get("gap_flags", []):
         print(f"  GAP: {g}")
+    return 0
+
+
+def _values(store, settings, number: str) -> int:
+    """Send one project's BuildingStart values from its last downloaded export and show what the website confirmed."""
+    from .runner import send_project_values
+    from .store import now_iso
+    from .values import pack_values
+    store.setup()                           # make sure the values columns exist
+    folder = settings.export_dir / number.replace("/", "_")
+    files = sorted(folder.rglob("*.xlsx"), key=lambda f: f.stat().st_mtime) if folder.exists() else []
+    if not files:
+        print(f"No downloaded export for {number} in {folder}. Press Sync on the website first.")
+        return 1
+    print(f"Export: {files[-1]}")
+    export = read_export(files[-1])
+    counts = pack_values(export, number)["counts"]
+    print(f"Sending: {counts['units']} units, {counts['values']} values")
+    problem = send_project_values(store, settings, number, export, now_iso(), force=True)
+    if problem:
+        print(f"PROBLEM: {problem}")
+        return 1
+    p = store.project(number) or {}
+    print(f"Website confirmed: {p.get('values_status', '')}")
     return 0

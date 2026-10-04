@@ -34,11 +34,23 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Web `lib/docs.ts`: keyword/tag page search, only the best pages go to Claude; answers cite [S#] file+page;
   history in Blob docs-qa/. File names/contents are client data: never in the repo or tests.
 
+## BuildingStart values (Search the Documents)
+- After each sync `runner.send_project_values` packs every equipment sheet (`hitlist/values.py`: unit name, path, non-blank
+  values) gzipped to `POST /api/worker/values/{key}` → Blob `values/<key>`. Skipped when the fingerprint
+  (results/values/<key>.json) is unchanged; the website replies with units/values counted and they must match.
+  Projects columns values_updated, values_status. CLI `hitlist values KEY` re-sends from the last export.
+- Web `lib/bsvalues.ts`: `bsExcerpts` gives [B#] excerpts: named units (all fields + missing required fields),
+  else a table per type named in the question (columns picked from the question's words, floor/level filter on
+  Area/Zone/path), and always the Hitlist progress per type counted in code. Over 60k chars → TRUNCATED, the AI
+  asks to narrow it. `checkValues` cross-checks against the results (shown on the AI Tools card).
+
 ## Tolerances
 - `web/lib/toleranceCats.ts`: groups AHUs/RTUs (supply, return, OA), Fans and Outlets & Inlets (supply, return, exhaust),
   Terminal Units (max, min), Water (pumps, coils, TU/FCU coils); each value has plus and minus. `categoriesFor(itemType,
   unitName)` maps a unit to its categories (outlets by their BuildingStart page; fans by type and SF/RF/EF tag).
   Tolerances tab rows: category, plus, minus (pct = old single ± value, still read; old category keys expand via LEGACY).
+- Company default (Admin → Settings, Settings tab default_tol_plus/minus, ±10% to start) fills every category a project
+  hasn't set (`withDefaults`, `isDefault` → shown "(default)"; AI gets "(company default)").
 - Document folders named Older versions / Old / Superseded / Archive / Previous / Void are skipped (`is_old_copy`).
 
 ## Project keys

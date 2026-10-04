@@ -385,6 +385,8 @@ header.top .top-drop form button:hover { background: #f5f6f8; }
 /* AI Tools: Ask the documents */
 
 .docs-status { background: #f6f8fb; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+.docs-bs { font-size: 13px; margin-top: 4px; }
+.docs-bs.problem { color: #9a3412; }
 .docs-folder { font-weight: 600; word-break: break-word; }
 .docs-working { margin-top: 6px; color: #2f6fb3; font-weight: 600; }
 .docs-counts { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
@@ -465,6 +467,9 @@ header.top .top-drop form button { background: transparent; }
 .tol-view[open] > summary::before { transform: rotate(90deg); }
 .tol-view[open] > summary .muted { display: none; }
 .tol-value { font-weight: 700; font-size: 16px; color: var(--ink); }
+.tol-value.default { font-weight: 600; color: var(--muted); }
+.tol-value.default small { font-weight: 400; font-size: 12px; }
+.eq-tol-item.default { background: #f3f4f6; border-color: #d9dce1; color: var(--muted); font-weight: 500; }
 .tol-value.none { font-weight: 400; font-size: 13px; color: var(--muted); }
 .tol-view .tol-item { padding: 5px 0; font-size: 14px; }
 .tol-view .tol-group-name { font-size: 15px; }

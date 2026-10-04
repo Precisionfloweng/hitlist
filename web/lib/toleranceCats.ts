@@ -2,7 +2,7 @@
 // Specs often give different values by air/water side and different plus and minus values, so each
 // category holds a +% and a −% (e.g. supply outlets +10/−0, exhaust 0/−10). Blank = not specified.
 
-export type Tol = { plus: string; minus: string };
+export type Tol = { plus: string; minus: string; isDefault?: boolean };   // isDefault: the company default, not set for this project
 export type Tolerances = Record<string, Tol>;
 export type ToleranceGroupKey = "ahu" | "fans" | "outlets" | "terminal" | "water";
 
@@ -23,6 +23,14 @@ export const TOLERANCE_GROUPS: { key: ToleranceGroupKey; label: string; items: {
 export const TOLERANCE_CATS = TOLERANCE_GROUPS.flatMap((g) =>
   g.items.map((i) => ({ ...i, group: g.key, full: `${g.label} – ${i.label}` })));
 export const isToleranceKey = (k: string) => TOLERANCE_CATS.some((c) => c.key === k);
+
+/** The project's tolerances with the company default (Admin → Settings, ±10% to start) filled into every
+ *  category the project hasn't set. Those carry isDefault so pages can show them as "(default)". */
+export function withDefaults(tol: Tolerances, def: Tol): Tolerances {
+  const out: Tolerances = {};
+  for (const c of TOLERANCE_CATS) out[c.key] = hasTol(tol[c.key]) ? tol[c.key] : { plus: def.plus, minus: def.minus, isDefault: true };
+  return out;
+}
 
 /** Before categories were split (one ± value each): where an old value goes. */
 export const LEGACY: Record<string, string[]> = {
@@ -73,12 +81,21 @@ export function categoriesFor(itemType: string, unitName = ""): string[] {
 export const groupsFor = (itemType: string): ToleranceGroupKey[] =>
   [...new Set(categoriesFor(itemType).map((k) => TOLERANCE_CATS.find((c) => c.key === k)!.group))];
 
+/** The groups for the equipment a project has, from its last sync (tracked types and untracked sheets like Supply Outlet). */
+export function presentGroups(results: { types: { key: string; export_sheet: string; units: unknown[] }[];
+  untracked_sheets?: Record<string, number> }): ToleranceGroupKey[] {
+  return [...new Set<ToleranceGroupKey>([
+    ...results.types.filter((t) => t.units.length).flatMap((t) => [...groupsFor(t.export_sheet), ...groupsFor(t.key)]),
+    ...Object.entries(results.untracked_sheets ?? {}).filter(([, n]) => n > 0).flatMap(([sheet]) => groupsFor(sheet)),
+  ])];
+}
+
 /** The project's tolerances that apply to a unit, as one line for the AI, e.g.
  *  "Outlets & Inlets – Supply +10/−0%". Null when none are set for it. */
 export function toleranceFor(itemType: string, tol: Tolerances, unitName = ""): string | null {
   const parts = categoriesFor(itemType, unitName)
     .filter((k) => hasTol(tol[k]))
-    .map((k) => `${TOLERANCE_CATS.find((c) => c.key === k)!.full} ${fmtTol(tol[k])}`);
+    .map((k) => `${TOLERANCE_CATS.find((c) => c.key === k)!.full} ${fmtTol(tol[k])}${tol[k].isDefault ? " (company default)" : ""}`);
   return parts.length ? parts.join("; ") : null;
 }
 

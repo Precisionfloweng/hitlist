@@ -124,7 +124,9 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
               return keys.length > 0 && (
                 <div className="eq-tol"><b>Tolerance</b>{" "}
                   {keys.map((k) => { const c = TOLERANCE_CATS.find((x) => x.key === k)!;
-                    return <span key={k} className="eq-tol-item">{keys.length > 1 || c.group === "ahu" || c.group === "terminal" ? `${c.label} ` : ""}{fmtTol(tolerances[k])}</span>; })}
+                    return <span key={k} className={`eq-tol-item${tolerances[k].isDefault ? " default" : ""}`}
+                      title={tolerances[k].isDefault ? "Company default: the spec's value hasn't been set on the Rules / Tol. tab" : undefined}>
+                      {keys.length > 1 || c.group === "ahu" || c.group === "terminal" ? `${c.label} ` : ""}{fmtTol(tolerances[k])}{tolerances[k].isDefault ? " (default)" : ""}</span>; })}
                 </div>
               );
             })()}

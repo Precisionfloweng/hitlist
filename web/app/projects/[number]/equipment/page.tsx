@@ -5,7 +5,7 @@ import EquipmentView from "./EquipmentView";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
-import { loadTolerances } from "@/lib/tolerances";
+import { loadTolerancesWithDefaults } from "@/lib/tolerances";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export default async function EquipmentPage({ params, searchParams }:
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
   const { type } = await searchParams;
-  const [data, results, tol] = await Promise.all([getProject(number), loadResults(number), loadTolerances(number)]);
+  const [data, results, tol] = await Promise.all([getProject(number), loadResults(number), loadTolerancesWithDefaults(number).then((t) => t.tol)]);
   if (!data || !canSee(user, data.project.id)) notFound();
   const p = data.project;
 

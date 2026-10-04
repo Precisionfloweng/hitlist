@@ -6,12 +6,15 @@ import { gunzipSync } from "node:zlib";
 import { del, get, list, put } from "@vercel/blob";
 import { callClaudeForm } from "./wording";
 import { normalizeTolerances, TOLERANCE_CATS, type Tolerances } from "./toleranceCats";
+import { bsExcerpts, loadValues } from "./bsvalues";
+import { loadResults } from "./results";
 
 export type DocFile = { id: string; category: string; name: string; path: string; modified: string;
   hash: string; size: number; pages: number; parts: string[] };
 export type Manifest = { project: string; folder: { id: string; path: string; name: string }; updated_at: string;
   found: Record<string, number>; missing?: string[]; other_types?: Record<string, string[]>;
   files: DocFile[]; skipped: (DocFile & { reason: string })[] };
+/** A cited excerpt: a document page ([S#]) or BuildingStart data ([B#], category "BuildingStart", page 0). */
 export type Source = { id: string; category: string; path: string; name: string; page: number; modified: string };
 export type Answer = { question: string; answer: string; found: boolean; sources: Source[];
   tolerances: Tolerances | null; at: string; by: string };
@@ -195,13 +198,27 @@ export function findPages(pages: Page[], question: string, mode: Mode, maxChars 
 
 // ---- asking ---------------------------------------------------------------------------------
 const GUIDE = `You answer questions for HVAC test-and-balance technicians at Precision Flow Engineering (PFE), using
-ONLY the excerpts from this project's documents given below (specs, submittals, drawings, TAB plan, ASIs/RFIs,
-change orders). Each excerpt is labelled like [S3] with its folder, file, page and file date.
+ONLY the excerpts given below. There are two kinds:
+- [S#] excerpts: pages from this project's documents (specs, submittals, drawings, TAB plan, ASIs/RFIs, change
+  orders), labelled with folder, file, page and file date.
+- [B#] excerpts: the project's BuildingStart TAB report data as of the last sync: the design and actual values the
+  techs entered per unit, tables of one equipment type, and the Hitlist progress (units complete / left, counted
+  for you). "?" means BuildingStart can't calculate it yet; a field not listed was left blank.
 
 Rules:
+- For "how many are left / done / not started" questions, use the counts and lists in the Hitlist progress excerpt
+  exactly as given; don't count rows yourself.
+- Comparing BuildingStart to the documents (e.g. the design CFM entered vs the schedule or submittal): give both
+  values with their sources and say clearly whether they match.
+- Readings outside tolerance: percent off = (actual - design) / design x 100, checked against the project
+  tolerance given in the [B#] excerpt (+ is the most allowed above design, − the most below). Show the numbers.
+- If an excerpt says TRUNCATED, or the question covers more units than the excerpts hold, say plainly that the
+  question is too broad to answer completely, answer for what's shown, and suggest a narrower question (one
+  equipment type, one floor, or one unit).
 - Use only the excerpts. Never guess or use typical values. If the answer isn't there, say so plainly
   (found = false) and say where it would usually be (e.g. "the AHU schedule on the mechanical drawings").
-- Give every value with its unit, exactly as written, and cite the excerpt after it, e.g. "12,500 CFM [S3]".
+- Give every value with its unit, exactly as written, and cite the excerpt after it, e.g. "12,500 CFM [S3]" or
+  "11,980 CFM [B1]".
 - If excerpts disagree (submittal vs drawing schedule, or an ASI/RFI/change order revising a value), give both,
   say which document is newer from the file dates, and note that later ASIs/RFIs/change orders usually govern.
 - Manufacturer submittals usually name units by model number, not the engineer's tag. If a schedule/drawing excerpt
@@ -225,9 +242,9 @@ Give your reply with the "answer" form.`;
 const FORM = {
   type: "object",
   properties: {
-    answer: { type: "string", description: "The answer for the tech, plain text, values cited like [S3]." },
+    answer: { type: "string", description: "The answer for the tech, plain text, values cited like [S3] or [B1]." },
     found: { type: "boolean", description: "false when the documents don't contain the answer." },
-    sources: { type: "array", items: { type: "string" }, description: "Excerpt ids used, e.g. [\"S1\", \"S4\"]." },
+    sources: { type: "array", items: { type: "string" }, description: "Excerpt ids used, e.g. [\"S1\", \"B2\"]." },
     tolerances: {
       type: "object",
       description: "Only for TAB tolerance questions: percent of design by category, \"10\" for ±10 or \"+10/-0\". Leave out otherwise.",
@@ -243,27 +260,41 @@ export const QUICK: Record<Exclude<Mode, "ask">, (unit?: string) => string> = {
   design: (unit) => `What are the design values for ${unit || "this unit"}: airflow (CFM), outside air, external/total static pressure, water flow (GPM), motor HP and anything else scheduled for it?`,
 };
 
-export async function askDocs(project: string, question: string, mode: Mode, by: string): Promise<Answer> {
-  const manifest = await loadManifest(project);
-  if (!manifest) throw new Error("This project's documents haven't been read yet. Press Update documents first.");
-  const pages = await loadPages(project, manifest);
-  const found = findPages(pages, question, mode);
+export async function askDocs(project: string, question: string, mode: Mode, by: string, tol: Tolerances = {}): Promise<Answer> {
+  const [manifest, values, results] = await Promise.all([loadManifest(project), loadValues(project), loadResults(project)]);
+  if (!manifest && !values && !results) {
+    throw new Error("Nothing to search yet: press Find documents to read the project's files, and sync the project for its BuildingStart data.");
+  }
+  const pages = manifest ? await loadPages(project, manifest) : [];
+  const found = pages.length ? findPages(pages, question, mode) : [];
+  // BuildingStart data only helps the questions about units (not the spec-only quick buttons).
+  const bs = mode === "tolerances" || mode === "tab" ? { blocks: [], tooBig: false }
+    : bsExcerpts(values, results, question, tagPatterns(question), tol);
   const at = new Date().toISOString();
-  if (!found.length) {
-    return { question, answer: "Nothing in this project's documents matches that question. Try other words, or check that the files are in the Drawings and Specs, Submittal, TAB Plan, ASIs and RFIs or Change Orders folders.",
+  const onlyProgress = bs.blocks.length === 1 && bs.blocks[0].label === "Hitlist progress" && !/\b(left|done|complete|finished|remaining|started|progress|how many)\b/i.test(question);
+  if (!found.length && (!bs.blocks.length || onlyProgress)) {
+    return { question, answer: "Nothing in this project's documents or BuildingStart data matches that question. Try other words, or check that the files are in the Drawings and Specs, Submittal, TAB Plan, ASIs and RFIs or Change Orders folders.",
       found: false, sources: [], tolerances: null, at, by };
   }
-  const sources: Source[] = found.map((p, i) => ({ id: `S${i + 1}`, category: p.file.category, path: p.file.path,
-    name: p.file.name, page: p.page, modified: (p.file.modified || "").slice(0, 10) }));
-  const excerpts = found.map((p, i) =>
-    `=== [S${i + 1}] ${p.file.category} / ${p.file.path}, page ${p.page} (file dated ${sources[i].modified || "unknown"}) ===\n${p.text}`).join("\n\n");
-  const reply = await callClaudeForm(GUIDE, `Question: ${question}\n\nExcerpts:\n\n${excerpts}`, "answer",
+  const synced = (values?.synced_at || results?.generated_at || "").slice(0, 10);
+  const sources: Source[] = [
+    ...found.map((p, i) => ({ id: `S${i + 1}`, category: p.file.category, path: p.file.path,
+      name: p.file.name, page: p.page, modified: (p.file.modified || "").slice(0, 10) })),
+    ...bs.blocks.map((b) => ({ id: b.id, category: "BuildingStart", path: b.label, name: b.label, page: 0, modified: synced })),
+  ];
+  const excerpts = [
+    ...found.map((p, i) =>
+      `=== [S${i + 1}] ${p.file.category} / ${p.file.path}, page ${p.page} (file dated ${sources[i].modified || "unknown"}) ===\n${p.text}`),
+    ...bs.blocks.map((b) => `=== [${b.id}] ${b.label} (BuildingStart, synced ${synced || "unknown"}) ===\n${b.text}`),
+  ].join("\n\n");
+  const note = bs.tooBig ? "\n\nNOTE: the BuildingStart data for this question was too large to include in full." : "";
+  const reply = await callClaudeForm(GUIDE, `Question: ${question}${note}\n\nExcerpts:\n\n${excerpts}`, "answer",
     "The answer to the tech's question, from the excerpts.", FORM);
   const r = (typeof reply.text === "string" && reply.answer === undefined ? { answer: reply.text } : reply) as
     { answer?: string; found?: boolean; sources?: string[]; tolerances?: Record<string, unknown> | null };
   const cited = new Set((r.sources ?? []).map(String));
   const answerText = String(r.answer ?? "").trim();
-  for (const m of answerText.matchAll(/\[(S\d+)\]/g)) cited.add(m[1]);
+  for (const m of answerText.matchAll(/\[([SB]\d+)\]/g)) cited.add(m[1]);
   let tolerances: Tolerances | null = null;
   if (r.tolerances && typeof r.tolerances === "object") {
     const t = normalizeTolerances(r.tolerances as Record<string, unknown>);

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { canEdit, canSee, currentUser } from "@/lib/auth";
 import { loadResults } from "@/lib/results";
-import { loadTolerances } from "@/lib/tolerances";
+import { loadTolerancesWithDefaults } from "@/lib/tolerances";
 import { refineText } from "@/lib/wording";
 
 export const maxDuration = 30;
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   if (!project || !text?.trim()) return NextResponse.json({ error: "Type or paste something first." }, { status: 400 });
   if (text.length > 4000) return NextResponse.json({ error: "That's too long. Keep it to one deficiency or note." }, { status: 400 });
   if (!canEdit(user) || !canSee(user, project)) return NextResponse.json({ error: "You have read-only access" }, { status: 403 });
-  const [results, tol] = await Promise.all([loadResults(project), loadTolerances(project)]);
+  const [results, tol] = await Promise.all([loadResults(project), loadTolerancesWithDefaults(project).then((t) => t.tol)]);
 
   let unit = null;
   const existing: string[] = [];

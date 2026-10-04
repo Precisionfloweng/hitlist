@@ -72,6 +72,13 @@ python -m hitlist dropbox-setup
    to the website. After that, each Sync queues a document update (only new or changed files are read), and the
    AI Tools tab has an Update documents button. The last index per project is kept in `worker\docs\`.
 
+## 7. BuildingStart values (Search the Documents)
+After each sync the worker also sends every value in the BuildingStart export to the website, so Search the
+Documents can answer questions about the readings. It's only sent when something changed; the website counts what
+arrived and the worker checks the counts. The result is in the Projects tab (`values_updated`, `values_status`) and
+on the AI Tools tab. A failed send emails Rick and is retried on the next sync. To send one project by hand from its
+last downloaded export and see what the website confirmed: `python -m hitlist values 99-001`.
+
 ## Updating later
 ```
 cd C:\Hitlist

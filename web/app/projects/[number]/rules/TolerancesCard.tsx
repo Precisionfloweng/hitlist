@@ -8,9 +8,10 @@ const toBoxes = (t: Tolerances): Record<string, Box> => Object.fromEntries(Objec
   [k, { plus: v.plus, minus: v.minus, linked: v.plus === v.minus }]));
 const same = (a?: Box, b?: Tol) => (a?.plus ?? "") === (b?.plus ?? "") && (a?.minus ?? "") === (b?.minus ?? "");
 
-/** The project's tolerances from the spec: + and − percent per category. Blank = not specified. */
-export default function TolerancesCard({ project, initial, canEdit, present }:
-  { project: string; initial: Tolerances; canEdit: boolean; present: ToleranceGroupKey[] | null }) {
+/** The project's tolerances from the spec: + and − percent per category. Blank = the company default
+ *  (Admin → Settings), shown greyed in the box. */
+export default function TolerancesCard({ project, initial, canEdit, present, def }:
+  { project: string; initial: Tolerances; canEdit: boolean; present: ToleranceGroupKey[] | null; def: Tol }) {
   // Only the groups for equipment this project has (plus any group that already has a value, so it can be cleared).
   const groups = TOLERANCE_GROUPS.filter((g) => !present || present.includes(g.key) || g.items.some((i) => initial[i.key]));
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function TolerancesCard({ project, initial, canEdit, present }:
     <div className="card tol-card">
       <div className="row" style={{ justifyContent: "space-between" }}>
         <b>Tolerances</b>
-        <span className="muted" style={{ fontSize: 13 }}>From the project spec, percent of design. Type in + and − fills to match; change − if it differs (e.g. +10 / −0). Leave blank if not specified.</span>
+        <span className="muted" style={{ fontSize: 13 }}>From the project spec, percent of design. Type in + and − fills to match; change − if it differs (e.g. +10 / −0). Blank uses the company default ({def.plus === def.minus ? `±${def.plus}` : `+${def.plus}/−${def.minus}`}%, shown grey).</span>
       </div>
       <div className="tol-groups">
         {groups.map((g) => (
@@ -60,9 +61,9 @@ export default function TolerancesCard({ project, initial, canEdit, present }:
                 <span className="tol-label">{i.label}</span>
                 <span className="tol-input">
                   +<input inputMode="decimal" aria-label={`${g.label} ${i.label} plus percent`} value={boxes[i.key]?.plus ?? ""}
-                    disabled={!canEdit} placeholder="–" onChange={(e) => setPlus(i.key, e.target.value)} />
+                    disabled={!canEdit} placeholder={def.plus} onChange={(e) => setPlus(i.key, e.target.value)} />
                   −<input inputMode="decimal" aria-label={`${g.label} ${i.label} minus percent`} value={boxes[i.key]?.minus ?? ""}
-                    disabled={!canEdit} placeholder="–" onChange={(e) => setMinus(i.key, e.target.value)} />%
+                    disabled={!canEdit} placeholder={def.minus} onChange={(e) => setMinus(i.key, e.target.value)} />%
                 </span>
               </div>
             ))}

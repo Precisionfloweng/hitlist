@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { canEdit, canSee, currentUser } from "@/lib/auth";
 import { docsJob, getProject, requestDocs, setDocsFolder } from "@/lib/data";
-import { saveTolerances } from "@/lib/tolerances";
+import { loadTolerancesWithDefaults, saveTolerances } from "@/lib/tolerances";
+import { checkValues, loadValues } from "@/lib/bsvalues";
+import { loadResults } from "@/lib/results";
 import { askDocs, loadHistory, loadManifest, QUICK, removeAnswer, type Mode } from "@/lib/docs";
 
 export const maxDuration = 60;
@@ -20,8 +22,11 @@ async function gate(project: string | null) {
 export async function GET(req: Request) {
   const g = await gate(new URL(req.url).searchParams.get("project"));
   if ("error" in g) return g.error;
-  const [job, manifest, history] = await Promise.all([docsJob(g.project.id), loadManifest(g.project.id), loadHistory(g.project.id)]);
+  const [job, manifest, history, values, results] = await Promise.all([docsJob(g.project.id), loadManifest(g.project.id),
+    loadHistory(g.project.id), loadValues(g.project.id), loadResults(g.project.id)]);
+  const p = g.project;
   return NextResponse.json({
+    buildingStart: checkValues(values, results, p.lastSync, p.valuesUpdated, p.valuesStatus),
     folder: manifest?.folder.path || g.project.dropboxPath, updated: g.project.docsUpdated, status: g.project.docsStatus, job,
     found: manifest?.found ?? null, missing: manifest?.missing ?? [], otherTypes: manifest?.other_types ?? {},
     files: manifest?.files.length ?? 0, pages: manifest?.files.reduce((n, f) => n + f.pages, 0) ?? 0,
@@ -62,7 +67,8 @@ export async function POST(req: Request) {
           ? `${typed}\n(This question is about ${unit} only; answer for that unit.)` : typed;
       if (!question) return NextResponse.json({ error: "Type a question first." }, { status: 400 });
       if (question.length > 1500) return NextResponse.json({ error: "That question is too long." }, { status: 400 });
-      const answer = await askDocs(project, question, mode, g.user.name || g.user.email);
+      const { tol } = await loadTolerancesWithDefaults(project);
+      const answer = await askDocs(project, question, mode, g.user.name || g.user.email, tol);
       // Tolerances found in the spec go straight onto the project (Rules / Tol. tab, Overview, checklist, AI).
       let tolerancesSaved = false;
       if (answer.tolerances && Object.keys(answer.tolerances).length) {

@@ -9,7 +9,9 @@ export const SCHEMA = {
     // Dropbox project folder and document index (written by the server; dropbox_path can be pasted on AI Tools)
     "dropbox_id", "dropbox_path", "docs_updated", "docs_status",
     // newest file in the project's Dropbox "Deficiency Reports" folder = last punch list sent (server)
-    "punch_sent", "punch_file"],
+    "punch_sent", "punch_file",
+    // BuildingStart values sent for Search the Documents (server): date, and "ok: N units, N values" or the problem
+    "values_updated", "values_status"],
   // projects: for role "customer", the project keys they may see (" | " separated)
   // last_seen: date (Central) the person last opened the app, updated at most once a day.
   Users: ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
@@ -32,6 +34,8 @@ export const SCHEMA = {
   // A project's email list for sending the deficiency list, kept on the project's Contacts tab. Website only.
   // on_list: "yes" = included in the "New email" link; send_as: "to" or "cc".
   Contacts: ["project_number", "id", "name", "company", "trade", "email", "on_list", "added_by", "added_at", "position", "send_as"],
+  // Company-wide settings (Admin → Settings), e.g. default_tol_plus / default_tol_minus.
+  Settings: ["setting", "value", "changed_by", "changed_at"],
   // Server heartbeat: "server_last_seen" (worker, every 5 min) and "down_alert_sent_for" (website).
   Status: ["name", "value", "local_time"],
   // One row per sign-in (time in Central). Written by the website only.

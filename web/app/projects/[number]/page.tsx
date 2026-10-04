@@ -8,15 +8,15 @@ import ProjectHeader from "./ProjectHeader";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { daysSince, getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
-import { loadTolerances } from "@/lib/tolerances";
-import { fmtTol, hasTol, TOLERANCE_GROUPS, toleranceSummary } from "@/lib/toleranceCats";
+import { loadTolerancesWithDefaults } from "@/lib/tolerances";
+import { fmtTol, presentGroups, TOLERANCE_GROUPS } from "@/lib/toleranceCats";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProjectPage({ params }: { params: Promise<{ number: string }> }) {
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
-  const [data, results, tol] = await Promise.all([getProject(number), loadResults(number), loadTolerances(number)]);
+  const [data, results, { tol, def }] = await Promise.all([getProject(number), loadResults(number), loadTolerancesWithDefaults(number)]);
   if (!data || !canSee(user, data.project.id)) notFound();
   const { project: p } = data;
   const summary = results?.summary;
@@ -43,29 +43,37 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
 
         {p.lastSync ? (
           <>
-            {toleranceSummary(tol).length > 0 && (
-              <details className="card tol-view">
-                <summary>
-                  <b>Tolerances</b>
-                  <span className="muted"> · from the spec ({TOLERANCE_GROUPS.filter((g) => g.items.some((i) => hasTol(tol[i.key]))).length} groups set) · tap to show</span>
-                </summary>
-                <div className="tol-groups">
-                  {TOLERANCE_GROUPS.filter((g) => g.items.some((i) => hasTol(tol[i.key]))).map((g) => (
-                    <div key={g.key} className="tol-group">
-                      <div className="tol-group-name">{g.label}</div>
-                      {g.items.map((i) => (
-                        <div key={i.key} className="tol-item">
-                          <span className="tol-label">{i.label}</span>
-                          <span className={`tol-value${hasTol(tol[i.key]) ? "" : " none"}`}>{hasTol(tol[i.key]) ? fmtTol(tol[i.key]) : "not set"}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-                {user.role !== "customer" && <div className="muted" style={{ fontSize: 13, marginTop: 8 }}>
-                  Change them on the <Link href={`/projects/${encodeURIComponent(p.id)}/rules`}>Rules / Tol.</Link> tab.</div>}
-              </details>
-            )}
+            {(() => {   // tolerances for the equipment this project has: from the spec, or the company default
+              const present = results ? presentGroups(results) : [];
+              const groups = TOLERANCE_GROUPS.filter((g) => present.includes(g.key) || g.items.some((i) => !tol[i.key].isDefault));
+              if (!groups.length) return null;
+              const fromSpec = groups.filter((g) => g.items.some((i) => !tol[i.key].isDefault)).length;
+              return (
+                <details className="card tol-view">
+                  <summary>
+                    <b>Tolerances</b>
+                    <span className="muted"> · {fromSpec ? `${fromSpec} group${fromSpec === 1 ? "" : "s"} from the spec, ` : ""}
+                      {fromSpec < groups.length ? `${fromSpec ? "the rest " : "all "}company default ${fmtTol(def)}` : "all from the spec"} · tap to show</span>
+                  </summary>
+                  <div className="tol-groups">
+                    {groups.map((g) => (
+                      <div key={g.key} className="tol-group">
+                        <div className="tol-group-name">{g.label}</div>
+                        {g.items.map((i) => (
+                          <div key={i.key} className="tol-item">
+                            <span className="tol-label">{i.label}</span>
+                            <span className={`tol-value${tol[i.key].isDefault ? " default" : ""}`}>
+                              {fmtTol(tol[i.key])}{tol[i.key].isDefault && <small> (default)</small>}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                  {user.role !== "customer" && <div className="muted" style={{ fontSize: 13, marginTop: 8 }}>
+                    Change them on the <Link href={`/projects/${encodeURIComponent(p.id)}/rules`}>Rules / Tol.</Link> tab.</div>}
+                </details>
+              );
+            })()}
             <div className="tiles">
               <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />
               <Tile big={pct(summary ? summary.fields_pct : p.fieldsPct)} label="Overall complete"

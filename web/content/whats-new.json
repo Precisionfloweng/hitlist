@@ -2,6 +2,24 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "Search the Documents knows BuildingStart",
+  "text": "Search the Documents now also uses each project's BuildingStart data, so you can ask things like \"does the design CFM entered for AHU-16 match the submittal?\" or \"how many VAVs are left on floor 3?\"."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
+  "title": "Default tolerance ±10%",
+  "text": "Any tolerance a project hasn't set from its spec now uses the company default of ±10%, shown in grey as \"(default)\" on the Overview, the Equipment checklist and the Rules / Tol. tab."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "admins",
+  "title": "Admin → Settings",
+  "text": "A new Settings page in Admin holds the company default tolerance. Only admins can change it, and every change is logged."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "New project tabs",
   "text": "A project's tabs now look like folder tabs, each with a small icon, and the open tab joins the page below."
  },

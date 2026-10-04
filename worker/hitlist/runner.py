@@ -82,6 +82,8 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
     store.set_job(job, status=DONE, finished_at=now_iso(), message="ok")
     if results.get("website_problem"):
         _email_website_problem(settings, mailer, job, project, results["website_problem"])
+    elif results.get("values_problem"):
+        _email_website_problem(settings, mailer, job, project, results["values_problem"], what="values")
     queue_docs_update(store, settings, number, job.get("requested_by", ""))
     return True
 
@@ -358,9 +360,50 @@ def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: Ex
     store.update_project(number, last_sync=stamp, last_sync_status="ok", fields_pct=s["fields_pct"],
                          units_pct=s["units_pct"], units=s["units"], open_deficiencies=d["open"],
                          open_high=open_high, gap_flags=len(results["gap_flags"]))
+    step("Sending BuildingStart values")
+    values_problem = send_project_values(store, settings, number, export, stamp)
     if website_problem:
         results["website_problem"] = website_problem
+    if values_problem:
+        results["values_problem"] = values_problem
     return results
+
+
+def send_project_values(store: HitlistStore, settings: Settings, number: str, export, stamp: str,
+                        force: bool = False, upload=None) -> str:
+    """Send the project's BuildingStart values to the website (skipped when unchanged) and note the result
+    in the Projects tab (values_updated, values_status). Returns "" or the problem."""
+    from .values import ValuesError, send_values, status_text
+    try:
+        result = send_values(export, number, stamp, settings.results_dir / "values",
+                             upload or _values_uploader(settings, number), force=force)
+    except Exception as exc:  # noqa: BLE001 - the sync itself still counts as done
+        problem = str(exc) if isinstance(exc, ValuesError) else f"{type(exc).__name__}: {str(exc)[:200]}"
+        log.warning("BuildingStart values for %s not confirmed: %s", number, problem)
+        store.update_project(number, values_status=f"failed: {problem[:200]}")
+        return problem
+    store.update_project(number, values_updated=stamp, values_status=status_text(result))
+    return ""
+
+
+def _values_uploader(settings: Settings, number: str):
+    """POST the gzipped values; the website replies with the units and values it counted."""
+    import requests
+    from .values import ValuesError
+    url = app_url(settings)
+    if not url or not settings.worker_secret:
+        raise ValuesError("APP_URL / WORKER_SECRET aren't set in the server's .env")
+
+    def upload(body: bytes) -> dict[str, Any]:
+        r = requests.post(f"{url}/api/worker/values/{number}", data=body, timeout=180,
+                          headers={"x-worker-secret": settings.worker_secret, "content-type": "application/gzip"})
+        if not r.ok:
+            raise ValuesError(f"the website didn't accept them ({r.status_code}): {r.text[:150]}")
+        try:
+            return r.json()
+        except ValueError as exc:
+            raise ValuesError("the website's reply wasn't readable") from exc
+    return upload
 
 
 def app_url(settings: Settings) -> str:
@@ -412,16 +455,22 @@ def _link(settings: Settings, number: str) -> str:
         if settings.app_url else ""
 
 
-def _email_website_problem(settings, mailer, job, project, problem) -> None:
-    """The sync worked but the results didn't reach the website: only Rick needs to know."""
+def _email_website_problem(settings, mailer, job, project, problem, what: str = "results") -> None:
+    """The sync worked but the results (or the BuildingStart values) didn't reach the website: only Rick
+    needs to know."""
     to = [e for e in settings.failure_emails if e]
     if not to:
         return
     shown = project.get("project_number") or job["project_number"]
-    body = (f"<p>The sync for <b>{esc(shown)} {esc(project.get('name'))}</b> finished, but the equipment "
-            f"details did not reach the website, so the Equipment checklist won't show this sync.</p>"
+    if what == "values":
+        lost, subject = ("BuildingStart values were not confirmed by the website, so Search the Documents "
+                         "won't use this sync's readings (it will try again next sync)"), "BuildingStart values not on website"
+    else:
+        lost, subject = ("equipment details did not reach the website, so the Equipment checklist won't show "
+                         "this sync"), "Results not on website"
+    body = (f"<p>The sync for <b>{esc(shown)} {esc(project.get('name'))}</b> finished, but the {lost}.</p>"
             f"<p>Reason: {esc(problem)}</p>" + _link(settings, job["project_number"]))
-    mailer.send(to, f"Results not on website: {shown} {project.get('name', '')}", body)
+    mailer.send(to, f"{subject}: {shown} {project.get('name', '')}", body)
 
 
 def _email_failure(store, settings, mailer, job, project, message, detail: str = "") -> None:
@@ -462,7 +511,7 @@ CLEANUP_EVERY = 12                     # heartbeats (about once an hour)
 
 def cleanup_deleted(store: HitlistStore, settings: Settings) -> list[str]:
     """Remove the server's local copies for projects deleted on the website: results files, the document
-    file lists and the downloaded BuildingStart exports. Returns what was removed."""
+    file lists, the BuildingStart values fingerprints and the downloaded BuildingStart exports. Returns what was removed."""
     import shutil
     from .store import project_key
     keys = {project_key(p) for p in store.rows("Projects")}
@@ -471,7 +520,7 @@ def cleanup_deleted(store: HitlistStore, settings: Settings) -> list[str]:
     safe = lambda k: k.replace("/", "_")  # noqa: E731
     keep = {safe(k) for k in keys}
     removed = []
-    for folder in (settings.results_dir, settings.docs_dir):
+    for folder in (settings.results_dir, settings.docs_dir, settings.results_dir / "values"):
         for f in (folder.glob("*.json") if folder.exists() else []):
             if f.stem not in keep:
                 f.unlink(missing_ok=True)
