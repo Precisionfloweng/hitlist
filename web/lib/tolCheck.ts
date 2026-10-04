@@ -124,11 +124,11 @@ const AMP_MAP: Record<string, AmpDef[]> = {
   electriccoil: [{ label: "Heater Amps", design: "EDH Design Amps", actual: T123("EDH Act. Amps "), heater: true }],
 };
 
-/** Motors in a fan wall from the "Fan Wall Array" field: "3x3" / "3 X 3" / "2×4" = rows × columns, or a plain count. */
+/** Motors in a fan wall from the "Fan Wall Array" field: "3x3" / "3 X 3" / "3/3" / "2×4" = rows × columns, or a plain count. */
 export function arrayCount(v: unknown): number | null {
   if (typeof v === "number") return v > 0 ? v : null;
   const t = String(v ?? "").trim();
-  const m = /^(\d+)\s*[x×*]\s*(\d+)$/i.exec(t);
+  const m = /^(\d+)\s*[x×*/]\s*(\d+)$/i.exec(t);
   if (m) return Number(m[1]) * Number(m[2]);
   return /^\d+$/.test(t) && Number(t) > 0 ? Number(t) : null;
 }
