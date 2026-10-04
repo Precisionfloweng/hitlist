@@ -75,7 +75,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               );
             })()}
             <div className="ov-head">Project summary</div>
-            <div className="tiles">
+            <div className="tiles summary-banner">
               <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />
               <Tile big={pct(summary ? summary.fields_pct : p.fieldsPct)} label="Overall complete"
                 title="Required fields filled across the whole project (same as Complete on the projects list)" />

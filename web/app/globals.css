@@ -555,3 +555,15 @@ header.top .top-drop form button { background: transparent; }
 .ptabs-drop a.on { border-left-color: var(--brand); background: #f0f5fa; }
 .ptabs-drop a.ptab-ai.on { border-left-color: #8e7cc3; background: #f4f1fb; }
 .ptabs-drop a:hover:not(.on) { background: #f5f6f8; }
+
+/* Overview: the Project summary as one navy banner, and the folded Tolerances as a slim pill, so they don't look
+   like the equipment cards. */
+.summary-banner { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; background: linear-gradient(#24578a, #1a4370);
+  border-radius: 14px; padding: 8px 4px; box-shadow: 0 2px 6px rgba(16, 24, 40, .18); }
+.summary-banner .tile, .summary-banner .tile-link .tile { background: transparent; border: 0; border-radius: 0; box-shadow: none; color: #fff; padding: 10px 8px; }
+.summary-banner .tile .big { color: #fff; font-size: 26px; }
+.summary-banner .tile .label { color: rgba(255, 255, 255, .85); }
+.summary-banner > * + * { border-left: 1px solid rgba(255, 255, 255, .25) !important; }
+.summary-banner .tile-link:hover .tile { background: rgba(255, 255, 255, .08); border: 0; }
+.tol-view:not([open]) { border: 1px solid var(--line); border-radius: 999px; padding: 8px 18px; box-shadow: none; }
+@media (max-width: 720px) { .summary-banner > * + * { border-left: 0 !important; } .summary-banner > * { border-bottom: 1px solid rgba(255, 255, 255, .15); } }
