@@ -65,12 +65,22 @@ export function checkUnit(sheet: string, unitName: string, v: Record<string, unk
   return out;
 }
 
-export const fmtPct = (pct: number) => `${pct > 0 ? "+" : pct < 0 ? "−" : ""}${Math.abs(pct).toFixed(1)}%`;
+/** The allowed range as percent of design: ±10 → "90–110%", +10/−5 → "95–110%". */
+export const tolRange = (t: Tol) => `${100 - Number(t.minus)}–${100 + Number(t.plus)}%`;
 
-/** "−8.1% within +10/−5%" / "+12.0% OUTSIDE ±10%" / "no reading". */
+/** A reading as percent of design, the way TAB reports show it: +8% → "108%". Whole numbers, with one decimal
+ *  only when rounding would land exactly on a limit (so 110.4% isn't shown as an in-range 110%). */
+export function fmtPct(pct: number, t?: Tol): string {
+  const of = 100 + pct;
+  const whole = Math.round(of);
+  const onLimit = t && (whole === 100 + Number(t.plus) || whole === 100 - Number(t.minus)) && Math.abs(of - whole) >= 0.05;
+  return `${onLimit ? of.toFixed(1) : whole}%`;
+}
+
+/** "92% of design, within 95–110%"-style text, or "no reading". */
 export function describe(c: PairCheck): string {
   if (c.pct === null) return "no reading";
-  return `${fmtPct(c.pct)} ${c.outside ? "OUTSIDE" : "within"} ${fmtTol(c.tol)}${c.tol.isDefault ? " (default)" : ""}`;
+  return `${fmtPct(c.pct, c.tol)} of design, ${c.outside ? "OUTSIDE" : "within"} ${tolRange(c.tol)}${c.tol.isDefault ? " (default)" : ""}`;
 }
 
 /** How close a reading is to its limit: 1 = right at it, over 1 = outside. */

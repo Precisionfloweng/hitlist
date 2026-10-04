@@ -3,7 +3,7 @@
   "date": "2026-10-04",
   "audience": "all",
   "title": "Exact tolerance checks in answers",
-  "text": "When you ask Search the Documents which units are outside tolerance, Hitlist now does the math itself (percent off for every unit) and the answer just reports it, without working it out on screen."
+  "text": "When you ask Search the Documents which units are outside tolerance, Hitlist now does the math itself and shows readings as percent of design (e.g. 108%, allowed 90–110%)."
  },
  {
   "date": "2026-10-04",

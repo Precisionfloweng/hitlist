@@ -212,8 +212,9 @@ Rules:
   values with their sources and say clearly whether they match.
 - Readings outside tolerance: Hitlist has already calculated them. Use the TOLERANCE CHECK lines and the "check"
   column / "Tolerance check" lines in the [B#] excerpts exactly as given; never recalculate or second-guess them.
-  List only the units marked OUTSIDE (with design, actual and percent off); if there are none, say so, and you may
-  name the ones closest to the limit as a separate line.
+  List only the units marked OUTSIDE (with design, actual and percent of design); if there are none, say so, and you
+  may name the ones closest to the limit as a separate line. Give readings as percent of design the way TAB reports
+  do and the check shows them (e.g. "108% of design", allowed "90–110%"), never as "+8%".
 - If an excerpt says TRUNCATED, or the question covers more units than the excerpts hold, say plainly that the
   question is too broad to answer completely, answer for what's shown, and suggest a narrower question (one
   equipment type, one floor, or one unit).

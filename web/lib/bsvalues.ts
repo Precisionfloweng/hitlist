@@ -7,7 +7,7 @@ import { gunzipSync } from "node:zlib";
 import { del, get, put } from "@vercel/blob";
 import type { Results, TypeResult } from "./results";
 import { categoriesFor, fmtTol, TOLERANCE_CATS, type Tolerances } from "./toleranceCats";
-import { checkUnit, describe, fmtPct, nearness, tolerancePairs, type PairCheck } from "./tolCheck";
+import { checkUnit, describe, fmtPct, nearness, tolerancePairs, tolRange, type PairCheck } from "./tolCheck";
 
 export type BsValue = string | number | boolean;
 export type BsUnit = { name: string; path: string; v: Record<string, BsValue> };
@@ -263,8 +263,8 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
         const read = list.filter((x) => x.c.pct !== null);
         const out = read.filter((x) => x.c.outside);
         const close = read.filter((x) => !x.c.outside).sort((a, b) => nearness(b.c) - nearness(a.c)).slice(0, 3);
-        const tols = [...new Set(list.map((x) => `${fmtTol(x.c.tol)}${x.c.tol.isDefault ? " (company default)" : ""}`))].join(" / ");
-        const fmt = (x: { u: BsUnit; c: PairCheck }) => `${x.u.name} ${fmtPct(x.c.pct!)} (design ${x.c.design}, actual ${x.c.actual})`;
+        const tols = [...new Set(list.map((x) => `${fmtTol(x.c.tol)} = ${tolRange(x.c.tol)} of design${x.c.tol.isDefault ? ", company default" : ""}`))].join(" / ");
+        const fmt = (x: { u: BsUnit; c: PairCheck }) => `${x.u.name} ${fmtPct(x.c.pct!, x.c.tol)} of design (design ${x.c.design}, actual ${x.c.actual})`;
         return `- ${name} (tolerance ${tols}): ${read.length} with a reading, ${out.length} OUTSIDE, ${list.length - read.length} with no actual yet.` +
           `\n  Outside: ${out.length ? out.map(fmt).join("; ") : "none"}` +
           (close.length ? `\n  Closest to the limit but within: ${close.map(fmt).join("; ")}` : "");
