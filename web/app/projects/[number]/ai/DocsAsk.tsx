@@ -243,9 +243,9 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           <select className="docs-suggest" value="" disabled={!!busy || !info} onChange={(e) => suggest(e.target.value)}
             aria-label="Suggestions">
             <option value="">{busy && busy !== "ask" && busy !== "remove" && busy !== "update" && busy !== "folder" ? "Working…" : "Suggestions"}</option>
-            <option value="tolerances" disabled={!ready}>Tolerances (from the spec)</option>
-            <option value="tab" disabled={!ready}>TAB requirements</option>
-            <option value="design" disabled={!canAsk}>Design values for the unit</option>
+            <option value="tolerances" disabled={!ready}>✨ Tolerances (from the spec)</option>
+            <option value="tab" disabled={!ready}>✨ TAB requirements</option>
+            <option value="design" disabled={!canAsk}>✨ Design values for the unit</option>
             <option value="tolerance" disabled={!bs || bs.units === 0}>Out of tolerance</option>
             <option value="left">What&apos;s left to do</option>
           </select>
