@@ -49,8 +49,8 @@ function Tolerance({ r, project }: { r: ToleranceReport; project: string }) {
                     {i === 0 && <td rowSpan={x.items.length}><UnitLink project={project} unit={x.unit} typeKey={x.typeKey} /></td>}
                     <td>{it.reading}</td>
                     <td>{it.design.toLocaleString()}{it.kind === "amps" && " A"}</td>
-                    <td>{it.actual.toLocaleString()}{it.kind === "amps" && " A"}</td>
-                    <td className="bad">{it.pct}</td>
+                    <td className={it.kind === "amps" ? "bad" : ""}>{it.actual.toLocaleString()}{it.kind === "amps" && " A"}</td>
+                    <td className={it.kind === "amps" ? "" : "bad"}>{it.pct}</td>
                     <td>{it.allowed}{it.isDefault && <span className="muted"> (default)</span>}</td>
                   </tr>
                 )))}

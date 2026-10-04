@@ -52,7 +52,7 @@ export function toleranceReport(values: BsValues, results: Results | null, tol: 
         ...flows.filter((c) => c.outside).map((c) => ({ reading: c.pair, design: c.design, actual: c.actual!, kind: "flow" as const,
           pct: fmtPct(c.pct!, c.tol), allowed: tolRange(c.tol), isDefault: !!c.tol.isDefault })),
         ...amps.filter((c) => c.over).map((c) => ({ reading: c.label, design: c.design, actual: c.actual!, kind: "amps" as const,
-          pct: `${Math.round((c.actual! / c.design) * 100)}%`, allowed: "not above design", isDefault: false })),
+          pct: "-", allowed: "below design", isDefault: false })),
       ];
       if (items.length) g.rows.push({ unit: u.name, typeKey, items });
     }
