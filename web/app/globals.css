@@ -342,7 +342,12 @@ button.linkish { border: 0; background: none; padding: 4px 2px; color: var(--mut
 .tocc button.on { background: var(--brand); color: #fff; opacity: 1; }
 .tocc button:disabled:not(.on) { opacity: .6; }
 .contacts-email-th { text-align: right; white-space: nowrap; }
-.contacts-email-th .btn { text-decoration: none; text-transform: none; letter-spacing: 0; font-size: 14px; }
+/* On the navy header row the button is the light raised style, so it stands out as a button. */
+.contacts-email-th .btn, .contacts-email-th button { display: inline-block; text-decoration: none; text-transform: none; letter-spacing: 0;
+  font-size: 14px; font-weight: 700; padding: 7px 16px; border-radius: 8px; border: 1px solid #9fb3cc; cursor: pointer;
+  background: linear-gradient(#ffffff, #e3ecf6); color: var(--brand); box-shadow: 0 1px 3px rgba(0, 0, 0, .3), inset 0 1px 0 #fff; }
+.contacts-email-th .btn:hover { background: #fff; text-decoration: none; box-shadow: 0 2px 6px rgba(0, 0, 0, .35); }
+.contacts-email-th button:disabled { opacity: .6; cursor: default; }
 .contacts-actions { white-space: nowrap; text-align: right; }
 .contacts-actions button { padding: 4px 10px; margin-left: 4px; }
 .contacts-off td { color: var(--muted); }
