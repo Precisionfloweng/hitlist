@@ -221,7 +221,7 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
     TYPE_WORDS.some((w) => w.q.test(q) && (w.sheet.test(t.export_sheet) || w.sheet.test(t.name)))).map((t) => t.key));
 
   // 1. Units named in the question (AHU-16): all of their fields. A tag that starts a family of names
-  //    ("CRAH-DH1100" for CRAH-DH1100-01 … -36) picks that family instead, shown as a table below.
+  //    ("CRAH-XX100" for CRAH-XX100-01 … -36) picks that family instead, shown as a table below.
   const tagged: { sheet: BsSheet; unit: BsUnit }[] = [];
   const family = new Map<BsSheet, BsUnit[]>();
   let familyTag = "";
@@ -238,7 +238,7 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
       }
     }
   }
-  // Tags typed with dashes ("CRAH-DH1100", "VAV-2"): units whose name starts with one, followed by "-" or ".".
+  // Tags typed with dashes ("CRAH-XX100", "VAV-2"): units whose name starts with one, followed by "-" or ".".
   const typed = [...new Set((question.match(/\b[A-Za-z][A-Za-z0-9]*(?:[-.][A-Za-z0-9]+)+\b/g) ?? [])
     .map((t) => t.toLowerCase()).filter((t) => /\d/.test(t)))];
   if (!tagged.length) {
