@@ -83,7 +83,7 @@ const MAX_UNITS = 15;                // units named in one question
 /** Words for each kind of equipment, matched to the export's sheet names. */
 const TYPE_WORDS: { q: RegExp; sheet: RegExp }[] = [
   { q: /\b(vavs?|terminal units?|tus?|boxes|box|fpbs?|fptus?|fan powered)\b/, sheet: /terminal|vav|fan powered/i },
-  { q: /\b(ahus?|air handl\w*|rtus?|roof ?tops?|doas|maus?|make-?up air)\b/, sheet: /air handl|roof ?top|doas|make-?up/i },
+  { q: /\b(ahus?|air handl\w*|rtus?|roof ?tops?|doas|maus?|make-?up air|crahs?|cracs?)\b/, sheet: /air handl|roof ?top|doas|make-?up/i },
   { q: /\b(fcus?|fan coils?)\b/, sheet: /fan coil/i },
   { q: /\b(pumps?)\b/, sheet: /pump/i },
   { q: /\b(exhaust fans?|efs?|supply fans?|return fans?|fans)\b/, sheet: /^(?!.*coil).*fan/i },
@@ -113,6 +113,8 @@ const COL_SYN: Record<string, string[]> = {
 
 const AMP_Q = /\bamps?\b|amperage|motor|fla\b|full load/;
 const TOL_Q = /toleran|outside|within|out of spec|off design|% off|percent off|over design|under design|too high|too low/;
+const GENERIC = new Set(["unit", "units", "system", "systems", "test", "tests", "equipment"]);
+const sheetKey = (n: string) => n.replace(/\s+/g, "").toLowerCase();
 const show = (v: BsValue) => (typeof v === "boolean" ? (v ? "yes" : "no") : String(v));
 const ESC = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -131,7 +133,7 @@ function locationFilter(q: string): Loc | null {
 function pickColumns(sheet: BsSheet, words: string[]): string[] {
   const used = new Set(sheet.units.flatMap((u) => Object.keys(u.v)));
   const headers = sheet.headers.filter((h) => used.has(h) && h !== "Area" && h !== "Zone");
-  const terms = [...new Set(words.flatMap((w) => COL_SYN[w] ?? (w.length >= 3 ? [w] : [])))]
+  const terms = [...new Set(words.flatMap((w) => COL_SYN[w] ?? COL_SYN[w.replace(/s$/, "")] ?? (w.length >= 3 ? [w.replace(/s$/, "")] : [])))]
     .filter((t) => !["design", "des", "actual", "act"].includes(t));
   let cols = terms.length ? headers.filter((h) => terms.some((t) => h.toLowerCase().includes(t))) : [];
   if (!cols.length) cols = headers.filter((h) => /airflow|air flow|cfm|gpm|o\/a|outside air/i.test(h));
@@ -209,7 +211,8 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
   const sheets = values?.sheets ?? [];
   const named = (s: string) => {
     const low = s.toLowerCase();
-    const long = low.split(/\s+/).filter((w) => w.length >= 4);
+    // Typing a sheet's name picks it, but only by its distinctive words ("unit" alone is in every question).
+    const long = low.split(/[\s_-]+/).filter((w) => w.length >= 4 && !GENERIC.has(w));
     return TYPE_WORDS.some((t) => t.q.test(q) && t.sheet.test(s)) ||
       (long.length > 0 && long.every((w) => q.includes(w.replace(/s$/, ""))));
   };
@@ -217,16 +220,36 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
   const focus = new Set((results?.types ?? []).filter((t) => typeSheets.some((s) => s.sheet === t.export_sheet) ||
     TYPE_WORDS.some((w) => w.q.test(q) && (w.sheet.test(t.export_sheet) || w.sheet.test(t.name)))).map((t) => t.key));
 
-  // 1. Units named in the question (AHU-16): all of their fields.
+  // 1. Units named in the question (AHU-16): all of their fields. A tag that starts a family of names
+  //    ("CRAH-DH1100" for CRAH-DH1100-01 … -36) picks that family instead, shown as a table below.
   const tagged: { sheet: BsSheet; unit: BsUnit }[] = [];
+  const family = new Map<BsSheet, BsUnit[]>();
+  let familyTag = "";
   if (tagRes.length) {
     for (const s of sheets) for (const u of s.units) {
       const name = u.name.toLowerCase();
-      // The tag has to be the whole name (or the name's first word): "VAV-2" mustn't pick VAV-2-14.
-      if (tagRes.some((re) => { re.lastIndex = 0; const m = re.exec(name);
-        return !!m && m.index === 0 && !/^[-.\w]/.test(name.slice(m[0].length)); })) tagged.push({ sheet: s, unit: u });
+      for (const re of tagRes) {
+        re.lastIndex = 0;
+        const m = re.exec(name);
+        if (!m || m.index !== 0) continue;
+        const rest = name.slice(m[0].length);
+        if (!/^[-.\w]/.test(rest)) { tagged.push({ sheet: s, unit: u }); break; }   // the whole name: VAV-2 is not VAV-2-14
+        if (/^[-.]/.test(rest)) { family.set(s, [...(family.get(s) ?? []), u]); familyTag ||= m[0].toUpperCase(); break; }
+      }
     }
   }
+  // Tags typed with dashes ("CRAH-DH1100", "VAV-2"): units whose name starts with one, followed by "-" or ".".
+  const typed = [...new Set((question.match(/\b[A-Za-z][A-Za-z0-9]*(?:[-.][A-Za-z0-9]+)+\b/g) ?? [])
+    .map((t) => t.toLowerCase()).filter((t) => /\d/.test(t)))];
+  if (!tagged.length) {
+    for (const s of sheets) for (const u of s.units) {
+      const name = u.name.toLowerCase();
+      const tok = typed.find((t) => name.startsWith(t) && /^[-.]/.test(name.slice(t.length)));
+      if (tok && !(family.get(s) ?? []).includes(u)) { family.set(s, [...(family.get(s) ?? []), u]); familyTag ||= tok.toUpperCase(); }
+    }
+  }
+  if (tagged.length) family.clear();
+  for (const s of family.keys()) for (const t of results?.types ?? []) if (sheetKey(t.export_sheet) === sheetKey(s.sheet)) focus.add(t.key);
   if (tagged.length > MAX_UNITS) tooBig = true;
   for (const { sheet, unit } of tagged.slice(0, MAX_UNITS)) {
     const r = resultUnit(results, sheet.sheet, unit);
@@ -246,13 +269,14 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
   // 2. A type with no single unit named: a table of its units with the columns the question is about.
   const loc = locationFilter(question);
   if (!tagged.length) {
-    for (const s of typeSheets) {
-      let units = s.units;
-      let locNote = "";
+    const tables: [BsSheet, BsUnit[]][] = family.size ? [...family] : typeSheets.map((t) => [t, t.units]);
+    for (const [s, base] of tables) {
+      let units = base;
+      let locNote = family.size ? ` named ${familyTag}-…` : "";
       if (loc) {
         const hit = units.filter((u) => loc.test({ area: u.v.Area, zone: u.v.Zone, path: u.path }));
-        if (hit.length) { units = hit; locNote = ` on ${loc.label}`; }
-        else locNote = ` (no unit's Area, Zone or path matched "${loc.label}", so all are listed)`;
+        if (hit.length) { units = hit; locNote += ` on ${loc.label}`; }
+        else locNote += ` (no unit's Area, Zone or path matched "${loc.label}", so all are listed)`;
       }
       let cols = pickColumns(s, words);
       // Tolerance check, calculated here for every unit: the pairs shown in the table, or all of them for a tolerance question.
@@ -303,7 +327,7 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
         size += row.length + 1;
       }
       const cut = rows.length < units.length ? `\nTRUNCATED: only the first ${rows.length} of ${units.length} units fit.` : "";
-      add(`BuildingStart – ${s.sheet}${locNote ? ` (${loc!.label})` : ""}`, `${head}\n${rows.join("\n")}${cut}`);
+      add(`BuildingStart – ${family.size ? `${familyTag} units` : s.sheet}${loc && locNote.includes(" on ") ? ` (${loc.label})` : ""}`, `${head}\n${rows.join("\n")}${cut}`);
     }
   }
 
