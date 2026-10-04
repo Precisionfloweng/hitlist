@@ -43,12 +43,13 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   else a table per type named in the question (columns picked from the question's words, floor/level filter on
   Area/Zone/path), and always the Hitlist progress per type counted in code. Tolerance checks are calculated in
   `lib/tolCheck.ts` (Design/Actual airflow and water pairs → category → % off, OUTSIDE/within), shown as a check column
-  plus a TOLERANCE CHECK summary; the AI must not recalculate. The answer form has a hidden "working" field. Over 60k chars → TRUNCATED, the AI
+  plus a TOLERANCE CHECK summary; the AI must not recalculate. AI Tools "Suggestions" also runs `lib/reports.ts`
+  (Out of tolerance, What's left to do) in code via POST /api/docs action "report"; not saved. The answer form has a hidden "working" field. Over 60k chars → TRUNCATED, the AI
   asks to narrow it. `checkValues` cross-checks against the results (shown on the AI Tools card).
 
 ## Tolerances
 - `web/lib/toleranceCats.ts`: groups AHUs/RTUs (supply, return, OA), Fans and Outlets & Inlets (supply, return, exhaust),
-  Terminal Units (max, min), Water (pumps, coils, TU/FCU coils); each value has plus and minus. `categoriesFor(itemType,
+  Terminal Units (max, min; fan/reheat airflow use max), FCUs/Heat Pumps/Splits/Unit Heaters (unitary_air), Water (pumps, coils, TU/FCU coils); each value has plus and minus. `categoriesFor(itemType,
   unitName)` maps a unit to its categories (outlets by their BuildingStart page; fans by type and SF/RF/EF tag).
   Tolerances tab rows: category, plus, minus (pct = old single ± value, still read; old category keys expand via LEGACY).
 - Company default (Admin → Settings, Settings tab default_tol_plus/minus, ±10% to start) fills every category a project

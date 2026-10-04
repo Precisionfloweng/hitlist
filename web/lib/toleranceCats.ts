@@ -4,7 +4,7 @@
 
 export type Tol = { plus: string; minus: string; isDefault?: boolean };   // isDefault: the company default, not set for this project
 export type Tolerances = Record<string, Tol>;
-export type ToleranceGroupKey = "ahu" | "fans" | "outlets" | "terminal" | "water";
+export type ToleranceGroupKey = "ahu" | "fans" | "outlets" | "terminal" | "unitary" | "water";
 
 export const TOLERANCE_GROUPS: { key: ToleranceGroupKey; label: string; items: { key: string; label: string }[] }[] = [
   { key: "ahu", label: "AHUs / RTUs", items: [
@@ -15,6 +15,8 @@ export const TOLERANCE_GROUPS: { key: ToleranceGroupKey; label: string; items: {
     { key: "out_supply", label: "Supply" }, { key: "out_return", label: "Return" }, { key: "out_exhaust", label: "Exhaust" }] },
   { key: "terminal", label: "Terminal Units", items: [
     { key: "tu_max", label: "Max airflow" }, { key: "tu_min", label: "Min airflow" }] },
+  { key: "unitary", label: "FCUs, Heat Pumps, Splits & Unit Heaters", items: [
+    { key: "unitary_air", label: "Airflow" }] },
   { key: "water", label: "Water", items: [
     { key: "pumps", label: "Pumps" }, { key: "coils", label: "Coils" }, { key: "tu_coils", label: "TU / FCU coils" }] },
 ];
@@ -63,7 +65,8 @@ export function categoriesFor(itemType: string, unitName = ""): string[] {
   if (/electric|sensor|chiller|boiler|cooling tower|duct traverse|face velocity|autoflow|filter|pressuriz|^ach/.test(t)) return [];
   if (/air handling|^ahu|roof top|^rtu|make-up|^mau|doas/.test(t)) return ["ahu_supply", "ahu_return", "ahu_oa"];
   if (/terminal|^vav/.test(t)) return ["tu_max", "tu_min"];
-  if (/fan coil|^fcu|heat pump|wshp/.test(t)) return ["tu_coils"];
+  if (/fan coil|^fcu|heat pump|wshp|unit heater|^uh\b|^cuh/.test(t)) return ["unitary_air", "tu_coils"];
+  if (/split|ductless/.test(t)) return ["unitary_air"];
   if (/pump/.test(t)) return ["pumps"];
   if (/coil/.test(t)) return ["coils"];
   if (/outlet|inlet|diffuser|grille|register|^(supply|return|exhaust)( air)?s?$/.test(t)) {

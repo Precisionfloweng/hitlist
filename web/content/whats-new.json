@@ -2,6 +2,18 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "Suggestions: Out of tolerance and What's left",
+  "text": "Search the Documents has a Suggestions list. New in it: Out of tolerance (every reading outside the project's tolerances, as percent of design) and What's left to do (unfinished units by type), worked out straight from the last sync."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
+  "title": "New tolerance: FCUs, heat pumps, splits, unit heaters",
+  "text": "The Rules / Tol. tab has a new airflow tolerance for fan coils, heat pumps, split systems and unit heaters, used by the Out of tolerance check and the AI."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "Exact tolerance checks in answers",
   "text": "When you ask Search the Documents which units are outside tolerance, Hitlist now does the math itself and shows readings as percent of design (e.g. 108%, allowed 90–110%)."
  },
