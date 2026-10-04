@@ -150,7 +150,7 @@ def test_update_documents_reads_only_the_doc_folders_and_skips_unchanged():
     assert names["AHU Submittal.pdf"]["pages"] == 2
     part = sent[names["AHU Submittal.pdf"]["parts"][0]]
     assert "AHU-2 supply 6200 CFM" in part["pages"][1]
-    assert m["found"]["TAB Plan"] == 0 and sent["manifest"]["updated_at"] == "t1"
+    assert m["found"]["Deficiency Reports"] == 0 and sent["manifest"]["updated_at"] == "t1"
     # second run: nothing changed, nothing downloaded or re-sent except the manifest
     dbx.downloads.clear()
     sent.clear()
@@ -282,7 +282,7 @@ def test_folder_names_that_differ_slightly_still_match_and_unread_types_are_repo
     m = update_documents(dbx, dbx.metadata(base), "99-006", None, lambda n, b: None)
     assert m["found"]["Submittal"] == 1 and m["found"]["Drawings and Specs"] == 0
     assert m["other_types"] == {"Drawings and Specs": [".dwg"]}
-    assert set(m["missing"]) == {"TAB Plan", "ASIs and RFIs", "Change Orders"}
+    assert set(m["missing"]) == {"ASIs and RFIs", "Change Orders", "Deficiency Reports"}
 
 
 def test_same_job_folder_in_several_tech_folders_prefers_the_projects_tech():

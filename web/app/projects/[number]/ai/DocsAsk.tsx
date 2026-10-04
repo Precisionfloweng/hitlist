@@ -14,7 +14,7 @@ type Info = { buildingStart?: BsCheck; folder: string; updated: string; status: 
   missing?: string[]; otherTypes?: Record<string, string[]>;
   files: number; pages: number; skipped: { name: string; category: string; reason: string }[]; history: Answer[] };
 
-const FOLDERS = ["Drawings and Specs", "Submittal", "TAB Plan", "ASIs and RFIs", "Change Orders"];
+const FOLDERS = ["Drawings and Specs", "Submittal", "ASIs and RFIs", "Change Orders", "Deficiency Reports"];
 
 const when = (iso: string) => {
   const d = new Date(iso);
@@ -162,8 +162,8 @@ export default function DocsAsk({ project, units }: { project: string; units: st
         <div>
           <b>Search the Documents</b>
           <div className="muted" style={{ fontSize: 13 }}>
-            Answers come from this project&apos;s Dropbox folder (specs, submittals, drawings, TAB plan, ASIs/RFIs,
-            change orders) and its BuildingStart data from the last sync, with the source for each value.
+            Answers come from this project&apos;s Dropbox folder (specs, submittals, drawings, ASIs/RFIs, change
+            orders, deficiency reports) and its BuildingStart data from the last sync, with the source for each value.
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 and hand the text to the website so AI Tools can answer questions about specs and submittals.
 
 Every project folder has the same sub-folders; only these are read (in this order):
-Drawings and Specs, Submittal, TAB Plan, ASIs and RFIs, Change Orders.
+Drawings and Specs, Submittal, ASIs and RFIs, Change Orders, Deficiency Reports (every punch list sent).
 
 What the website gets (all gzipped JSON, stored privately in Vercel Blob under docs/<project>/):
   manifest  {project, folder, updated_at, files: [{id, category, name, path, modified, hash, pages, parts}], skipped}
@@ -26,7 +26,7 @@ from .matching import similarity
 
 log = logging.getLogger("hitlist")
 
-DOC_FOLDERS = ["Drawings and Specs", "Submittal", "TAB Plan", "ASIs and RFIs", "Change Orders"]
+DOC_FOLDERS = ["Drawings and Specs", "Submittal", "ASIs and RFIs", "Change Orders", "Deficiency Reports"]
 READABLE = (".pdf", ".docx", ".xlsx", ".xlsm", ".txt")
 SKIP_TECH_FOLDERS = re.compile(r"^\d\d\s")          # "01 Tech Resources" and the like are not technicians
 PART_PAGES = 300                                      # pages per uploaded part (keeps each upload small)
@@ -147,7 +147,7 @@ def find_project_folder(dbx: Dropbox, tech_root: str, number: str, name: str,
 
 
 # Folders every project folder has; two or more of them means "this is the project's document folder".
-STANDARD_FOLDERS = DOC_FOLDERS + ["Deficiency Reports", "Contract", "Field Notes", "Final Report"]
+STANDARD_FOLDERS = DOC_FOLDERS + ["TAB Plan", "Contract", "Field Notes", "Final Report"]
 
 
 def folder_key(name: str) -> str:

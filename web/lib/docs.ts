@@ -1,5 +1,5 @@
-// "Search the Documents": a project's Dropbox documents (specs, submittals, drawings, TAB plan, ASIs/RFIs,
-// change orders) as page text, sent by the server. A question finds the best-matching pages and only
+// "Search the Documents": a project's Dropbox documents (specs, submittals, drawings, ASIs/RFIs, change
+// orders, deficiency reports) as page text, sent by the server. A question finds the best-matching pages and only
 // those go to Claude, which answers with the file and page for each value.
 import "server-only";
 import { gunzipSync } from "node:zlib";
@@ -110,7 +110,7 @@ const EXTRA: Record<Mode, string[]> = {
   design: ["cfm", "gpm", "schedule", "airflow", "static", "outside air", "hp", "rpm"],
 };
 const FAVOR: Record<Mode, string[]> = {
-  ask: [], tolerances: ["Drawings and Specs", "TAB Plan"], tab: ["Drawings and Specs", "TAB Plan"],
+  ask: [], tolerances: ["Drawings and Specs"], tab: ["Drawings and Specs"],
   design: ["Submittal", "Drawings and Specs"],
 };
 
@@ -199,8 +199,10 @@ export function findPages(pages: Page[], question: string, mode: Mode, maxChars 
 // ---- asking ---------------------------------------------------------------------------------
 const GUIDE = `You answer questions for HVAC test-and-balance technicians at Precision Flow Engineering (PFE), using
 ONLY the excerpts given below. There are two kinds:
-- [S#] excerpts: pages from this project's documents (specs, submittals, drawings, TAB plan, ASIs/RFIs, change
-  orders), labelled with folder, file, page and file date.
+- [S#] excerpts: pages from this project's documents (specs, submittals, drawings, ASIs/RFIs, change orders,
+  deficiency reports), labelled with folder, file, page and file date. "Deficiency Reports" pages are punch lists
+  PFE already sent to the contractors, one file per round, dated by the file date: use them for questions about
+  what was reported and when (e.g. when an item was first reported, or whether it's still on the newest list).
 - [B#] excerpts: the project's BuildingStart TAB report data as of the last sync: the design and actual values the
   techs entered per unit, tables of one equipment type, and the Hitlist progress (units complete / left, counted
   for you). "?" means BuildingStart can't calculate it yet; a field not listed was left blank.
@@ -282,7 +284,7 @@ export async function askDocs(project: string, question: string, mode: Mode, by:
   const at = new Date().toISOString();
   const onlyProgress = bs.blocks.length === 1 && bs.blocks[0].label === "Hitlist progress" && !/\b(left|done|complete|finished|remaining|started|progress|how many)\b/i.test(question);
   if (!found.length && (!bs.blocks.length || onlyProgress)) {
-    return { question, answer: "Nothing in this project's documents or BuildingStart data matches that question. Try other words, or check that the files are in the Drawings and Specs, Submittal, TAB Plan, ASIs and RFIs or Change Orders folders.",
+    return { question, answer: "Nothing in this project's documents or BuildingStart data matches that question. Try other words, or check that the files are in the Drawings and Specs, Submittal, ASIs and RFIs, Change Orders or Deficiency Reports folders.",
       found: false, sources: [], tolerances: null, at, by };
   }
   const synced = (values?.synced_at || results?.generated_at || "").slice(0, 10);

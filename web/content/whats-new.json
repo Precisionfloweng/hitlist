@@ -2,6 +2,12 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "Search the Documents reads punch lists",
+  "text": "Search the Documents now reads the Deficiency Reports folder (every punch list sent) instead of TAB Plan, so you can ask things like when an item was first reported."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "Suggestions: Out of tolerance and What's left",
   "text": "Search the Documents has a Suggestions list. New in it: Out of tolerance (airflow and water flow outside the project's tolerances as percent of design, and motor or heater amps above design, grouped by unit) and What's left to do (unfinished units by type)."
  },
