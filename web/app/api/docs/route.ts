@@ -5,9 +5,10 @@ import { loadTolerancesWithDefaults, saveTolerances } from "@/lib/tolerances";
 import { checkValues, loadValues } from "@/lib/bsvalues";
 import { loadResults } from "@/lib/results";
 import { leftReport, toleranceReport } from "@/lib/reports";
-import { askDocs, loadHistory, loadManifest, QUICK, removeAnswer, type Mode } from "@/lib/docs";
+import { loadHistory, loadManifest, QUICK, removeAnswer, saveHistory, writeHistory, type Answer, type Mode } from "@/lib/docs";
+import { runAgent } from "@/lib/agent";
 
-export const maxDuration = 60;
+export const maxDuration = 300;     // the AI may make several lookups (Fluid compute allows 300 s)
 
 async function gate(project: string | null) {
   const user = await currentUser();
@@ -38,7 +39,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as
-    { project?: string; action?: string; question?: string; mode?: string; unit?: string; path?: string; at?: string };
+    { project?: string; action?: string; question?: string; mode?: string; unit?: string; path?: string; at?: string; replyTo?: string };
   const g = await gate(body.project ?? null);
   if ("error" in g) return g.error;
   const project = g.project.id;
@@ -79,15 +80,44 @@ export async function POST(req: Request) {
           ? `${typed}\n(This question is about ${unit} only; answer for that unit.)` : typed;
       if (!question) return NextResponse.json({ error: "Type a question first." }, { status: 400 });
       if (question.length > 1500) return NextResponse.json({ error: "That question is too long." }, { status: 400 });
+      // A reply continues a saved thread: the AI gets its earlier turns.
+      const history = body.replyTo ? await loadHistory(project) : [];
+      const parent = body.replyTo ? history.find((h) => h.at === body.replyTo) : undefined;
+      if (body.replyTo && !parent) return NextResponse.json({ error: "That conversation was deleted." }, { status: 404 });
       const { tol } = await loadTolerancesWithDefaults(project);
-      const answer = await askDocs(project, question, mode, g.user.name || g.user.email, tol);
-      // Tolerances found in the spec go straight onto the project (Rules / Tol. tab, Overview, checklist, AI).
-      let tolerancesSaved = false;
-      if (answer.tolerances && Object.keys(answer.tolerances).length) {
-        await saveTolerances(project, answer.tolerances, g.user);
-        tolerancesSaved = true;
-      }
-      return NextResponse.json({ ok: true, answer, tolerancesSaved });
+      const user = g.user;
+      // The answer streams back as lines of JSON: {"step": "..."} while it works, then {"answer": ...} or {"error": ...}.
+      const enc = new TextEncoder();
+      const stream = new ReadableStream({
+        async start(ctrl) {
+          const send = (o: unknown) => ctrl.enqueue(enc.encode(JSON.stringify(o) + "\n"));
+          try {
+            const thread = parent ? [parent, ...(parent.replies ?? [])] : [];
+            const answer = await runAgent(project, question, user.name || user.email, tol, thread, (step) => send({ step }));
+            let entry: Answer = answer;
+            if (parent) {
+              const now = await loadHistory(project);                 // fresh copy: someone may have asked meanwhile
+              const p = now.find((h) => h.at === parent.at) ?? parent;
+              entry = { ...p, replies: [...(p.replies ?? []), answer] };
+              await writeHistory(project, [entry, ...now.filter((h) => h.at !== parent.at)]);
+            } else {
+              await saveHistory(project, answer);
+            }
+            // Tolerances found in the spec go straight onto the project (Rules / Tol. tab, Overview, checklist, AI).
+            let tolerancesSaved = false;
+            if (answer.tolerances && Object.keys(answer.tolerances).length) {
+              await saveTolerances(project, answer.tolerances, user);
+              tolerancesSaved = true;
+            }
+            send({ ok: true, answer, entry, tolerancesSaved });
+          } catch (e) {
+            console.error("docs question failed", e);
+            send({ error: (e as Error).message || "That didn't work. Try again." });
+          }
+          ctrl.close();
+        },
+      });
+      return new Response(stream, { headers: { "content-type": "application/x-ndjson; charset=utf-8", "cache-control": "no-store" } });
     }
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });
   } catch (e) {

@@ -17,7 +17,7 @@ export type Review = {
 };
 export type WordingFile = { reviewedAt: string; items: Record<string, Review> };
 
-const MODEL = process.env.WORDING_MODEL || "claude-sonnet-5";
+export const MODEL = process.env.WORDING_MODEL || "claude-sonnet-5";
 const BATCH = 25;
 const pathFor = (project: string, kind: Kind) =>
   `${kind === "notes" ? "wording-notes" : "wording"}/${project.replace(/[^A-Za-z0-9_.-]/g, "_")}.json`;
@@ -88,9 +88,9 @@ function payloadFor(kind: Kind, d: ReviewItem, tol: Tolerances) {
         priority: d.priority, assigned_role: d.role, assigned_contact: d.contact, text: d.text };
 }
 
-type Block = { type: string; text?: string; input?: Record<string, unknown> };
+export type Block = { type: string; text?: string; input?: Record<string, unknown>; id?: string; name?: string };
 
-async function request(body: Record<string, unknown>): Promise<Block[]> {
+export async function request(body: Record<string, unknown>): Promise<Block[]> {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("The Anthropic API key isn't set on the website yet (ANTHROPIC_API_KEY in Vercel).");
   const r = await fetch("https://api.anthropic.com/v1/messages", {

@@ -6,7 +6,7 @@ import type { LeftReport, ToleranceReport } from "@/lib/reports";
 import ReportView from "./ReportView";
 
 type Source = { id: string; category: string; path: string; name: string; page: number; modified: string };
-type Answer = { question: string; answer: string; found: boolean; sources: Source[];
+type Answer = { question: string; answer: string; found: boolean; sources: Source[]; replies?: Answer[];
   tolerances: Record<string, unknown> | null; at: string; by: string };
 type Job = { status: "queued" | "running" | "done" | "failed"; step: string; ahead: number } | null;
 type BsCheck = { units: number; values: number; types: number; synced: string; missing: number; ok: boolean; problem: string };
@@ -27,7 +27,23 @@ const fileDate = (s: string) => {
 };
 const showPath = (p: string) => p.split("/").filter(Boolean).join(" / ");
 
-function AnswerView({ a, project, onClose, saved = false }: { a: Answer; project: string; onClose?: () => void; saved?: boolean }) {
+function Sources({ list }: { list: Source[] }) {
+  if (!list.length) return null;
+  return (
+    <ul className="docs-sources">
+      {list.map((s) => (
+        s.category === "BuildingStart"
+          ? <li key={s.id}><b>{s.id}</b> {s.name} <span className="muted">· BuildingStart data{s.modified && `, synced ${fileDate(s.modified)}`}</span></li>
+          : <li key={s.id}><b>{s.id}</b> {s.category} / {s.path} <span className="muted">· page {s.page}{s.modified && ` · ${fileDate(s.modified)}`}</span></li>
+      ))}
+    </ul>
+  );
+}
+
+/** A question's answer plus its replies, with a box to reply (the AI keeps the conversation in mind). */
+export function AnswerView({ a, project, onClose, saved = false, onReply, busy }: { a: Answer; project: string; onClose?: () => void;
+  saved?: boolean; onReply?: (text: string) => Promise<boolean>; busy?: string }) {
+  const [reply, setReply] = useState("");
   const router = useRouter();
   const [tolMsg, setTolMsg] = useState(saved ? "Saved to the Rules / Tol. tab ✓" : "");
   const tol = normalizeTolerances(a.tolerances);   // also reads answers saved before tolerances had + and −
@@ -42,7 +58,7 @@ function AnswerView({ a, project, onClose, saved = false }: { a: Answer; project
   }
   return (
     <div className="docs-answer">
-      {onClose && <button type="button" className="ai-close" onClick={onClose} title="Delete this answer" aria-label="Delete answer">✕</button>}
+      {onClose && <button type="button" className="ai-close" onClick={onClose} title="Delete this conversation" aria-label="Delete conversation">✕</button>}
       <div className={`docs-answer-text${a.found ? "" : " notfound"}`}>{a.answer}</div>
       {tolText && (
         <div className="docs-tol">
@@ -51,14 +67,21 @@ function AnswerView({ a, project, onClose, saved = false }: { a: Answer; project
             : <button className="primary" onClick={fillTolerances}>Use these tolerances</button>}
         </div>
       )}
-      {a.sources.length > 0 && (
-        <ul className="docs-sources">
-          {a.sources.map((s) => (
-            s.category === "BuildingStart"
-              ? <li key={s.id}><b>{s.id}</b> {s.name} <span className="muted">· BuildingStart data{s.modified && `, synced ${fileDate(s.modified)}`}</span></li>
-              : <li key={s.id}><b>{s.id}</b> {s.category} / {s.path} <span className="muted">· page {s.page}{s.modified && ` · ${fileDate(s.modified)}`}</span></li>
-          ))}
-        </ul>
+      <Sources list={a.sources} />
+      {(a.replies ?? []).map((r) => (
+        <div key={r.at} className="docs-turn">
+          <div className="docs-turn-q"><span className="muted">{r.by}, {when(r.at)}:</span> {r.question}</div>
+          <div className={`docs-answer-text${r.found ? "" : " notfound"}`}>{r.answer}</div>
+          <Sources list={r.sources} />
+        </div>
+      ))}
+      {onReply && (
+        <div className="docs-reply">
+          <textarea className="ai-input" rows={2} value={reply} onChange={(e) => setReply(e.target.value)} disabled={!!busy}
+            placeholder="Reply: answer its question or ask a follow-up (e.g. now just the ones on level 2)" />
+          <button className="primary ai-btn" disabled={!!busy || !reply.trim()}
+            onClick={async () => { if (await onReply(reply.trim())) setReply(""); }}>{busy ? "Working…" : "Reply"}</button>
+        </div>
       )}
     </div>
   );
@@ -71,6 +94,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   const [question, setQuestion] = useState("");
   const [unit, setUnit] = useState("");
   const [busy, setBusy] = useState<string>("");
+  const [step, setStep] = useState("");                      // what the AI is doing right now
   const [error, setError] = useState("");
   const [answer, setAnswer] = useState<Answer | null>(null);
   const unitBox = useRef<HTMLInputElement>(null);
@@ -124,10 +148,54 @@ export default function DocsAsk({ project, units }: { project: string; units: st
     if (data?.history) setInfo((i) => (i ? { ...i, history: data.history } : i));
   }
 
+  /** Ask (or reply): the answer streams back with what the AI is doing ("Reading BuildingStart values…"). */
+  async function askStream(body: Record<string, unknown>, label: string): Promise<{ entry: Answer; tolerancesSaved?: boolean } | null> {
+    setBusy(label); setStep("Thinking…"); setError("");
+    try {
+      const r = await fetch("/api/docs", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ project, action: "ask", ...body }) });
+      if (!r.ok || !r.body) { const d = await r.json().catch(() => ({})); setError(d.error || "That didn't work. Try again."); return null; }
+      const reader = r.body.getReader();
+      const dec = new TextDecoder();
+      let buf = "";
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let nl;
+        while ((nl = buf.indexOf("\n")) >= 0) {
+          const line = buf.slice(0, nl).trim();
+          buf = buf.slice(nl + 1);
+          if (!line) continue;
+          const msg = JSON.parse(line);
+          if (msg.step) setStep(msg.step);
+          if (msg.error) { setError(msg.error); return null; }
+          if (msg.entry) return { entry: msg.entry, tolerancesSaved: msg.tolerancesSaved };
+        }
+      }
+      setError("The answer didn't finish (the connection closed). Try again.");
+      return null;
+    } catch {
+      setError("Could not reach the website. Check your connection.");
+      return null;
+    } finally {
+      setBusy(""); setStep("");
+    }
+  }
+
   async function ask(mode: string) {
     setAnswer(null); setReport(null);
-    const data = await post({ action: "ask", mode, question, unit }, mode);
-    if (data?.answer) { setAnswer(data.answer); setAnswerSaved(!!data.tolerancesSaved); load(); if (data.tolerancesSaved) router.refresh(); }
+    const data = await askStream({ mode, question, unit }, mode);
+    if (data) { setAnswer(data.entry); setAnswerSaved(!!data.tolerancesSaved); load(); if (data.tolerancesSaved) router.refresh(); }
+  }
+
+  /** A reply in a thread: the thread comes back with the new answer added. */
+  async function replyTo(entry: Answer, text: string): Promise<boolean> {
+    setReport(null);
+    const data = await askStream({ mode: "ask", question: text, replyTo: entry.at }, "reply");
+    if (!data) return false;
+    setAnswer(data.entry); setAnswerSaved(false); load();
+    return true;
   }
 
   /** A pick from the Suggestions list. */
@@ -264,9 +332,10 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           placeholder="Ask anything, e.g. Does the design CFM entered for AHU-16 match the submittal? How many VAVs are left on floor 3? Which pumps still need amps?" />
         <div className="row" style={{ marginTop: 8 }}>
           <button className="primary ai-btn" disabled={!canAsk || !!busy || !question.trim()} onClick={() => ask("ask")}>
-            {busy === "ask" ? "Reading…" : "Ask"}
+            {busy === "ask" ? "Working…" : "Ask"}
           </button>
           {!canAsk && info && !working && <span className="muted" style={{ fontSize: 13 }}>Press Find documents to read this project&apos;s files first.</span>}
+          {step && busy !== "reply" && <span className="docs-step">⏳ {step}</span>}
           {error && <span className="error">{error}</span>}
         </div>
       </div>
@@ -279,7 +348,9 @@ export default function DocsAsk({ project, units }: { project: string; units: st
             {answer ? "Answer" : "Latest question"} · {shown.by}, {when(shown.at)}
             {!answer && <> · <b>{shown.question.split("\n")[0]}</b></>}
           </div>
-          <AnswerView key={shown.at} a={shown} project={project} saved={!!answer && answerSaved} onClose={() => removeAnswer(shown.at)} />
+          <AnswerView key={shown.at} a={shown} project={project} saved={!!answer && answerSaved} onClose={() => removeAnswer(shown.at)}
+            onReply={(t) => replyTo(shown, t)} busy={busy === "reply" ? step || "Working…" : busy ? "busy" : ""} />
+          {busy === "reply" && step && <div className="docs-step">⏳ {step}</div>}
         </>
       )}
 
@@ -288,8 +359,8 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           <summary>Asked before ({older.length})</summary>
           {older.map((h) => (
             <details key={h.at} className="docs-hist-item">
-              <summary>{h.question.split("\n")[0]} <span className="muted">· {h.by}, {when(h.at)}</span></summary>
-              <AnswerView a={h} project={project} onClose={() => removeAnswer(h.at)} />
+              <summary>{h.question.split("\n")[0]} <span className="muted">· {h.by}, {when(h.at)}{h.replies?.length ? ` · ${h.replies.length} repl${h.replies.length === 1 ? "y" : "ies"}` : ""}</span></summary>
+              <AnswerView a={h} project={project} onClose={() => removeAnswer(h.at)} onReply={(t) => replyTo(h, t)} busy={busy ? "busy" : ""} />
             </details>
           ))}
         </details>

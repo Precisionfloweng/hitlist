@@ -1,13 +1,10 @@
 // "Search the Documents": a project's Dropbox documents (specs, submittals, drawings, ASIs/RFIs, change
-// orders, deficiency reports) as page text, sent by the server. A question finds the best-matching pages and only
-// those go to Claude, which answers with the file and page for each value.
+// orders, deficiency reports) as page text, sent by the server, the page search the AI uses (lib/agent.ts), and
+// the saved questions and answers.
 import "server-only";
 import { gunzipSync } from "node:zlib";
 import { del, get, list, put } from "@vercel/blob";
-import { callClaudeForm } from "./wording";
-import { normalizeTolerances, TOLERANCE_CATS, type Tolerances } from "./toleranceCats";
-import { bsExcerpts, loadValues } from "./bsvalues";
-import { loadResults } from "./results";
+import type { Tolerances } from "./toleranceCats";
 
 export type DocFile = { id: string; category: string; name: string; path: string; modified: string;
   hash: string; size: number; pages: number; parts: string[] };
@@ -16,7 +13,8 @@ export type Manifest = { project: string; folder: { id: string; path: string; na
   files: DocFile[]; skipped: (DocFile & { reason: string })[] };
 /** A cited excerpt: a document page ([S#]) or BuildingStart data ([B#], category "BuildingStart", page 0). */
 export type Source = { id: string; category: string; path: string; name: string; page: number; modified: string };
-export type Answer = { question: string; answer: string; found: boolean; sources: Source[];
+/** One question and its answer; a thread's follow-ups are in replies (each one an Answer too). */
+export type Answer = { question: string; answer: string; found: boolean; sources: Source[]; replies?: Answer[];
   tolerances: Tolerances | null; at: string; by: string };
 export type Mode = "ask" | "tolerances" | "tab" | "design";
 
@@ -58,10 +56,10 @@ export async function loadManifest(project: string): Promise<Manifest | null> {
   return b ? (JSON.parse(gunzipSync(b).toString("utf8")) as Manifest) : null;
 }
 
-type Page = { file: DocFile; page: number; text: string; low: string };
+export type Page = { file: DocFile; page: number; text: string; low: string };
 const cache = new Map<string, { updated: string; pages: Page[] }>();
 
-async function loadPages(project: string, manifest: Manifest): Promise<Page[]> {
+export async function loadPages(project: string, manifest: Manifest): Promise<Page[]> {
   const hit = cache.get(project);
   if (hit && hit.updated === manifest.updated_at) return hit.pages;
   const pages: Page[] = [];
@@ -196,126 +194,12 @@ export function findPages(pages: Page[], question: string, mode: Mode, maxChars 
   return out;
 }
 
-// ---- asking ---------------------------------------------------------------------------------
-const GUIDE = `You answer questions for HVAC test-and-balance technicians at Precision Flow Engineering (PFE), using
-ONLY the excerpts given below. There are two kinds:
-- [S#] excerpts: pages from this project's documents (specs, submittals, drawings, ASIs/RFIs, change orders,
-  deficiency reports), labelled with folder, file, page and file date. "Deficiency Reports" pages are punch lists
-  PFE already sent to the contractors, one file per round, dated by the file date: use them for questions about
-  what was reported and when (e.g. when an item was first reported, or whether it's still on the newest list).
-- [B#] excerpts: the project's BuildingStart TAB report data as of the last sync: the design and actual values the
-  techs entered per unit, tables of one equipment type, and the Hitlist progress (units complete / left, counted
-  for you). "?" means BuildingStart can't calculate it yet; a field not listed was left blank.
-
-Rules:
-- For "how many are left / done / not started" questions, use the counts and lists in the Hitlist progress excerpt
-  exactly as given; don't count rows yourself.
-- Comparing BuildingStart to the documents (e.g. the design CFM entered vs the schedule or submittal): give both
-  values with their sources and say clearly whether they match.
-- Readings outside tolerance: Hitlist has already calculated them. Use the TOLERANCE CHECK lines and the "check"
-  column / "Tolerance check" lines in the [B#] excerpts exactly as given; never recalculate or second-guess them.
-  List only the units marked OUTSIDE (with design, actual and percent of design); if there are none, say so, and you
-  may name the ones closest to the limit as a separate line. Give readings as percent of design the way TAB reports
-  do and the check shows them (e.g. "108% of design", allowed "90–110%"), never as "+8%".
-- Amps: motor amps are flagged when the highest actual reading is above design by any amount (design = nameplate
-  amps × number of motors on fan arrays); heater amps are always ±10% of design. Use the "Amps check" lines /
-  columns as given. When one unit has several problems, list them together under that unit.
-- If an excerpt says TRUNCATED, or the question covers more units than the excerpts hold, say plainly that the
-  question is too broad to answer completely, answer for what's shown, and suggest a narrower question (one
-  equipment type, one floor, or one unit).
-- Use only the excerpts. Never guess or use typical values. If the answer isn't there, say so plainly
-  (found = false) and say where it would usually be (e.g. "the AHU schedule on the mechanical drawings").
-- Give every value with its unit, exactly as written, and cite the excerpt after it, e.g. "12,500 CFM [S3]" or
-  "11,980 CFM [B1]".
-- If excerpts disagree (submittal vs drawing schedule, or an ASI/RFI/change order revising a value), give both,
-  say which document is newer from the file dates, and note that later ASIs/RFIs/change orders usually govern.
-- Manufacturer submittals usually name units by model number, not the engineer's tag. If a schedule/drawing excerpt
-  gives the unit's model and a submittal excerpt shows that model, use the submittal's data for the unit (coil face
-  area, face velocity, fan curves, motor data...) and say which model you matched it by.
-- If the question names one unit, answer for that unit only (don't list other equipment); if its values aren't in
-  the excerpts, say so.
-- Work things out in the "working" field first (the tech never sees it). The "answer" is only your final result:
-  no thinking out loud, no "re-checking", no corrections, and never list an item and then say it doesn't belong.
-- Start with the direct answer, then a few short supporting lines. Plain text, "-" bullets are fine, no headings.
-- tolerances: only when the question is about TAB tolerances. Fill each category the documents clearly give a
-  tolerance for (keys: ${TOLERANCE_CATS.map((c) => `${c.key} = ${c.full}`).join("; ")}). Write the value as "10"
-  for ±10%, or "+10/-0" when plus and minus differ (e.g. supply +10%/-0%, exhaust 0/-10 is "0/-10"). One spec value
-  can fill several categories (e.g. "all air devices ±10%" fills supply, return and exhaust outlets). Leave out
-  categories the documents don't cover. Otherwise leave tolerances out.
-  Read the direction exactly: "0 to plus 10 percent", "plus 10, minus 0" or "+10%/-0%" is "+10/-0" (nothing allowed
-  below design); "minus 10 to 0" is "0/-10"; only "plus or minus 10" / "±10" is "10". Never turn a one-sided range
-  into ±. If the tolerance depends on size (e.g. up to 5,000 cfm one value, above it another), fill the category with
-  the value for units above the size limit and state both in the answer, so the tech can adjust smaller units.
-
-Give your reply with the "answer" form.`;
-
-const FORM = {
-  type: "object",
-  properties: {
-    working: { type: "string", description: "Your scratch work: find the values and check them here before answering. Never shown to the tech." },
-    answer: { type: "string", description: "The answer for the tech, plain text, values cited like [S3] or [B1]." },
-    found: { type: "boolean", description: "false when the documents don't contain the answer." },
-    sources: { type: "array", items: { type: "string" }, description: "Excerpt ids used, e.g. [\"S1\", \"B2\"]." },
-    tolerances: {
-      type: "object",
-      description: "Only for TAB tolerance questions: percent of design by category, \"10\" for ±10 or \"+10/-0\". Leave out otherwise.",
-      properties: Object.fromEntries(TOLERANCE_CATS.map((c) => [c.key, { type: "string", description: c.full }])),
-    },
-  },
-  required: ["working", "answer", "found", "sources"],
-};
-
+// ---- quick questions (the ✨ Suggestions) -----------------------------------------------------
 export const QUICK: Record<Exclude<Mode, "ask">, (unit?: string) => string> = {
   tolerances: () => "What are the TAB tolerances (plus and minus percent of design) in the spec for each kind of equipment: air handlers and rooftop units (supply, return and outside air), supply/return/exhaust fans, supply/return/exhaust outlets and inlets, terminal units (max and min airflow), fan coils/heat pumps/split systems/unit heaters (airflow), pumps, coils and terminal-unit/FCU coils?",
   tab: () => "What does the spec require for testing, adjusting and balancing: what must be tested and reported, instrument and certification requirements, and anything unusual the TAB tech should know?",
   design: (unit) => `What are the design values for ${unit || "this unit"}: airflow (CFM), outside air, external/total static pressure, water flow (GPM), motor HP and anything else scheduled for it?`,
 };
-
-export async function askDocs(project: string, question: string, mode: Mode, by: string, tol: Tolerances = {}): Promise<Answer> {
-  const [manifest, values, results] = await Promise.all([loadManifest(project), loadValues(project), loadResults(project)]);
-  if (!manifest && !values && !results) {
-    throw new Error("Nothing to search yet: press Find documents to read the project's files, and sync the project for its BuildingStart data.");
-  }
-  const pages = manifest ? await loadPages(project, manifest) : [];
-  const found = pages.length ? findPages(pages, question, mode) : [];
-  // BuildingStart data only helps the questions about units (not the spec-only quick buttons).
-  const bs = mode === "tolerances" || mode === "tab" ? { blocks: [], tooBig: false }
-    : bsExcerpts(values, results, question, tagPatterns(question), tol);
-  const at = new Date().toISOString();
-  const onlyProgress = bs.blocks.length === 1 && bs.blocks[0].label === "Hitlist progress" && !/\b(left|done|complete|finished|remaining|started|progress|how many)\b/i.test(question);
-  if (!found.length && (!bs.blocks.length || onlyProgress)) {
-    return { question, answer: "Nothing in this project's documents or BuildingStart data matches that question. Try other words, or check that the files are in the Drawings and Specs, Submittal, ASIs and RFIs, Change Orders or Deficiency Reports folders.",
-      found: false, sources: [], tolerances: null, at, by };
-  }
-  const synced = (values?.synced_at || results?.generated_at || "").slice(0, 10);
-  const sources: Source[] = [
-    ...found.map((p, i) => ({ id: `S${i + 1}`, category: p.file.category, path: p.file.path,
-      name: p.file.name, page: p.page, modified: (p.file.modified || "").slice(0, 10) })),
-    ...bs.blocks.map((b) => ({ id: b.id, category: "BuildingStart", path: b.label, name: b.label, page: 0, modified: synced })),
-  ];
-  const excerpts = [
-    ...found.map((p, i) =>
-      `=== [S${i + 1}] ${p.file.category} / ${p.file.path}, page ${p.page} (file dated ${sources[i].modified || "unknown"}) ===\n${p.text}`),
-    ...bs.blocks.map((b) => `=== [${b.id}] ${b.label} (BuildingStart, synced ${synced || "unknown"}) ===\n${b.text}`),
-  ].join("\n\n");
-  const note = bs.tooBig ? "\n\nNOTE: the BuildingStart data for this question was too large to include in full." : "";
-  const reply = await callClaudeForm(GUIDE, `Question: ${question}${note}\n\nExcerpts:\n\n${excerpts}`, "answer",
-    "The answer to the tech's question, from the excerpts.", FORM);
-  const r = (typeof reply.text === "string" && reply.answer === undefined ? { answer: reply.text } : reply) as
-    { answer?: string; found?: boolean; sources?: string[]; tolerances?: Record<string, unknown> | null };
-  const cited = new Set((r.sources ?? []).map(String));
-  const answerText = String(r.answer ?? "").trim();
-  for (const m of answerText.matchAll(/\[([SB]\d+)\]/g)) cited.add(m[1]);
-  let tolerances: Tolerances | null = null;
-  if (r.tolerances && typeof r.tolerances === "object") {
-    const t = normalizeTolerances(r.tolerances as Record<string, unknown>);
-    tolerances = Object.keys(t).length ? t : null;
-  }
-  const answer: Answer = { question, answer: answerText || "No answer came back. Try again.", found: r.found !== false,
-    sources: sources.filter((s) => cited.has(s.id)), tolerances, at, by };
-  await saveHistory(project, answer);
-  return answer;
-}
 
 // ---- questions already asked -----------------------------------------------------------------
 const historyPath = (project: string) => `docs-qa/${safe(project)}.json`;
@@ -325,13 +209,13 @@ export async function loadHistory(project: string): Promise<Answer[]> {
   try { return b ? (JSON.parse(b.toString("utf8")) as Answer[]) : []; } catch { return []; }
 }
 
-async function writeHistory(project: string, list: Answer[]) {
+export async function writeHistory(project: string, list: Answer[]) {
   await put(historyPath(project), JSON.stringify(list), {
     access: "private", allowOverwrite: true, addRandomSuffix: false, contentType: "application/json",
   });
 }
 
-async function saveHistory(project: string, a: Answer) {
+export async function saveHistory(project: string, a: Answer) {
   await writeHistory(project, [a, ...(await loadHistory(project))].slice(0, 50));
 }
 

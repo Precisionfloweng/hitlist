@@ -1,23 +1,17 @@
 // The BuildingStart values (every reading the techs entered), sent by the server after each sync, as a
 // source for Search the Documents next to the Dropbox documents. Stored privately in Blob as values/<key>.
-// Questions get the part that matters: a named unit's fields, a table of one type (only the columns the
-// question is about), and always the Hitlist progress per type (counted here, not by the AI).
+// Also the helpers the AI's lookup tools use (lib/agent.ts): picking columns, locations, progress per type.
 import "server-only";
 import { gunzipSync } from "node:zlib";
 import { del, get, put } from "@vercel/blob";
 import type { Results, TypeResult } from "./results";
-import { toleranceReport } from "./reports";
 import { categoriesFor, fmtTol, TOLERANCE_CATS, type Tolerances } from "./toleranceCats";
-import { ampChecksFor, checkAmps, checkUnit, describe, describeAmps, fmtPct, nearness, tolerancePairs, tolRange,
-  type PairCheck } from "./tolCheck";
 
 export type BsValue = string | number | boolean;
 export type BsUnit = { name: string; path: string; v: Record<string, BsValue> };
 export type BsSheet = { sheet: string; headers: string[]; units: BsUnit[] };
 export type BsValues = { schema: number; project: string; synced_at: string; sheets: BsSheet[];
   counts: { units: number; values: number } };
-/** One BuildingStart excerpt for the AI: [B1] ... */
-export type BsBlock = { id: string; label: string; text: string };
 
 const safe = (project: string) => project.replace(/[^A-Za-z0-9_.-]/g, "_");
 const pathFor = (project: string) => `values/${safe(project)}`;
@@ -81,7 +75,7 @@ const MAX_CHARS = 60_000;            // BuildingStart part of one question (the 
 const MAX_UNITS = 15;                // units named in one question
 
 /** Words for each kind of equipment, matched to the export's sheet names. */
-const TYPE_WORDS: { q: RegExp; sheet: RegExp }[] = [
+export const TYPE_WORDS: { q: RegExp; sheet: RegExp }[] = [
   { q: /\b(vavs?|terminal units?|tus?|boxes|box|fpbs?|fptus?|fan powered)\b/, sheet: /terminal|vav|fan powered/i },
   { q: /\b(ahus?|air handl\w*|rtus?|roof ?tops?|doas|maus?|make-?up air|crahs?|cracs?)\b/, sheet: /air handl|roof ?top|doas|make-?up/i },
   { q: /\b(fcus?|fan coils?)\b/, sheet: /fan coil/i },
@@ -101,7 +95,7 @@ const STOP = new Set(("the and for are what with that this from have has was wer
   "you your give list show tell find value values please many much more left still need needs project units unit done do").split(" "));
 
 // Question words that also mean these column words (lower case, matched inside header names).
-const COL_SYN: Record<string, string[]> = {
+export const COL_SYN: Record<string, string[]> = {
   cfm: ["airflow", "air flow", "cfm"], airflow: ["airflow", "air flow", "cfm"], air: ["airflow"], gpm: ["gpm", "flow"],
   water: ["gpm", "water", "flow"], amps: ["amp"], amp: ["amp"], volts: ["volt"], voltage: ["volt"], static: ["static", "sp"],
   pressure: ["pressure", "static", "psi", "head"], rpm: ["rpm"], speed: ["rpm", "speed", "hz"], hp: ["hp", "horsepower"],
@@ -111,16 +105,13 @@ const COL_SYN: Record<string, string[]> = {
   size: ["size"], filter: ["filter"], completed: ["completed"], design: ["design", "des"], actual: ["actual", "act"],
 };
 
-const AMP_Q = /\bamps?\b|amperage|motor|fla\b|full load/;
-const TOL_Q = /toleran|outside|within|out of spec|off design|% off|percent off|over design|under design|too high|too low/;
-const GENERIC = new Set(["unit", "units", "system", "systems", "test", "tests", "equipment"]);
-const sheetKey = (n: string) => n.replace(/\s+/g, "").toLowerCase();
-const show = (v: BsValue) => (typeof v === "boolean" ? (v ? "yes" : "no") : String(v));
+export const sheetKey = (n: string) => n.replace(/\s+/g, "").toLowerCase();
+export const show = (v: BsValue) => (typeof v === "boolean" ? (v ? "yes" : "no") : String(v));
 const ESC = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-type Loc = { label: string; test: (u: { area?: unknown; zone?: unknown; path?: string }) => boolean };
+export type Loc = { label: string; test: (u: { area?: unknown; zone?: unknown; path?: string }) => boolean };
 /** Location in the question: "floor 3", "level 3", "3rd floor", "L3". Matches a unit's Area, Zone or path. */
-function locationFilter(q: string): Loc | null {
+export function locationFilter(q: string): Loc | null {
   const m = /\b(?:floor|level|lvl|fl)\.?\s*([a-z]?\d{1,2}[a-z]?)\b/i.exec(q) ?? /\b(\d{1,2})(?:st|nd|rd|th)\s+(?:floor|level)\b/i.exec(q)
     ?? /\bL(\d{1,2})\b/.exec(q);
   if (!m) return null;
@@ -130,7 +121,7 @@ function locationFilter(q: string): Loc | null {
 }
 
 /** Columns the question is about; otherwise the main design/actual airflow and water columns. */
-function pickColumns(sheet: BsSheet, words: string[]): string[] {
+export function pickColumns(sheet: BsSheet, words: string[]): string[] {
   const used = new Set(sheet.units.flatMap((u) => Object.keys(u.v)));
   const headers = sheet.headers.filter((h) => used.has(h) && h !== "Area" && h !== "Zone");
   const terms = [...new Set(words.flatMap((w) => COL_SYN[w] ?? COL_SYN[w.replace(/s$/, "")] ?? (w.length >= 3 ? [w.replace(/s$/, "")] : [])))]
@@ -143,7 +134,7 @@ function pickColumns(sheet: BsSheet, words: string[]): string[] {
   return [...lead, ...cols.slice(0, 14), ...(done && !cols.includes(done) ? [done] : [])];
 }
 
-function resultUnit(results: Results | null, sheet: string, u: BsUnit) {
+export function resultUnit(results: Results | null, sheet: string, u: BsUnit) {
   for (const t of results?.types ?? []) {
     if (t.export_sheet.replace(/\s+/g, "").toLowerCase() !== sheet.replace(/\s+/g, "").toLowerCase()) continue;
     const r = t.units.find((x) => (u.path && x.path === u.path) || x.name === u.name);
@@ -152,16 +143,16 @@ function resultUnit(results: Results | null, sheet: string, u: BsUnit) {
   return null;
 }
 
-const missingFields = (t: TypeResult, codes: string) => t.fields.filter((f, i) => codes[i] === "R").map((f) => f.label);
+export const missingFields = (t: TypeResult, codes: string) => t.fields.filter((f, i) => codes[i] === "R").map((f) => f.label);
 
-function tolLine(sheet: string, unitName: string, tol: Tolerances): string {
+export function tolLine(sheet: string, unitName: string, tol: Tolerances): string {
   const keys = categoriesFor(sheet, unitName).filter((k) => tol[k]);
   return keys.map((k) => `${TOLERANCE_CATS.find((c) => c.key === k)!.full} ${fmtTol(tol[k])}${tol[k].isDefault ? " (company default)" : ""}`).join("; ");
 }
 
 /** Hitlist progress per type (from the last sync's results): what's done and what's left, counted in code.
  *  For the types the question is about, the unfinished units are listed (only those at the location asked about). */
-function progressBlock(results: Results, focus: Set<string>, loc: Loc | null): string {
+export function progressBlock(results: Results, focus: Set<string>, loc: Loc | null): string {
   const lines = [`Synced ${results.generated_at.slice(0, 10)}. "Complete" = every required field filled in. "Not started" = none of its required fields filled in.`];
   type RU = TypeResult["units"][number];
   const count = (units: RU[]) => {
@@ -189,175 +180,4 @@ function progressBlock(results: Results, focus: Set<string>, loc: Loc | null): s
     if (part.length) lines.push(`  Partly done: ${part.map((u) => `${u.name} (missing ${missingFields(t, u.codes).join(", ")})`).join("; ")}`);
   }
   return lines.join("\n");
-}
-
-/**
- * The BuildingStart excerpts for one question. tooBig: some of what the question asks about didn't fit
- * (the AI is told, and asks the tech to narrow it down).
- */
-export function bsExcerpts(values: BsValues | null, results: Results | null, question: string, tagRes: RegExp[],
-  tol: Tolerances): { blocks: BsBlock[]; tooBig: boolean } {
-  const q = question.toLowerCase();
-  const words = [...new Set(q.match(/[a-z][a-z0-9/-]{1,}/g) ?? [])].filter((w) => !STOP.has(w));
-  const blocks: BsBlock[] = [];
-  let tooBig = false;
-  let chars = 0;
-  const add = (label: string, text: string) => {
-    blocks.push({ id: `B${blocks.length + 1}`, label, text });
-    chars += text.length;
-  };
-
-  // Types the question is about (by words like "VAVs", "pumps", or a sheet name typed out).
-  const sheets = values?.sheets ?? [];
-  const named = (s: string) => {
-    const low = s.toLowerCase();
-    // Typing a sheet's name picks it, but only by its distinctive words ("unit" alone is in every question).
-    const long = low.split(/[\s_-]+/).filter((w) => w.length >= 4 && !GENERIC.has(w));
-    return TYPE_WORDS.some((t) => t.q.test(q) && t.sheet.test(s)) ||
-      (long.length > 0 && long.every((w) => q.includes(w.replace(/s$/, ""))));
-  };
-  const typeSheets = sheets.filter((s) => named(s.sheet));
-  const focus = new Set((results?.types ?? []).filter((t) => typeSheets.some((s) => s.sheet === t.export_sheet) ||
-    TYPE_WORDS.some((w) => w.q.test(q) && (w.sheet.test(t.export_sheet) || w.sheet.test(t.name)))).map((t) => t.key));
-
-  // 1. Units named in the question (AHU-16): all of their fields. A tag that starts a family of names
-  //    ("CRAH-XX100" for CRAH-XX100-01 … -36) picks that family instead, shown as a table below.
-  const tagged: { sheet: BsSheet; unit: BsUnit }[] = [];
-  const family = new Map<BsSheet, BsUnit[]>();
-  let familyTag = "";
-  if (tagRes.length) {
-    for (const s of sheets) for (const u of s.units) {
-      const name = u.name.toLowerCase();
-      for (const re of tagRes) {
-        re.lastIndex = 0;
-        const m = re.exec(name);
-        if (!m || m.index !== 0) continue;
-        const rest = name.slice(m[0].length);
-        if (!/^[-.\w]/.test(rest)) { tagged.push({ sheet: s, unit: u }); break; }   // the whole name: VAV-2 is not VAV-2-14
-        if (/^[-.]/.test(rest)) { family.set(s, [...(family.get(s) ?? []), u]); familyTag ||= m[0].toUpperCase(); break; }
-      }
-    }
-  }
-  // Tags typed with dashes ("CRAH-XX100", "VAV-2"): units whose name starts with one, followed by "-" or ".".
-  const typed = [...new Set((question.match(/\b[A-Za-z][A-Za-z0-9]*(?:[-.][A-Za-z0-9]+)+\b/g) ?? [])
-    .map((t) => t.toLowerCase()).filter((t) => /\d/.test(t)))];
-  if (!tagged.length) {
-    for (const s of sheets) for (const u of s.units) {
-      const name = u.name.toLowerCase();
-      const tok = typed.find((t) => name.startsWith(t) && /^[-.]/.test(name.slice(t.length)));
-      if (tok && !(family.get(s) ?? []).includes(u)) { family.set(s, [...(family.get(s) ?? []), u]); familyTag ||= tok.toUpperCase(); }
-    }
-  }
-  if (tagged.length) family.clear();
-  for (const s of family.keys()) for (const t of results?.types ?? []) if (sheetKey(t.export_sheet) === sheetKey(s.sheet)) focus.add(t.key);
-  if (tagged.length > MAX_UNITS) tooBig = true;
-  for (const { sheet, unit } of tagged.slice(0, MAX_UNITS)) {
-    const r = resultUnit(results, sheet.sheet, unit);
-    const miss = r ? missingFields(r.type, r.unit.codes) : [];
-    const tl = tolLine(sheet.sheet, unit.name, tol);
-    const checks = checkUnit(sheet.sheet, unit.name, unit.v, tolerancePairs(sheet.headers), tol);
-    const text = [`Unit ${unit.name} (BuildingStart sheet "${sheet.sheet}", path ${unit.path || unit.name})`,
-      ...Object.entries(unit.v).map(([h, v]) => `${h}: ${show(v)}`),
-      r ? (miss.length ? `Hitlist: required fields still missing: ${miss.join(", ")}` : "Hitlist: all required fields filled in") : "",
-      tl ? `Project tolerance: ${tl}` : "",
-      ...checks.map((c) => `Tolerance check (calculated by Hitlist): ${c.pair}: design ${c.design}, actual ${c.actual ?? "not entered"} = ${describe(c)}`),
-      ...checkAmps(sheet.sheet, unit.v).map((c) => `Amps check (calculated by Hitlist): ${c.label}: ${describeAmps(c)}`),
-    ].filter(Boolean).join("\n");
-    add(`BuildingStart – ${unit.name}`, text);
-  }
-
-  // 2. A type with no single unit named: a table of its units with the columns the question is about.
-  const loc = locationFilter(question);
-  if (!tagged.length) {
-    const tables: [BsSheet, BsUnit[]][] = family.size ? [...family] : typeSheets.map((t) => [t, t.units]);
-    for (const [s, base] of tables) {
-      let units = base;
-      let locNote = family.size ? ` named ${familyTag}-…` : "";
-      if (loc) {
-        const hit = units.filter((u) => loc.test({ area: u.v.Area, zone: u.v.Zone, path: u.path }));
-        if (hit.length) { units = hit; locNote += ` on ${loc.label}`; }
-        else locNote += ` (no unit's Area, Zone or path matched "${loc.label}", so all are listed)`;
-      }
-      let cols = pickColumns(s, words);
-      // Tolerance check, calculated here for every unit: the pairs shown in the table, or all of them for a tolerance question.
-      const allPairs = tolerancePairs(s.headers);
-      let pairs = allPairs.filter((p) => cols.includes(p.design) || cols.includes(p.actual));
-      if (TOL_Q.test(q) && (!pairs.length || !words.some((w) => COL_SYN[w]))) pairs = allPairs;
-      cols = [...cols, ...pairs.flatMap((p) => [p.design, p.actual]).filter((c, i, a) => !cols.includes(c) && a.indexOf(c) === i)];
-      const checks = new Map(units.map((u) => [u, checkUnit(s.sheet, u.name, u.v, pairs, tol)]));
-      const checkCols = pairs.filter((p) => units.some((u) => checks.get(u)!.some((c) => c.pair === p.name))).map((p) => p.name);
-      // Amps (above design by any amount) when the question is about amps, motors or tolerances.
-      const ampDefs = AMP_Q.test(q) || TOL_Q.test(q) ? ampChecksFor(s.sheet) : [];
-      const amps = new Map(units.map((u) => [u, ampDefs.length ? checkAmps(s.sheet, u.v) : []]));
-      const ampCols = ampDefs.map((d) => d.label).filter((l) => units.some((u) => amps.get(u)!.some((c) => c.label === l)));
-      const summary = checkCols.map((name) => {
-        const list = units.flatMap((u) => checks.get(u)!.filter((c) => c.pair === name).map((c) => ({ u, c })));
-        const read = list.filter((x) => x.c.pct !== null);
-        const out = read.filter((x) => x.c.outside);
-        const close = read.filter((x) => !x.c.outside).sort((a, b) => nearness(b.c) - nearness(a.c)).slice(0, 3);
-        const tols = [...new Set(list.map((x) => `${fmtTol(x.c.tol)} = ${tolRange(x.c.tol)} of design${x.c.tol.isDefault ? ", company default" : ""}`))].join(" / ");
-        const fmt = (x: { u: BsUnit; c: PairCheck }) => `${x.u.name} ${fmtPct(x.c.pct!, x.c.tol)} of design (design ${x.c.design}, actual ${x.c.actual})`;
-        return `- ${name} (tolerance ${tols}): ${read.length} with a reading, ${out.length} OUTSIDE, ${list.length - read.length} with no actual yet.` +
-          `\n  Outside: ${out.length ? out.map(fmt).join("; ") : "none"}` +
-          (close.length ? `\n  Closest to the limit but within: ${close.map(fmt).join("; ")}` : "");
-      });
-      for (const label of ampCols) {
-        const list = units.flatMap((u) => amps.get(u)!.filter((c) => c.label === label).map((c) => ({ u, c })));
-        const read = list.filter((x) => x.c.actual !== null);
-        const over = read.filter((x) => x.c.over);
-        const heater = list.some((x) => x.c.heater);
-        summary.push(`- ${label} (${heater ? "heater amps: always ±10% of design" : "flagged if the highest actual is above design by any amount; design = amps × number of motors"}): ` +
-          `${read.length} with a reading, ${over.length} ${heater ? "OUTSIDE" : "OVER DESIGN"}, ${list.length - read.length} with no actual yet.` +
-          `\n  ${heater ? "Outside" : "Over design"}: ${over.length ? over.map((x) => `${x.u.name} ${describeAmps(x.c)}`).join("; ") : "none"}`);
-      }
-      const tl = tolLine(s.sheet, "", tol);
-      const head = `${s.sheet}: ${units.length} unit${units.length === 1 ? "" : "s"}${locNote}. Columns: Unit | ${[...cols, ...checkCols.map((n) => `${n} check`), ...ampCols.map((n) => `${n} check`)].join(" | ")}` +
-        (tl ? `\nProject tolerance: ${tl}` : "") +
-        (summary.length ? `\nTOLERANCE CHECK, calculated by Hitlist for all ${units.length} units listed here (use these results; don't recalculate):\n${summary.join("\n")}` : "") +
-        `\n"?" = BuildingStart can't calculate it yet; blank = not entered.`;
-      const rows: string[] = [];
-      let size = head.length;
-      for (const u of units) {
-        const cks = checks.get(u)!;
-        const row = [u.name, ...cols.map((c) => (u.v[c] === undefined ? "" : show(u.v[c]))),
-          ...checkCols.map((n) => { const c = cks.find((x) => x.pair === n); return c ? describe(c) : ""; }),
-          ...ampCols.map((n) => { const c = amps.get(u)!.find((x) => x.label === n); return c ? describeAmps(c) : ""; })].join(" | ");
-        if (chars + size + row.length > MAX_CHARS) { tooBig = true; break; }
-        rows.push(row);
-        size += row.length + 1;
-      }
-      const cut = rows.length < units.length ? `\nTRUNCATED: only the first ${rows.length} of ${units.length} units fit.` : "";
-      add(`BuildingStart – ${family.size ? `${familyTag} units` : s.sheet}${loc && locNote.includes(" on ") ? ` (${loc.label})` : ""}`, `${head}\n${rows.join("\n")}${cut}`);
-    }
-  }
-
-  // 2b. Tolerance or amps question that names no unit or type: Hitlist's check across all equipment.
-  if (!tagged.length && !typeSheets.length && values && (TOL_Q.test(q) || AMP_Q.test(q))) {
-    const r = toleranceReport(values, results, tol);
-    const ampsOnly = AMP_Q.test(q) && !TOL_Q.test(q);
-    const lines = [`OUT OF TOLERANCE, calculated by Hitlist across all equipment (use as given; don't recalculate). ` +
-      `Airflow/water: percent of design vs the allowed range. Motor amps: flagged when the highest actual is above design ` +
-      `(design = amps × number of motors). Heater amps: always ±10% of design.`];
-    for (const g of r.groups) {
-      const rows = g.rows.map((x) => ({ ...x, items: x.items.filter((i) => !ampsOnly || i.kind !== "flow") })).filter((x) => x.items.length);
-      lines.push(`${g.sheet}: ${g.checked} units checked, ${rows.length} with readings outside${g.unchecked.length ? `, ${g.unchecked.length} can't be checked yet (no actual reading)` : ""}`);
-      for (const x of rows) lines.push(`  ${x.unit}: ${x.items.map((i) => i.kind === "amps"
-        ? `${i.reading} ${i.actual} A over design ${i.design} A${i.note ? ` (${i.note})` : ""}`
-        : i.kind === "heater" ? `${i.reading} ${i.actual} A = ${i.pct} of design ${i.design} A (allowed ${i.allowed})` : `${i.reading} ${i.pct} of design (design ${i.design}, actual ${i.actual}, allowed ${i.allowed})`).join("; ")}`);
-    }
-    let text = lines.join("\n");
-    if (chars + text.length > MAX_CHARS) { text = text.slice(0, Math.max(0, MAX_CHARS - chars)) + "\nTRUNCATED"; tooBig = true; }
-    add("BuildingStart – out of tolerance", text);
-  }
-
-  // 3. Always: the Hitlist progress per type (what's complete and what's left).
-  if (results?.types.length) {
-    let text = progressBlock(results, focus, loc);
-    if (chars + text.length > MAX_CHARS + 20_000) {
-      text = progressBlock(results, new Set(), null) + "\nTRUNCATED: the lists of unfinished units were too long to include.";
-      tooBig = true;
-    }
-    add("Hitlist progress", text);
-  }
-  return { blocks, tooBig };
 }

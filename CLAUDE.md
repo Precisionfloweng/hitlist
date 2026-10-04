@@ -31,23 +31,25 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   queues one. Projects columns dropbox_id, dropbox_path (pasted path or found), docs_updated, docs_status.
 - Last punch list sent = newest file (client_modified) in the project's "Deficiency Reports" folder (names/dates only):
   Projects punch_sent/punch_file, updated by docs jobs and by `refresh_punch_lists` right before the Monday email.
-- Web `lib/docs.ts`: keyword/tag page search, only the best pages go to Claude; answers cite [S#] file+page;
-  history in Blob docs-qa/. File names/contents are client data: never in the repo or tests.
+- Web `lib/docs.ts`: storage, keyword/tag page search (`findPages`), history in Blob docs-qa/ (an Answer may hold
+  `replies`). `lib/agent.ts`: the AI answers with lookup tools (equipment_index, find_units, unit_readings,
+  tolerance_check, progress, search_documents, then a forced "answer"), max 8 rounds / ~200 s; replies get the
+  thread's earlier Q/A. POST /api/docs action "ask" (optional replyTo) streams NDJSON {step}…{entry}; maxDuration 300
+  (Fluid compute). Sources: [S#] pages, [B#] BuildingStart/Hitlist lookups. File names/contents are client data: never in the repo or tests.
 
 ## BuildingStart values (Search the Documents)
 - After each sync `runner.send_project_values` packs every equipment sheet (`hitlist/values.py`: unit name, path, non-blank
   values) gzipped to `POST /api/worker/values/{key}` → Blob `values/<key>`. Skipped when the fingerprint
   (results/values/<key>.json) is unchanged; the website replies with units/values counted and they must match.
   Projects columns values_updated, values_status. CLI `hitlist values KEY` re-sends from the last export.
-- Web `lib/bsvalues.ts`: `bsExcerpts` gives [B#] excerpts: named units (all fields + missing required fields),
-  else a table per type named in the question (columns picked from the question's words, floor/level filter on
-  Area/Zone/path), and always the Hitlist progress per type counted in code. Tolerance checks are calculated in
+- Web `lib/bsvalues.ts`: storage plus helpers for the AI's lookup tools (columns, locations, progress per type,
+  counted in code). Tolerance checks are calculated in
   `lib/tolCheck.ts` (Design/Actual airflow and water pairs → category → % off, OUTSIDE/within; amps via a per-sheet AMP_MAP: motor
   amps flagged when the highest phase is above design (design × "Number of Motors/Fans", else "Fan Wall Array" 3x3 → 9, on AHU/RTU/MAU);
   heater amps (EDH, unit heaters: electric heat only, no motor amps) fixed ±10%, phase furthest from design), shown as a check column
   plus a TOLERANCE CHECK summary; the AI must not recalculate. AI Tools "Suggestions" also runs `lib/reports.ts`
-  (Out of tolerance, What's left to do) in code via POST /api/docs action "report"; not saved. The answer form has a hidden "working" field. Over 60k chars → TRUNCATED, the AI
-  asks to narrow it. `checkValues` cross-checks against the results (shown on the AI Tools card).
+  (Out of tolerance, What's left to do) in code via POST /api/docs action "report"; not saved. The answer form has a hidden "working" field. Lookup results over 40k chars →
+  TRUNCATED. `checkValues` cross-checks against the results (shown on the AI Tools card).
 
 ## Tolerances
 - `web/lib/toleranceCats.ts`: groups AHUs/RTUs (supply, return, OA), Fans and Outlets & Inlets (supply, return, exhaust),

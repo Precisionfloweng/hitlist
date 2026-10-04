@@ -411,6 +411,11 @@ select.docs-suggest option { color: var(--ink); font-weight: 400; }
 .report-type { padding: 6px 0; border-top: 1px solid var(--line, #e5e7eb); font-size: 14px; }
 .report-type.done { color: var(--muted); }
 .report-type-body { padding: 6px 0 4px 18px; display: grid; gap: 6px; }
+.docs-step { font-size: 13px; color: var(--brand); }
+.docs-turn { margin-top: 14px; padding-top: 10px; border-top: 1px dashed #c9d8ea; }
+.docs-turn-q { font-weight: 600; margin-bottom: 6px; }
+.docs-reply { margin-top: 12px; display: grid; gap: 6px; justify-items: start; }
+.docs-reply textarea { width: 100%; }
 .docs-bs { font-size: 13px; margin-top: 4px; }
 .docs-bs.problem { color: #9a3412; }
 .docs-folder { font-weight: 600; word-break: break-word; }

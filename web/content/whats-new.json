@@ -2,6 +2,12 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "Search the Documents: a real conversation",
+  "text": "The AI now looks up what it needs itself (equipment list, readings, tolerance check, documents), asks you when a question is unclear, and you can reply to an answer to follow up."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "Search the Documents reads punch lists",
   "text": "Search the Documents now reads the Deficiency Reports folder (every punch list sent) instead of TAB Plan, so you can ask things like when an item was first reported."
  },
