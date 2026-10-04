@@ -92,7 +92,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               <div className="type-cards">
                 {[...results.types].sort(byTypeOrder).map((t) => {
                   const done = t.summary.units_complete, n = t.summary.units;
-                  const pctDone = n ? (100 * done) / n : 0;
+                  const pctDone = Math.min(100, t.summary.fields_pct);   // the bar follows the % (required fields filled)
                   return (
                     <Link key={t.key} href={eqHref(t.key)} className={`type-card${pctDone >= 100 ? " full" : ""}`} title={`${t.name}: ${done} of ${n} units fully complete, ${Math.round(t.summary.fields_pct)}% of required fields filled`}>
                       <span className="tc-name">{t.name}</span>
