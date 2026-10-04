@@ -157,7 +157,7 @@ export default async function HelpPage() {
           <ul>
             <li>When someone asks to be added, type their name, position, company, trade and email into <b>Add a contact</b>.</li>
             <li>Set each person to <b>To</b> or <b>Cc</b>. PFE staff start on <b>Cc</b>, everyone else on <b>To</b>; tap to switch.</li>
-            <li><b>✉ New email</b> opens a new email in your own mail app (Outlook) with everyone ticked on the To and Cc lines and the project name in the subject. Attach the deficiency list and send it as usual. It goes out from your account and shows in your Sent Items.</li>
+            <li><b>✉ New email</b> (in the list's header row, far right) opens a new email in your own mail app (Outlook) with everyone ticked on the To and Cc lines and the project name in the subject. Attach the deficiency list and send it as usual. It goes out from your account and shows in your Sent Items.</li>
             <li>Untick <b>On list</b> to leave someone off for now without deleting them. <b>✕</b> removes them for good.</li>
             <li><b>Added</b> shows when each person joined the list, so you can see who&apos;s new since your last send.</li>
             <li>On an iPad, set Outlook as your email app first: <b>Settings → Apps → Default Apps → Email</b>.</li>

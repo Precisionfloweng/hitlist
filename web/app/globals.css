@@ -341,7 +341,8 @@ button.linkish { border: 0; background: none; padding: 4px 2px; color: var(--mut
 .tocc button + button { border-left: 1px solid var(--line); }
 .tocc button.on { background: var(--brand); color: #fff; opacity: 1; }
 .tocc button:disabled:not(.on) { opacity: .6; }
-.contacts-top .btn { text-decoration: none; }
+.contacts-email-th { text-align: right; white-space: nowrap; }
+.contacts-email-th .btn { text-decoration: none; text-transform: none; letter-spacing: 0; font-size: 14px; }
 .contacts-actions { white-space: nowrap; text-align: right; }
 .contacts-actions button { padding: 4px 10px; margin-left: 4px; }
 .contacts-off td { color: var(--muted); }

@@ -58,16 +58,6 @@ export default function ContactsList({ project, subject, initial, canEdit }:
 
   return (
     <>
-      <div className="card contacts-top">
-        <div>
-          <b>To:</b> {to.length} <span className="muted">·</span> <b>Cc:</b> {cc.length}
-          {list.length > onList.length && <span className="muted"> ({list.length - onList.length} unticked, left off)</span>}
-          <div className="muted" style={{ fontSize: 13 }}>Opens a new email in your mail app with everyone ticked on the To and Cc lines.</div>
-        </div>
-        {onList.length ? <a className="btn primary" href={mailto}>✉ New email</a>
-          : <button className="primary" disabled>✉ New email</button>}
-      </div>
-
       {canEdit && (
         <form className="card contacts-add" onSubmit={(e) => { e.preventDefault(); send({ action: "add", contact: draft }, () => setDraft(EMPTY)); }}>
           <b>Add a contact</b>
@@ -90,7 +80,12 @@ export default function ContactsList({ project, subject, initial, canEdit }:
         ) : (
           <table className="proj-table contacts-table">
             <thead>
-              <tr><th title="Included in New email">On list</th><th>To / Cc</th><th>Name</th><th>Position</th><th>Company</th><th>Trade</th><th>Email</th><th>Added</th>{canEdit && <th />}</tr>
+              <tr><th title="Included in New email">On list</th><th>To / Cc</th><th>Name</th><th>Position</th><th>Company</th><th>Trade</th><th>Email</th><th>Added</th>
+                <th className="contacts-email-th">
+                  {onList.length
+                    ? <a className="btn primary" href={mailto} title={`Opens a new email in your mail app: To ${to.length}, Cc ${cc.length}${list.length > onList.length ? ` (${list.length - onList.length} unticked, left off)` : ""}`}>✉ New email</a>
+                    : <button className="primary" disabled title="Tick On list for the people to email">✉ New email</button>}
+                </th></tr>
             </thead>
             <tbody>
               {list.map((c) => editing?.id === c.id ? (
@@ -119,6 +114,7 @@ export default function ContactsList({ project, subject, initial, canEdit }:
                   <td>{c.trade}</td>
                   <td><a href={`mailto:${c.email}`}>{c.email}</a></td>
                   <td className="muted" title={c.addedBy ? `Added by ${c.addedBy}` : undefined}>{added(c.addedAt)}</td>
+                  {!canEdit && <td />}
                   {canEdit && (
                     <td className="contacts-actions">
                       {removing === c.id ? (
