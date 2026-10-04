@@ -1,7 +1,7 @@
 // Out-of-tolerance check, done in code (exact) rather than by the AI: for each Design/Actual pair on a unit
 // (e.g. "Design Max Airflow" / "Actual Max Airflow"), percent off = (actual − design) / design × 100, against the
 // project's tolerance for that kind of reading (or the company default). Only airflow and water-flow pairs
-// have tolerances; motor and heater amps are flagged when above design by any amount (see the end);
+// have tolerances; motor amps are flagged when above design by any amount, heater amps outside ±10% (see the end);
 // temperatures, pressures, volts etc. are not checked.
 import { categoriesFor, fmtTol, type Tol, type Tolerances } from "./toleranceCats";
 
@@ -91,18 +91,24 @@ export function nearness(c: PairCheck): number {
   return limit > 0 ? Math.abs(c.pct) / limit : c.pct === 0 ? 0 : Infinity;
 }
 
-// ---- motor (and electric heat) amps: flagged when the highest actual reading is above design by any amount ----
-export type AmpCheck = { label: string; design: number; actual: number | null; over: boolean | null };
+// ---- amps -------------------------------------------------------------------------------------------------
+// Motor amps: flagged when the highest actual phase is above design by any amount. When a unit has several motors
+// (a fan array: "Number of Motors/Fans"), design = per-motor amps × motors, since the reading is the total.
+// Heater amps (electric heat, unit heater elements): always ±10% of design; the phase furthest from design is used.
+export type AmpCheck = { label: string; heater: boolean; design: number; perMotor: number | null; motors: number;
+  actual: number | null; pct: number | null; over: boolean | null };
+export const HEATER_TOL: Tol = { plus: "10", minus: "10" };
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 const T123 = (prefix: string) => [1, 2, 3].map((n) => `${prefix}${n}`);
-/** BuildingStart names the amp columns differently on each sheet, so each sheet has its own map
- *  (design column, actual columns; the highest actual is compared). Keys and columns are compared without
- *  case, spaces or punctuation. */
-const AMP_MAP: Record<string, { label: string; design: string; actual: string[] }[]> = {
-  airhandlingunit: [{ label: "Motor Amps", design: "Amps", actual: T123("Motor Amps T") }],
-  rooftopunit: [{ label: "Motor Amps", design: "Amps", actual: T123("Motor Amps T") }],
-  makeupairunit: [{ label: "Motor Amps", design: "Amps", actual: ["Motor Amps T1"] }],
+const MOTORS = ["Number of Motors/Fans", "No. of Motors/fans", "Number of Motors", "No. of Motors", "# of Motors"];
+type AmpDef = { label: string; design: string; actual: string[]; heater?: boolean; count?: string[] };
+/** BuildingStart names the amp columns differently on each sheet, so each sheet has its own map. Keys and
+ *  columns are compared without case, spaces or punctuation. */
+const AMP_MAP: Record<string, AmpDef[]> = {
+  airhandlingunit: [{ label: "Motor Amps", design: "Amps", actual: T123("Motor Amps T"), count: MOTORS }],
+  rooftopunit: [{ label: "Motor Amps", design: "Amps", actual: T123("Motor Amps T"), count: MOTORS }],
+  makeupairunit: [{ label: "Motor Amps", design: "Amps", actual: ["Motor Amps T1"], count: MOTORS }],
   fanunit: [{ label: "Motor Amps", design: "Motor FL Amps", actual: T123("Motor Amps T") }],
   toiletexhaustfan: [{ label: "Motor Amps", design: "Motor FL Amps", actual: ["Motor Amps T1"] }],
   airapparatusfan: [{ label: "Motor Amps", design: "Motor FL Amps", actual: T123("Motor Amps T") }],
@@ -113,11 +119,11 @@ const AMP_MAP: Record<string, { label: string; design: string; actual: string[] 
   hydronicpump: [{ label: "Motor Amps", design: "Motor F.L. Amps", actual: T123("Motor Amps T") }],
   coolingtower: [{ label: "Motor Amps", design: "Motor F.L. Amps", actual: ["Actual Amps T1"] }],
   unitheater: [{ label: "Motor Amps", design: "Motor Amps", actual: T123("Amps ") },
-    { label: "Heater Amps", design: "Dsgn. Amps", actual: T123("Amps ") }],
-  electriccoil: [{ label: "Heater Amps", design: "EDH Design Amps", actual: T123("EDH Act. Amps ") }],
+    { label: "Heater Amps", design: "Dsgn. Amps", actual: T123("Amps "), heater: true }],
+  electriccoil: [{ label: "Heater Amps", design: "EDH Design Amps", actual: T123("EDH Act. Amps "), heater: true }],
 };
 
-export function ampChecksFor(sheet: string): { label: string; design: string; actual: string[] }[] {
+export function ampChecksFor(sheet: string): AmpDef[] {
   return AMP_MAP[norm(sheet)] ?? [];
 }
 
@@ -125,18 +131,38 @@ export function ampChecksFor(sheet: string): { label: string; design: string; ac
 export function checkAmps(sheet: string, v: Record<string, unknown>): AmpCheck[] {
   const byNorm = new Map(Object.entries(v).map(([h, x]) => [norm(h), x]));
   const out: AmpCheck[] = [];
-  for (const m of ampChecksFor(sheet)) {
-    const design = num(byNorm.get(norm(m.design)));
-    if (design === null || design <= 0) continue;
+  const defs = ampChecksFor(sheet);
+  // A unit heater has one set of amp readings: with a heater design (electric heat) they're the heater's, else the motor's.
+  const heaterDesigned = defs.some((m) => m.heater && (num(byNorm.get(norm(m.design))) ?? 0) > 0);
+  for (const m of defs) {
+    if (!m.heater && heaterDesigned && defs.some((d) => d.heater && d.actual.join() === m.actual.join())) continue;
+    const base = num(byNorm.get(norm(m.design)));
+    if (base === null || base <= 0) continue;
     const readings = m.actual.map((a) => num(byNorm.get(norm(a)))).filter((x): x is number => x !== null);
+    if (m.heater) {
+      const actual = readings.length ? readings.reduce((a, b) => (Math.abs(b - base) > Math.abs(a - base) ? b : a)) : null;
+      const pct = actual === null ? null : Math.round(((actual - base) / base) * 1000) / 10;
+      out.push({ label: m.label, heater: true, design: base, perMotor: null, motors: 1, actual, pct,
+        over: pct === null ? null : Math.abs(pct) > 10 + 1e-9 });
+      continue;
+    }
+    const counted = (m.count ?? []).map((c) => num(byNorm.get(norm(c)))).find((n) => n !== null && n !== undefined);
+    const motors = counted && counted > 1 ? Math.round(counted) : 1;
+    const design = Math.round(base * motors * 100) / 100;
     const actual = readings.length ? Math.max(...readings) : null;
-    out.push({ label: m.label, design, actual, over: actual === null ? null : actual > design + 1e-9 });
+    out.push({ label: m.label, heater: false, design, perMotor: motors > 1 ? base : null, motors, actual,
+      pct: actual === null ? null : Math.round(((actual - design) / design) * 1000) / 10,
+      over: actual === null ? null : actual > design + 1e-9 });
   }
   return out;
 }
 
-/** "15.1 A, over design 14.2 A" / "13.8 A, within design 14.2 A" / "no reading". */
+/** The design as text: "39.6 A (9 motors × 4.4 A)" or "14.2 A". */
+export const ampDesign = (c: AmpCheck) => `${c.design} A${c.perMotor ? ` (${c.motors} motors × ${c.perMotor} A)` : ""}`;
+
+/** For the AI: "15.1 A, OVER DESIGN 14.2 A" / "21.0 A = 105% of design, within 90–110% (heater amps)" / "no reading". */
 export function describeAmps(c: AmpCheck): string {
   if (c.actual === null) return "no reading";
-  return `${c.actual} A, ${c.over ? "OVER DESIGN" : "within"} ${c.design} A`;
+  if (c.heater) return `${c.actual} A = ${fmtPct(c.pct!, HEATER_TOL)} of design ${c.design} A, ${c.over ? "OUTSIDE" : "within"} 90–110% (heater amps are always ±10%)`;
+  return `${c.actual} A, ${c.over ? "OVER DESIGN" : "within design"} ${ampDesign(c)}`;
 }

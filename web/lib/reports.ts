@@ -4,12 +4,12 @@
 import type { BsValues } from "./bsvalues";
 import type { Results } from "./results";
 import type { Tolerances } from "./toleranceCats";
-import { ampChecksFor, checkAmps, checkUnit, fmtPct, tolerancePairs, tolRange } from "./tolCheck";
+import { ampChecksFor, checkAmps, checkUnit, fmtPct, HEATER_TOL, tolerancePairs, tolRange } from "./tolCheck";
 import { byTypeOrder } from "./typeOrder";
 
 /** One reading outside tolerance (flow: % of design vs the allowed range; amps: above design by any amount). */
-export type OutItem = { reading: string; design: number; actual: number; kind: "flow" | "amps";
-  pct: string; allowed: string; isDefault: boolean };
+export type OutItem = { reading: string; design: number; actual: number; kind: "flow" | "amps" | "heater";
+  pct: string; allowed: string; isDefault: boolean; note?: string };
 /** One unit, with everything on it that's out of tolerance together. */
 export type OutRow = { unit: string; typeKey: string | null; items: OutItem[] };
 export type OutGroup = { sheet: string; checked: number; rows: OutRow[];
@@ -51,8 +51,11 @@ export function toleranceReport(values: BsValues, results: Results | null, tol: 
       const items: OutItem[] = [
         ...flows.filter((c) => c.outside).map((c) => ({ reading: c.pair, design: c.design, actual: c.actual!, kind: "flow" as const,
           pct: fmtPct(c.pct!, c.tol), allowed: tolRange(c.tol), isDefault: !!c.tol.isDefault })),
-        ...amps.filter((c) => c.over).map((c) => ({ reading: c.label, design: c.design, actual: c.actual!, kind: "amps" as const,
-          pct: "-", allowed: "below design", isDefault: false })),
+        ...amps.filter((c) => c.over).map((c) => c.heater
+          ? { reading: c.label, design: c.design, actual: c.actual!, kind: "heater" as const,
+              pct: fmtPct(c.pct!, HEATER_TOL), allowed: tolRange(HEATER_TOL), isDefault: false }
+          : { reading: c.label, design: c.design, actual: c.actual!, kind: "amps" as const, pct: "-", allowed: "below design",
+              isDefault: false, note: c.perMotor ? `${c.motors} motors × ${c.perMotor} A` : undefined }),
       ];
       if (items.length) g.rows.push({ unit: u.name, typeKey, items });
     }

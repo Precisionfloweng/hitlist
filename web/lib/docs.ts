@@ -215,8 +215,9 @@ Rules:
   List only the units marked OUTSIDE (with design, actual and percent of design); if there are none, say so, and you
   may name the ones closest to the limit as a separate line. Give readings as percent of design the way TAB reports
   do and the check shows them (e.g. "108% of design", allowed "90–110%"), never as "+8%".
-- Amps: a motor or heater is flagged when its highest actual amp reading is above design by any amount. Use the
-  "Amps check" lines / columns as given. When one unit has several problems, list them together under that unit.
+- Amps: motor amps are flagged when the highest actual reading is above design by any amount (design = nameplate
+  amps × number of motors on fan arrays); heater amps are always ±10% of design. Use the "Amps check" lines /
+  columns as given. When one unit has several problems, list them together under that unit.
 - If an excerpt says TRUNCATED, or the question covers more units than the excerpts hold, say plainly that the
   question is too broad to answer completely, answer for what's shown, and suggest a narrower question (one
   equipment type, one floor, or one unit).

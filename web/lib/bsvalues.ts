@@ -238,7 +238,7 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
       r ? (miss.length ? `Hitlist: required fields still missing: ${miss.join(", ")}` : "Hitlist: all required fields filled in") : "",
       tl ? `Project tolerance: ${tl}` : "",
       ...checks.map((c) => `Tolerance check (calculated by Hitlist): ${c.pair}: design ${c.design}, actual ${c.actual ?? "not entered"} = ${describe(c)}`),
-      ...checkAmps(sheet.sheet, unit.v).map((c) => `Amps check (calculated by Hitlist; flagged if the highest actual is above design): ${c.label}: ${describeAmps(c)}`),
+      ...checkAmps(sheet.sheet, unit.v).map((c) => `Amps check (calculated by Hitlist): ${c.label}: ${describeAmps(c)}`),
     ].filter(Boolean).join("\n");
     add(`BuildingStart – ${unit.name}`, text);
   }
@@ -281,9 +281,10 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
         const list = units.flatMap((u) => amps.get(u)!.filter((c) => c.label === label).map((c) => ({ u, c })));
         const read = list.filter((x) => x.c.actual !== null);
         const over = read.filter((x) => x.c.over);
-        summary.push(`- ${label} (flagged if the highest actual is above design by any amount): ${read.length} with a reading, ` +
-          `${over.length} OVER DESIGN, ${list.length - read.length} with no actual yet.` +
-          `\n  Over design: ${over.length ? over.map((x) => `${x.u.name} ${x.c.actual} A (design ${x.c.design} A)`).join("; ") : "none"}`);
+        const heater = list.some((x) => x.c.heater);
+        summary.push(`- ${label} (${heater ? "heater amps: always ±10% of design" : "flagged if the highest actual is above design by any amount; design = amps × number of motors"}): ` +
+          `${read.length} with a reading, ${over.length} ${heater ? "OUTSIDE" : "OVER DESIGN"}, ${list.length - read.length} with no actual yet.` +
+          `\n  ${heater ? "Outside" : "Over design"}: ${over.length ? over.map((x) => `${x.u.name} ${describeAmps(x.c)}`).join("; ") : "none"}`);
       }
       const tl = tolLine(s.sheet, "", tol);
       const head = `${s.sheet}: ${units.length} unit${units.length === 1 ? "" : "s"}${locNote}. Columns: Unit | ${[...cols, ...checkCols.map((n) => `${n} check`), ...ampCols.map((n) => `${n} check`)].join(" | ")}` +
@@ -311,12 +312,14 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
     const r = toleranceReport(values, results, tol);
     const ampsOnly = AMP_Q.test(q) && !TOL_Q.test(q);
     const lines = [`OUT OF TOLERANCE, calculated by Hitlist across all equipment (use as given; don't recalculate). ` +
-      `Airflow/water: percent of design vs the allowed range. Amps: flagged when the highest actual is above design.`];
+      `Airflow/water: percent of design vs the allowed range. Motor amps: flagged when the highest actual is above design ` +
+      `(design = amps × number of motors). Heater amps: always ±10% of design.`];
     for (const g of r.groups) {
-      const rows = g.rows.map((x) => ({ ...x, items: x.items.filter((i) => !ampsOnly || i.kind === "amps") })).filter((x) => x.items.length);
+      const rows = g.rows.map((x) => ({ ...x, items: x.items.filter((i) => !ampsOnly || i.kind !== "flow") })).filter((x) => x.items.length);
       lines.push(`${g.sheet}: ${g.checked} units checked, ${rows.length} with readings outside${g.unchecked.length ? `, ${g.unchecked.length} can't be checked yet (no actual reading)` : ""}`);
       for (const x of rows) lines.push(`  ${x.unit}: ${x.items.map((i) => i.kind === "amps"
-        ? `${i.reading} ${i.actual} A over design ${i.design} A` : `${i.reading} ${i.pct} of design (design ${i.design}, actual ${i.actual}, allowed ${i.allowed})`).join("; ")}`);
+        ? `${i.reading} ${i.actual} A over design ${i.design} A${i.note ? ` (${i.note})` : ""}`
+        : i.kind === "heater" ? `${i.reading} ${i.actual} A = ${i.pct} of design ${i.design} A (allowed ${i.allowed})` : `${i.reading} ${i.pct} of design (design ${i.design}, actual ${i.actual}, allowed ${i.allowed})`).join("; ")}`);
     }
     let text = lines.join("\n");
     if (chars + text.length > MAX_CHARS) { text = text.slice(0, Math.max(0, MAX_CHARS - chars)) + "\nTRUNCATED"; tooBig = true; }
