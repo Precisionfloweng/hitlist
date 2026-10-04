@@ -154,11 +154,11 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
 
       <section className="eq-main">
         <div className="eq-tools">
-          <input type="search" placeholder="Find a unit or area" value={q} onChange={(e) => setQ(e.target.value)} />
           <div className="seg" role="group">
             <button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>All units ({t.units.length})</button>
             <button className={filter === "missing" ? "on" : ""} onClick={() => setFilter("missing")}>Needs data ({incomplete})</button>
           </div>
+          <input type="search" placeholder="Find a unit or area" value={q} onChange={(e) => setQ(e.target.value)} />
           <div className="legend" title="Optional fields have grey headings. Hover or tap and hold a mark to see the field name.">
             <span><span className="ck-key p">✓</span>Filled</span>
             <span><span className="ck-key r"><span>✕</span></span>Required missing</span>
