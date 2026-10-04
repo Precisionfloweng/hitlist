@@ -1,6 +1,6 @@
-// The two Suggestions on AI Tools worked out in code (no AI, nothing saved): Out of tolerance (every unit's
-// Design/Actual airflow and water pairs against the project's tolerances) and What's left to do (from the last
-// sync's Hitlist results). Both are calculated fresh each time from the latest data.
+// The Suggestions on AI Tools worked out in code (no AI, nothing saved): Out of tolerance (every unit's
+// Design/Actual airflow and water pairs and amps against the project's tolerances), What's left to do (from the
+// last sync's Hitlist results) and Design values – BuildingStart. All calculated fresh from the latest data.
 import type { BsValues } from "./bsvalues";
 import type { Results } from "./results";
 import type { Tolerances } from "./toleranceCats";
@@ -83,4 +83,33 @@ export function leftReport(results: Results): LeftReport {
   }).sort(byTypeOrder);
   return { kind: "left", synced: results.generated_at, groups,
     units: groups.reduce((n, g) => n + g.units, 0), complete: groups.reduce((n, g) => n + g.complete, 0) };
+}
+
+// ---- Design values – BuildingStart: the unit's design / nameplate values and its sub-items (coils, heat…) ----
+export type DesignSection = { name: string; sheet: string; fields: [string, string][] };
+export type DesignReport = { kind: "design"; synced: string; unit: string; sections: DesignSection[] };
+
+/** Readings (not design): actual values, phase readings, percentages, dates, notes, location. */
+const NOT_DESIGN = [/^(actual|act\.?)\s/i, /\bact\.?\s/i, /\bT[123](\b|-T[123])/i, /\bamps?\s*[123]$/i, /^%/, /final|measured|reading|vfd display/i,
+  /^completed$/i, /date|comment|note/i, /^(area|zone)$/i];
+const isDesignField = (h: string) => !NOT_DESIGN.some((re) => re.test(h));
+const squashName = (s: string) => s.toLowerCase().replace(/[\s_-]+/g, "");
+
+export function designReport(values: BsValues, unitName: string): DesignReport | null {
+  let found: { sheet: string; unit: BsValues["sheets"][number]["units"][number] } | null = null;
+  for (const s of values.sheets) for (const u of s.units) {
+    if (!found && squashName(u.name) === squashName(unitName)) found = { sheet: s.sheet, unit: u };
+  }
+  if (!found) return null;
+  const base = found.unit.path || found.unit.name;
+  const section = (sheet: string, u: { name: string; v: Record<string, unknown> }): DesignSection => ({
+    name: u.name, sheet,
+    fields: Object.entries(u.v).filter(([h]) => isDesignField(h)).map(([h, v]) => [h, typeof v === "boolean" ? (v ? "yes" : "no") : String(v)]),
+  });
+  const subs: DesignSection[] = [];
+  for (const s of values.sheets) for (const u of s.units) {
+    if (u !== found.unit && u.path && u.path.toLowerCase().startsWith(base.toLowerCase() + "/")) subs.push(section(s.sheet, u));
+  }
+  return { kind: "design", synced: values.synced_at, unit: found.unit.name,
+    sections: [section(found.sheet, found.unit), ...subs].filter((x) => x.fields.length) };
 }

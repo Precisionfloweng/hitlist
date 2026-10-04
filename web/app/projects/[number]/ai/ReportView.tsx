@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
-import type { LeftReport, ToleranceReport } from "@/lib/reports";
+import type { DesignReport, LeftReport, ToleranceReport } from "@/lib/reports";
 
 const day = (iso: string) => {
-  const d = new Date(iso);
+  const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T12:00:00` : iso);   // a bare date is that day, not UTC midnight
   return isNaN(+d) ? "" : d.toLocaleDateString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric" });
 };
 const plural = (n: number, word: string) => `${n.toLocaleString()} ${word}${n === 1 ? "" : "s"}`;
@@ -15,11 +15,12 @@ function UnitLink({ project, unit, typeKey }: { project: string; unit: string; t
 
 /** Out of tolerance / What's left to do, worked out by Hitlist from the last sync (not saved). */
 export default function ReportView({ report, project, onClose }:
-  { report: ToleranceReport | LeftReport; project: string; onClose: () => void }) {
+  { report: ToleranceReport | LeftReport | DesignReport; project: string; onClose: () => void }) {
   return (
     <div className="docs-answer report">
       <button type="button" className="ai-close" onClick={onClose} title="Close" aria-label="Close">✕</button>
-      {report.kind === "tolerance" ? <Tolerance r={report} project={project} /> : <Left r={report} project={project} />}
+      {report.kind === "tolerance" ? <Tolerance r={report} project={project} />
+        : report.kind === "design" ? <Design r={report} /> : <Left r={report} project={project} />}
     </div>
   );
 }
@@ -103,6 +104,26 @@ function Left({ r, project }: { r: LeftReport; project: string }) {
           </details>
         );
       })}
+    </>
+  );
+}
+
+function Design({ r }: { r: DesignReport }) {
+  return (
+    <>
+      <div className="report-head">
+        <b>Design values – {r.unit}</b>
+        <span className="muted"> · as entered in BuildingStart, synced {day(r.synced)}</span>
+      </div>
+      {r.sections.map((sec) => (
+        <div key={sec.name + sec.sheet} className="report-group">
+          <div className="report-group-name">{sec.name} <span className="muted">· {sec.sheet}</span></div>
+          <table className="report-table design">
+            <tbody>{sec.fields.map(([k, v]) => <tr key={k}><td className="muted">{k}</td><td>{v}</td></tr>)}</tbody>
+          </table>
+        </div>
+      ))}
+      {!r.sections.length && <div className="muted">No design values entered for {r.unit} yet.</div>}
     </>
   );
 }

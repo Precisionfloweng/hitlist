@@ -2,11 +2,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fmtTol, normalizeTolerances, TOLERANCE_CATS } from "@/lib/toleranceCats";
-import type { LeftReport, ToleranceReport } from "@/lib/reports";
+import type { DesignReport, LeftReport, ToleranceReport } from "@/lib/reports";
 import ReportView from "./ReportView";
 
 type Source = { id: string; category: string; path: string; name: string; page: number; modified: string };
 type Answer = { question: string; answer: string; found: boolean; sources: Source[]; replies?: Answer[];
+  table?: { columns: string[]; rows: string[][] };
   tolerances: Record<string, unknown> | null; at: string; by: string };
 type Job = { status: "queued" | "running" | "done" | "failed"; step: string; ahead: number } | null;
 type BsCheck = { units: number; values: number; types: number; synced: string; missing: number; ok: boolean; problem: string };
@@ -26,6 +27,20 @@ const fileDate = (s: string) => {
   return isNaN(+d) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 };
 const showPath = (p: string) => p.split("/").filter(Boolean).join(" / ");
+
+function AnswerTable({ t }: { t?: { columns: string[]; rows: string[][] } }) {
+  if (!t || !t.rows.length) return null;
+  return (
+    <div className="docs-table-wrap">
+      <table className="docs-table">
+        <thead><tr>{t.columns.map((c, i) => <th key={i}>{c}</th>)}</tr></thead>
+        <tbody>{t.rows.map((r, i) => (
+          <tr key={i}>{r.map((c, j) => <td key={j} className={/mismatch|≠|differs/i.test(c) ? "bad" : /not found/i.test(c) ? "muted" : ""}>{c}</td>)}</tr>
+        ))}</tbody>
+      </table>
+    </div>
+  );
+}
 
 function Sources({ list }: { list: Source[] }) {
   if (!list.length) return null;
@@ -67,11 +82,13 @@ export function AnswerView({ a, project, onClose, saved = false, onReply, busy }
             : <button className="primary" onClick={fillTolerances}>Use these tolerances</button>}
         </div>
       )}
+      <AnswerTable t={a.table} />
       <Sources list={a.sources} />
       {(a.replies ?? []).map((r) => (
         <div key={r.at} className="docs-turn">
           <div className="docs-turn-q"><span className="muted">{r.by}, {when(r.at)}:</span> {r.question}</div>
           <div className={`docs-answer-text${r.found ? "" : " notfound"}`}>{r.answer}</div>
+          <AnswerTable t={r.table} />
           <Sources list={r.sources} />
         </div>
       ))}
@@ -98,8 +115,8 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   const [error, setError] = useState("");
   const [answer, setAnswer] = useState<Answer | null>(null);
   const unitBox = useRef<HTMLInputElement>(null);
-  const [needUnit, setNeedUnit] = useState(false);          // Design values picked with no unit: the box lights up
-  const [report, setReport] = useState<ToleranceReport | LeftReport | null>(null);   // Out of tolerance / What's left
+  const [needUnit, setNeedUnit] = useState("");             // a Design values pick waiting for a unit: the box lights up
+  const [report, setReport] = useState<ToleranceReport | LeftReport | DesignReport | null>(null);   // Out of tolerance / What's left
   const [answerSaved, setAnswerSaved] = useState(false);       // its tolerances were saved automatically
   const router = useRouter();
   const [changing, setChanging] = useState(false);
@@ -201,11 +218,12 @@ export default function DocsAsk({ project, units }: { project: string; units: st
   /** A pick from the Suggestions list. */
   async function suggest(v: string) {
     if (!v) return;
-    if (v === "design" && !unit.trim()) { setError(""); setNeedUnit(true); unitBox.current?.focus(); return; }
-    setNeedUnit(false);
-    if (v === "tolerance" || v === "left") {
+    const forUnit = v === "design_bs" || v.startsWith("dv_");
+    if (forUnit && !unit.trim()) { setError(""); setNeedUnit(v); unitBox.current?.focus(); return; }
+    setNeedUnit("");
+    if (v === "tolerance" || v === "left" || v === "design_bs") {
       setAnswer(null); setReport(null);
-      const data = await post({ action: "report", mode: v }, v);
+      const data = await post({ action: "report", mode: v === "design_bs" ? "design" : v, unit }, v);
       if (data?.report) setReport(data.report);
       return;
     }
@@ -316,15 +334,22 @@ export default function DocsAsk({ project, units }: { project: string; units: st
             <option value="">{busy && busy !== "ask" && busy !== "remove" && busy !== "update" && busy !== "folder" ? "Working…" : "Suggestions"}</option>
             <option value="tolerances" disabled={!ready}>✨ Tolerances (from the spec)</option>
             <option value="tab" disabled={!ready}>✨ TAB requirements</option>
-            <option value="design" disabled={!canAsk}>✨ Design values for the unit</option>
+            <optgroup label="Design values (unit in the box)">
+              <option value="design_bs" disabled={!bs || bs.units === 0}>BuildingStart</option>
+              <option value="dv_drawings" disabled={!ready}>✨ Drawings (schedules)</option>
+              <option value="dv_submittals" disabled={!ready}>✨ Submittals</option>
+              <option value="dv_compare" disabled={!canAsk}>✨ Compare all</option>
+            </optgroup>
+            <optgroup label="From the last sync">
             <option value="tolerance" disabled={!bs || bs.units === 0}>Out of tolerance</option>
             <option value="left">What&apos;s left to do</option>
+            </optgroup>
           </select>
           <span className="docs-design">
             <input ref={unitBox} list="docs-units" value={unit} className={needUnit ? "need-unit" : undefined}
-              onChange={(e) => setUnit(e.target.value)} onBlur={() => { if (!unit.trim()) setNeedUnit(false); }}
-              onKeyDown={(e) => { if (e.key === "Enter" && needUnit && unit.trim()) { e.preventDefault(); setNeedUnit(false); ask("design"); } }}
-              placeholder={needUnit ? "Type or pick the unit, then press Enter for its design values" : "Unit (optional, used by Ask and Design values)"} />
+              onChange={(e) => setUnit(e.target.value)} onBlur={() => { if (!unit.trim()) setNeedUnit(""); }}
+              onKeyDown={(e) => { if (e.key === "Enter" && needUnit && unit.trim()) { e.preventDefault(); suggest(needUnit); } }}
+              placeholder={needUnit ? "Type or pick the unit, then press Enter for its design values" : "Unit (used by Ask and Design values)"} />
             <datalist id="docs-units">{units.map((u) => <option key={u} value={u} />)}</datalist>
           </span>
         </div>

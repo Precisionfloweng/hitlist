@@ -5,7 +5,8 @@ import { loadTolerancesWithDefaults, saveTolerances } from "@/lib/tolerances";
 import { checkValues, loadValues } from "@/lib/bsvalues";
 import { loadResults } from "@/lib/results";
 import { leftReport, toleranceReport } from "@/lib/reports";
-import { loadHistory, loadManifest, QUICK, removeAnswer, saveHistory, writeHistory, type Answer, type Mode } from "@/lib/docs";
+import { loadHistory, loadManifest, MODE_FOLDERS, QUICK, removeAnswer, saveHistory, writeHistory, type Answer, type Mode } from "@/lib/docs";
+import { designReport } from "@/lib/reports";
 import { runAgent } from "@/lib/agent";
 
 export const maxDuration = 300;     // the AI may make several lookups (Fluid compute allows 300 s)
@@ -61,6 +62,15 @@ export async function POST(req: Request) {
     }
     if (body.action === "report") {           // Out of tolerance / What's left to do: worked out in code, not saved
       const results = await loadResults(project);
+      if (body.mode === "design") {             // the unit's design values as entered in BuildingStart (no AI)
+        const unit = (body.unit ?? "").trim();
+        if (!unit) return NextResponse.json({ error: "Put a unit in the unit box first." }, { status: 400 });
+        const values = await loadValues(project);
+        if (!values) return NextResponse.json({ error: "This project's BuildingStart data hasn't arrived yet. Press Sync, then try again." }, { status: 400 });
+        const report = designReport(values, unit);
+        if (!report) return NextResponse.json({ error: `No unit named ${unit} in the BuildingStart data. Check the tag (the unit box suggests names as you type).` }, { status: 404 });
+        return NextResponse.json({ ok: true, report });
+      }
       if (body.mode === "left") {
         if (!results) return NextResponse.json({ error: "Sync the project first." }, { status: 400 });
         return NextResponse.json({ ok: true, report: leftReport(results) });
@@ -71,7 +81,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, report: toleranceReport(values, results, tol) });
     }
     if (body.action === "ask") {
-      const mode: Mode = (["tolerances", "tab", "design"] as const).find((m) => m === body.mode) ?? "ask";
+      const mode: Mode = (["tolerances", "tab", "design", "dv_drawings", "dv_submittals", "dv_compare"] as const).find((m) => m === body.mode) ?? "ask";
+      if (mode.startsWith("dv_") && !(body.unit ?? "").trim()) return NextResponse.json({ error: "Put a unit in the unit box first." }, { status: 400 });
       const unit = (body.unit ?? "").trim().slice(0, 80);
       const typed = (body.question ?? "").trim();
       // A unit in the unit box goes with a typed question too, unless the question already names it.
@@ -93,7 +104,8 @@ export async function POST(req: Request) {
           const send = (o: unknown) => ctrl.enqueue(enc.encode(JSON.stringify(o) + "\n"));
           try {
             const thread = parent ? [parent, ...(parent.replies ?? [])] : [];
-            const answer = await runAgent(project, question, user.name || user.email, tol, thread, (step) => send({ step }));
+            const answer = await runAgent(project, question, user.name || user.email, tol, thread, (step) => send({ step }),
+              MODE_FOLDERS[mode]);
             let entry: Answer = answer;
             if (parent) {
               const now = await loadHistory(project);                 // fresh copy: someone may have asked meanwhile

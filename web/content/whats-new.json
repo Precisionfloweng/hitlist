@@ -2,6 +2,12 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "Design values by source",
+  "text": "Suggestions → Design values now lets you pick BuildingStart, Drawings, Submittals, or Compare all (a side-by-side table that flags mismatches), including the unit's coils."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "Search the Documents: a real conversation",
   "text": "The AI now looks up what it needs itself (equipment list, readings, tolerance check, documents), asks you when a question is unclear, and you can reply to an answer to follow up."
  },

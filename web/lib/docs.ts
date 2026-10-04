@@ -15,8 +15,14 @@ export type Manifest = { project: string; folder: { id: string; path: string; na
 export type Source = { id: string; category: string; path: string; name: string; page: number; modified: string };
 /** One question and its answer; a thread's follow-ups are in replies (each one an Answer too). */
 export type Answer = { question: string; answer: string; found: boolean; sources: Source[]; replies?: Answer[];
+  table?: { columns: string[]; rows: string[][] };
   tolerances: Tolerances | null; at: string; by: string };
-export type Mode = "ask" | "tolerances" | "tab" | "design";
+export type Mode = "ask" | "tolerances" | "tab" | "design" | "dv_drawings" | "dv_submittals" | "dv_compare";
+/** Folders a Suggestion may search (the AI's document search is limited to these). */
+export const MODE_FOLDERS: Partial<Record<Mode, string[]>> = {
+  dv_drawings: ["Drawings and Specs", "ASIs and RFIs", "Change Orders"],
+  dv_submittals: ["Submittal", "ASIs and RFIs", "Change Orders"],
+};
 
 const safe = (project: string) => project.replace(/[^A-Za-z0-9_.-]/g, "_");
 const dir = (project: string) => `docs/${safe(project)}/`;
@@ -106,10 +112,11 @@ const EXTRA: Record<Mode, string[]> = {
   tolerances: ["tolerance", "tolerances", "plus or minus", "±", "+/-", "percent", "balancing", "23 05 93", "design"],
   tab: ["testing, adjusting", "balancing", "23 05 93", "tab", "report", "submit", "instrument", "certified"],
   design: ["cfm", "gpm", "schedule", "airflow", "static", "outside air", "hp", "rpm"],
+  dv_drawings: [], dv_submittals: [], dv_compare: [],
 };
 const FAVOR: Record<Mode, string[]> = {
   ask: [], tolerances: ["Drawings and Specs"], tab: ["Drawings and Specs"],
-  design: ["Submittal", "Drawings and Specs"],
+  design: ["Submittal", "Drawings and Specs"], dv_drawings: [], dv_submittals: [], dv_compare: [],
 };
 
 // Field shorthand: a word in the question also matches these (lower weight).
@@ -199,6 +206,9 @@ export const QUICK: Record<Exclude<Mode, "ask">, (unit?: string) => string> = {
   tolerances: () => "What are the TAB tolerances (plus and minus percent of design) in the spec for each kind of equipment: air handlers and rooftop units (supply, return and outside air), supply/return/exhaust fans, supply/return/exhaust outlets and inlets, terminal units (max and min airflow), fan coils/heat pumps/split systems/unit heaters (airflow), pumps, coils and terminal-unit/FCU coils?",
   tab: () => "What does the spec require for testing, adjusting and balancing: what must be tested and reported, instrument and certification requirements, and anything unusual the TAB tech should know?",
   design: (unit) => `What are the design values for ${unit || "this unit"}: airflow (CFM), outside air, external/total static pressure, water flow (GPM), motor HP and anything else scheduled for it?`,
+  dv_drawings: (unit) => `Design values for ${unit} from the DRAWINGS only (equipment schedules in Drawings and Specs, and any ASI/RFI/change order that revised them). Don't use BuildingStart values or submittals for the answer (you may look up the unit in BuildingStart only to find its model or coils). Cover the design value list, including every coil that belongs to the unit.`,
+  dv_submittals: (unit) => `Design values for ${unit} from the SUBMITTALS only (the Submittal folder, and any ASI/RFI/change order that revised them). Submittals usually name the unit by model number: find the model (from the schedule or BuildingStart) and match it, and say which model you matched by. Don't use BuildingStart values for the answer. Cover the design value list, including every coil that belongs to the unit.`,
+  dv_compare: (unit) => `Compare the design values for ${unit} across all three sources: BuildingStart (what's entered), the drawings (schedule) and the submittal. Put them in the answer form's table: one row per value, columns Value | BuildingStart | Drawings | Submittal | Match ("✓" when the sources that give it agree, "Mismatch" when they don't), "not found" where a source doesn't give it, each value cited; group coils as their own rows (e.g. "CC – EWT"). Then list the mismatches in the answer text. Cover the design value list, including every coil that belongs to the unit.`,
 };
 
 // ---- questions already asked -----------------------------------------------------------------

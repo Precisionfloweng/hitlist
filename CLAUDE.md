@@ -48,7 +48,9 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   amps flagged when the highest phase is above design (design × "Number of Motors/Fans", else "Fan Wall Array" 3x3 → 9, on AHU/RTU/MAU);
   heater amps (EDH, unit heaters: electric heat only, no motor amps) fixed ±10%, phase furthest from design), shown as a check column
   plus a TOLERANCE CHECK summary; the AI must not recalculate. AI Tools "Suggestions" also runs `lib/reports.ts`
-  (Out of tolerance, What's left to do) in code via POST /api/docs action "report"; not saved. The answer form has a hidden "working" field. Lookup results over 40k chars →
+  (Out of tolerance, What's left to do, Design values – BuildingStart = `designReport`: the unit's non-reading fields
+  plus sub-items under its path) in code via POST /api/docs action "report"; not saved. Design values – Drawings /
+  Submittals / Compare all are AI modes dv_* (MODE_FOLDERS limits the document search; Compare fills the answer's `table`). The answer form has a hidden "working" field. Lookup results over 40k chars →
   TRUNCATED. `checkValues` cross-checks against the results (shown on the AI Tools card).
 
 ## Tolerances

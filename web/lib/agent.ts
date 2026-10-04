@@ -22,6 +22,7 @@ const MAX_FULL_UNITS = 15;          // units shown with every field
 type Ctx = {
   values: BsValues | null; results: Results | null; tol: Tolerances; pages: Page[];
   folders: Record<string, number>; sources: Source[]; pageIds: Map<string, string>; synced: string;
+  onlyFolders?: string[];            // a Suggestion limited to some folders (e.g. Drawings only)
 };
 export type Step = (label: string) => void;
 
@@ -63,6 +64,9 @@ const ANSWER_TOOL = {
       answer: { type: "string", description: "The answer for the tech, plain text, values cited like [S3] or [B1]. Or, when the question is unclear, a short question back offering the choices you found." },
       found: { type: "boolean", description: "false when the data doesn't contain the answer." },
       sources: { type: "array", items: { type: "string" }, description: "Source ids used, e.g. [\"S1\", \"B2\"]." },
+      table: { type: "object", description: "Optional table shown under the answer (e.g. a side-by-side comparison). Cite in the cells like \"12,500 [S3]\".",
+        properties: { columns: { type: "array", items: { type: "string" } },
+          rows: { type: "array", items: { type: "array", items: { type: "string" } } } }, required: ["columns", "rows"] },
       tolerances: {
         type: "object",
         description: "Only for TAB tolerance questions: percent of design by category, \"10\" for ±10 or \"+10/-0\". Leave out otherwise.",
@@ -104,6 +108,14 @@ Rules:
 - If a result says TRUNCATED, say the answer covers only part and suggest a narrower question.
 - The "answer" is only your final result: no thinking out loud, no "re-checking", no corrections. Start with the
   direct answer, then short supporting lines. Plain text, "-" bullets are fine, no headings.
+- Design values for a unit: cover airflow (CFM), outside air, external/total static pressure, fan RPM, motor HP/BHP,
+  volts/phase, FLA, water flow (GPM), and every coil that belongs to the unit (in BuildingStart coils are usually
+  sub-items under the unit's path, e.g. "AHU-3/AHU-3 CC"; on drawings they're on the unit's schedule row or a coil
+  schedule). Say each coil's type and give the values for that type:
+  chilled/hot water: GPM, EWT/LWT, water pressure drop, EAT/LAT DB/WB, air pressure drop, capacity (MBH), rows/fins,
+  face area, face velocity; DX: EAT/LAT DB/WB, air pressure drop, capacity (MBH or tons), rows/fins, face area, face
+  velocity, refrigerant and stages if listed; electric heat: kW, amps, volts/phase, stages, EAT/LAT, airflow.
+  (Steam coils aren't tested; skip them.) Leave out values a source doesn't give rather than guessing.
 - tolerances (in the answer form): only for TAB tolerance questions from the spec. Keys: ${TOLERANCE_CATS.map((c) => `${c.key} = ${c.full}`).join("; ")}.
   "10" for ±10%, "+10/-0" when they differ. One spec value can fill several categories. Read the direction exactly:
   "0 to plus 10 percent" / "+10%/-0%" is "+10/-0"; "minus 10 to 0" is "0/-10"; only "plus or minus 10" is "10".
@@ -263,7 +275,12 @@ function progress(ctx: Ctx, a: { sheet?: string; location?: string }): string {
 
 function searchDocuments(ctx: Ctx, a: { query?: string; folders?: string[] }): string {
   if (!ctx.pages.length) return "No documents have been read for this project yet (press Find documents on AI Tools).";
-  const want = (a.folders ?? []).map(squash);
+  let want = (a.folders ?? []).map(squash);
+  if (ctx.onlyFolders) {                // a limited Suggestion: never outside its folders
+    const allowed = ctx.onlyFolders.map(squash);
+    want = want.length ? want.filter((f) => allowed.some((x) => x.includes(f) || f.includes(x))) : allowed;
+    if (!want.length) want = allowed;
+  }
   const pages = want.length ? ctx.pages.filter((p) => want.some((f) => squash(p.file.category).includes(f) || f.includes(squash(p.file.category)))) : ctx.pages;
   const found = findPages(pages, String(a.query ?? ""), "ask", 30_000, 10);
   if (!found.length) return "No pages match. Try other words (a tag, model number, 'schedule', a spec section) or another folder.";
@@ -311,14 +328,14 @@ type Msg = { role: "user" | "assistant"; content: string | Record<string, unknow
 
 /** Answer one question (with the earlier turns of its thread, if it's a reply). */
 export async function runAgent(project: string, question: string, by: string, tol: Tolerances,
-  thread: Answer[] = [], step: Step = () => {}): Promise<Answer> {
+  thread: Answer[] = [], step: Step = () => {}, onlyFolders?: string[]): Promise<Answer> {
   const [manifest, values, results] = await Promise.all([loadManifest(project), loadValues(project), loadResults(project)]);
   if (!manifest && !values && !results) {
     throw new Error("Nothing to search yet: press Find documents to read the project's files, and sync the project for its BuildingStart data.");
   }
   const ctx: Ctx = {
     values, results, tol, pages: manifest ? await loadPages(project, manifest) : [],
-    folders: manifest?.found ?? {}, sources: [], pageIds: new Map(),
+    folders: manifest?.found ?? {}, sources: [], pageIds: new Map(), onlyFolders,
     synced: (values?.synced_at || results?.generated_at || "").slice(0, 10),
   };
   return converse(ctx, question, by, thread, step);
@@ -356,17 +373,21 @@ async function converse(ctx: Ctx, question: string, by: string, thread: Answer[]
     }
     messages.push({ role: "user", content: results_ });
   }
-  const r = (final ?? {}) as { answer?: string; found?: boolean; sources?: string[]; tolerances?: Record<string, unknown> | null };
+  const r = (final ?? {}) as { answer?: string; found?: boolean; sources?: string[]; tolerances?: Record<string, unknown> | null;
+    table?: { columns?: unknown; rows?: unknown } };
   const answerText = String(r.answer ?? "").trim();
   const cited = new Set((r.sources ?? []).map(String));
-  for (const m of answerText.matchAll(/\[([SB]\d+)\]/g)) cited.add(m[1]);
+  const table = Array.isArray(r.table?.columns) && Array.isArray(r.table?.rows)
+    ? { columns: (r.table!.columns as unknown[]).map(String), rows: (r.table!.rows as unknown[]).filter(Array.isArray).map((row) => (row as unknown[]).map(String)) }
+    : undefined;
+  for (const m of [answerText, ...(table?.rows.flat() ?? [])].join(" ").matchAll(/\[([SB]\d+)\]/g)) cited.add(m[1]);
   let tolerances: Tolerances | null = null;
   if (r.tolerances && typeof r.tolerances === "object") {
     const t = normalizeTolerances(r.tolerances as Record<string, unknown>);
     tolerances = Object.keys(t).length ? t : null;
   }
   return { question, answer: answerText || "No answer came back. Try again.", found: r.found !== false,
-    sources: ctx.sources.filter((s) => cited.has(s.id)), tolerances, at: new Date().toISOString(), by };
+    sources: ctx.sources.filter((s) => cited.has(s.id)), tolerances, at: new Date().toISOString(), by, ...(table ? { table } : {}) };
 }
 
 export const _test = { converse, pick, families, equipmentIndex, findUnits, unitReadings, toleranceCheck, progress, searchDocuments, COL_SYN, sheetKey };
