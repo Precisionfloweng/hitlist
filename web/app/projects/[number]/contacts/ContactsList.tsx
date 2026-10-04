@@ -58,23 +58,21 @@ export default function ContactsList({ project, subject, initial, canEdit }:
 
   return (
     <>
-      {canEdit && (
-        <form className="card contacts-add" onSubmit={(e) => { e.preventDefault(); send({ action: "add", contact: draft }, () => setDraft(EMPTY)); }}>
-          <b>Add a contact</b>
-          <div className="contacts-form">
+      {msg && <div className={msg.ok ? "pill ok" : "error"} style={{ margin: "0 0 10px" }}>{msg.text}</div>}
+
+      <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+        {canEdit && (
+          <form className="contacts-add-bar" onSubmit={(e) => { e.preventDefault(); send({ action: "add", contact: draft }, () => setDraft(EMPTY)); }}>
+            <b>Add a contact</b>
             {field(draft, setDraft, "name", "Name")}
             {field(draft, setDraft, "position", "Position")}
             {field(draft, setDraft, "company", "Company")}
             {field(draft, setDraft, "trade", "Trade", { list: "contact-trades" })}
             {field(draft, setDraft, "email", "Email", { type: "email", required: true, autoCapitalize: "none" })}
             <button className="primary" disabled={busy || !draft.email.trim()}>Add</button>
-          </div>
-          <datalist id="contact-trades">{TRADES.map((t) => <option key={t} value={t} />)}</datalist>
-        </form>
-      )}
-      {msg && <div className={msg.ok ? "pill ok" : "error"} style={{ margin: "0 0 10px" }}>{msg.text}</div>}
-
-      <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+            <datalist id="contact-trades">{TRADES.map((t) => <option key={t} value={t} />)}</datalist>
+          </form>
+        )}
         {list.length === 0 ? (
           <div className="muted" style={{ padding: 16 }}>No contacts yet.{canEdit && " Add the first one above."}</div>
         ) : (
