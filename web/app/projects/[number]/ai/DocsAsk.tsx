@@ -246,7 +246,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
       {shown && (
         <>
           <div className="docs-latest muted">
-            {answer ? "Answer" : "Latest answer"} · {shown.by}, {when(shown.at)}
+            {answer ? "Answer" : "Latest question"} · {shown.by}, {when(shown.at)}
             {!answer && <> · <b>{shown.question.split("\n")[0]}</b></>}
           </div>
           <AnswerView key={shown.at} a={shown} project={project} saved={!!answer && answerSaved} onClose={() => removeAnswer(shown.at)} />
