@@ -493,3 +493,22 @@ header.top .top-drop form button { background: transparent; }
 .eq-types li button.full .eq-sub, .eq-types li button.on.full .eq-sub { color: #1e8a4c; font-weight: 600; }
 .tc-bar.full > span { background: #2e9e5b; }
 .tc-pct.full { color: #1e8a4c; }
+
+/* Project tabs as folder tabs with line icons; the open tab joins the page below */
+.ptabs { gap: 4px; border-bottom: 1px solid #d5dae1; overflow: visible; align-items: flex-end; padding-left: 2px; }
+.ptabs a { padding: 9px 15px; color: #475467; background: #e9edf2; border: 1px solid #d5dae1; border-bottom: 1px solid #d5dae1;
+  border-radius: 10px 10px 0 0; margin-bottom: -1px; gap: 7px; }
+.ptabs a:hover { background: #f1f4f8; color: var(--ink); }
+.ptabs a.on { background: #fff; color: var(--brand); border-top: 3px solid #2f6fb3; border-bottom-color: #fff; padding-top: 7px; }
+.ptabs a.ptab-ai.on { border-top-color: #8e7cc3; border-bottom-color: #fff; }
+.ptab-icon { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round;
+  stroke-linejoin: round; opacity: .85; flex: none; }
+.ptabs a.on .ptab-icon { opacity: 1; }
+.ptab-m { padding: 9px 15px; gap: 7px; border: 1px solid transparent; }
+.ptabs-measure { border: 0 !important; }
+.ptabs-menu { border-bottom: 0; }
+.ptabs-drop a, .ptabs-drop a.on, .ptabs-drop a:hover { border: 0; border-left: 3px solid transparent; border-radius: 6px; margin: 0;
+  padding: 11px 14px; background: transparent; }
+.ptabs-drop a.on { border-left-color: var(--brand); background: #f0f5fa; }
+.ptabs-drop a.ptab-ai.on { border-left-color: #8e7cc3; background: #f4f1fb; }
+.ptabs-drop a:hover:not(.on) { background: #f5f6f8; }

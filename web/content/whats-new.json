@@ -2,6 +2,12 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "New project tabs",
+  "text": "A project's tabs now look like folder tabs, each with a small icon, and the open tab joins the page below."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "Finished types stand out",
   "text": "When an equipment type is 100% complete, its card shows a green bar, a green 100% and \"✓ All complete\"."
  },
