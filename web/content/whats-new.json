@@ -2,6 +2,12 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "Exact tolerance checks in answers",
+  "text": "When you ask Search the Documents which units are outside tolerance, Hitlist now does the math itself (percent off for every unit) and the answer just reports it, without working it out on screen."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "Search the Documents knows BuildingStart",
   "text": "Search the Documents now also uses each project's BuildingStart data, so you can ask things like \"does the design CFM entered for AHU-16 match the submittal?\" or \"how many VAVs are left on floor 3?\"."
  },

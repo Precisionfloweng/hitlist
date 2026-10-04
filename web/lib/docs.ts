@@ -210,8 +210,10 @@ Rules:
   exactly as given; don't count rows yourself.
 - Comparing BuildingStart to the documents (e.g. the design CFM entered vs the schedule or submittal): give both
   values with their sources and say clearly whether they match.
-- Readings outside tolerance: percent off = (actual - design) / design x 100, checked against the project
-  tolerance given in the [B#] excerpt (+ is the most allowed above design, − the most below). Show the numbers.
+- Readings outside tolerance: Hitlist has already calculated them. Use the TOLERANCE CHECK lines and the "check"
+  column / "Tolerance check" lines in the [B#] excerpts exactly as given; never recalculate or second-guess them.
+  List only the units marked OUTSIDE (with design, actual and percent off); if there are none, say so, and you may
+  name the ones closest to the limit as a separate line.
 - If an excerpt says TRUNCATED, or the question covers more units than the excerpts hold, say plainly that the
   question is too broad to answer completely, answer for what's shown, and suggest a narrower question (one
   equipment type, one floor, or one unit).
@@ -226,6 +228,8 @@ Rules:
   area, face velocity, fan curves, motor data...) and say which model you matched it by.
 - If the question names one unit, answer for that unit only (don't list other equipment); if its values aren't in
   the excerpts, say so.
+- Work things out in the "working" field first (the tech never sees it). The "answer" is only your final result:
+  no thinking out loud, no "re-checking", no corrections, and never list an item and then say it doesn't belong.
 - Start with the direct answer, then a few short supporting lines. Plain text, "-" bullets are fine, no headings.
 - tolerances: only when the question is about TAB tolerances. Fill each category the documents clearly give a
   tolerance for (keys: ${TOLERANCE_CATS.map((c) => `${c.key} = ${c.full}`).join("; ")}). Write the value as "10"
@@ -242,6 +246,7 @@ Give your reply with the "answer" form.`;
 const FORM = {
   type: "object",
   properties: {
+    working: { type: "string", description: "Your scratch work: find the values and check them here before answering. Never shown to the tech." },
     answer: { type: "string", description: "The answer for the tech, plain text, values cited like [S3] or [B1]." },
     found: { type: "boolean", description: "false when the documents don't contain the answer." },
     sources: { type: "array", items: { type: "string" }, description: "Excerpt ids used, e.g. [\"S1\", \"B2\"]." },
@@ -251,7 +256,7 @@ const FORM = {
       properties: Object.fromEntries(TOLERANCE_CATS.map((c) => [c.key, { type: "string", description: c.full }])),
     },
   },
-  required: ["answer", "found", "sources"],
+  required: ["working", "answer", "found", "sources"],
 };
 
 export const QUICK: Record<Exclude<Mode, "ask">, (unit?: string) => string> = {

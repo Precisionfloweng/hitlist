@@ -41,7 +41,9 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   Projects columns values_updated, values_status. CLI `hitlist values KEY` re-sends from the last export.
 - Web `lib/bsvalues.ts`: `bsExcerpts` gives [B#] excerpts: named units (all fields + missing required fields),
   else a table per type named in the question (columns picked from the question's words, floor/level filter on
-  Area/Zone/path), and always the Hitlist progress per type counted in code. Over 60k chars → TRUNCATED, the AI
+  Area/Zone/path), and always the Hitlist progress per type counted in code. Tolerance checks are calculated in
+  `lib/tolCheck.ts` (Design/Actual airflow and water pairs → category → % off, OUTSIDE/within), shown as a check column
+  plus a TOLERANCE CHECK summary; the AI must not recalculate. The answer form has a hidden "working" field. Over 60k chars → TRUNCATED, the AI
   asks to narrow it. `checkValues` cross-checks against the results (shown on the AI Tools card).
 
 ## Tolerances

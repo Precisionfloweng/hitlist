@@ -7,6 +7,7 @@ import { gunzipSync } from "node:zlib";
 import { del, get, put } from "@vercel/blob";
 import type { Results, TypeResult } from "./results";
 import { categoriesFor, fmtTol, TOLERANCE_CATS, type Tolerances } from "./toleranceCats";
+import { checkUnit, describe, fmtPct, nearness, tolerancePairs, type PairCheck } from "./tolCheck";
 
 export type BsValue = string | number | boolean;
 export type BsUnit = { name: string; path: string; v: Record<string, BsValue> };
@@ -108,6 +109,7 @@ const COL_SYN: Record<string, string[]> = {
   size: ["size"], filter: ["filter"], completed: ["completed"], design: ["design", "des"], actual: ["actual", "act"],
 };
 
+const TOL_Q = /toleran|outside|within|out of spec|off design|% off|percent off|over design|under design|too high|too low/;
 const show = (v: BsValue) => (typeof v === "boolean" ? (v ? "yes" : "no") : String(v));
 const ESC = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -227,10 +229,13 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
     const r = resultUnit(results, sheet.sheet, unit);
     const miss = r ? missingFields(r.type, r.unit.codes) : [];
     const tl = tolLine(sheet.sheet, unit.name, tol);
+    const checks = checkUnit(sheet.sheet, unit.name, unit.v, tolerancePairs(sheet.headers), tol);
     const text = [`Unit ${unit.name} (BuildingStart sheet "${sheet.sheet}", path ${unit.path || unit.name})`,
       ...Object.entries(unit.v).map(([h, v]) => `${h}: ${show(v)}`),
       r ? (miss.length ? `Hitlist: required fields still missing: ${miss.join(", ")}` : "Hitlist: all required fields filled in") : "",
-      tl ? `Project tolerance: ${tl}` : ""].filter(Boolean).join("\n");
+      tl ? `Project tolerance: ${tl}` : "",
+      ...checks.map((c) => `Tolerance check (calculated by Hitlist): ${c.pair}: design ${c.design}, actual ${c.actual ?? "not entered"} = ${describe(c)}`),
+    ].filter(Boolean).join("\n");
     add(`BuildingStart – ${unit.name}`, text);
   }
 
@@ -245,14 +250,36 @@ export function bsExcerpts(values: BsValues | null, results: Results | null, que
         if (hit.length) { units = hit; locNote = ` on ${loc.label}`; }
         else locNote = ` (no unit's Area, Zone or path matched "${loc.label}", so all are listed)`;
       }
-      const cols = pickColumns(s, words);
+      let cols = pickColumns(s, words);
+      // Tolerance check, calculated here for every unit: the pairs shown in the table, or all of them for a tolerance question.
+      const allPairs = tolerancePairs(s.headers);
+      let pairs = allPairs.filter((p) => cols.includes(p.design) || cols.includes(p.actual));
+      if (TOL_Q.test(q) && (!pairs.length || !words.some((w) => COL_SYN[w]))) pairs = allPairs;
+      cols = [...cols, ...pairs.flatMap((p) => [p.design, p.actual]).filter((c, i, a) => !cols.includes(c) && a.indexOf(c) === i)];
+      const checks = new Map(units.map((u) => [u, checkUnit(s.sheet, u.name, u.v, pairs, tol)]));
+      const checkCols = pairs.filter((p) => units.some((u) => checks.get(u)!.some((c) => c.pair === p.name))).map((p) => p.name);
+      const summary = checkCols.map((name) => {
+        const list = units.flatMap((u) => checks.get(u)!.filter((c) => c.pair === name).map((c) => ({ u, c })));
+        const read = list.filter((x) => x.c.pct !== null);
+        const out = read.filter((x) => x.c.outside);
+        const close = read.filter((x) => !x.c.outside).sort((a, b) => nearness(b.c) - nearness(a.c)).slice(0, 3);
+        const tols = [...new Set(list.map((x) => `${fmtTol(x.c.tol)}${x.c.tol.isDefault ? " (company default)" : ""}`))].join(" / ");
+        const fmt = (x: { u: BsUnit; c: PairCheck }) => `${x.u.name} ${fmtPct(x.c.pct!)} (design ${x.c.design}, actual ${x.c.actual})`;
+        return `- ${name} (tolerance ${tols}): ${read.length} with a reading, ${out.length} OUTSIDE, ${list.length - read.length} with no actual yet.` +
+          `\n  Outside: ${out.length ? out.map(fmt).join("; ") : "none"}` +
+          (close.length ? `\n  Closest to the limit but within: ${close.map(fmt).join("; ")}` : "");
+      });
       const tl = tolLine(s.sheet, "", tol);
-      const head = `${s.sheet}: ${units.length} unit${units.length === 1 ? "" : "s"}${locNote}. Columns: Unit | ${cols.join(" | ")}` +
-        (tl ? `\nProject tolerance: ${tl}` : "") + `\n"?" = BuildingStart can't calculate it yet; blank = not entered.`;
+      const head = `${s.sheet}: ${units.length} unit${units.length === 1 ? "" : "s"}${locNote}. Columns: Unit | ${[...cols, ...checkCols.map((n) => `${n} check`)].join(" | ")}` +
+        (tl ? `\nProject tolerance: ${tl}` : "") +
+        (summary.length ? `\nTOLERANCE CHECK, calculated by Hitlist for all ${units.length} units listed here (use these results; don't recalculate):\n${summary.join("\n")}` : "") +
+        `\n"?" = BuildingStart can't calculate it yet; blank = not entered.`;
       const rows: string[] = [];
       let size = head.length;
       for (const u of units) {
-        const row = [u.name, ...cols.map((c) => (u.v[c] === undefined ? "" : show(u.v[c])))].join(" | ");
+        const cks = checks.get(u)!;
+        const row = [u.name, ...cols.map((c) => (u.v[c] === undefined ? "" : show(u.v[c]))),
+          ...checkCols.map((n) => { const c = cks.find((x) => x.pair === n); return c ? describe(c) : ""; })].join(" | ");
         if (chars + size + row.length > MAX_CHARS) { tooBig = true; break; }
         rows.push(row);
         size += row.length + 1;
