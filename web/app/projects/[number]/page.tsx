@@ -9,16 +9,22 @@ import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { daysSince, getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
 import { loadTolerancesWithDefaults } from "@/lib/tolerances";
-import { fmtTol, presentGroups, TOLERANCE_GROUPS } from "@/lib/toleranceCats";
+import { loadHistory } from "@/lib/docs";
+import { fmtTol, normalizeTolerances, presentGroups, TOLERANCE_GROUPS } from "@/lib/toleranceCats";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProjectPage({ params }: { params: Promise<{ number: string }> }) {
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
-  const [data, results, { tol, def }] = await Promise.all([getProject(number), loadResults(number), loadTolerancesWithDefaults(number)]);
+  const [data, results, { tol, def }, history] = await Promise.all([getProject(number), loadResults(number), loadTolerancesWithDefaults(number), loadHistory(number).catch(() => [])]);
   if (!data || !canSee(user, data.project.id)) notFound();
   const { project: p } = data;
+  // The newest tolerances the AI found in the spec (Search the Documents), to show next to the current ones.
+  const specAnswer = history.flatMap((h) => [h, ...(h.replies ?? [])]).filter((a) => a.tolerances && Object.keys(a.tolerances).length)
+    .sort((a, b) => b.at.localeCompare(a.at))[0];
+  const spec = specAnswer ? normalizeTolerances(specAnswer.tolerances as Record<string, unknown>) : null;
+  const specAt = specAnswer ? new Date(specAnswer.at).toLocaleDateString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric" }) : "";
   const summary = results?.summary;
   // Only "ticked Complete but required fields empty" (older results may also hold "went blank" flags).
   const issues = (results?.gap_flags ?? []).filter((g) => g.kind === "completed_but_missing");
@@ -55,20 +61,26 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                     <span className="muted"> · {fromSpec ? `${fromSpec} group${fromSpec === 1 ? "" : "s"} from the spec, ` : ""}
                       {fromSpec < groups.length ? `${fromSpec ? "the rest " : "all "}company default ${fmtTol(def)}` : "all from the spec"} · tap to show</span>
                   </summary>
-                  <div className="tol-groups">
+                  <div className="docs-tol-grid" style={{ marginTop: 10 }}>
                     {groups.map((g) => (
-                      <div key={g.key} className="tol-group">
-                        <div className="tol-group-name">{g.label}</div>
-                        {g.items.map((i) => (
-                          <div key={i.key} className="tol-item">
-                            <span className="tol-label">{i.label}</span>
-                            <span className={`tol-value${tol[i.key].isDefault ? " default" : ""}`}>
-                              {fmtTol(tol[i.key])}{tol[i.key].isDefault && <small> (default)</small>}</span>
-                          </div>
-                        ))}
-                      </div>
+                      <table key={g.key} className="docs-tol-table">
+                        <thead><tr><th>{g.label}</th>{spec && <><th className="c">Current</th><th className="c">Spec</th></>}</tr></thead>
+                        <tbody>{g.items.map((i) => {
+                          const cur = tol[i.key], sp = spec?.[i.key];
+                          const differs = !!sp && (cur.isDefault || fmtTol(cur) !== fmtTol(sp));
+                          return (
+                            <tr key={i.key} className={differs ? "differs" : ""}>
+                              <td>{i.label}</td>
+                              <td className={`v${cur.isDefault ? " dflt" : ""}`}>{fmtTol(cur)}{cur.isDefault && <small> (default)</small>}</td>
+                              {spec && <td className="v spec">{sp ? fmtTol(sp) : <span className="muted">–</span>}</td>}
+                            </tr>
+                          );
+                        })}</tbody>
+                      </table>
                     ))}
                   </div>
+                  {spec && <div className="muted" style={{ fontSize: 13, marginTop: 8 }}>
+                    Spec values from Search the Documents ({specAt}). Shaded rows: the project&apos;s current value isn&apos;t the spec&apos;s.</div>}
                   {user.role !== "customer" && <div className="muted" style={{ fontSize: 13, marginTop: 8 }}>
                     Change them on the <Link href={`/projects/${encodeURIComponent(p.id)}/rules`}>Rules / Tol.</Link> tab.</div>}
                 </details>
