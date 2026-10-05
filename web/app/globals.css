@@ -438,7 +438,7 @@ select.docs-suggest option { color: var(--ink); font-weight: 400; }
 .docs-tol-table td { padding: 5px 10px; }
 .docs-tol-table td.v { text-align: right; font-weight: 700; white-space: nowrap; }
 .docs-tol-table td.now { color: #9a3412; font-size: 12px; white-space: nowrap; }
-.docs-tol-table tr.differs td { background: #fff4e5; }
+.docs-tol-table tr.differs td { background: #f0f2f5; }
 .docs-tol-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
 .docs-bs { font-size: 13px; margin-top: 4px; }
 .docs-bs.problem { color: #9a3412; }
