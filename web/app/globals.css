@@ -429,6 +429,7 @@ select.docs-suggest option { color: var(--ink); font-weight: 400; }
 .docs-table { font-size: 14px; background: #fff; }
 .docs-table td.bad { color: #b42318; font-weight: 700; }
 .report-table.design td:first-child { width: 45%; }
+.docs-tol-diff { display: block; width: 100%; color: #9a3412; font-size: 13px; }
 .docs-bs { font-size: 13px; margin-top: 4px; }
 .docs-bs.problem { color: #9a3412; }
 .docs-folder { font-weight: 600; word-break: break-word; }

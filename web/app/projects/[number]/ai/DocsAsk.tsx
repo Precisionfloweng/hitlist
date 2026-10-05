@@ -66,6 +66,9 @@ export function AnswerView({ a, project, onClose, saved = false, onReply, busy, 
   const onProject = !!projectTol && Object.keys(tolFound).length > 0 &&
     Object.entries(tolFound).every(([k, t]) => projectTol[k] && fmtTol(projectTol[k]) === fmtTol(t));
   const [tolMsg, setTolMsg] = useState(saved || onProject ? "Saved to the Rules / Tol. tab ✓" : "");
+  // What the spec says vs what the project has now, for each category that differs.
+  const changed = projectTol ? TOLERANCE_CATS.filter((c) => tolFound[c.key] && (!projectTol[c.key] || fmtTol(projectTol[c.key]) !== fmtTol(tolFound[c.key])))
+    .map((c) => `${c.full} now ${projectTol[c.key] ? fmtTol(projectTol[c.key]) : "default"}, spec ${fmtTol(tolFound[c.key])}`) : [];
   const tol = normalizeTolerances(a.tolerances);   // also reads answers saved before tolerances had + and −
   const tolText = TOLERANCE_CATS.filter((c) => tol[c.key]).map((c) => `${c.full} ${fmtTol(tol[c.key])}`).join(" · ");
   async function fillTolerances() {
@@ -83,8 +86,12 @@ export function AnswerView({ a, project, onClose, saved = false, onReply, busy, 
       {tolText && (
         <div className="docs-tol">
           <span>Tolerances found: {tolText}</span>
-          {tolMsg ? <span className={tolMsg.includes("✓") ? "pill ok" : "muted"}>{tolMsg}</span>
-            : <button className="primary" onClick={fillTolerances}>Use these tolerances</button>}
+          {tolMsg ? <span className={tolMsg.includes("✓") ? "pill ok" : "muted"}>{tolMsg}</span> : (
+            <>
+              {changed.length > 0 && <span className="docs-tol-diff">Different from the project&apos;s current tolerances: {changed.join(" · ")}</span>}
+              <button className="primary" onClick={fillTolerances}>Use the spec&apos;s tolerances</button>
+            </>
+          )}
         </div>
       )}
       <AnswerTable t={a.table} />
