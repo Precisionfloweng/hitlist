@@ -2,6 +2,12 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "Design Tolerances on the Overview",
+  "text": "The Overview's Design Tolerances card shows the tolerance to use for each reading in small tables; values from the spec are in bold, company defaults are marked \"(default)\"."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "Overview headings",
   "text": "The project Overview now has \"Project summary\" and \"Equipment\" headings, and each equipment card's bar matches its percentage."
  },
