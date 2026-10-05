@@ -607,3 +607,4 @@ header.top .top-drop form button { background: transparent; }
 @media (max-width: 900px) { .contacts-add-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); } .contacts-add-bar b { grid-column: 1 / -1; } }
 .card-head { display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
 .tol-ai-link { color: #5a3fb0; font-weight: 700; }
+.ok-check { width: 16px; height: 16px; vertical-align: -3px; margin-right: 5px; } .ok-check circle { fill: #2e9e5b; } .ok-check path { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }

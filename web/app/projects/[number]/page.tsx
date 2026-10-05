@@ -76,7 +76,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                 <details className="card tol-view">
                   <summary>
                     <b>Design Tolerances</b>
-                    <span className="muted"> · {tags.every((t) => t === "spec") ? "✓ All from the project spec"
+                    <span className="muted"> · {tags.every((t) => t === "spec") ? <><svg className="ok-check" viewBox="0 0 20 20" aria-hidden><circle cx="10" cy="10" r="10" /><path d="M5.5 10.5l3 3 6-6.5" /></svg>All from the project spec</>
                       : canEdit(user) ? <>Ask <Link href={`/projects/${encodeURIComponent(p.id)}/ai`} className="tol-ai-link">✨ AI Tools</Link> to pull these from the project spec</>
                       : line} · tap to show</span>
                   </summary>
