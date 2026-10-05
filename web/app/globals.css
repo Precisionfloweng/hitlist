@@ -565,6 +565,10 @@ header.top .top-drop form button { background: transparent; }
 .ptabs a:hover { background: #f1f4f8; color: var(--ink); }
 .ptabs a.on { background: #fff; color: var(--brand); border-top: 3px solid #2f6fb3; border-bottom-color: #fff; padding-top: 7px; }
 .ptabs a.ptab-ai.on { border-top-color: #8e7cc3; border-bottom-color: #fff; }
+/* AI Tools tab stands out: light purple with a purple border and text (white with a purple top when open) */
+.ptabs a.ptab-ai { background: #efe9fc; color: #5a3fb0; border-color: #b9a8e6; border-bottom-color: #d5dae1; font-weight: 700; }
+.ptabs a.ptab-ai:hover { background: #e6ddfa; color: #5a3fb0; }
+.ptabs a.ptab-ai.on { background: #fff; border-color: #b9a8e6; border-top: 3px solid #7b5fd0; border-bottom-color: #fff; }
 .ptab-icon { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round;
   stroke-linejoin: round; opacity: .85; flex: none; }
 .ptabs a.on .ptab-icon { opacity: 1; }
@@ -576,6 +580,7 @@ header.top .top-drop form button { background: transparent; }
 .ptabs-drop a.on { border-left-color: var(--brand); background: #f0f5fa; }
 .ptabs-drop a.ptab-ai.on { border-left-color: #8e7cc3; background: #f4f1fb; }
 .ptabs-drop a:hover:not(.on) { background: #f5f6f8; }
+.ptabs-drop a.ptab-ai:not(.on) { background: #efe9fc; color: #5a3fb0; font-weight: 700; }
 
 /* Overview: the Project summary as one navy banner, and the folded Tolerances as a slim pill, so they don't look
    like the equipment cards. */
