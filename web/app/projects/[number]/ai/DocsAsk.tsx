@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fmtTol, normalizeTolerances, TOLERANCE_CATS } from "@/lib/toleranceCats";
+import { fmtTol, normalizeTolerances, TOLERANCE_CATS, TOLERANCE_GROUPS } from "@/lib/toleranceCats";
 import type { DesignReport, LeftReport, ToleranceReport } from "@/lib/reports";
 import ReportView from "./ReportView";
 
@@ -85,13 +85,32 @@ export function AnswerView({ a, project, onClose, saved = false, onReply, busy, 
       <div className={`docs-answer-text${a.found ? "" : " notfound"}`}>{a.answer}</div>
       {tolText && (
         <div className="docs-tol">
-          <span>Tolerances found: {tolText}</span>
-          {tolMsg ? <span className={tolMsg.includes("✓") ? "pill ok" : "muted"}>{tolMsg}</span> : (
-            <>
-              {changed.length > 0 && <span className="docs-tol-diff">Different from the project&apos;s current tolerances: {changed.join(" · ")}</span>}
-              <button className="primary" onClick={fillTolerances}>Use the spec&apos;s tolerances</button>
-            </>
-          )}
+          <div className="docs-tol-title">Tolerances found in the spec</div>
+          <div className="docs-tol-grid">
+            {TOLERANCE_GROUPS.filter((g) => g.items.some((i) => tol[i.key])).map((g) => (
+              <table key={g.key} className="docs-tol-table">
+                <thead><tr><th colSpan={projectTol && changed.length ? 3 : 2}>{g.label}</th></tr></thead>
+                <tbody>{g.items.filter((i) => tol[i.key]).map((i) => {
+                  const now = projectTol?.[i.key];
+                  const differs = !!projectTol && (!now || fmtTol(now) !== fmtTol(tol[i.key]));
+                  return (
+                    <tr key={i.key} className={differs && !tolMsg ? "differs" : ""}>
+                      <td>{i.label}</td><td className="v">{fmtTol(tol[i.key])}</td>
+                      {projectTol && changed.length > 0 && <td className="now">{differs && !tolMsg ? `now ${now ? fmtTol(now) : "default"}` : ""}</td>}
+                    </tr>
+                  );
+                })}</tbody>
+              </table>
+            ))}
+          </div>
+          <div className="docs-tol-actions">
+            {tolMsg ? <span className={tolMsg.includes("✓") ? "pill ok" : "muted"}>{tolMsg}</span> : (
+              <>
+                {changed.length > 0 && <span className="docs-tol-diff">{changed.length} value{changed.length === 1 ? "" : "s"} differ from the project&apos;s current tolerances (marked).</span>}
+                <button className="primary" onClick={fillTolerances}>Use the spec&apos;s tolerances</button>
+              </>
+            )}
+          </div>
         </div>
       )}
       <AnswerTable t={a.table} />

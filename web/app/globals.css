@@ -429,7 +429,17 @@ select.docs-suggest option { color: var(--ink); font-weight: 400; }
 .docs-table { font-size: 14px; background: #fff; }
 .docs-table td.bad { color: #b42318; font-weight: 700; }
 .report-table.design td:first-child { width: 45%; }
-.docs-tol-diff { display: block; width: 100%; color: #9a3412; font-size: 13px; }
+.docs-tol-diff { color: #9a3412; font-size: 13px; }
+.docs-tol { display: block !important; }
+.docs-tol-title { font-weight: 700; margin-bottom: 8px; }
+.docs-tol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.docs-tol-table { font-size: 14px; background: #fff; border: 1px solid #d5dae1; border-top: 3px solid #2f6fb3; border-radius: 8px; border-collapse: separate; overflow: hidden; }
+.docs-tol-table th { background: #fff; color: var(--ink); text-transform: none; letter-spacing: 0; font-size: 14px; position: static; }
+.docs-tol-table td { padding: 5px 10px; }
+.docs-tol-table td.v { text-align: right; font-weight: 700; white-space: nowrap; }
+.docs-tol-table td.now { color: #9a3412; font-size: 12px; white-space: nowrap; }
+.docs-tol-table tr.differs td { background: #fff4e5; }
+.docs-tol-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
 .docs-bs { font-size: 13px; margin-top: 4px; }
 .docs-bs.problem { color: #9a3412; }
 .docs-folder { font-weight: 600; word-break: break-word; }
