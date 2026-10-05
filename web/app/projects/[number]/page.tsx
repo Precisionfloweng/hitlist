@@ -51,22 +51,21 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               return (
                 <details className="card tol-view">
                   <summary>
-                    <b>Tolerances</b>
+                    <b>Design Tolerances</b>
                     <span className="muted"> · {fromSpec ? `${fromSpec} group${fromSpec === 1 ? "" : "s"} from the spec, ` : ""}
                       {fromSpec < groups.length ? `${fromSpec ? "the rest " : "all "}company default ${fmtTol(def)}` : "all from the spec"} · tap to show</span>
                   </summary>
-                  <div className="tol-groups">
+                  <div className="docs-tol-grid" style={{ marginTop: 10 }}>
                     {groups.map((g) => (
-                      <div key={g.key} className="tol-group">
-                        <div className="tol-group-name">{g.label}</div>
-                        {g.items.map((i) => (
-                          <div key={i.key} className="tol-item">
-                            <span className="tol-label">{i.label}</span>
-                            <span className={`tol-value${tol[i.key].isDefault ? " default" : ""}`}>
-                              {fmtTol(tol[i.key])}{tol[i.key].isDefault && <small> (default)</small>}</span>
-                          </div>
-                        ))}
-                      </div>
+                      <table key={g.key} className="docs-tol-table">
+                        <thead><tr><th colSpan={2}>{g.label}</th></tr></thead>
+                        <tbody>{g.items.map((i) => (
+                          <tr key={i.key}>
+                            <td>{i.label}</td>
+                            <td className={`v${tol[i.key].isDefault ? " dflt" : ""}`}>{fmtTol(tol[i.key])}{tol[i.key].isDefault && <small> (default)</small>}</td>
+                          </tr>
+                        ))}</tbody>
+                      </table>
                     ))}
                   </div>
                   {user.role !== "customer" && <div className="muted" style={{ fontSize: 13, marginTop: 8 }}>
