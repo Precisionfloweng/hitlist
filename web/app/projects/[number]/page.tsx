@@ -8,7 +8,7 @@ import ProjectHeader from "./ProjectHeader";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { daysSince, getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
-import { loadTolerancesWithDefaults } from "@/lib/tolerances";
+import { loadToleranceSources, loadTolerancesWithDefaults } from "@/lib/tolerances";
 import { fmtTol, presentGroups, TOLERANCE_GROUPS } from "@/lib/toleranceCats";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,8 @@ export const dynamic = "force-dynamic";
 export default async function ProjectPage({ params }: { params: Promise<{ number: string }> }) {
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
-  const [data, results, { tol, def }] = await Promise.all([getProject(number), loadResults(number), loadTolerancesWithDefaults(number)]);
+  const [data, results, { tol, def }, tolSrc] = await Promise.all([getProject(number), loadResults(number),
+    loadTolerancesWithDefaults(number), loadToleranceSources(number)]);
   if (!data || !canSee(user, data.project.id)) notFound();
   const { project: p } = data;
   const summary = results?.summary;
@@ -47,18 +48,40 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               const present = results ? presentGroups(results) : [];
               const groups = TOLERANCE_GROUPS.filter((g) => present.includes(g.key) || g.items.some((i) => !tol[i.key].isDefault));
               if (!groups.length) return null;
-              const fromSpec = groups.filter((g) => g.items.some((i) => !tol[i.key].isDefault)).length;
+              // Each group's tag: where its saved values came from (recorded when they were saved).
+              const TAGS = { spec: ["ok", "From spec"], hand: ["warn", "Set by hand"], mixed: ["warn", "Spec + by hand"],
+                saved: ["gray", "Saved"], default: ["gray", "Default"] } as const;
+              const tagOf = (g: (typeof groups)[number]): keyof typeof TAGS => {
+                const set = g.items.filter((i) => !tol[i.key].isDefault).map((i) => tolSrc[i.key]?.source ?? "");
+                if (!set.length) return "default";
+                if (set.every((x) => x === "spec")) return "spec";
+                if (set.every((x) => x === "hand")) return "hand";
+                return set.includes("spec") && set.includes("hand") ? "mixed" : "saved";
+              };
+              const tags = groups.map(tagOf);
+              const count = (k: string) => tags.filter((t) => t === k).length;
+              const parts = [["spec", "from the spec"], ["hand", "set by hand"], ["mixed", "partly by hand"], ["saved", "saved"]]
+                .filter(([k]) => count(k)).map(([k, w]) => `${count(k)} group${count(k) === 1 ? "" : "s"} ${w}`);
+              const nDef = count("default");
+              const line = [...parts, nDef ? `${parts.length ? "the rest" : "all"} company default ${fmtTol(def)}` : ""].filter(Boolean).join(", ");
+              // The spec(s) the values came from, newest first.
+              const specs = new Map<string, string>();
+              for (const g of groups) for (const i of g.items) {
+                const src = tolSrc[i.key];
+                if (!tol[i.key].isDefault && src?.source === "spec" && !specs.has(src.note)) specs.set(src.note, src.at);
+              }
+              const day = (iso: string) => { const d = new Date(iso);
+                return isNaN(+d) ? "" : d.toLocaleDateString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric" }); };
               return (
                 <details className="card tol-view">
                   <summary>
                     <b>Design Tolerances</b>
-                    <span className="muted"> · {fromSpec ? `${fromSpec} group${fromSpec === 1 ? "" : "s"} from the spec, ` : ""}
-                      {fromSpec < groups.length ? `${fromSpec ? "the rest " : "all "}company default ${fmtTol(def)}` : "all from the spec"} · tap to show</span>
+                    <span className="muted"> · {line} · tap to show</span>
                   </summary>
                   <div className="docs-tol-grid" style={{ marginTop: 10 }}>
-                    {groups.map((g) => (
+                    {groups.map((g, n) => (
                       <table key={g.key} className="docs-tol-table">
-                        <thead><tr><th colSpan={2}>{g.label}</th></tr></thead>
+                        <thead><tr><th colSpan={2}>{g.label}<span className={`pill ${TAGS[tags[n]][0]} tol-src`}>{TAGS[tags[n]][1]}</span></th></tr></thead>
                         <tbody>{g.items.map((i) => (
                           <tr key={i.key}>
                             <td>{i.label}</td>
@@ -68,6 +91,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                       </table>
                     ))}
                   </div>
+                  {[...specs].sort((a, b) => b[1].localeCompare(a[1])).map(([note, at]) => (
+                    <div key={note} className="muted" style={{ fontSize: 13, marginTop: 10 }}>
+                      <b style={{ color: "var(--ink)" }}>From spec:</b> {note || "the project spec"}{day(at) && ` · saved ${day(at)}`}</div>
+                  ))}
                   {user.role !== "customer" && <div className="muted" style={{ fontSize: 13, marginTop: 8 }}>
                     Change them on the <Link href={`/projects/${encodeURIComponent(p.id)}/rules`}>Rules / Tol.</Link> tab.</div>}
                 </details>

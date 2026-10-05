@@ -3,7 +3,7 @@
   "date": "2026-10-04",
   "audience": "all",
   "title": "Design Tolerances on the Overview",
-  "text": "The Overview's Design Tolerances card shows the tolerance to use for each reading in small tables; values from the spec are in bold, company defaults are marked \"(default)\"."
+  "text": "The Overview's Design Tolerances card shows the tolerance to use for each reading, with a tag on each group (From spec, Set by hand or Default) and the spec file and page they came from."
  },
  {
   "date": "2026-10-04",

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { canEdit, canSee, currentUser } from "@/lib/auth";
 import { docsJob, getProject, requestDocs, setDocsFolder } from "@/lib/data";
 import { loadTolerancesWithDefaults, saveTolerances } from "@/lib/tolerances";
+import { specNote } from "@/lib/toleranceCats";
 import { checkValues, loadValues } from "@/lib/bsvalues";
 import { loadResults } from "@/lib/results";
 import { leftReport, toleranceReport } from "@/lib/reports";
@@ -118,7 +119,7 @@ export async function POST(req: Request) {
             // Tolerances found in the spec go straight onto the project (Rules / Tol. tab, Overview, checklist, AI).
             let tolerancesSaved = false;
             if (answer.tolerances && Object.keys(answer.tolerances).length) {
-              await saveTolerances(project, answer.tolerances, user);
+              await saveTolerances(project, answer.tolerances, user, { kind: "spec", note: specNote(answer.sources) });
               tolerancesSaved = true;
             }
             send({ ok: true, answer, entry, tolerancesSaved });

@@ -34,6 +34,23 @@ export async function loadTolerances(project: string): Promise<Tolerances> {
   }
 }
 
+export type TolSourceIn = { kind: "spec" | "hand"; note?: string };
+/** Where a project's saved value came from. "" = saved before sources were recorded. */
+export type TolSource = { source: "spec" | "hand" | ""; note: string; by: string; at: string };
+
+export async function loadToleranceSources(project: string): Promise<Record<string, TolSource>> {
+  try {
+    const out: Record<string, TolSource> = {};
+    for (const r of (await readTab("Tolerances")).filter((r) => r.project_number === project && isToleranceKey(r.category))) {
+      out[r.category] = { source: r.source === "spec" || r.source === "hand" ? r.source : "", note: r.source_note ?? "",
+        by: r.changed_by ?? "", at: r.changed_at ?? "" };
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 /** Every category: the project's value, or the company default (marked isDefault) where it hasn't set one. */
 export async function loadTolerancesWithDefaults(project: string): Promise<{ tol: Tolerances; def: Tol }> {
   const [tol, def] = await Promise.all([loadTolerances(project), defaultTolerance()]);
@@ -42,7 +59,11 @@ export async function loadTolerancesWithDefaults(project: string): Promise<{ tol
 
 /** Save the boxes shown for one project. A key with both boxes blank removes that value; a blank box takes
  *  the other box's number (so "10" alone means ±10). Each change is logged in RuleHistory. */
-export async function saveTolerances(project: string, values: Record<string, Partial<Tol>>, by: User): Promise<Tolerances> {
+export async function saveTolerances(project: string, values: Record<string, Partial<Tol>>, by: User,
+  from?: TolSourceIn): Promise<Tolerances> {
+  // Where these values came from: the spec (file and page, from the AI answer) or typed in by hand.
+  const source = from?.kind === "spec" ? "spec" : "hand";
+  const note = from?.kind === "spec" ? (from.note ?? "").slice(0, 300) : "";
   const clean: Record<string, Tol | null> = {};
   for (const [k, v] of Object.entries(values)) {
     if (!isToleranceKey(k)) throw new Error("Unknown tolerance");
@@ -66,12 +87,17 @@ export async function saveTolerances(project: string, values: Record<string, Par
     const v = keep(c.key);
     const row = rows.find((r) => r.category === c.key);
     const was = before[c.key];
+    const mine = c.key in clean;                       // only the values in this save take its source
     const rec = v && { project_number: project, category: c.key, pct: v.plus === v.minus ? v.plus : "", plus: v.plus,
-      minus: v.minus, changed_by: by.email, changed_at: now };
+      minus: v.minus, changed_by: mine ? by.email : row?.changed_by ?? by.email, changed_at: mine ? now : row?.changed_at ?? now,
+      source: mine ? source : row?.source ?? "", source_note: mine ? note : row?.source_note ?? "" };
     if (!v && row) removes.push(row._row);
     else if (v && row) {
       const cur = rowTol(row);
-      if (!cur || fmtTol(cur) !== fmtTol(v)) updates.push({ row: row._row, rec: rec! });
+      const changed = !cur || fmtTol(cur) !== fmtTol(v);
+      // A spec save of the same value still records that it now comes from the spec.
+      const respec = mine && source === "spec" && (row.source !== "spec" || (row.source_note ?? "") !== note);
+      if (changed || respec) updates.push({ row: row._row, rec: rec! });
     }
     else if (v) adds.push(rec!);
     if (c.key in clean && (was ? fmtTol(was) : "") !== (v ? fmtTol(v) : "")) {
@@ -79,7 +105,7 @@ export async function saveTolerances(project: string, values: Record<string, Par
         old_status: was ? fmtTol(was) : "(none)", new_status: v ? fmtTol(v) : "(none)", project_number: project });
     }
   }
-  if (!log.length && !removes.length) return before;
+  if (!log.length && !removes.length && !updates.length && !adds.length) return before;
   if (updates.length) await updateRows("Tolerances", updates);
   if (adds.length) await appendRows("Tolerances", adds);
   if (removes.length) await deleteRows("Tolerances", removes);

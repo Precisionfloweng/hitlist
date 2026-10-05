@@ -30,7 +30,7 @@ export const SCHEMA = {
     "open_deficiencies", "open_high"],
   // A project's tolerances (+% / −%) by category, typed in on the project's Rules tab. Website only.
   // pct = the single ± value (also how rows saved before the +/− split are read).
-  Tolerances: ["project_number", "category", "pct", "changed_by", "changed_at", "plus", "minus"],
+  Tolerances: ["project_number", "category", "pct", "changed_by", "changed_at", "plus", "minus", "source", "source_note"],
   // A project's email list for sending the deficiency list, kept on the project's Contacts tab. Website only.
   // on_list: "yes" = included in the "New email" link; send_as: "to" or "cc".
   Contacts: ["project_number", "id", "name", "company", "trade", "email", "on_list", "added_by", "added_at", "position", "send_as"],

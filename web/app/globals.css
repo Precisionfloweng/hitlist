@@ -438,6 +438,7 @@ select.docs-suggest option { color: var(--ink); font-weight: 400; }
 .docs-tol-table td { padding: 5px 10px; }
 .docs-tol-table td.v { text-align: right; font-weight: 700; white-space: nowrap; }
 .tol-view .docs-tol-grid { align-items: start; }
+.docs-tol-table th .tol-src { float: right; font-size: 11px; }
 .docs-tol-table td.v.dflt { color: var(--muted); font-weight: 600; } .docs-tol-table td.v small { font-weight: 400; font-size: 11px; }
 .docs-tol-table td.now { color: #9a3412; font-size: 12px; white-space: nowrap; }
 .docs-tol-table tr.differs td { background: #f0f2f5; }

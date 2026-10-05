@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fmtTol, normalizeTolerances, TOLERANCE_CATS, TOLERANCE_GROUPS } from "@/lib/toleranceCats";
+import { fmtTol, normalizeTolerances, specNote, TOLERANCE_CATS, TOLERANCE_GROUPS } from "@/lib/toleranceCats";
 import type { DesignReport, LeftReport, ToleranceReport } from "@/lib/reports";
 import ReportView from "./ReportView";
 
@@ -74,7 +74,7 @@ export function AnswerView({ a, project, onClose, saved = false, onReply, busy, 
   async function fillTolerances() {
     setTolMsg("Saving…");
     const r = await fetch("/api/tolerances", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ project, values: tol }) });
+      body: JSON.stringify({ project, values: tol, from: { kind: "spec", note: specNote(a.sources) } }) });
     const data = await r.json().catch(() => ({}));
     setTolMsg(r.ok ? "Saved to the Rules / Tol. tab ✓" : data.error || "Couldn't save");
     if (r.ok) router.refresh();

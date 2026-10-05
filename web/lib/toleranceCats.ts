@@ -127,3 +127,10 @@ export function normalizeTolerances(raw: Record<string, unknown> | null | undefi
   }
   return out;
 }
+
+/** "file.pdf, page 7" for the spec an AI tolerance answer cited (a spec-looking file first; never BuildingStart). */
+export function specNote(sources: { category: string; name: string; page: number }[] | undefined): string {
+  const docs = (sources ?? []).filter((s) => s.category !== "BuildingStart" && s.name);
+  const s = docs.find((d) => /spec|23\s?05\s?93|balanc/i.test(`${d.category} ${d.name}`)) ?? docs[0];
+  return s ? `${s.name}${s.page ? `, page ${s.page}` : ""}` : "";
+}

@@ -40,7 +40,7 @@ SCHEMA: dict[str, list[str]] = {
     "History": ["project_number", "synced_at", "fields_pct", "units_pct", "units",
                 "open_deficiencies", "open_high"],
     # Written by the website: a project's tolerances (±%) by category.
-    "Tolerances": ["project_number", "category", "pct", "changed_by", "changed_at", "plus", "minus"],
+    "Tolerances": ["project_number", "category", "pct", "changed_by", "changed_at", "plus", "minus", "source", "source_note"],
     # Written by the website: a project's email list for the deficiency list (on_list "yes"/"no").
     "Contacts": ["project_number", "id", "name", "company", "trade", "email", "on_list", "added_by", "added_at", "position", "send_as"],
     # Written by the website (Admin -> Settings): company-wide settings, e.g. default_tol_plus / default_tol_minus.
