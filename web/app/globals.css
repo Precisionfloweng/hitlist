@@ -606,3 +606,4 @@ header.top .top-drop form button { background: transparent; }
 .contacts-add-bar input { min-width: 0; }
 @media (max-width: 900px) { .contacts-add-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); } .contacts-add-bar b { grid-column: 1 / -1; } }
 .card-head { display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
+.tol-ai-link { color: #5a3fb0; font-weight: 700; }

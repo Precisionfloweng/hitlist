@@ -76,7 +76,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                 <details className="card tol-view">
                   <summary>
                     <b>Design Tolerances</b>
-                    <span className="muted"> · {line} · tap to show</span>
+                    <span className="muted"> · {tags.every((t) => t === "spec") ? "✓ All from the project spec"
+                      : canEdit(user) ? <>Ask <Link href={`/projects/${encodeURIComponent(p.id)}/ai`} className="tol-ai-link">✨ AI Tools</Link> to pull these from the project spec</>
+                      : line} · tap to show</span>
                   </summary>
                   <div className="docs-tol-grid" style={{ marginTop: 10 }}>
                     {groups.map((g, n) => (
