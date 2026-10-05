@@ -326,6 +326,18 @@ function stepLabel(name: string, input: Record<string, unknown>): string {
 // ---- the conversation ----------------------------------------------------------------------------
 type Msg = { role: "user" | "assistant"; content: string | Record<string, unknown>[] };
 
+// Prompt caching: each round re-sends the whole conversation, so the instructions and everything up to the newest
+// message are marked for Anthropic to keep (about 5 minutes). The next round reads that part from the cache, which
+// costs about a tenth and doesn't count toward the account's input-tokens-per-minute limit.
+const SYSTEM = [{ type: "text", text: GUIDE, cache_control: { type: "ephemeral" } }];
+function cached(messages: Msg[]): Msg[] {
+  if (!messages.length) return messages;
+  const last = messages[messages.length - 1];
+  const blocks = typeof last.content === "string" ? [{ type: "text", text: last.content }] : last.content;
+  const marked = blocks.map((b, i) => (i === blocks.length - 1 ? { ...b, cache_control: { type: "ephemeral" } } : b));
+  return [...messages.slice(0, -1), { ...last, content: marked }];
+}
+
 /** Answer one question (with the earlier turns of its thread, if it's a reply). */
 export async function runAgent(project: string, question: string, by: string, tol: Tolerances,
   thread: Answer[] = [], step: Step = () => {}, onlyFolders?: string[]): Promise<Answer> {
@@ -357,8 +369,9 @@ async function converse(ctx: Ctx, question: string, by: string, thread: Answer[]
     if (mustAnswer) messages.push({ role: "user", content: "That's all the lookups there's time for: answer now with what you have, and say what you couldn't check." });
     if (round === 0) step("Thinking…");
     else if (mustAnswer) step("Writing the answer…");
-    const blocks: Block[] = await request({ system: GUIDE, messages, tools, max_tokens: 6000,
-      tool_choice: mustAnswer ? { type: "tool", name: "answer" } : { type: "any" } });
+    const blocks: Block[] = await request({ system: SYSTEM, messages: cached(messages), tools, max_tokens: 6000,
+      tool_choice: mustAnswer ? { type: "tool", name: "answer" } : { type: "any" } },
+      () => step("The AI is busy, waiting a moment…"));
     const uses = blocks.filter((b) => b.type === "tool_use");
     const ans = uses.find((b) => b.name === "answer");
     if (ans?.input) { final = ans.input; break; }

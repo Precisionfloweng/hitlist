@@ -90,21 +90,36 @@ function payloadFor(kind: Kind, d: ReviewItem, tol: Tolerances) {
 
 export type Block = { type: string; text?: string; input?: Record<string, unknown>; id?: string; name?: string };
 
-export async function request(body: Record<string, unknown>): Promise<Block[]> {
+/** One call to the Anthropic API. When the account's per-minute limit is hit (429) or the API is overloaded (529),
+ *  it waits as long as the reply says (retry-after) and tries again, up to about 30 seconds in all; onWait is told
+ *  so the page can say so. */
+export async function request(body: Record<string, unknown>, onWait?: (seconds: number) => void): Promise<Block[]> {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("The Anthropic API key isn't set on the website yet (ANTHROPIC_API_KEY in Vercel).");
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: 8000, ...body }),
-  });
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok) {
+  let waited = 0;
+  for (let attempt = 0; ; attempt++) {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+      body: JSON.stringify({ model: MODEL, max_tokens: 8000, ...body }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (r.ok) return (data.content ?? []) as Block[];
     const msg = data?.error?.message || `HTTP ${r.status}`;
     if (/credit balance/i.test(msg)) throw new Error("The Anthropic account is out of credit. Add credit in the Anthropic Console.");
+    if (r.status === 429 || r.status === 529) {
+      const after = Number(r.headers.get("retry-after"));
+      const wait = Math.min(20, Math.max(2, isFinite(after) && after > 0 ? Math.ceil(after) : 5 * (attempt + 1)));
+      if (attempt < 3 && waited + wait <= 30) {
+        onWait?.(wait);
+        await new Promise((ok) => setTimeout(ok, wait * 1000));
+        waited += wait;
+        continue;
+      }
+      throw new Error("The AI is busy right now (too many questions at once). Try again in a minute.");
+    }
     throw new Error(`The AI request failed: ${msg}`);
   }
-  return (data.content ?? []) as Block[];
 }
 
 /** One call to Claude; returns the text of its reply. */
