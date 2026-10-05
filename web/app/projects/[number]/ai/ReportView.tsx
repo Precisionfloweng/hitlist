@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import type { DesignReport, LeftReport, ToleranceReport } from "@/lib/reports";
+import type { DesignReport, LeftReport, OutItem, ToleranceReport } from "@/lib/reports";
 
 const day = (iso: string) => {
   const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T12:00:00` : iso);   // a bare date is that day, not UTC midnight
@@ -51,8 +51,8 @@ function Tolerance({ r, project }: { r: ToleranceReport; project: string }) {
                     {i === 0 && <td rowSpan={x.items.length}><UnitLink project={project} unit={x.unit} typeKey={x.typeKey} /></td>}
                     <td>{it.reading}</td>
                     <td>{it.design.toLocaleString()}{it.kind !== "flow" && " A"}{it.note && <div className="muted" style={{ fontSize: 12 }}>{it.note}</div>}</td>
-                    <td className={it.kind === "amps" ? "bad" : ""}>{it.actual.toLocaleString()}{it.kind !== "flow" && " A"}</td>
-                    <td className={it.kind === "amps" ? "" : "bad"}>{it.pct}</td>
+                    <td><Actual it={it} /></td>
+                    <td className="bad">{it.pct}</td>
                     <td>{it.allowed}{it.isDefault && <span className="muted"> (default)</span>}</td>
                   </tr>
                 )))}
@@ -72,6 +72,16 @@ function Tolerance({ r, project }: { r: ToleranceReport; project: string }) {
       {!r.groups.length && <div className="muted">No units with design and actual airflow or water flow readings to check.</div>}
     </>
   );
+}
+
+/** The actual reading; for amps every phase, with the one that's out of tolerance in red ("0.3 / 0.3 / 3.0 A"). */
+function Actual({ it }: { it: OutItem }) {
+  if (it.kind === "flow" || !it.phases || it.phases.length < 2) return <>{it.actual.toLocaleString()}{it.kind !== "flow" && " A"}</>;
+  const dec = it.phases.some((x) => !Number.isInteger(x));
+  const hit = it.phases.indexOf(it.actual);
+  return <>{it.phases.map((x, i) => (
+    <span key={i}>{i > 0 && " / "}<span style={i === hit ? { color: "#b42318", fontWeight: 700 } : undefined}>{dec ? x.toFixed(1) : x}</span></span>
+  ))} A</>;
 }
 
 function Left({ r, project }: { r: LeftReport; project: string }) {

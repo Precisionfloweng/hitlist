@@ -2,6 +2,12 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "Clearer motor amps in Out of tolerance",
+  "text": "Motor amps now show every phase reading (the high one in red), the % of design, and the limit as \"up to X A\"."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "Rules / Tol. tab layout",
   "text": "A project's rules now sit in their own Rules card below Tolerances, with short instructions next to the title."
  },

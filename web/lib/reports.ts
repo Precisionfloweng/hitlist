@@ -9,7 +9,7 @@ import { byTypeOrder } from "./typeOrder";
 
 /** One reading outside tolerance (flow: % of design vs the allowed range; amps: above design by any amount). */
 export type OutItem = { reading: string; design: number; actual: number; kind: "flow" | "amps" | "heater";
-  pct: string; allowed: string; isDefault: boolean; note?: string };
+  pct: string; allowed: string; isDefault: boolean; note?: string; phases?: number[] };   // phases: amps, every reading
 /** One unit, with everything on it that's out of tolerance together. */
 export type OutRow = { unit: string; typeKey: string | null; items: OutItem[] };
 export type OutGroup = { sheet: string; checked: number; rows: OutRow[];
@@ -53,9 +53,10 @@ export function toleranceReport(values: BsValues, results: Results | null, tol: 
           pct: fmtPct(c.pct!, c.tol), allowed: tolRange(c.tol), isDefault: !!c.tol.isDefault })),
         ...amps.filter((c) => c.over).map((c) => c.heater
           ? { reading: c.label, design: c.design, actual: c.actual!, kind: "heater" as const,
-              pct: fmtPct(c.pct!, HEATER_TOL), allowed: tolRange(HEATER_TOL), isDefault: false }
-          : { reading: c.label, design: c.design, actual: c.actual!, kind: "amps" as const, pct: "-", allowed: "below design",
-              isDefault: false, note: c.perMotor ? `${c.motors} motors × ${c.perMotor} A` : undefined }),
+              pct: fmtPct(c.pct!, HEATER_TOL), allowed: tolRange(HEATER_TOL), isDefault: false, phases: c.phases }
+          : { reading: c.label, design: c.design, actual: c.actual!, kind: "amps" as const, pct: fmtPct(c.pct!),
+              allowed: `up to ${c.design} A`, isDefault: false, phases: c.phases,
+              note: c.perMotor ? `${c.motors} motors × ${c.perMotor} A` : undefined }),
       ];
       if (items.length) g.rows.push({ unit: u.name, typeKey, items });
     }

@@ -97,7 +97,7 @@ export function nearness(c: PairCheck): number {
 // since the reading is the total.
 // Heater amps (electric heat, unit heater elements): always ±10% of design; the phase furthest from design is used.
 export type AmpCheck = { label: string; heater: boolean; design: number; perMotor: number | null; motors: number;
-  actual: number | null; pct: number | null; over: boolean | null };
+  actual: number | null; pct: number | null; over: boolean | null; phases: number[] };   // phases: every reading, in order
 export const HEATER_TOL: Tol = { plus: "10", minus: "10" };
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -149,7 +149,7 @@ export function checkAmps(sheet: string, v: Record<string, unknown>): AmpCheck[]
       const actual = readings.length ? readings.reduce((a, b) => (Math.abs(b - base) > Math.abs(a - base) ? b : a)) : null;
       const pct = actual === null ? null : Math.round(((actual - base) / base) * 1000) / 10;
       out.push({ label: m.label, heater: true, design: base, perMotor: null, motors: 1, actual, pct,
-        over: pct === null ? null : Math.abs(pct) > 10 + 1e-9 });
+        over: pct === null ? null : Math.abs(pct) > 10 + 1e-9, phases: readings });
       continue;
     }
     const counted = (m.count ?? []).map((c) => num(byNorm.get(norm(c)))).find((n) => n !== null && n !== undefined)
@@ -159,7 +159,7 @@ export function checkAmps(sheet: string, v: Record<string, unknown>): AmpCheck[]
     const actual = readings.length ? Math.max(...readings) : null;
     out.push({ label: m.label, heater: false, design, perMotor: motors > 1 ? base : null, motors, actual,
       pct: actual === null ? null : Math.round(((actual - design) / design) * 1000) / 10,
-      over: actual === null ? null : actual > design + 1e-9 });
+      over: actual === null ? null : actual > design + 1e-9, phases: readings });
   }
   return out;
 }
@@ -167,9 +167,17 @@ export function checkAmps(sheet: string, v: Record<string, unknown>): AmpCheck[]
 /** The design as text: "39.6 A (9 motors × 4.4 A)" or "14.2 A". */
 export const ampDesign = (c: AmpCheck) => `${c.design} A${c.perMotor ? ` (${c.motors} motors × ${c.perMotor} A)` : ""}`;
 
-/** For the AI: "15.1 A, OVER DESIGN 14.2 A" / "21.0 A = 105% of design, within 90–110% (heater amps)" / "no reading". */
+/** The phase readings as text: "0.3 / 0.3 / 3.0 A" (one decimal when any reading has one). */
+export function ampPhases(c: AmpCheck): string {
+  const dec = c.phases.some((x) => !Number.isInteger(x));
+  return `${c.phases.map((x) => (dec ? x.toFixed(1) : String(x))).join(" / ")} A`;
+}
+
+/** For the AI: "phases 0.3 / 0.3 / 3.0 A, highest 3 A = 176% of design, OVER DESIGN (allowed up to 1.7 A)" /
+ *  "21.0 A = 105% of design, within 90–110% (heater amps)" / "no reading". */
 export function describeAmps(c: AmpCheck): string {
   if (c.actual === null) return "no reading";
-  if (c.heater) return `${c.actual} A = ${fmtPct(c.pct!, HEATER_TOL)} of design ${c.design} A, ${c.over ? "OUTSIDE" : "within"} 90–110% (heater amps are always ±10%)`;
-  return `${c.actual} A, ${c.over ? "OVER DESIGN" : "within design"} ${ampDesign(c)}`;
+  const ph = c.phases.length > 1 ? `phases ${ampPhases(c)}, ` : "";
+  if (c.heater) return `${ph}${c.phases.length > 1 ? "furthest " : ""}${c.actual} A = ${fmtPct(c.pct!, HEATER_TOL)} of design ${c.design} A, ${c.over ? "OUTSIDE" : "within"} 90–110% (heater amps are always ±10%)`;
+  return `${ph}${c.phases.length > 1 ? "highest " : ""}${c.actual} A = ${fmtPct(c.pct!)} of design, ${c.over ? "OVER DESIGN" : "within design"} (allowed up to ${ampDesign(c)})`;
 }
