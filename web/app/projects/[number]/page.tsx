@@ -84,7 +84,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               {user.role !== "customer" && (
                 <Tile big={p.punchSent ? new Date(p.punchSent).toLocaleDateString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric" })
                   : p.dropboxPath ? "None yet" : "–"}
-                  label={p.punchSent ? `Last punch list sent · ${syncLabel(daysSince(p.punchSent)).text.toLowerCase()}` : "Last punch list sent"}
+                  label={p.punchSent ? `Last punch list sent · ${syncLabel(daysSince(p.punchSent)).text.toLowerCase().replace(/ ago$/, "")}` : "Last punch list sent"}
                   title={p.punchFile ? `Newest file in Deficiency Reports: ${p.punchFile}` : "From the newest file in the project's Dropbox Deficiency Reports folder"} />
               )}
             </div>
