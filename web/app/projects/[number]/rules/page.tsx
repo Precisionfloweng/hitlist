@@ -34,8 +34,8 @@ export default async function ProjectRulesPage({ params }: { params: Promise<{ n
         <div className="card tol-card">
           <div className="row" style={{ justifyContent: "space-between", marginBottom: 10 }}>
             <b>Rules</b>
-            <span className="muted" style={{ fontSize: 13 }}>What this project needs filled in. Pick a type, set each field Required, Optional or Ignore.
-              Starts from the <Link href="/rules">company defaults</Link>; changes (blue) apply to this project only, on its next sync.
+            <span className="muted" style={{ fontSize: 13 }}>Pick a type, set each field Required, Optional or Ignore.
+              Starts from the <Link href="/rules">company defaults</Link>; changes (blue) apply to this project only. After making changes, run a new sync to update the Hitlist.
               {changed > 0 && <> This project has <b>{changed}</b> field{changed === 1 ? "" : "s"} changed.</>}</span>
           </div>
           <RulesEditor types={rules.types} history={rules.history} canEdit={canEdit(user)} project={data.project.id} />
