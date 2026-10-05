@@ -2,6 +2,12 @@
  {
   "date": "2026-10-04",
   "audience": "all",
+  "title": "Rules / Tol. tab layout",
+  "text": "A project's rules now sit in their own Rules card below Tolerances, with short instructions next to the title."
+ },
+ {
+  "date": "2026-10-04",
+  "audience": "all",
   "title": "Design Tolerances on the Overview",
   "text": "The Overview's Design Tolerances card shows the tolerance to use for each reading, with a tag on each group (From spec, Set by hand or Default) and the spec file and page they came from."
  },

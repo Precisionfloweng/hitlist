@@ -30,13 +30,16 @@ export default async function ProjectRulesPage({ params }: { params: Promise<{ n
       <Header user={user} />
       <main>
         <ProjectHeader user={{ customer: false, canSync: canEdit(user) }} project={data.project} tab="rules" missingRequired={results?.summary.missing_required} rulesChanged={changed} notes={results?.notes?.length} />
-        <p className="muted" style={{ marginTop: 0 }}>
-          What this project needs filled in. It starts from the <Link href="/rules">company default rules</Link>;
-          anything you change here applies to this project only (highlighted blue), on its next sync.
-          {changed > 0 && <> This project has <b>{changed}</b> field{changed === 1 ? "" : "s"} changed from the default.</>}
-        </p>
         <TolerancesCard project={data.project.id} initial={tol} canEdit={canEdit(user)} present={present} def={def} />
-        <RulesEditor types={rules.types} history={rules.history} canEdit={canEdit(user)} project={data.project.id} />
+        <div className="card tol-card">
+          <div className="row" style={{ justifyContent: "space-between", marginBottom: 10 }}>
+            <b>Rules</b>
+            <span className="muted" style={{ fontSize: 13 }}>What this project needs filled in. Pick a type, set each field Required, Optional or Ignore.
+              Starts from the <Link href="/rules">company defaults</Link>; changes (blue) apply to this project only, on its next sync.
+              {changed > 0 && <> This project has <b>{changed}</b> field{changed === 1 ? "" : "s"} changed.</>}</span>
+          </div>
+          <RulesEditor types={rules.types} history={rules.history} canEdit={canEdit(user)} project={data.project.id} />
+        </div>
       </main>
     </>
   );
