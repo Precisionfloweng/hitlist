@@ -3,6 +3,7 @@ import Header from "../../../Header";
 import ProjectHeader from "../ProjectHeader";
 import AiTools from "./AiTools";
 import DocsAsk from "./DocsAsk";
+import { loadTolerances } from "@/lib/tolerances";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
@@ -14,7 +15,7 @@ export default async function AiToolsPage({ params }: { params: Promise<{ number
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
   if (!canEdit(user)) redirect(`/projects/${encodeURIComponent(number)}`);   // techs and admins only
-  const [data, results] = await Promise.all([getProject(number), loadResults(number)]);
+  const [data, results, projectTol] = await Promise.all([getProject(number), loadResults(number), loadTolerances(number)]);
   if (!data || !canSee(user, data.project.id)) notFound();
   const p = data.project;
   // Every unit and sub-item, in BuildingStart order, for the optional equipment picker.
@@ -29,7 +30,7 @@ export default async function AiToolsPage({ params }: { params: Promise<{ number
           missingRequired={results?.summary.missing_required} notes={results?.notes?.length} />
         <AiTools project={p.id} units={units} />
         <section className="ai-tools">
-          <DocsAsk project={p.id} units={[...new Set(units.map((u) => u.name))]} />
+          <DocsAsk project={p.id} units={[...new Set(units.map((u) => u.name))]} projectTol={projectTol} />
         </section>
       </main>
     </>

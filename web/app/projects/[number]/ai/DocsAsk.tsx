@@ -56,11 +56,16 @@ function Sources({ list }: { list: Source[] }) {
 }
 
 /** A question's answer plus its replies, with a box to reply (the AI keeps the conversation in mind). */
-export function AnswerView({ a, project, onClose, saved = false, onReply, busy }: { a: Answer; project: string; onClose?: () => void;
+export function AnswerView({ a, project, onClose, saved = false, onReply, busy, projectTol }: { a: Answer; project: string; onClose?: () => void;
+  projectTol?: Record<string, { plus: string; minus: string }>;
   saved?: boolean; onReply?: (text: string) => Promise<boolean>; busy?: string }) {
   const [reply, setReply] = useState("");
   const router = useRouter();
-  const [tolMsg, setTolMsg] = useState(saved ? "Saved to the Rules / Tol. tab ✓" : "");
+  const tolFound = normalizeTolerances(a.tolerances);
+  // Already on the project (saved automatically when asked, or by hand since)? Then say so instead of offering to save.
+  const onProject = !!projectTol && Object.keys(tolFound).length > 0 &&
+    Object.entries(tolFound).every(([k, t]) => projectTol[k] && fmtTol(projectTol[k]) === fmtTol(t));
+  const [tolMsg, setTolMsg] = useState(saved || onProject ? "Saved to the Rules / Tol. tab ✓" : "");
   const tol = normalizeTolerances(a.tolerances);   // also reads answers saved before tolerances had + and −
   const tolText = TOLERANCE_CATS.filter((c) => tol[c.key]).map((c) => `${c.full} ${fmtTol(tol[c.key])}`).join(" · ");
   async function fillTolerances() {
@@ -105,7 +110,8 @@ export function AnswerView({ a, project, onClose, saved = false, onReply, busy }
 }
 
 /** Ask questions about the project's Dropbox documents; answers cite the file and page. */
-export default function DocsAsk({ project, units }: { project: string; units: string[] }) {
+export default function DocsAsk({ project, units, projectTol }: { project: string; units: string[];
+  projectTol?: Record<string, { plus: string; minus: string }> }) {
   const [info, setInfo] = useState<Info | null>(null);
   const [loadErr, setLoadErr] = useState("");
   const [question, setQuestion] = useState("");
@@ -373,7 +379,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
             {answer ? "Answer" : "Latest question"} · {shown.by}, {when(shown.at)}
             {!answer && <> · <b>{shown.question.split("\n")[0]}</b></>}
           </div>
-          <AnswerView key={shown.at} a={shown} project={project} saved={!!answer && answerSaved} onClose={() => removeAnswer(shown.at)}
+          <AnswerView key={shown.at} a={shown} project={project} saved={!!answer && answerSaved} projectTol={projectTol} onClose={() => removeAnswer(shown.at)}
             onReply={(t) => replyTo(shown, t)} busy={busy === "reply" ? step || "Working…" : busy ? "busy" : ""} />
           {busy === "reply" && step && <div className="docs-step">⏳ {step}</div>}
         </>
@@ -385,7 +391,7 @@ export default function DocsAsk({ project, units }: { project: string; units: st
           {older.map((h) => (
             <details key={h.at} className="docs-hist-item">
               <summary>{h.question.split("\n")[0]} <span className="muted">· {h.by}, {when(h.at)}{h.replies?.length ? ` · ${h.replies.length} repl${h.replies.length === 1 ? "y" : "ies"}` : ""}</span></summary>
-              <AnswerView a={h} project={project} onClose={() => removeAnswer(h.at)} onReply={(t) => replyTo(h, t)} busy={busy ? "busy" : ""} />
+              <AnswerView a={h} project={project} projectTol={projectTol} onClose={() => removeAnswer(h.at)} onReply={(t) => replyTo(h, t)} busy={busy ? "busy" : ""} />
             </details>
           ))}
         </details>
