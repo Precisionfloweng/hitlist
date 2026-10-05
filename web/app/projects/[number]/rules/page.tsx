@@ -32,7 +32,7 @@ export default async function ProjectRulesPage({ params }: { params: Promise<{ n
         <ProjectHeader user={{ customer: false, canSync: canEdit(user) }} project={data.project} tab="rules" missingRequired={results?.summary.missing_required} rulesChanged={changed} notes={results?.notes?.length} />
         <TolerancesCard project={data.project.id} initial={tol} canEdit={canEdit(user)} present={present} def={def} />
         <div className="card tol-card">
-          <div className="row" style={{ justifyContent: "space-between", marginBottom: 10 }}>
+          <div className="card-head">
             <b>Rules</b>
             <span className="muted" style={{ fontSize: 13 }}>Pick a type, set each field Required, Optional or Ignore.
               Starts from the <Link href="/rules">company defaults</Link>; changes (blue) apply to this project only. After making changes, run a new sync to update the Hitlist.

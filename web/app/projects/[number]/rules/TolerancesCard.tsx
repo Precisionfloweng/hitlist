@@ -48,7 +48,7 @@ export default function TolerancesCard({ project, initial, canEdit, present, def
   if (groups.length === 0) return null;          // none of this equipment on the project
   return (
     <div className="card tol-card">
-      <div className="row" style={{ justifyContent: "space-between" }}>
+      <div className="card-head">
         <b>Tolerances</b>
         <span className="muted" style={{ fontSize: 13 }}>From the project spec, percent of design. Type in + and − fills to match; change − if it differs (e.g. +10 / −0). Blank uses the company default ({def.plus === def.minus ? `±${def.plus}` : `+${def.plus}/−${def.minus}`}%, shown grey).</span>
       </div>
