@@ -3,8 +3,6 @@ import type { User } from "@/lib/auth";
 import { serverStatus } from "@/lib/serverStatus";
 import TopMenu from "./TopMenu";
 
-/** The narrated training videos (a private Claude page; share it with the team from its Share menu). */
-export const TRAINING_URL = "https://claude.ai/artifact/72eiypLypvA4vLjM4cofa2";
 
 export default async function Header({ user }: { user: User }) {
   const status = user.role === "customer" ? null : await serverStatus();
@@ -20,7 +18,7 @@ export default async function Header({ user }: { user: User }) {
           { href: "/projects", label: "Projects" },
           ...(user.role !== "customer" ? [{ href: "/rules", label: "Default Rules" }] : []),
           ...(user.role === "admin" ? [{ href: "/admin", label: "Admin" }] : []),
-          ...(user.role !== "customer" ? [{ href: "/help", label: "Help" }, { href: TRAINING_URL, label: "🎬 Training", external: true }] : []),
+          ...(user.role !== "customer" ? [{ href: "/help", label: "Help" }, { href: "/training", label: "🎬 Training" }] : []),
         ]} />
       </div>
     </header>

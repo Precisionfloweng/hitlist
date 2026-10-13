@@ -608,3 +608,29 @@ header.top .top-drop form button { background: transparent; }
 .card-head { display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
 .tol-ai-link { color: #5a3fb0; font-weight: 700; }
 .ok-check { width: 16px; height: 16px; vertical-align: -3px; margin-right: 5px; } .ok-check circle { fill: #2e9e5b; } .ok-check path { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Training videos */
+.training { max-width: 1240px; }
+.training-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+@media (max-width: 960px) { .training-wrap { grid-template-columns: minmax(0, 1fr); } }
+.training-player { padding: 0; overflow: hidden; }
+.training-stage { position: relative; }
+.training-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #0b1420; }
+.training-next { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 8px; padding: 16px; text-align: center;
+  background: radial-gradient(ellipse at 50% 45%, rgba(36, 89, 139, .96), rgba(14, 34, 54, .97)); color: #fff; }
+.training-next-eye { color: #5fd08a; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; }
+.training-next-num { color: #c9d7e6; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.training-next-title { font-size: clamp(22px, 3.6vw, 36px); font-weight: 800; line-height: 1.15; max-width: 22ch; }
+.training-next-count { color: #c9d7e6; font-variant-numeric: tabular-nums; }
+.training-now { padding: 16px 20px 20px; }
+.training-now h2 { margin: 8px 0 4px; }
+.training-eye { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--brand); }
+.training-covers { margin: 6px 0 0; padding-left: 18px; columns: 2 240px; }
+.training-list { display: grid; gap: 10px; }
+.training-ch { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 10px; align-items: center; text-align: left; width: 100%;
+  background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 7px; cursor: pointer; font: inherit; color: var(--ink); }
+.training-ch:hover { border-color: #2f6fb3; }
+.training-ch.on { background: #e8f0f9; border-color: #2f6fb3; }
+.training-ch img { width: 104px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; display: block; }
+.training-ch b { display: block; font-size: 15px; line-height: 1.25; }
+.training-ch small { color: var(--muted); font-size: 13px; }

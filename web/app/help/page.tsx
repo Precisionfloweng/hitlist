@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Header, { TRAINING_URL } from "../Header";
+import Header from "../Header";
 import { requireStaff } from "@/lib/auth";
 import { whatsNew } from "@/lib/whatsNew";
 
@@ -35,7 +35,7 @@ export default async function HelpPage() {
           it in BuildingStart and press <b>Sync</b> on the Hitlist project.
         </p>
         <p className="lead">
-          New to Hitlist? <a href={TRAINING_URL} target="_blank" rel="noopener noreferrer"><b>🎬 Watch the training videos</b></a>:
+          New to Hitlist? <Link href="/training"><b>🎬 Watch the training videos</b></Link>:
           short narrated chapters, from the Overview and putting Hitlist on your phone to the AI Tools.
         </p>
 
