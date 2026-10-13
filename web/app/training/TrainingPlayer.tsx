@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 type Chapter = { id: string; file: string; title: string; who: "all" | "tech"; dur: string; desc: string; covers: string[] };
 
 const CHAPTERS: Chapter[] = [
-  { id: "ch1", file: "ch1-overview.mp4", title: "Overview tour", who: "all", dur: "3:31",
+  { id: "ch1", file: "ch1-overview.mp4", title: "Overview tour", who: "all", dur: "3:30",
     desc: "What Hitlist does, how the BuildingStart data gets in, and a walk through a job: progress, tolerances, the equipment checklist, deficiencies, AI Tools and the Monday email.",
     covers: ["How the data gets from BuildingStart to Hitlist", "The Projects list and Sync", "A job's Overview, tolerances and equipment checklist", "Deficiencies and the Monday summary email"] },
   { id: "ch2", file: "ch2-install.mp4", title: "Put Hitlist on your phone and PC", who: "all", dur: "1:40",
