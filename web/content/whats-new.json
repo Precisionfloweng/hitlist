@@ -1,5 +1,11 @@
 [
  {
+  "date": "2026-10-13",
+  "audience": "all",
+  "title": "RPM as whole numbers",
+  "text": "RPM values (design, actual, motor and fan) now show as whole numbers with no comma, e.g. 1400, in Design values and AI answers."
+ },
+ {
   "date": "2026-10-12",
   "audience": "all",
   "title": "Training videos",

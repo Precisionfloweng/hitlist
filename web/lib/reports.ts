@@ -6,6 +6,7 @@ import type { Results } from "./results";
 import type { Tolerances } from "./toleranceCats";
 import { ampChecksFor, checkAmps, checkUnit, fmtPct, HEATER_TOL, tolerancePairs, tolRange } from "./tolCheck";
 import { byTypeOrder } from "./typeOrder";
+import { displayValue } from "./numberFormat";
 
 /** One reading outside tolerance (flow: % of design vs the allowed range; amps: above design by any amount). */
 export type OutItem = { reading: string; design: number; actual: number; kind: "flow" | "amps" | "heater";
@@ -105,7 +106,7 @@ export function designReport(values: BsValues, unitName: string): DesignReport |
   const base = found.unit.path || found.unit.name;
   const section = (sheet: string, u: { name: string; v: Record<string, unknown> }): DesignSection => ({
     name: u.name, sheet,
-    fields: Object.entries(u.v).filter(([h]) => isDesignField(h)).map(([h, v]) => [h, typeof v === "boolean" ? (v ? "yes" : "no") : String(v)]),
+    fields: Object.entries(u.v).filter(([h]) => isDesignField(h)).map(([h, v]) => [h, displayValue(h, v)]),
   });
   const subs: DesignSection[] = [];
   for (const s of values.sheets) for (const u of s.units) {

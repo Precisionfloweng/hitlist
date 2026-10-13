@@ -11,6 +11,7 @@ import {
 import { loadResults, type Results } from "./results";
 import { toleranceReport } from "./reports";
 import { checkAmps, checkUnit, describe, describeAmps, tolerancePairs } from "./tolCheck";
+import { cleanRpmTable, cleanRpmText, displayValue } from "./numberFormat";
 import { fmtTol, normalizeTolerances, TOLERANCE_CATS, TOLERANCE_GROUPS, type Tolerances } from "./toleranceCats";
 import { request, type Block } from "./wording";
 
@@ -94,6 +95,7 @@ How to work:
   "12,500 CFM [S3]" or "11,980 CFM [B2]". Never guess or use typical values.
 
 Rules:
+- RPM (design, actual, motor, fan, any equipment) is always a whole number with no comma and no decimals: 1400, never 1,400.0.
 - Counts of done / left / not started: use the progress tool's numbers exactly; don't count rows yourself.
 - Tolerances and amps: use Hitlist's check results exactly as given (they're exact); never recalculate. Give readings
   as percent of design, e.g. "108% of design (allowed 90–110%)", never "+8%". Motor amps are flagged when the
@@ -217,7 +219,7 @@ function unitReadings(ctx: Ctx, a: { units?: string[]; tag?: string; sheet?: str
       const miss = r ? missingFields(r.type, r.unit.codes) : [];
       const tl = tolLine(s.sheet, u.name, ctx.tol);
       return [`Unit ${u.name} (sheet "${s.sheet}", path ${u.path || u.name})`,
-        ...Object.entries(u.v).map(([h, v]) => `${h}: ${show(v)}`),
+        ...Object.entries(u.v).map(([h, v]) => `${h}: ${displayValue(h, v)}`),
         r ? (miss.length ? `Hitlist: required fields still missing: ${miss.join(", ")}` : "Hitlist: all required fields filled in") : "",
         tl ? `Project tolerance: ${tl}` : "",
         ...checkUnit(s.sheet, u.name, u.v, tolerancePairs(s.headers), ctx.tol).map((c) => `Tolerance check (Hitlist): ${c.pair}: design ${c.design}, actual ${c.actual ?? "not entered"} = ${describe(c)}`),
@@ -237,7 +239,7 @@ function unitReadings(ctx: Ctx, a: { units?: string[]; tag?: string; sheet?: str
     const rows = units.map((u) => {
       const checks = checkUnit(s.sheet, u.name, u.v, pairs, ctx.tol);
       const amps = wantsAmps ? checkAmps(s.sheet, u.v) : [];
-      return [u.name, ...cols.map((c) => (u.v[c] === undefined ? "" : show(u.v[c]))),
+      return [u.name, ...cols.map((c) => (u.v[c] === undefined ? "" : displayValue(c, u.v[c]))),
         ...pairs.map((p) => { const c = checks.find((x) => x.pair === p.name); return c ? describe(c) : ""; }),
         ...amps.map(describeAmps)].join(" | ");
     });
@@ -388,10 +390,10 @@ async function converse(ctx: Ctx, question: string, by: string, thread: Answer[]
   }
   const r = (final ?? {}) as { answer?: string; found?: boolean; sources?: string[]; tolerances?: Record<string, unknown> | null;
     table?: { columns?: unknown; rows?: unknown } };
-  const answerText = String(r.answer ?? "").trim();
+  const answerText = cleanRpmText(String(r.answer ?? "").trim());
   const cited = new Set((r.sources ?? []).map(String));
   const table = Array.isArray(r.table?.columns) && Array.isArray(r.table?.rows)
-    ? { columns: (r.table!.columns as unknown[]).map(String), rows: (r.table!.rows as unknown[]).filter(Array.isArray).map((row) => (row as unknown[]).map(String)) }
+    ? cleanRpmTable({ columns: (r.table!.columns as unknown[]).map(String), rows: (r.table!.rows as unknown[]).filter(Array.isArray).map((row) => (row as unknown[]).map(String)) })
     : undefined;
   for (const m of [answerText, ...(table?.rows.flat() ?? [])].join(" ").matchAll(/\[([SB]\d+)\]/g)) cited.add(m[1]);
   let tolerances: Tolerances | null = null;
