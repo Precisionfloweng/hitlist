@@ -3,7 +3,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-type NavLink = { href: string; label: string };
+type NavLink = { href: string; label: string; external?: boolean };
+
+/** A link; external ones (the training videos) open in a new tab. */
+function NavItem({ l, className }: { l: NavLink; className?: string }) {
+  if (l.external) return <a href={l.href} target="_blank" rel="noopener noreferrer" className={className}>{l.label}</a>;
+  return <Link href={l.href} className={className}>{l.label}</Link>;
+}
 
 /** The top bar's links. On a narrow screen (phone upright) they fold into a ☰ menu at the right. */
 export default function TopMenu({ links, name }: { links: NavLink[]; name: string }) {
@@ -25,7 +31,7 @@ export default function TopMenu({ links, name }: { links: NavLink[]; name: strin
   return (
     <>
       <nav className="top-links">
-        {links.map((l) => <Link key={l.href} href={l.href}>{l.label}</Link>)}
+        {links.map((l) => <NavItem key={l.href} l={l} />)}
         <span className="spacer" />
         <Link href="/account/password">{name}</Link>
         {signOut}
@@ -34,7 +40,7 @@ export default function TopMenu({ links, name }: { links: NavLink[]; name: strin
         <button type="button" aria-label="Menu" aria-expanded={open} onClick={() => setOpen(!open)}>☰</button>
         {open && (
           <div className="top-drop">
-            {links.map((l) => <Link key={l.href} href={l.href} className={path.startsWith(l.href) ? "on" : ""}>{l.label}</Link>)}
+            {links.map((l) => <NavItem key={l.href} l={l} className={!l.external && path.startsWith(l.href) ? "on" : ""} />)}
             <div className="top-drop-sep" />
             <Link href="/account/password" className={path.startsWith("/account") ? "on" : ""}>{name}<span className="top-drop-sub">Change password</span></Link>
             {signOut}

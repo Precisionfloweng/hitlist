@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Header from "../Header";
+import Header, { TRAINING_URL } from "../Header";
 import { requireStaff } from "@/lib/auth";
 import { whatsNew } from "@/lib/whatsNew";
 
@@ -33,6 +33,10 @@ export default async function HelpPage() {
           Hitlist reads each project&apos;s BuildingStart export and shows what&apos;s been filled in, what&apos;s still
           missing, and the open punch items. It only <b>reads</b> BuildingStart. To change anything you see here, update
           it in BuildingStart and press <b>Sync</b> on the Hitlist project.
+        </p>
+        <p className="lead">
+          New to Hitlist? <a href={TRAINING_URL} target="_blank" rel="noopener noreferrer"><b>🎬 Watch the training videos</b></a>:
+          short narrated chapters, from the Overview and putting Hitlist on your phone to the AI Tools.
         </p>
 
         <nav className="help-toc card">
