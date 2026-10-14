@@ -30,6 +30,7 @@ const WHO = { all: "Everyone", tech: "Techs" };
 export default function TrainingPlayer() {
   const [i, setI] = useState(0);
   const [next, setNext] = useState<number | null>(null);     // seconds left before the next chapter, or null
+  const offered = useRef(false);                              // "Up next" already shown for this play-through
   const video = useRef<HTMLVideoElement>(null);
   const autoplay = useRef(false);
   const c = CHAPTERS[i];
@@ -43,7 +44,7 @@ export default function TrainingPlayer() {
     if (!v) return;
     v.load();
     if (autoplay.current) v.play().catch(() => {});
-    autoplay.current = false;
+    autoplay.current = false; offered.current = false;
     history.replaceState(null, "", `#${CHAPTERS[i].id}`);
   }, [i]);
   useEffect(() => {                                 // the countdown
@@ -62,7 +63,12 @@ export default function TrainingPlayer() {
       <section className="card training-player">
         <div className="training-stage">
           <video ref={video} controls playsInline preload="metadata" poster={src(`poster-${c.id}.jpg`)}
-            onEnded={() => { if (i < CHAPTERS.length - 1) setNext(5); }} onPlay={() => setNext(null)}>
+            onTimeUpdate={(e) => {                    // "Up next" as the narration ends (the last 1.5 s are quiet)
+              const v = e.currentTarget;
+              if (!offered.current && v.duration && v.duration - v.currentTime < 1.5 && i < CHAPTERS.length - 1) { offered.current = true; setNext(2); }
+            }}
+            onEnded={() => { if (!offered.current && i < CHAPTERS.length - 1) { offered.current = true; setNext(2); } }}
+            onPlay={(e) => { if (e.currentTarget.duration - e.currentTarget.currentTime > 2) { offered.current = false; setNext(null); } }}>
             <source src={src(c.file)} type="video/mp4" />
           </video>
           {next !== null && i < CHAPTERS.length - 1 && (
