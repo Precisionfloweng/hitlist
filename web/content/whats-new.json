@@ -2,6 +2,12 @@
  {
   "date": "2026-10-13",
   "audience": "all",
+  "title": "Training videos updated",
+  "text": "The training videos no longer have captions over the screen, and now explain what each Sync does, including finding the job's Dropbox documents on its own."
+ },
+ {
+  "date": "2026-10-13",
+  "audience": "all",
   "title": "RPM as whole numbers",
   "text": "RPM values (design, actual, motor and fan) now show as whole numbers with no comma, e.g. 1400, in Design values and AI answers."
  },

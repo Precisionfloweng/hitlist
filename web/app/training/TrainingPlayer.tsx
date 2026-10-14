@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 type Chapter = { id: string; file: string; title: string; who: "all" | "tech"; dur: string; desc: string; covers: string[] };
 
 const CHAPTERS: Chapter[] = [
-  { id: "ch1", file: "ch1-overview.mp4", title: "Overview tour", who: "all", dur: "3:30",
+  { id: "ch1", file: "ch1-overview.mp4", title: "Overview tour", who: "all", dur: "4:07",
     desc: "What Hitlist does, how the BuildingStart data gets in, and a walk through a job: progress, tolerances, the equipment checklist, deficiencies, AI Tools and the Monday email.",
     covers: ["How the data gets from BuildingStart to Hitlist", "The Projects list and Sync", "A job's Overview, tolerances and equipment checklist", "Deficiencies and the Monday summary email"] },
   { id: "ch2", file: "ch2-install.mp4", title: "Put Hitlist on your phone and PC", who: "all", dur: "1:40",
@@ -16,9 +16,9 @@ const CHAPTERS: Chapter[] = [
   { id: "ch4", file: "ch4-refine-review.mp4", title: "AI Tools: Refine & AI Review", who: "tech", dur: "2:12",
     desc: "Turn rough notes into clear deficiencies, dictate instead of typing, and have the AI check every open deficiency's wording.",
     covers: ["Refine a deficiency or a note", "Blanks for values only you know", "AI Review on the Deficiencies tab", "Keep as is, and items that read well"] },
-  { id: "ch5", file: "ch5-documents-suggestions.mp4", title: "AI Tools: Documents & Suggestions", who: "tech", dur: "3:10",
+  { id: "ch5", file: "ch5-documents-suggestions.mp4", title: "AI Tools: Documents & Suggestions", who: "tech", dur: "3:16",
     desc: "Link the job's Dropbox folder, then use the Suggestions list: spec tolerances, TAB requirements, design values from three sources, Out of tolerance and What's left to do.",
-    covers: ["Find documents and Set folder", "Tolerances and TAB requirements from the spec", "Design values: BuildingStart, drawings, submittals, Compare all", "Out of tolerance and What's left to do"] },
+    covers: ["How each sync reads the job's Dropbox folder", "Tolerances and TAB requirements from the spec", "Design values: BuildingStart, drawings, submittals, Compare all", "Out of tolerance and What's left to do"] },
   { id: "ch6", file: "ch6-asking.mp4", title: "AI Tools: Asking your own questions", who: "tech", dur: "1:49",
     desc: "Ask anything about the job in plain English, check where each answer came from, follow up with Reply, and find earlier questions.",
     covers: ["Watching the AI work step by step", "[S#] document and [B#] BuildingStart sources", "Reply to follow up or answer its question", "Asked before, and tips for good answers"] },
