@@ -1,5 +1,11 @@
 [
  {
+  "date": "2026-10-16",
+  "audience": "all",
+  "title": "Shorter Compare all answers",
+  "text": "Design values – Compare all now gives a few short lines above the table, highlights mismatched rows in red (with a count), and marks values that can't be compared directly as Check."
+ },
+ {
   "date": "2026-10-13",
   "audience": "all",
   "title": "Training videos updated",

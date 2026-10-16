@@ -428,6 +428,14 @@ select.docs-suggest option { color: var(--ink); font-weight: 400; }
 .docs-table-wrap { overflow-x: auto; margin-top: 10px; }
 .docs-table { font-size: 14px; background: #fff; }
 .docs-table td.bad { color: #b42318; font-weight: 700; }
+.docs-table tr.row-bad td { background: #fdecea; }
+.docs-table tr.row-check td { background: #fff6e0; }
+.docs-table td.match { white-space: nowrap; font-weight: 700; }
+.docs-table td.match:not(.bad):not(.check) { color: #1b7a3d; }
+.docs-table td.match.check { color: #8a5a00; white-space: normal; }
+.docs-table-sum { display: inline-block; font-weight: 700; font-size: 14px; padding: 3px 10px; border-radius: 999px; margin-bottom: 6px; }
+.docs-table-sum.bad { background: #fdecea; color: #b42318; }
+.docs-table-sum.ok { background: #e7f6ec; color: #1b7a3d; }
 .report-table.design td:first-child { width: 45%; }
 .docs-tol-diff { color: #9a3412; font-size: 13px; }
 .docs-tol { display: block !important; }

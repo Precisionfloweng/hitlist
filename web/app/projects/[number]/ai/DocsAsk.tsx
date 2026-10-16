@@ -30,13 +30,24 @@ const showPath = (p: string) => p.split("/").filter(Boolean).join(" / ");
 
 function AnswerTable({ t }: { t?: { columns: string[]; rows: string[][] } }) {
   if (!t || !t.rows.length) return null;
+  const m = t.columns.findIndex((c) => /^match/i.test(c.trim()));          // Compare all's Match column
+  const kind = (r: string[]) => (m < 0 ? "" : /mismatch/i.test(r[m] ?? "") ? "bad" : /^\s*(check|not comparable)/i.test(r[m] ?? "") ? "check" : "");
+  const bad = m < 0 ? 0 : t.rows.filter((r) => kind(r) === "bad").length;
   return (
     <div className="docs-table-wrap">
+      {m >= 0 && <div className={`docs-table-sum ${bad ? "bad" : "ok"}`}>{bad ? `⚠ ${bad} mismatch${bad === 1 ? "" : "es"}` : "✓ No mismatches"}</div>}
       <table className="docs-table">
         <thead><tr>{t.columns.map((c, i) => <th key={i}>{c}</th>)}</tr></thead>
-        <tbody>{t.rows.map((r, i) => (
-          <tr key={i}>{r.map((c, j) => <td key={j} className={/mismatch|≠|differs/i.test(c) ? "bad" : /not found/i.test(c) ? "muted" : ""}>{c}</td>)}</tr>
-        ))}</tbody>
+        <tbody>{t.rows.map((r, i) => {
+          const k = kind(r);
+          return (
+            <tr key={i} className={k ? `row-${k}` : ""}>{r.map((c, j) => (
+              <td key={j} className={j === m ? `match ${k}` : m < 0 && /mismatch|≠|differs/i.test(c) ? "bad" : /not found/i.test(c) ? "muted" : ""}>
+                {j === m && k === "bad" && !c.includes("⚠") ? `⚠ ${c}` : c}
+              </td>
+            ))}</tr>
+          );
+        })}</tbody>
       </table>
     </div>
   );
