@@ -68,7 +68,8 @@ def process_next(store: HitlistStore, settings: Settings, mailer: Mailer,
     try:
         if project is None:
             raise ExportError(f"Project {number} is not on the Projects list")
-        results = _refresh(store, settings, number, export_fn, step, project)
+        results = _refresh(store, settings, number, export_fn, step, project,
+                           by=_who(store, job.get("requested_by", "")))
     except Exception as exc:  # noqa: BLE001 - any failure is reported, the loop keeps going
         log.exception("Refresh of %s failed", number)
         message = friendly_error(exc, job.get("message", ""))[:500]
@@ -311,8 +312,20 @@ def _call_export(export_fn: ExportFn, number: str, step: StepFn, name: str = "",
     return export_fn(number, step, **kwargs) if len(params) >= 2 else export_fn(number)
 
 
+def _who(store: HitlistStore, email: str) -> str:
+    """The name of whoever pressed Sync (from Users), else their email; "server" stays "server"."""
+    email = (email or "").strip()
+    if not email or "@" not in email:
+        return email or "server"
+    try:
+        u = next((u for u in store.rows("Users") if u.get("email", "").strip().lower() == email.lower()), None)
+    except Exception:  # noqa: BLE001 - a name is nice to have; never fail a sync over it
+        u = None
+    return (u or {}).get("name", "").strip() or email
+
+
 def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: ExportFn,
-             step: StepFn = lambda m: None, project: dict[str, str] | None = None) -> dict[str, Any]:
+             step: StepFn = lambda m: None, project: dict[str, str] | None = None, by: str = "") -> dict[str, Any]:
     # `number` is the project's key (usually its number). BuildingStart is searched by the real
     # project number, and by name when two projects share a number.
     bs_number = (project or {}).get("project_number") or number
@@ -356,10 +369,10 @@ def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: Ex
     open_high = d["open_by_priority"].get("High", 0)
     store.append("History", [{"project_number": number, "synced_at": stamp, "fields_pct": s["fields_pct"],
                               "units_pct": s["units_pct"], "units": s["units"],
-                              "open_deficiencies": d["open"], "open_high": open_high}])
+                              "open_deficiencies": d["open"], "open_high": open_high, "synced_by": by}])
     store.update_project(number, last_sync=stamp, last_sync_status="ok", fields_pct=s["fields_pct"],
                          units_pct=s["units_pct"], units=s["units"], open_deficiencies=d["open"],
-                         open_high=open_high, gap_flags=len(results["gap_flags"]))
+                         open_high=open_high, gap_flags=len(results["gap_flags"]), last_sync_by=by)
     step("Sending BuildingStart values")
     values_problem = send_project_values(store, settings, number, export, stamp)
     if website_problem:

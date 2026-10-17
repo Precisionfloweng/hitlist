@@ -21,7 +21,9 @@ SCHEMA: dict[str, list[str]] = {
                  # newest file in the project's Dropbox "Deficiency Reports" folder = last punch list sent
                  "punch_sent", "punch_file",
                  # the BuildingStart values sent to the website for Search the Documents (date, and "ok: N units..." or the problem)
-                 "values_updated", "values_status"],
+                 "values_updated", "values_status",
+                 # who pressed Sync for the last good sync (their name from Users, else their email; "server" = from the server)
+                 "last_sync_by"],
     # projects: for role "customer", the project keys they may see (" | " separated)
     "Users": ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
     "Rules": ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
@@ -38,7 +40,7 @@ SCHEMA: dict[str, list[str]] = {
                   "units_pct", "updated_at"],
     "Deficiencies": ["project_number", "group", "value", "count", "updated_at"],
     "History": ["project_number", "synced_at", "fields_pct", "units_pct", "units",
-                "open_deficiencies", "open_high"],
+                "open_deficiencies", "open_high", "synced_by"],
     # Written by the website: a project's tolerances (±%) by category.
     "Tolerances": ["project_number", "category", "pct", "changed_by", "changed_at", "plus", "minus", "source", "source_note"],
     # Written by the website: a project's email list for the deficiency list (on_list "yes"/"no").

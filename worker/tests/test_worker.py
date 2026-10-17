@@ -54,6 +54,8 @@ def test_refresh_success(sample_export, tmp_path):
     assert {r["type"] for r in store.rows("Dashboard")} == {"AHUs", "VAVs", "VAV Electric Heat",
                                                             "Electric Heat (sub-item)"}
     assert len(store.rows("History")) == 1
+    # who pressed Sync: their name from Users, on Projects and on the History row
+    assert p["last_sync_by"] == "Taylor Tech" and store.rows("History")[0]["synced_by"] == "Taylor Tech"
     assert (tmp_path / "results" / "99-001.json").exists()
     # A successful sync emails nobody but Rick, and only because the website hand-off failed (no APP_URL in tests).
     assert len(mail.sent) == 1 and mail.sent[0]["To"] == "rick@example.com"
@@ -67,6 +69,18 @@ def test_second_refresh_replaces_dashboard_rows(sample_export, tmp_path):
         process_next(store, s, mail, export_fn=lambda n: sample_export)
     assert len(store.rows("Dashboard")) == 4
     assert len(store.rows("History")) == 2
+    assert store.project("99-001")["last_sync_by"] == "Taylor"          # not an email: kept as given
+
+
+def test_sync_by_unknown_email_or_server(sample_export, tmp_path):
+    store, s, mail = make_store(), settings(tmp_path), Mailer("app@example.com", "")
+    store.request_refresh("99-001", "someone@example.com")
+    process_next(store, s, mail, export_fn=lambda n: sample_export)
+    assert store.project("99-001")["last_sync_by"] == "someone@example.com"
+    store.request_refresh("99-001", "")
+    process_next(store, s, mail, export_fn=lambda n: sample_export)
+    assert store.project("99-001")["last_sync_by"] == "server"
+    assert [r["synced_by"] for r in store.rows("History")] == ["someone@example.com", "server"]
 
 
 def test_refresh_failure_emails_requester_and_admins(tmp_path):
