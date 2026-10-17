@@ -1,5 +1,11 @@
 [
  {
+  "date": "2026-10-17",
+  "audience": "all",
+  "title": "Spec tolerances found automatically",
+  "text": "When a job's documents are first read and no tolerances are set yet, Hitlist now finds the spec's tolerances on its own and saves them. Check them on the Rules / Tol. tab; tolerances already saved are never replaced."
+ },
+ {
   "date": "2026-10-16",
   "audience": "all",
   "title": "Shorter Compare all answers",

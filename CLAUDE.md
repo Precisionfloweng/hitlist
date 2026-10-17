@@ -60,6 +60,9 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   Tolerances tab rows: category, plus, minus (pct = old single ± value, still read; old category keys expand via LEGACY).
 - Company default (Admin → Settings, Settings tab default_tol_plus/minus, ±10% to start) fills every category a project
   hasn't set (`withDefaults`, `isDefault` → shown "(default)"; AI gets "(company default)").
+- Automatic spec tolerances (`web/lib/autoTolerances.ts`): when the docs manifest arrives (worker docs route, `after()`), a project with
+  Drawings and Specs files and no saved tolerances gets the Tolerances question run once by the AI; found values are saved as source
+  spec by "Hitlist (automatic)", the answer goes to history. State in Blob autotol/<key>.json (done/none stop; error retries after a day).
 - Document folders named Older versions / Old / Superseded / Archive / Previous / Void are skipped (`is_old_copy`).
 
 ## Project keys

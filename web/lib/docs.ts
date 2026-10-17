@@ -37,6 +37,18 @@ async function readBlob(path: string): Promise<Buffer | null> {
   }
 }
 
+/** The automatic spec-tolerance lookup's state for a project (so it runs once, not on every sync). */
+export type AutoTol = { status: "running" | "done" | "none" | "error"; at: string; message?: string };
+const autoTolPath = (project: string) => `autotol/${safe(project)}.json`;
+export async function loadAutoTol(project: string): Promise<AutoTol | null> {
+  const b = await readBlob(autoTolPath(project));
+  try { return b ? (JSON.parse(b.toString("utf8")) as AutoTol) : null; } catch { return null; }
+}
+export async function saveAutoTol(project: string, state: AutoTol) {
+  await put(autoTolPath(project), JSON.stringify(state), {
+    access: "private", allowOverwrite: true, addRandomSuffix: false, contentType: "application/json" });
+}
+
 /** Save one gzipped part from the server. After the manifest, delete parts it no longer uses. */
 export async function saveDocsPart(project: string, part: string, body: Buffer) {
   const manifest = part === "manifest" ? (JSON.parse(gunzipSync(body).toString("utf8")) as Manifest) : null;

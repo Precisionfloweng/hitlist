@@ -1,10 +1,11 @@
 // The server posts a project's document index here in gzipped parts (see worker/hitlist/documents.py).
 // "manifest" comes last; then parts the manifest no longer lists are deleted.
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { saveDocsPart } from "@/lib/docs";
+import { autoTolerances } from "@/lib/autoTolerances";
 
-export const maxDuration = 60;
+export const maxDuration = 300;     // the automatic spec-tolerance lookup runs after the reply (see below)
 
 function authorized(req: Request) {
   const expected = process.env.WORKER_SECRET || "";
@@ -25,6 +26,17 @@ export async function POST(req: Request, ctx: { params: Promise<{ number: string
     const msg = e instanceof Error ? e.message : String(e);
     console.error("Saving document index failed", number, part, msg);
     return NextResponse.json({ error: msg }, { status: 400 });
+  }
+  // Once the whole index is in: a project with no tolerances yet gets them looked up in its spec, after this
+  // reply (the server doesn't wait for the AI).
+  if (part === "manifest") {
+    after(async () => {
+      try {
+        console.log("automatic spec tolerances", number, await autoTolerances(number));
+      } catch (e) {
+        console.error("automatic spec tolerances failed", number, e instanceof Error ? e.message : e);
+      }
+    });
   }
   return NextResponse.json({ ok: true });
 }
