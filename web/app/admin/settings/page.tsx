@@ -2,12 +2,12 @@ import Header from "../../Header";
 import AdminNav from "../AdminNav";
 import DefaultTolerance from "./DefaultTolerance";
 import { requireAdmin } from "@/lib/auth";
-import { defaultTolerance } from "@/lib/settings";
+import { companyTolerances } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsAdmin() {
-  const [user, def] = await Promise.all([requireAdmin(), defaultTolerance()]);
+  const [user, def] = await Promise.all([requireAdmin(), companyTolerances()]);
   return (
     <>
       <Header user={user} />

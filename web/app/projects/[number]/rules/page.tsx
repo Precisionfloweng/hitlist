@@ -10,7 +10,7 @@ import { loadResults } from "@/lib/results";
 import { loadTolerances } from "@/lib/tolerances";
 import TolerancesCard from "./TolerancesCard";
 import { presentGroups } from "@/lib/toleranceCats";
-import { defaultTolerance } from "@/lib/settings";
+import { defaultTolerances } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,7 @@ export default async function ProjectRulesPage({ params }: { params: Promise<{ n
   const user = await requireStaff();
   const number = decodeURIComponent((await params).number);
   const [data, rules, results, tol, def] = await Promise.all([getProject(number), loadRules(number), loadResults(number),
-    loadTolerances(number), defaultTolerance()]);
+    loadTolerances(number), defaultTolerances()]);
   if (!data) notFound();
   // Tolerance boxes only for equipment this project has (from its last sync, including untracked sheets
   // like Supply Outlet); before a first sync, all of them.

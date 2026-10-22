@@ -63,7 +63,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               const parts = [["spec", "from the spec"], ["hand", "set by hand"], ["mixed", "partly by hand"], ["saved", "saved"]]
                 .filter(([k]) => count(k)).map(([k, w]) => `${count(k)} group${count(k) === 1 ? "" : "s"} ${w}`);
               const nDef = count("default");
-              const line = [...parts, nDef ? `${parts.length ? "the rest" : "all"} company default ${fmtTol(def)}` : ""].filter(Boolean).join(", ");
+              const line = [...parts, nDef ? `${parts.length ? "the rest" : "all"} company default${new Set(groups.flatMap((g) => g.items.filter((i) => tol[i.key].isDefault).map((i) => fmtTol(tol[i.key])))).size === 1 ? ` ${fmtTol(tol[groups.flatMap((g) => g.items).find((i) => tol[i.key].isDefault)!.key])}` : "s"}` : ""].filter(Boolean).join(", ");
               // The spec(s) the values came from, newest first.
               const specs = new Map<string, string>();
               for (const g of groups) for (const i of g.items) {

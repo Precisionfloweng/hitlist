@@ -58,8 +58,9 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   Terminal Units (max, min; fan/reheat airflow use max), FCUs/Heat Pumps/Splits/Unit Heaters (unitary_air), Water (pumps, coils, TU/FCU coils); each value has plus and minus. `categoriesFor(itemType,
   unitName)` maps a unit to its categories (outlets by their BuildingStart page; fans by type and SF/RF/EF tag).
   Tolerances tab rows: category, plus, minus (pct = old single ± value, still read; old category keys expand via LEGACY).
-- Company default (Admin → Settings, Settings tab default_tol_plus/minus, ±10% to start) fills every category a project
-  hasn't set (`withDefaults`, `isDefault` → shown "(default)"; AI gets "(company default)").
+- Company defaults (Admin → Settings): All equipment = Settings default_tol_plus/minus (±10% to start), and per category
+  default_tol_plus_<key>/default_tol_minus_<key> (blank = All equipment); `settings.defaultTolerances()` gives every category's.
+  They fill every category a project hasn't set (`withDefaults(tol, defaults)`, `isDefault` → shown "(default)"; AI gets "(company default)").
 - Automatic spec tolerances (`web/lib/autoTolerances.ts`): when the docs manifest arrives (worker docs route, `after()`), a project with
   Drawings and Specs files and no saved tolerances gets the Tolerances question run once by the AI; found values are saved as source
   spec by "Hitlist (automatic)", the answer goes to history. State in Blob autotol/<key>.json (done/none stop; error retries after a day).

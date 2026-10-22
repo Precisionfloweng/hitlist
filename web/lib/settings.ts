@@ -2,7 +2,7 @@
 import "server-only";
 import type { User } from "./auth";
 import { appendRows, ensureHeader, ensureTab, readTab, updateRows } from "./sheets";
-import type { Tol } from "./toleranceCats";
+import { isToleranceKey, TOLERANCE_CATS, type Tol, type Tolerances } from "./toleranceCats";
 
 export const DEFAULT_TOL: Tol = { plus: "10", minus: "10" };
 const num = /^\d{1,2}(\.\d+)?$/;
@@ -15,12 +15,33 @@ export async function loadSettings(): Promise<Record<string, string>> {
   }
 }
 
-/** The tolerance used for any category a project hasn't set (±10% unless an admin changed it). */
-export async function defaultTolerance(): Promise<Tol> {
+const readTol = (s: Record<string, string>, plusKey: string, minusKey: string): Tol | null => {
+  const plus = num.test(s[plusKey] ?? "") ? s[plusKey] : "";
+  const minus = num.test(s[minusKey] ?? "") ? s[minusKey] : "";
+  return plus || minus ? { plus: plus || minus, minus: minus || plus } : null;
+};
+
+/** Company defaults (Admin → Settings): "all equipment" (±10% to start) and any category given its own value. */
+export type CompanyTol = { all: Tol; cats: Tolerances };
+export async function companyTolerances(): Promise<CompanyTol> {
   const s = await loadSettings();
-  const plus = num.test(s.default_tol_plus ?? "") ? s.default_tol_plus : "";
-  const minus = num.test(s.default_tol_minus ?? "") ? s.default_tol_minus : "";
-  return plus || minus ? { plus: plus || minus, minus: minus || plus } : DEFAULT_TOL;
+  const cats: Tolerances = {};
+  for (const c of TOLERANCE_CATS) {
+    const t = readTol(s, `default_tol_plus_${c.key}`, `default_tol_minus_${c.key}`);
+    if (t) cats[c.key] = t;
+  }
+  return { all: readTol(s, "default_tol_plus", "default_tol_minus") ?? DEFAULT_TOL, cats };
+}
+
+/** The default for every category: its own company default, else the all-equipment one. */
+export async function defaultTolerances(): Promise<Tolerances> {
+  const { all, cats } = await companyTolerances();
+  return Object.fromEntries(TOLERANCE_CATS.map((c) => [c.key, cats[c.key] ?? all]));
+}
+
+/** The all-equipment default (±10% unless an admin changed it). */
+export async function defaultTolerance(): Promise<Tol> {
+  return (await companyTolerances()).all;
 }
 
 /** Save settings (admins only, checked by the caller). Changes are logged in RuleHistory. */
@@ -46,10 +67,22 @@ export async function saveSettings(values: Record<string, string>, by: User) {
   if (log.length) await appendRows("RuleHistory", log);
 }
 
-export async function saveDefaultTolerance(t: Partial<Tol>, by: User): Promise<Tol> {
-  const plus = (t.plus ?? "").trim(), minus = (t.minus ?? "").trim();
-  if (!plus && !minus) throw new Error("Enter the default tolerance, e.g. 10");
-  for (const x of [plus, minus]) if (x && !num.test(x)) throw new Error("Tolerances are a number like 5 or 10 (percent)");
-  await saveSettings({ default_tol_plus: plus || minus, default_tol_minus: minus || plus }, by);
-  return defaultTolerance();
+/** Save the company defaults: the all-equipment value (required) and each category's (blank = use all-equipment). */
+export async function saveCompanyTolerances(all: Partial<Tol>, cats: Record<string, Partial<Tol>>, by: User): Promise<CompanyTol> {
+  const check = (t?: Partial<Tol>) => {
+    const plus = (t?.plus ?? "").trim(), minus = (t?.minus ?? "").trim();
+    for (const x of [plus, minus]) if (x && !num.test(x)) throw new Error("Tolerances are a number like 5 or 10 (percent)");
+    return { plus: plus || minus, minus: minus || plus };
+  };
+  const a = check(all);
+  if (!a.plus) throw new Error("Enter the all-equipment default, e.g. 10");
+  const values: Record<string, string> = { default_tol_plus: a.plus, default_tol_minus: a.minus };
+  for (const [k, t] of Object.entries(cats ?? {})) {
+    if (!isToleranceKey(k)) throw new Error("Unknown tolerance");
+    const c = check(t);
+    values[`default_tol_plus_${k}`] = c.plus;
+    values[`default_tol_minus_${k}`] = c.minus;
+  }
+  await saveSettings(values, by);
+  return companyTolerances();
 }

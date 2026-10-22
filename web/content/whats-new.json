@@ -1,6 +1,12 @@
 [
  {
   "date": "2026-10-22",
+  "audience": "admins",
+  "title": "Default tolerances per equipment",
+  "text": "Admin → Settings now has a default + and − for each tolerance line (AHU supply, fan exhaust, pumps…), with one All equipment value for any line left blank."
+ },
+ {
+  "date": "2026-10-22",
   "audience": "all",
   "title": "Ductless: air ΔT now required",
   "text": "Ductless split systems now need Actual Air ΔT DB Cooling filled in (BuildingStart's \"Act. Air ΔT - DB Cooling\"). It shows on the checklist after each job's next sync."

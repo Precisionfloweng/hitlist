@@ -2,7 +2,7 @@
 import "server-only";
 import type { User } from "./auth";
 import { appendRows, deleteRows, ensureHeader, ensureTab, readTab, updateRows } from "./sheets";
-import { defaultTolerance } from "./settings";
+import { defaultTolerances } from "./settings";
 import { fmtTol, isToleranceKey, LEGACY, parseTol, TOLERANCE_CATS, withDefaults, type Tol, type Tolerances } from "./toleranceCats";
 
 const num = /^\d{1,2}(\.\d+)?$/;
@@ -52,8 +52,8 @@ export async function loadToleranceSources(project: string): Promise<Record<stri
 }
 
 /** Every category: the project's value, or the company default (marked isDefault) where it hasn't set one. */
-export async function loadTolerancesWithDefaults(project: string): Promise<{ tol: Tolerances; def: Tol }> {
-  const [tol, def] = await Promise.all([loadTolerances(project), defaultTolerance()]);
+export async function loadTolerancesWithDefaults(project: string): Promise<{ tol: Tolerances; def: Tolerances }> {
+  const [tol, def] = await Promise.all([loadTolerances(project), defaultTolerances()]);
   return { tol: withDefaults(tol, def), def };
 }
 

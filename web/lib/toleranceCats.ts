@@ -26,11 +26,14 @@ export const TOLERANCE_CATS = TOLERANCE_GROUPS.flatMap((g) =>
   g.items.map((i) => ({ ...i, group: g.key, full: `${g.label} – ${i.label}` })));
 export const isToleranceKey = (k: string) => TOLERANCE_CATS.some((c) => c.key === k);
 
-/** The project's tolerances with the company default (Admin → Settings, ±10% to start) filled into every
- *  category the project hasn't set. Those carry isDefault so pages can show them as "(default)". */
-export function withDefaults(tol: Tolerances, def: Tol): Tolerances {
+/** The project's tolerances with the company defaults (Admin → Settings: per category, else all-equipment ±10%)
+ *  filled into every category the project hasn't set. Those carry isDefault so pages can show them as "(default)". */
+export function withDefaults(tol: Tolerances, def: Tolerances): Tolerances {
   const out: Tolerances = {};
-  for (const c of TOLERANCE_CATS) out[c.key] = hasTol(tol[c.key]) ? tol[c.key] : { plus: def.plus, minus: def.minus, isDefault: true };
+  for (const c of TOLERANCE_CATS) {
+    const d = def[c.key] ?? { plus: "10", minus: "10" };
+    out[c.key] = hasTol(tol[c.key]) ? tol[c.key] : { plus: d.plus, minus: d.minus, isDefault: true };
+  }
   return out;
 }
 
