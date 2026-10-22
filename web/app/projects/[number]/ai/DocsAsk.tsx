@@ -344,7 +344,7 @@ export default function DocsAsk({ project, units, projectTol }: { project: strin
           {bs && (
             <div className={`docs-bs${bs.ok ? "" : " problem"}`}>
               <b>BuildingStart data:</b>{" "}
-              {bs.units > 0 && <>{bs.units.toLocaleString()} units in {bs.types} type{bs.types === 1 ? "" : "s"}, {bs.values.toLocaleString()} values
+              {bs.units > 0 && <>{bs.units.toLocaleString()} items in {bs.types} type{bs.types === 1 ? "" : "s"}, {bs.values.toLocaleString()} values
                 {bs.synced && <> · synced {fileDate(bs.synced.slice(0, 10))}</>}{bs.ok && " ✓"}</>}
               {bs.problem && <span>{bs.units > 0 ? " · " : ""}{bs.problem}</span>}
             </div>

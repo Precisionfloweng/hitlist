@@ -104,7 +104,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
             })()}
             <div className="ov-head">Project summary</div>
             <div className="tiles summary-banner">
-              <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Units fully complete" />
+              <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Items fully complete" />
               <Tile big={pct(summary ? summary.fields_pct : p.fieldsPct)} label="Overall complete"
                 title="Required fields filled across the whole project (same as Complete on the projects list)" />
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>
@@ -124,10 +124,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                   const done = t.summary.units_complete, n = t.summary.units;
                   const pctDone = Math.min(100, t.summary.fields_pct);   // the bar follows the % (required fields filled)
                   return (
-                    <Link key={t.key} href={eqHref(t.key)} className={`type-card${pctDone >= 100 ? " full" : ""}`} title={`${t.name}: ${done} of ${n} units fully complete, ${Math.round(t.summary.fields_pct)}% of required fields filled`}>
+                    <Link key={t.key} href={eqHref(t.key)} className={`type-card${pctDone >= 100 ? " full" : ""}`} title={`${t.name}: ${done} of ${n} items fully complete, ${Math.round(t.summary.fields_pct)}% of required fields filled`}>
                       <span className="tc-name">{t.name}</span>
                       <span className="tc-row">
-                        <span className="tc-num"><b>{done}</b> / {n} <span className="tc-units">units</span></span>
+                        <span className="tc-num"><b>{done}</b> / {n} <span className="tc-units">items</span></span>
                         <span className={`tc-pct${t.summary.fields_pct >= 100 ? " full" : ""}`} title="Required fields filled for this equipment type (same as the Equipment checklist)">{Math.round(t.summary.fields_pct)}%</span>
                       </span>
                       <span className={`tc-bar ${pctDone >= 100 ? "full" : ""}`}><span style={{ width: `${pctDone}%` }} /></span>

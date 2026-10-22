@@ -1,6 +1,12 @@
 [
  {
   "date": "2026-10-22",
+  "audience": "all",
+  "title": "\"Units\" is now \"Items\"",
+  "text": "The counts on the Projects list, Overview and Equipment checklist now say items: each unit and each sub-item (fan, coil, filter…) counts as one. The numbers are the same."
+ },
+ {
+  "date": "2026-10-22",
   "audience": "admins",
   "title": "Default tolerances per equipment",
   "text": "Admin → Settings now has a default + and − for each tolerance line (AHU supply, fan exhaust, pumps…), with one All equipment value for any line left blank."

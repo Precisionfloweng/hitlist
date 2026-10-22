@@ -116,7 +116,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
           <div>
             <h2>{t.name}</h2>
             <div className="muted">
-              {t.summary.units_complete} of {t.summary.units} units complete · {missingReq} required field{missingReq === 1 ? "" : "s"} missing
+              {t.summary.units_complete} of {t.summary.units} items complete · {missingReq} required field{missingReq === 1 ? "" : "s"} missing
               {syncedAt && <> · synced {new Date(syncedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</>}
             </div>
             {(() => {   // the project's tolerances for this kind of equipment (Rules / Tol. tab)

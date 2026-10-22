@@ -45,7 +45,7 @@ export default function ProjectsTable({ rows, userName, customer = false, canSyn
       <div className="scroll">
         <table className="proj-table">
           <thead>
-            <tr><th>Project #</th><th>Project</th><th>Tech</th><th>Complete</th><th className="ctr">Units</th>
+            <tr><th>Project #</th><th>Project</th><th>Tech</th><th>Complete</th><th className="ctr" title="Each unit and each sub-item (fans, coils, filters…) counts as one">Items</th>
               <th className="ctr">Punch items</th><th className="ctr">Last sync</th><th className="ctr">Sync status</th>{canSync && <th></th>}</tr>
           </thead>
           <tbody>
