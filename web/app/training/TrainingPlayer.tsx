@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from "react";
 type Chapter = { id: string; file: string; title: string; who: "all" | "tech"; dur: string; desc: string; covers: string[] };
 
 const CHAPTERS: Chapter[] = [
-  { id: "ch1", file: "ch1-overview.mp4", title: "Overview tour", who: "all", dur: "4:07",
+  { id: "ch1", file: "ch1-overview.mp4", title: "Overview tour", who: "all", dur: "4:09",
     desc: "What Hitlist does, how the BuildingStart data gets in, and a walk through a job: progress, tolerances, the equipment checklist, deficiencies, AI Tools and the Monday email.",
     covers: ["How the data gets from BuildingStart to Hitlist", "The Projects list and Sync", "A job's Overview, tolerances and equipment checklist", "Deficiencies and the Monday summary email"] },
   { id: "ch2", file: "ch2-install.mp4", title: "Put Hitlist on your phone and PC", who: "all", dur: "1:40",
     desc: "Add Hitlist to the iPhone or iPad home screen, and install it as an app on a Windows PC, so it opens with one tap.",
     covers: ["iPhone and iPad: Add to Home Screen", "Windows PC: install it from Edge or Chrome", "Pin it to the taskbar"] },
-  { id: "ch3", file: "ch3-contacts-rules.mp4", title: "Contacts, Rules & Tolerances", who: "tech", dur: "2:59",
+  { id: "ch3", file: "ch3-contacts-rules.mp4", title: "Contacts, Rules & Tolerances", who: "tech", dur: "3:07",
     desc: "Keep each job's email list, send the punch list in one tap, set the job's tolerances, and change what's required for one job.",
     covers: ["Add, edit and remove contacts", "On list, To and Cc, and New email", "Tolerances, and the company default (Admin → Settings)", "Required, Optional and Ignore, with change history"] },
   { id: "ch4", file: "ch4-refine-review.mp4", title: "AI Tools: Refine & AI Review", who: "tech", dur: "2:12",
