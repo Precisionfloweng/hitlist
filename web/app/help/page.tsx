@@ -36,7 +36,7 @@ export default async function HelpPage() {
         </p>
         <p className="lead">
           New to Hitlist? <Link href="/training"><b>🎬 Watch the training videos</b></Link>:
-          short narrated chapters, from the Overview and putting Hitlist on your phone to the AI Tools.
+          short narrated chapters, from the Overview and putting Hitlist on your iPad to the AI Tools.
         </p>
 
         <nav className="help-toc card">
