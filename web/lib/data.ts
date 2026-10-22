@@ -11,7 +11,7 @@ export type Project = {
   sharedWith: string[];// names of other projects with the same number
   number: string; name: string; tech: string; date: string; address: string; status: string;
   lastSync: string; lastSyncStatus: string; daysSinceSync: number | null;
-  fieldsPct: number | null; unitsPct: number | null; units: number | null;
+  fieldsPct: number | null; completePct: number | null; unitsPct: number | null; units: number | null;
   openDeficiencies: number | null; openHigh: number | null; gapFlags: number | null;
   punchItems: number | null;   // all deficiencies, open and closed
   queue: "queued" | "running" | null; job: SyncJob | null; row: number;
@@ -96,7 +96,7 @@ function toProject(p: Rec, queue: Rec[], punch?: Map<string, number>, all: Rec[]
     sharedWith: all.filter((o) => o.project_number === p.project_number && keyOf(o) !== key).map((o) => o.name),
     number: p.project_number, name: p.name, tech: p.tech, date: p.date, address: p.address,
     status: p.status || "active", lastSync: p.last_sync, lastSyncStatus: p.last_sync_status,
-    daysSinceSync: daysSince(p.last_sync), fieldsPct: num(p.fields_pct), unitsPct: num(p.units_pct),
+    daysSinceSync: daysSince(p.last_sync), fieldsPct: num(p.fields_pct), completePct: num(p.complete_pct) ?? num(p.fields_pct), unitsPct: num(p.units_pct),
     units: num(p.units), openDeficiencies: num(p.open_deficiencies), openHigh: num(p.open_high),
     gapFlags: num(p.gap_flags),
     punchItems: p.last_sync ? (punch?.get(key) ?? 0) : null,

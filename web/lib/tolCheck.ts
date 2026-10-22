@@ -15,8 +15,17 @@ const key = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
 const isAir = (s: string) => /airflow|air flow|cfm|o\/a|outside air|air vol/i.test(s);
 const isWater = (s: string) => !isAir(s) && /gpm|flow/i.test(s);
 
-/** The Design/Actual pairs among a sheet's columns that have a tolerance (airflow or water flow). */
-export function tolerancePairs(headers: string[]): Pair[] {
+/** Outlet sheets (Supply Outlet, Return Inlet, Exhaust Inlet…): their reading is "Final Reading", not "Actual …". */
+export const isOutletSheet = (sheet: string) => /outlet|inlet|diffuser|grille|register/i.test(sheet);
+
+/** The Design/Actual pairs among a sheet's columns that have a tolerance (airflow or water flow).
+ *  On an outlet sheet, Design Airflow is paired with Final Reading. */
+export function tolerancePairs(headers: string[], sheet = ""): Pair[] {
+  if (isOutletSheet(sheet)) {
+    const find = (re: RegExp) => headers.find((h) => re.test(h.trim()));
+    const d = find(/^design airflow$/i), a = find(/^final reading$/i);
+    if (d && a) return [{ name: "Airflow", design: d, actual: a, water: false }];
+  }
   const designs = new Map<string, string>();
   for (const h of headers) { const m = DES.exec(h); if (m) designs.set(key(m[1]), h); }
   const out: Pair[] = [];

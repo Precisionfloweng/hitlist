@@ -58,8 +58,8 @@ export default function ProjectsTable({ rows, userName, customer = false, canSyn
                   <td>{p.tech}</td>
                   <td style={{ minWidth: 140 }}>
                     <div className="row" style={{ gap: 8, flexWrap: "nowrap" }}>
-                      <div className="bar" style={{ flex: 1 }}><span style={{ width: `${p.fieldsPct ?? 0}%` }} /></div>
-                      <span className="num" style={{ width: 40 }}>{pct(p.fieldsPct)}</span>
+                      <div className="bar" style={{ flex: 1 }}><span style={{ width: `${p.completePct ?? 0}%` }} /></div>
+                      <span className="num" style={{ width: 40 }}>{pct(p.completePct)}</span>
                     </div>
                   </td>
                   <td className="ctr num-font">{p.units ?? "–"}</td>

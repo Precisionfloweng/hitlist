@@ -12,7 +12,7 @@ import { displayValue } from "./numberFormat";
 export type OutItem = { reading: string; design: number; actual: number; kind: "flow" | "amps" | "heater";
   pct: string; allowed: string; isDefault: boolean; note?: string; phases?: number[] };   // phases: amps, every reading
 /** One unit, with everything on it that's out of tolerance together. */
-export type OutRow = { unit: string; typeKey: string | null; items: OutItem[] };
+export type OutRow = { unit: string; typeKey: string | null; items: OutItem[]; where?: string };   // where: Area · Zone (outlets)
 export type OutGroup = { sheet: string; checked: number; rows: OutRow[];
   unchecked: { unit: string; typeKey: string | null; readings: string[] }[] };
 export type ToleranceReport = { kind: "tolerance"; synced: string; groups: OutGroup[]; outside: number; checked: number; unchecked: number };   // outside = units
@@ -38,7 +38,7 @@ export function toleranceReport(values: BsValues, results: Results | null, tol: 
   const typeOf = typeIndex(results);
   const groups: OutGroup[] = [];
   for (const s of values.sheets) {
-    const pairs = tolerancePairs(s.headers);
+    const pairs = tolerancePairs(s.headers, s.sheet);
     if (!pairs.length && !ampChecksFor(s.sheet).length) continue;
     const g: OutGroup = { sheet: s.sheet, checked: 0, rows: [], unchecked: [] };
     for (const u of s.units) {
@@ -59,7 +59,8 @@ export function toleranceReport(values: BsValues, results: Results | null, tol: 
               allowed: `up to ${c.design} A`, isDefault: false, phases: c.phases,
               note: c.perMotor ? `${c.motors} motors × ${c.perMotor} A` : undefined }),
       ];
-      if (items.length) g.rows.push({ unit: u.name, typeKey, items });
+      const where = [u.v.Area, u.v.Zone].filter((x) => x !== undefined && x !== null && String(x).trim()).join(" · ");
+      if (items.length) g.rows.push({ unit: u.name, typeKey, items, ...(where ? { where } : {}) });
     }
     if (g.checked || g.unchecked.length) groups.push(g);
   }

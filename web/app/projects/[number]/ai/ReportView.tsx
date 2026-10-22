@@ -48,7 +48,7 @@ function Tolerance({ r, project }: { r: ToleranceReport; project: string }) {
               <tbody>
                 {g.rows.flatMap((x) => x.items.map((it, i) => (
                   <tr key={`${x.unit}-${i}`} className={i === 0 ? "unit-first" : "unit-more"}>
-                    {i === 0 && <td rowSpan={x.items.length}><UnitLink project={project} unit={x.unit} typeKey={x.typeKey} /></td>}
+                    {i === 0 && <td rowSpan={x.items.length}><UnitLink project={project} unit={x.unit} typeKey={x.typeKey} />{x.where && <div className="muted" style={{ fontSize: 12 }}>{x.where}</div>}</td>}
                     <td>{it.reading}</td>
                     <td>{it.design.toLocaleString()}{it.kind !== "flow" && " A"}{it.note && <div className="muted" style={{ fontSize: 12 }}>{it.note}</div>}</td>
                     <td><Actual it={it} /></td>

@@ -47,7 +47,7 @@ def when_text(days: int | None) -> str:
 
 def _pct(p: dict[str, Any]) -> str:
     try:
-        return f"{round(float(p.get('fields_pct')))}%"
+        return f"{round(float(p.get('complete_pct') or p.get('fields_pct')))}%"
     except (TypeError, ValueError):
         return "–"
 

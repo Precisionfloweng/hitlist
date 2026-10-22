@@ -182,3 +182,18 @@ def test_accepted_deficiency_counts_as_closed():
     from hitlist.engine import _clean_deficiency
     assert _clean_deficiency({"Deficiency": "x", "Deficiency Status": "Accepted"})["open"] is False
     assert _clean_deficiency({"Deficiency": "x", "Deficiency Status": "Open"})["open"] is True
+
+
+def test_outlets_are_checked_with_the_bundled_rules():
+    headers = ["Full Path", "Equipment Name", "Area", "Zone", "Design Airflow", "Final Reading", "% Final Diff. "]
+    rows = [["AHU-1/VAV-1/S-1", "S-1", "Room 101", "Z1", 200, 190, 95],
+            ["AHU-1/VAV-1/S-2", "S-2", "Room 101", "Z1", 200, "", ""]]
+    sheets = {name: Sheet(name, headers, [dict(zip(headers, r)) for r in rows])
+              for name in ("Supply Outlet", "Return Inlet", "Exhaust Inlet")}
+    r = check_project(Export(project={"Number": "99-010"}, sheets=sheets), load_rules())
+    for key in ("supply_outlet", "return_inlet", "exhaust_inlet"):
+        t = _type(r, key)
+        assert [f["label"] for f in t["fields"]] == ["Area", "Zone", "Design Airflow", "Final Reading", "% Final Diff"]
+        assert _unit(t, "S-1")["codes"] == "PPPPP"          # "% Final Diff. " (trailing space) still matches
+        assert _unit(t, "S-2")["codes"] == "PPPRR"
+    assert not [w for w in r["warnings"] if "not in export" in w]

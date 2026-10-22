@@ -15,6 +15,7 @@ from .engine import check_project, dashboard_rows, gap_check
 from .export_reader import read_export
 from .exporter import ExportError, run_export
 from .mailer import Mailer, esc
+from .completion import complete_pct, weights_from_settings
 from .rules import load_rules
 from .store import DONE, FAILED, RUNNING, HitlistStore, apply_overrides, now_iso
 
@@ -312,6 +313,15 @@ def _call_export(export_fn: ExportFn, number: str, step: StepFn, name: str = "",
     return export_fn(number, step, **kwargs) if len(params) >= 2 else export_fn(number)
 
 
+def _weights(store: HitlistStore) -> dict[str, float]:
+    """Completion weights from the Settings tab (Admin -> Completion weights), else the defaults."""
+    try:
+        settings = {r.get("setting", ""): r.get("value", "") for r in store.rows("Settings")}
+    except Exception:  # noqa: BLE001 - tab missing or unreadable: defaults
+        settings = {}
+    return weights_from_settings(settings)
+
+
 def _who(store: HitlistStore, email: str) -> str:
     """The name of whoever pressed Sync (from Users), else their email; "server" stays "server"."""
     email = (email or "").strip()
@@ -367,12 +377,15 @@ def _refresh(store: HitlistStore, settings: Settings, number: str, export_fn: Ex
         for g, counts in groups for v, c in counts.items()])
     s = results["summary"]
     open_high = d["open_by_priority"].get("High", 0)
+    complete = complete_pct(results, _weights(store))
     store.append("History", [{"project_number": number, "synced_at": stamp, "fields_pct": s["fields_pct"],
                               "units_pct": s["units_pct"], "units": s["units"],
-                              "open_deficiencies": d["open"], "open_high": open_high, "synced_by": by}])
+                              "open_deficiencies": d["open"], "open_high": open_high, "synced_by": by,
+                              "complete_pct": complete}])
     store.update_project(number, last_sync=stamp, last_sync_status="ok", fields_pct=s["fields_pct"],
                          units_pct=s["units_pct"], units=s["units"], open_deficiencies=d["open"],
-                         open_high=open_high, gap_flags=len(results["gap_flags"]), last_sync_by=by)
+                         open_high=open_high, gap_flags=len(results["gap_flags"]), last_sync_by=by,
+                         complete_pct=complete)
     step("Sending BuildingStart values")
     values_problem = send_project_values(store, settings, number, export, stamp)
     if website_problem:

@@ -654,3 +654,12 @@ header.top .top-drop form button { background: transparent; }
 .cust-st.progress { color: #8a5a00; }
 .cust-st.none { color: var(--muted); }
 .phead-live { font-size: 13px; margin-top: 2px; }
+
+/* Admin → Completion weights */
+.weights-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.weights-table th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+  padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.weights-table td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.weights-table .tol-input input { width: 64px; }
+.weights-total td { border-bottom: 0; }
+.ok-text { color: var(--ok); }

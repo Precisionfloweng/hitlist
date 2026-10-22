@@ -13,7 +13,9 @@ export const SCHEMA = {
     // BuildingStart values sent for Search the Documents (server): date, and "ok: N units, N values" or the problem
     "values_updated", "values_status",
     // who pressed Sync for the last good sync (name from Users, else email; "server" = from the server)
-    "last_sync_by"],
+    "last_sync_by",
+    // overall % complete weighted by equipment category (lib/completion.ts); written by the server, and here when weights change
+    "complete_pct"],
   // projects: for role "customer", the project keys they may see (" | " separated)
   // last_seen: date (Central) the person last opened the app, updated at most once a day.
   Users: ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
@@ -29,7 +31,7 @@ export const SCHEMA = {
     "required_filled", "missing_required", "missing_optional", "fields_pct", "units_pct", "updated_at"],
   Deficiencies: ["project_number", "group", "value", "count", "updated_at"],
   History: ["project_number", "synced_at", "fields_pct", "units_pct", "units",
-    "open_deficiencies", "open_high", "synced_by"],
+    "open_deficiencies", "open_high", "synced_by", "complete_pct"],
   // A project's tolerances (+% / −%) by category, typed in on the project's Rules tab. Website only.
   // pct = the single ± value (also how rows saved before the +/− split are read).
   Tolerances: ["project_number", "category", "pct", "changed_by", "changed_at", "plus", "minus", "source", "source_note"],

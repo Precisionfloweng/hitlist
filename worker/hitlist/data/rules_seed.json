@@ -7999,6 +7999,138 @@
      "when": null
     }
    ]
+  },
+  {
+   "key": "supply_outlet",
+   "name": "Supply Outlets",
+   "export_sheet": "Supply Outlet",
+   "export_sheet_confirmed": true,
+   "parent_types": null,
+   "fields": [
+    {
+     "label": "Area",
+     "columns": [
+      "Area"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "Zone",
+     "columns": [
+      "Zone"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "Design Airflow",
+     "columns": [
+      "Design Airflow"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "Final Reading",
+     "columns": [
+      "Final Reading"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "% Final Diff",
+     "columns": [
+      "% Final Diff."
+     ],
+     "status": "required"
+    }
+   ]
+  },
+  {
+   "key": "return_inlet",
+   "name": "Return Inlets",
+   "export_sheet": "Return Inlet",
+   "export_sheet_confirmed": true,
+   "parent_types": null,
+   "fields": [
+    {
+     "label": "Area",
+     "columns": [
+      "Area"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "Zone",
+     "columns": [
+      "Zone"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "Design Airflow",
+     "columns": [
+      "Design Airflow"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "Final Reading",
+     "columns": [
+      "Final Reading"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "% Final Diff",
+     "columns": [
+      "% Final Diff."
+     ],
+     "status": "required"
+    }
+   ]
+  },
+  {
+   "key": "exhaust_inlet",
+   "name": "Exhaust Inlets",
+   "export_sheet": "Exhaust Inlet",
+   "export_sheet_confirmed": true,
+   "parent_types": null,
+   "fields": [
+    {
+     "label": "Area",
+     "columns": [
+      "Area"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "Zone",
+     "columns": [
+      "Zone"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "Design Airflow",
+     "columns": [
+      "Design Airflow"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "Final Reading",
+     "columns": [
+      "Final Reading"
+     ],
+     "status": "required"
+    },
+    {
+     "label": "% Final Diff",
+     "columns": [
+      "% Final Diff."
+     ],
+     "status": "required"
+    }
+   ]
   }
  ]
 }

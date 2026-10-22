@@ -446,3 +446,28 @@ def test_move_rule_field_after_another():
     assert sorted(int(r["order"]) for r in store.rows("Rules") if r["type_key"] == key) == list(range(1, len(order()) + 1))
     with pytest.raises(KeyError):
         store.move_rule_field(key, "no such field", first)
+
+
+def test_complete_pct_is_weighted_by_category(sample_export, tmp_path):
+    from hitlist.completion import complete_pct, weights_from_settings
+    types = [{"key": "supply_outlet", "units": [{"required": 10, "required_filled": 10}]},     # outlets 100%
+             {"key": "ahu", "units": [{"required": 20, "required_filled": 10}]},               # air handlers 50%
+             {"key": "something_new", "units": [{"required": 4, "required_filled": 0}]}]       # other 0%
+    w = weights_from_settings({})
+    assert w["outlets"] == 40 and w["air_handlers"] == 30 and w["other"] == 2
+    # (40*100 + 30*50 + 2*0) / (40+30+2) = 76.4; categories the job doesn't have don't count
+    assert complete_pct({"types": types}, w) == 76.4
+    assert complete_pct({"types": types}, weights_from_settings({"weight_other": "0", "weight_air_handlers": "x"})) == 78.6
+    # written on each sync, to Projects and History
+    store, s, mail = make_store(), settings(tmp_path), Mailer("app@example.com", "")
+    store.request_refresh("99-001", "tech@example.com")
+    process_next(store, s, mail, export_fn=lambda n: sample_export)
+    assert store.project("99-001")["complete_pct"] != "" and store.rows("History")[0]["complete_pct"] != ""
+
+
+def test_completion_categories_match_the_website():
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parents[2]
+    a = (here / "web" / "content" / "completion-categories.json").read_text(encoding="utf-8")
+    b = (here / "worker" / "hitlist" / "data" / "completion_categories.json").read_text(encoding="utf-8")
+    assert a == b, "copy web/content/completion-categories.json to worker/hitlist/data/completion_categories.json"

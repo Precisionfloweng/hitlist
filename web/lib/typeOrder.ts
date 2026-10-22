@@ -31,6 +31,9 @@ export const TYPE_ORDER = [
   "boiler",           // Boiler
   "ach",              // ACH / Pressurization
   "autoflow_valve",   // Autoflow Valve
+  "supply_outlet",    // Supply Outlet
+  "return_inlet",     // Return Inlet
+  "exhaust_inlet",    // Exhaust Inlet
 ];
 
 export function byTypeOrder<T extends { key: string; name: string }>(a: T, b: T): number {

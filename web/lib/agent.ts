@@ -222,7 +222,7 @@ function unitReadings(ctx: Ctx, a: { units?: string[]; tag?: string; sheet?: str
         ...Object.entries(u.v).map(([h, v]) => `${h}: ${displayValue(h, v)}`),
         r ? (miss.length ? `Hitlist: required fields still missing: ${miss.join(", ")}` : "Hitlist: all required fields filled in") : "",
         tl ? `Project tolerance: ${tl}` : "",
-        ...checkUnit(s.sheet, u.name, u.v, tolerancePairs(s.headers), ctx.tol).map((c) => `Tolerance check (Hitlist): ${c.pair}: design ${c.design}, actual ${c.actual ?? "not entered"} = ${describe(c)}`),
+        ...checkUnit(s.sheet, u.name, u.v, tolerancePairs(s.headers, s.sheet), ctx.tol).map((c) => `Tolerance check (Hitlist): ${c.pair}: design ${c.design}, actual ${c.actual ?? "not entered"} = ${describe(c)}`),
         ...checkAmps(s.sheet, u.v).map((c) => `Amps check (Hitlist): ${c.label}: ${describeAmps(c)}`),
       ].filter(Boolean).join("\n");
     }).join("\n\n") + (hits.length > MAX_FULL_UNITS ? `\n\nTRUNCATED: ${hits.length} units match; only ${MAX_FULL_UNITS} shown in full.` : ""));
@@ -233,7 +233,7 @@ function unitReadings(ctx: Ctx, a: { units?: string[]; tag?: string; sheet?: str
   for (const [s, u] of hits) bySheet.set(s, [...(bySheet.get(s) ?? []), u]);
   const parts = [...bySheet].map(([s, units]) => {
     let cols = pickColumns(s, words);
-    const pairs = tolerancePairs(s.headers).filter((p) => cols.includes(p.design) || cols.includes(p.actual));
+    const pairs = tolerancePairs(s.headers, s.sheet).filter((p) => cols.includes(p.design) || cols.includes(p.actual));
     cols = [...cols, ...pairs.flatMap((p) => [p.design, p.actual]).filter((c, i, arr) => !cols.includes(c) && arr.indexOf(c) === i)];
     const wantsAmps = words.some((w) => /amp/.test(w));
     const rows = units.map((u) => {

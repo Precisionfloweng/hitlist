@@ -23,7 +23,9 @@ SCHEMA: dict[str, list[str]] = {
                  # the BuildingStart values sent to the website for Search the Documents (date, and "ok: N units..." or the problem)
                  "values_updated", "values_status",
                  # who pressed Sync for the last good sync (their name from Users, else their email; "server" = from the server)
-                 "last_sync_by"],
+                 "last_sync_by",
+                 # overall % complete weighted by equipment category (hitlist/completion.py); the website updates it when weights change
+                 "complete_pct"],
     # projects: for role "customer", the project keys they may see (" | " separated)
     "Users": ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
     "Rules": ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
@@ -40,7 +42,7 @@ SCHEMA: dict[str, list[str]] = {
                   "units_pct", "updated_at"],
     "Deficiencies": ["project_number", "group", "value", "count", "updated_at"],
     "History": ["project_number", "synced_at", "fields_pct", "units_pct", "units",
-                "open_deficiencies", "open_high", "synced_by"],
+                "open_deficiencies", "open_high", "synced_by", "complete_pct"],
     # Written by the website: a project's tolerances (±%) by category.
     "Tolerances": ["project_number", "category", "pct", "changed_by", "changed_at", "plus", "minus", "source", "source_note"],
     # Written by the website: a project's email list for the deficiency list (on_list "yes"/"no").

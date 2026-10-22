@@ -64,7 +64,17 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Automatic spec tolerances (`web/lib/autoTolerances.ts`): when the docs manifest arrives (worker docs route, `after()`), a project with
   Drawings and Specs files and no saved tolerances gets the Tolerances question run once by the AI; found values are saved as source
   spec by "Hitlist (automatic)", the answer goes to history. State in Blob autotol/<key>.json (done/none stop; error retries after a day).
+- Outlets: types supply_outlet / return_inlet / exhaust_inlet (sheets Supply Outlet, Return Inlet, Exhaust Inlet). `tolCheck.tolerancePairs(headers, sheet)`
+  pairs Design Airflow with Final Reading on outlet sheets (`isOutletSheet`); Out of tolerance rows carry `where` (Area · Zone).
 - Document folders named Older versions / Old / Superseded / Archive / Previous / Void are skipped (`is_old_copy`).
+
+## Completion weights
+- Overall % complete = Σ(category share × category's required-fields %) / Σ(shares of categories the job has). Categories are fixed in
+  `web/content/completion-categories.json` (copy in `worker/hitlist/data/completion_categories.json`; a test checks they match); unknown types →
+  "other". Shares: Settings weight_<category> (Admin → Completion weights, must total 100), else each category's default.
+  Worker `hitlist/completion.py` writes Projects/History complete_pct on each sync; web `lib/completion.ts` (Overview, preview) and
+  `settings.saveWeights` recalculates every project's complete_pct from its results when shares change. Projects list/email read complete_pct
+  (fallback fields_pct). Type cards keep their own fields_pct.
 
 ## Project keys
 - Projects can share a number (two sites on one contract). Each project's key is `project_id`, blank

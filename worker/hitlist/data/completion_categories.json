@@ -1,0 +1,102 @@
+{
+ "_note": "Fixed equipment categories for the job's overall % complete. Admins set each one's share of the job (Admin -> Completion weights); 'default' is the starting share. A type not listed counts as 'other'. Keep worker/hitlist/data/completion_categories.json identical (a test checks).",
+ "categories": [
+  {
+   "key": "outlets",
+   "label": "Outlets & inlets",
+   "default": 40,
+   "types": [
+    "supply_outlet",
+    "return_inlet",
+    "exhaust_inlet"
+   ],
+   "includes": "Supply outlets, return inlets, exhaust inlets"
+  },
+  {
+   "key": "air_handlers",
+   "label": "Air handlers",
+   "default": 30,
+   "types": [
+    "ahu",
+    "rtu",
+    "mau",
+    "fan_sub",
+    "chw_coil_sub",
+    "hw_coil_sub",
+    "dx_coil_sub",
+    "edh_sub",
+    "filter_sub",
+    "duct_traverse"
+   ],
+   "includes": "AHUs, RTUs, make-up air units, and their fans, coils, electric heat, filters; duct traverses"
+  },
+  {
+   "key": "terminal",
+   "label": "Terminal units",
+   "default": 8,
+   "types": [
+    "vav",
+    "vav_electric_heat"
+   ],
+   "includes": "VAVs and their electric heat"
+  },
+  {
+   "key": "hydronic",
+   "label": "Hydronic",
+   "default": 6,
+   "types": [
+    "pump",
+    "chiller",
+    "cooling_tower",
+    "boiler",
+    "coil_test",
+    "autoflow_valve"
+   ],
+   "includes": "Pumps, chillers, cooling towers, boilers, coil tests, autoflow valves"
+  },
+  {
+   "key": "unitary",
+   "label": "Unitary",
+   "default": 5,
+   "types": [
+    "fcu",
+    "wshp",
+    "split",
+    "ductless",
+    "unit_heater"
+   ],
+   "includes": "FCUs, WSHPs, split and ductless systems, unit heaters"
+  },
+  {
+   "key": "face_velocity",
+   "label": "Face velocity",
+   "default": 5,
+   "types": [
+    "face_velocity"
+   ],
+   "includes": "Face velocity tests"
+  },
+  {
+   "key": "fans",
+   "label": "Fans",
+   "default": 4,
+   "types": [
+    "exhaust_fan",
+    "toilet_exhaust"
+   ],
+   "includes": "Exhaust fans, toilet exhaust fans"
+  },
+  {
+   "key": "other",
+   "label": "Other tests",
+   "default": 2,
+   "types": [
+    "temp_sensor",
+    "flow_sensor",
+    "pressure_sensor",
+    "ach"
+   ],
+   "includes": "Temp, flow and pressure sensors, ACH / pressurization, anything else"
+  }
+ ]
+}

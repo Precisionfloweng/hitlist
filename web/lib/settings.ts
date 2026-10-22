@@ -1,7 +1,9 @@
 // Company-wide settings (Admin → Settings), kept in the sheet's Settings tab: one row per setting.
 import "server-only";
 import type { User } from "./auth";
-import { appendRows, ensureHeader, ensureTab, readTab, updateRows } from "./sheets";
+import { appendRows, ensureHeader, ensureTab, readTab, updateCell, updateRows } from "./sheets";
+import { CATEGORIES, completePct, typeTotals, weightsFromSettings, type Weights } from "./completion";
+import { loadResults } from "./results";
 import { isToleranceKey, TOLERANCE_CATS, type Tol, type Tolerances } from "./toleranceCats";
 
 export const DEFAULT_TOL: Tol = { plus: "10", minus: "10" };
@@ -85,4 +87,34 @@ export async function saveCompanyTolerances(all: Partial<Tol>, cats: Record<stri
   }
   await saveSettings(values, by);
   return companyTolerances();
+}
+
+/** Completion weights (Admin → Completion weights): each category's share of the job. */
+export async function loadWeights(): Promise<Weights> {
+  return weightsFromSettings(await loadSettings());
+}
+
+/** Save the shares (must total 100), then recalculate every project's overall % from its last sync. */
+export async function saveWeights(input: Record<string, unknown>, by: User): Promise<{ weights: Weights; updated: number }> {
+  const values: Record<string, string> = {};
+  let total = 0;
+  for (const c of CATEGORIES) {
+    const v = Number(String(input[c.key] ?? "").trim());
+    if (String(input[c.key] ?? "").trim() === "" || !isFinite(v) || v < 0 || v > 100) throw new Error(`Enter a % from 0 to 100 for ${c.label}`);
+    values[`weight_${c.key}`] = String(v);
+    total += v;
+  }
+  if (Math.abs(total - 100) > 0.001) throw new Error(`The shares add up to ${Math.round(total * 10) / 10}%, not 100%`);
+  await saveSettings(values, by);
+  await ensureHeader("Projects");
+  const weights = await loadWeights();
+  let updated = 0;
+  for (const p of await readTab("Projects", true)) {
+    const key = (p.project_id || "").trim() || p.project_number;
+    const r = key ? await loadResults(key) : null;
+    if (!r) continue;
+    const pct = String(completePct(typeTotals(r.types), weights, r.summary.fields_pct));
+    if (pct !== (p.complete_pct ?? "")) { await updateCell("Projects", p._row, "complete_pct", pct); updated++; }
+  }
+  return { weights, updated };
 }

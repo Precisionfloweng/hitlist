@@ -1,6 +1,18 @@
 [
  {
   "date": "2026-10-22",
+  "audience": "all",
+  "title": "Grilles are now checked",
+  "text": "Supply outlets, return inlets and exhaust inlets are on the Equipment checklist (Area, Zone, Design Airflow, Final Reading and % Final Diff. required), and AI Tools → Out of tolerance lists every grille whose Final Reading is outside the Outlets & Inlets tolerance."
+ },
+ {
+  "date": "2026-10-22",
+  "audience": "admins",
+  "title": "Completion weights",
+  "text": "Admin → Completion weights sets how much of the job each equipment category is (e.g. outlets 40%, air handlers 30%). The overall % complete on the Projects list, Overview and Monday email now uses these shares."
+ },
+ {
+  "date": "2026-10-22",
   "audience": "admins",
   "title": "Simpler view for customers",
   "text": "Customers now see only the main units on the Equipment checklist, each Done, In progress or Not started (counting its sub-items), with any open punch items, and a note that it updates when the tech syncs."
