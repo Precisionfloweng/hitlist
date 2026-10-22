@@ -85,7 +85,8 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Rules: the Rules tab is the company default (admins edit). `update-rules TYPE [--statuses]` copies a type from
   the bundled seed; with the same field count it pairs fields by position, so renames carry over (and to ProjectRules);
   new fields are appended, or with --statuses the type is rewritten to match the seed exactly. `add-field TYPE "Label" --column COL
-  [--status]` adds one field to the live Rules tab (and nothing else); export columns match by `engine.col_key` (NFKC, ∆=Δ, spaces, case). ProjectRules holds one project's
+  [--status]` adds one field to the live Rules tab (and nothing else), `add-field TYPE --from-bundled` adds the bundled fields whose column the
+  type doesn't use yet; export columns match by `engine.col_key` (NFKC, ∆=Δ, spaces, case). ProjectRules holds one project's
   required/optional/ignore changes (anyone edits, on the project's Rules tab); blank status = default.
   The worker applies them per project (`store.apply_overrides`).
 - The "Electric Coil" sheet feeds two types: under a Terminal Unit = VAV electric heat, else EDH sub-item.

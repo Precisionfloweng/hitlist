@@ -417,3 +417,15 @@ def test_add_rule_field_adds_one_field_once():
 def test_column_names_match_either_delta_and_spacing():
     from hitlist.engine import col_key
     assert col_key("Act. Air ΔT - DB Cooling") == col_key("act.  air ∆T - DB Cooling ")
+
+
+def test_add_bundled_fields_adds_only_new_columns():
+    store = make_store()
+    t = SAMPLE_RULES["types"][0]
+    rows = [r for r in store.rows("Rules") if r["type_key"] == t["key"]]
+    store.update("Rules", rows[0]["_row"], {**rows[0], "field": "Renamed by an admin"})   # renamed: not added again
+    bundled = {"types": [{**t, "fields": t["fields"] + [
+        {"label": "Actual Air ΔT DB Cooling", "columns": ["Act. Air ΔT - DB Cooling"], "status": "required"}]}]}
+    assert store.add_bundled_fields(bundled, t["key"]) == ["Actual Air ΔT DB Cooling"]
+    assert store.add_bundled_fields(bundled, t["key"]) == []
+    assert len([r for r in store.rows("Rules") if r["type_key"] == t["key"]]) == len(rows) + 1

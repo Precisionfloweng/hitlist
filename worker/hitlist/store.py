@@ -306,6 +306,21 @@ class HitlistStore:
                                      "field": label, "old_status": "", "new_status": f"{status} (new field)"}])
         return True
 
+    def add_bundled_fields(self, rules: dict[str, Any], type_key: str, by: str = "server") -> list[str]:
+        """Add the bundled rules' fields for one type whose export column the Rules tab doesn't use yet
+        (so renamed fields aren't added twice). Returns the names added."""
+        src = next((t for t in rules["types"] if t["key"] == type_key), None)
+        if src is None:
+            raise KeyError(f"No equipment type '{type_key}' in the bundled rules")
+        have = {c.strip() for r in self.rows("Rules") if r["type_key"] == type_key
+                for c in r.get("columns", "").split("|") if c.strip()}
+        added = []
+        for f in src["fields"]:
+            if f.get("columns") and not set(f["columns"]) & have and \
+                    self.add_rule_field(type_key, f["label"], f["columns"], f["status"], by):
+                added.append(f["label"])
+        return added
+
     def refresh_rule_mapping(self, rules: dict[str, Any], type_key: str, by: str = "server",
                              statuses: bool = False) -> int:
         """Copy one type's name, export sheet, parent filter, field names, columns and conditions from `rules`
