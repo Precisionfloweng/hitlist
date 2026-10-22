@@ -13,12 +13,6 @@
  },
  {
   "date": "2026-10-17",
-  "audience": "admins",
-  "title": "Who synced, in the sheet",
-  "text": "The Google Sheet now records who pressed Sync: last_sync_by on the Projects tab and synced_by on each History row."
- },
- {
-  "date": "2026-10-17",
   "audience": "all",
   "title": "Spec tolerances found automatically",
   "text": "When a job's documents are first read and no tolerances are set yet, Hitlist now finds the spec's tolerances on its own and saves them. Check them on the Rules / Tol. tab; tolerances already saved are never replaced."
