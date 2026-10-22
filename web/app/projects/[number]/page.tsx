@@ -152,7 +152,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               );
             })()}
 
-            {issues.length > 0 && (
+            {issues.length > 0 && user.role !== "customer" && (   // staff only: units ticked Complete but missing readings
               <div className="card" style={{ marginTop: 16, borderColor: "#f5c2c0" }}>
                 <b>Possible issues found ({issues.length})</b>
                 <p className="muted" style={{ margin: "4px 0 8px" }}>BuildingStart shows the following units checked complete with required fields empty.</p>
