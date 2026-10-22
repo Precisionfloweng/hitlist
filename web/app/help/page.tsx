@@ -79,7 +79,7 @@ export default async function HelpPage() {
 
         <section id="sync">
           <h2>Syncing a project</h2>
-          <p><b>Don&apos;t see your project on the Projects page?</b> Ask an admin to add it. Only admins can add projects.</p>
+          <p><b>Don&apos;t see your project on the Projects page?</b> Ask an admin to add it. While Hitlist is in beta testing, only admins can add projects.</p>
           <p>Press <b>Sync</b> to pull the latest data from BuildingStart. A server downloads the project&apos;s export and checks it. It usually takes <b>1–5 minutes</b>, and longer for big projects. You can leave the page while it runs.</p>
           <table className="card help-table"><tbody>
             <tr><td><span className="pill gray">Waiting</span></td><td>In line for the server. If another project is syncing, yours starts next.</td></tr>
