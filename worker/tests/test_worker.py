@@ -429,3 +429,20 @@ def test_add_bundled_fields_adds_only_new_columns():
     assert store.add_bundled_fields(bundled, t["key"]) == ["Actual Air ΔT DB Cooling"]
     assert store.add_bundled_fields(bundled, t["key"]) == []
     assert len([r for r in store.rows("Rules") if r["type_key"] == t["key"]]) == len(rows) + 1
+
+
+def test_move_rule_field_after_another():
+    store = make_store()
+    key = store.rows("Rules")[0]["type_key"]
+    order = lambda: [r["field"] for r in sorted((r for r in store.rows("Rules") if r["type_key"] == key),  # noqa: E731
+                                                 key=lambda r: int(r["order"]))]
+    store.add_rule_field(key, "Actual Air ΔT DB Cooling", ["Act. Air ΔT - DB Cooling"])
+    first, second = order()[0], order()[1]
+    import pytest
+    with pytest.raises(KeyError):                       # "Actual Airflow" starts the same way: ambiguous
+        store.move_rule_field(key, "actual air", second)
+    assert store.move_rule_field(key, "air cooling", second) == "Actual Air ΔT DB Cooling"
+    assert order()[:3] == [first, second, "Actual Air ΔT DB Cooling"]
+    assert sorted(int(r["order"]) for r in store.rows("Rules") if r["type_key"] == key) == list(range(1, len(order()) + 1))
+    with pytest.raises(KeyError):
+        store.move_rule_field(key, "no such field", first)

@@ -2080,6 +2080,13 @@
      "when": null
     },
     {
+     "label": "Actual Air ΔT DB Cooling",
+     "columns": [
+      "Act. Air ΔT - DB Cooling"
+     ],
+     "status": "required"
+    },
+    {
      "label": "Design EAT Heating",
      "columns": [
       "Des. E.A.T. Heating"
@@ -2294,13 +2301,6 @@
      ],
      "status": "optional",
      "when": null
-    },
-    {
-     "label": "Actual Air ΔT DB Cooling",
-     "columns": [
-      "Act. Air ΔT - DB Cooling"
-     ],
-     "status": "required"
     }
    ]
   },

@@ -10,6 +10,7 @@
     python -m hitlist publish NUMBER                            re-send a project's last results to the website
     python -m hitlist add-field TYPE_KEY "Field name" --column "Export column" [--status required]   add one field
     python -m hitlist add-field TYPE_KEY --from-bundled    add the bundled fields whose export column the type doesn't use yet
+    python -m hitlist move-field TYPE_KEY "Field" --after "Other field"   (names: the start, or words in them)
     python -m hitlist update-rules TYPE_KEY [--statuses]        copy a type's sheet/column links (and names) from the bundled rules
     python -m hitlist dropbox-setup [--relink]                  connect the read-only Dropbox app (once), then test it
     python -m hitlist dropbox-test                              show what the server can see in Dropbox
@@ -63,6 +64,10 @@ def main(argv: list[str] | None = None) -> int:
     af.add_argument("--from-bundled", action="store_true",
                     help="add the bundled rules' fields for this type whose export column isn't on the Rules tab yet")
     af.add_argument("--status", default="required", choices=["required", "optional", "ignore"])
+    mf = sub.add_parser("move-field", help="Move a field to just after another on the Rules tab")
+    mf.add_argument("type_key", help="e.g. ductless")
+    mf.add_argument("field", help="the field to move (or the start of its name)")
+    mf.add_argument("--after", required=True, help="the field it goes after (or the start of its name)")
     pub = sub.add_parser("publish", help="Re-send a project's last results to the website")
     pub.add_argument("number")
     w = sub.add_parser("weekly-summary")
@@ -118,6 +123,14 @@ def main(argv: list[str] | None = None) -> int:
                 store.append("Users", [{"email": email, "name": name, "role": "admin",
                                         "active": "yes", "added": date.today().isoformat()}])
                 print(f"Added admin {email}.")
+        return 0
+    if args.cmd == "move-field":
+        try:
+            name = store.move_rule_field(args.type_key, args.field, args.after)
+        except KeyError as e:
+            print(e.args[0])
+            return 1
+        print(f"{args.type_key}: moved '{name}' after '{args.after}'")
         return 0
     if args.cmd == "add-field":
         if args.from_bundled:

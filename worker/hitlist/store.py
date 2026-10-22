@@ -306,6 +306,35 @@ class HitlistStore:
                                      "field": label, "old_status": "", "new_status": f"{status} (new field)"}])
         return True
 
+    def move_rule_field(self, type_key: str, field: str, after: str, by: str = "server") -> str:
+        """Move one field of a type on the Rules tab to just after another (names: exact, or the start of
+        one name, or words it contains; any case). Renumbers the type's order. Returns the moved field's name."""
+        mine = sorted((r for r in self.rows("Rules") if r["type_key"] == type_key), key=lambda r: int(r.get("order") or 0))
+        if not mine:
+            raise KeyError(f"No equipment type '{type_key}' on the Rules tab")
+
+        def find(name: str) -> dict:
+            n = name.strip().lower()
+            exact = [r for r in mine if r["field"].strip().lower() == n]
+            hits = exact or [r for r in mine if r["field"].strip().lower().startswith(n)] \
+                or [r for r in mine if all(w in r["field"].lower() for w in n.split())]
+            if len(hits) != 1:
+                raise KeyError(f"'{name}' matches {len(hits)} fields of {type_key}"
+                               + (": " + ", ".join(r["field"] for r in hits) if hits else ""))
+            return hits[0]
+
+        moving, anchor = find(field), find(after)
+        if moving is anchor:
+            raise KeyError("A field can't go after itself")
+        rest = [r for r in mine if r is not moving]
+        rest.insert(rest.index(anchor) + 1, moving)
+        for i, r in enumerate(rest, start=1):
+            if str(r.get("order", "")) != str(i):
+                self.update("Rules", r["_row"], {**r, "order": i})
+        self.append("RuleHistory", [{"changed_at": now_iso(), "changed_by": by, "type_key": type_key,
+                                     "field": moving["field"], "old_status": "", "new_status": f"moved after {anchor['field']}"}])
+        return moving["field"]
+
     def add_bundled_fields(self, rules: dict[str, Any], type_key: str, by: str = "server") -> list[str]:
         """Add the bundled rules' fields for one type whose export column the Rules tab doesn't use yet
         (so renamed fields aren't added twice). Returns the names added."""
