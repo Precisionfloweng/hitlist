@@ -93,7 +93,7 @@ export default async function HelpPage() {
 
         <section id="checklist">
           <h2>Reading the equipment checklist</h2>
-          <p>Pick an equipment type on the left (they&apos;re in the same order as BuildingStart). Each row is a unit and each column is a field.</p>
+          <p>Pick an equipment type at the top (they&apos;re in the same order as BuildingStart). Each row is a unit and each column is a field.</p>
           <table className="card help-table"><tbody>
             <tr><td><span className="ck-key p">✓</span></td><td><b>Filled in.</b></td></tr>
             <tr><td><span className="ck-key r"><span>✕</span></span></td><td><b>Required and missing.</b> This counts against the unit and the project.</td></tr>
