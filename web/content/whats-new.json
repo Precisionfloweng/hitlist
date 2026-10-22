@@ -1,6 +1,12 @@
 [
  {
   "date": "2026-10-22",
+  "audience": "admins",
+  "title": "Simpler view for customers",
+  "text": "Customers now see only the main units on the Equipment checklist, each Done, In progress or Not started (counting its sub-items), with any open punch items, and a note that it updates when the tech syncs."
+ },
+ {
+  "date": "2026-10-22",
   "audience": "all",
   "title": "\"Units\" is now \"Items\"",
   "text": "The counts on the Projects list, Overview and Equipment checklist now say items: each unit and each sub-item (fan, coil, filter…) counts as one. The numbers are the same."

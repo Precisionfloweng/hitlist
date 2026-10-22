@@ -12,7 +12,8 @@ export const STATUS_LABEL: Record<CustStatus, string> = { done: "Done", progress
 const norm = (path: string | null | undefined) => String(path ?? "").split("/").map((x) => x.trim()).filter(Boolean).join("/");
 
 /** Types that belong to a unit rather than being one: rolled into the unit above them (by BuildingStart path). */
-const SUB_KEYS = new Set(["vav_electric_heat", "duct_traverse", "face_velocity"]);
+const SUB_KEYS = new Set(["vav_electric_heat", "duct_traverse", "face_velocity", "coil_test", "ach",
+  "temp_sensor", "flow_sensor", "pressure_sensor", "autoflow_valve"]);
 export const isSubType = (t: { key: string; name: string }) => /sub-item/i.test(t.name) || SUB_KEYS.has(t.key);
 
 /** The deepest of `paths` that is `path` itself or above it (a/b/c → a/b/c, a/b, a). */
