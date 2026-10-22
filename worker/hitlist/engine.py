@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Any
@@ -63,14 +64,21 @@ def _parent_path(full_path: str) -> str | None:
     return "/".join(parts[:-1]) if len(parts) > 1 else None
 
 
+def col_key(name: str) -> str:
+    """A column name for matching: Unicode-normalized (both Δ characters the same), spaces collapsed, any case."""
+    return " ".join(unicodedata.normalize("NFKC", str(name or "")).replace("\u2206", "\u0394").split()).casefold()
+
+
 def _resolve_columns(type_rule: TypeRule, headers: list[str], warnings: list[str]) -> list[list[str] | None]:
     """Columns per field; fill in unmapped ones by fuzzy match against this export's headers."""
     header_set = set(headers)
+    by_key = {col_key(h): h for h in headers}
     used = {c for f in type_rule.fields for c in (f.columns or [])}
     resolved: list[list[str] | None] = []
     for f in type_rule.fields:
         if f.columns:
-            present = [c for c in f.columns if c in header_set]
+            present = [c if c in header_set else by_key[col_key(c)] for c in f.columns
+                       if c in header_set or col_key(c) in by_key]
             if not present:
                 warnings.append(f"{type_rule.name}: column(s) {f.columns} for '{f.label}' not in export")
             resolved.append(present or None)

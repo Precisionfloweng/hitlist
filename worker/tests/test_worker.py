@@ -396,3 +396,24 @@ def test_cleanup_removes_local_files_of_deleted_projects(tmp_path):
     assert (s.results_dir / "values" / "99-001.json").exists() and not (s.results_dir / "values" / "99-999.json").exists()
     assert (s.results_dir / "99-001.json").exists() and not (s.docs_dir / "99-999.json").exists()
     assert (s.export_dir / "99-001").exists() and not (s.export_dir / "99-999").exists()
+
+
+def test_add_rule_field_adds_one_field_once():
+    store = make_store()
+    key = store.rows("Rules")[0]["type_key"]
+    before = [r for r in store.rows("Rules") if r["type_key"] == key]
+    assert store.add_rule_field(key, "Actual Air ΔT DB Cooling", ["Act. Air ΔT - DB Cooling"], "required")
+    after = [r for r in store.rows("Rules") if r["type_key"] == key]
+    assert len(after) == len(before) + 1
+    new = after[-1]
+    assert new["field"] == "Actual Air ΔT DB Cooling" and new["columns"] == "Act. Air ΔT - DB Cooling"
+    assert new["status"] == "required" and int(new["order"]) == max(int(r["order"]) for r in before) + 1
+    assert new["export_sheet"] == before[0]["export_sheet"]
+    # a second time changes nothing
+    assert not store.add_rule_field(key, "actual air δt db cooling", ["Other"], "required")
+    assert len([r for r in store.rows("Rules") if r["type_key"] == key]) == len(after)
+
+
+def test_column_names_match_either_delta_and_spacing():
+    from hitlist.engine import col_key
+    assert col_key("Act. Air ΔT - DB Cooling") == col_key("act.  air ∆T - DB Cooling ")

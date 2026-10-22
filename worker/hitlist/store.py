@@ -285,6 +285,27 @@ class HitlistStore:
         return {(r["type_key"], r["field"]): r["status"] for r in rows
                 if r.get("project_number") == project_number and r.get("status")}
 
+    def add_rule_field(self, type_key: str, label: str, columns: list[str], status: str = "required",
+                       by: str = "server") -> bool:
+        """Add one field to a type on the Rules tab (after its last field). Nothing else changes.
+        Returns False when the type has a field with that name or that column already."""
+        if status not in ("required", "optional", "ignore"):
+            raise ValueError("status is required, optional or ignore")
+        mine = [r for r in self.rows("Rules") if r["type_key"] == type_key]
+        if not mine:
+            raise KeyError(f"No equipment type '{type_key}' on the Rules tab")
+        have_cols = {c.strip() for r in mine for c in r.get("columns", "").split("|") if c.strip()}
+        if any(r["field"].strip().lower() == label.strip().lower() for r in mine) or have_cols & set(columns):
+            return False
+        last = max(mine, key=lambda r: int(r.get("order") or 0))
+        self.append("Rules", [{k: last.get(k, "") for k in ("type_key", "type_name", "export_sheet",
+                                                              "sheet_confirmed", "parent_types")}
+                              | {"order": int(last.get("order") or 0) + 1, "field": label,
+                                 "columns": " | ".join(columns), "status": status, "when": ""}])
+        self.append("RuleHistory", [{"changed_at": now_iso(), "changed_by": by, "type_key": type_key,
+                                     "field": label, "old_status": "", "new_status": f"{status} (new field)"}])
+        return True
+
     def refresh_rule_mapping(self, rules: dict[str, Any], type_key: str, by: str = "server",
                              statuses: bool = False) -> int:
         """Copy one type's name, export sheet, parent filter, field names, columns and conditions from `rules`

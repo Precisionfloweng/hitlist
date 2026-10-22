@@ -8,6 +8,7 @@
     python -m hitlist run-once                                  handle queued refreshes, then stop
     python -m hitlist weekly-summary [--dry-run]                send the Monday summary emails
     python -m hitlist publish NUMBER                            re-send a project's last results to the website
+    python -m hitlist add-field TYPE_KEY "Field name" --column "Export column" [--status required]   add one field
     python -m hitlist update-rules TYPE_KEY [--statuses]        copy a type's sheet/column links (and names) from the bundled rules
     python -m hitlist dropbox-setup [--relink]                  connect the read-only Dropbox app (once), then test it
     python -m hitlist dropbox-test                              show what the server can see in Dropbox
@@ -54,6 +55,11 @@ def main(argv: list[str] | None = None) -> int:
     ur = sub.add_parser("update-rules", help="Copy a type's sheet and column links from the bundled rules")
     ur.add_argument("type_key", nargs="+", help="e.g. fcu edh_sub")
     ur.add_argument("--statuses", action="store_true", help="also reset required/optional/ignore to the bundled choice")
+    af = sub.add_parser("add-field", help="Add one field to an equipment type on the Rules tab")
+    af.add_argument("type_key", help="e.g. ductless")
+    af.add_argument("label", help="the field's name in Hitlist")
+    af.add_argument("--column", action="append", required=True, help="the export's column name (repeat for 3 phases)")
+    af.add_argument("--status", default="required", choices=["required", "optional", "ignore"])
     pub = sub.add_parser("publish", help="Re-send a project's last results to the website")
     pub.add_argument("number")
     w = sub.add_parser("weekly-summary")
@@ -109,6 +115,11 @@ def main(argv: list[str] | None = None) -> int:
                 store.append("Users", [{"email": email, "name": name, "role": "admin",
                                         "active": "yes", "added": date.today().isoformat()}])
                 print(f"Added admin {email}.")
+        return 0
+    if args.cmd == "add-field":
+        added = store.add_rule_field(args.type_key, args.label, args.column, args.status)
+        print(f"{args.type_key}: added '{args.label}' ({args.status})" if added
+              else f"{args.type_key}: already has '{args.label}' or that column; nothing changed")
         return 0
     if args.cmd == "update-rules":
         for key in args.type_key:

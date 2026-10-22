@@ -2294,6 +2294,13 @@
      ],
      "status": "optional",
      "when": null
+    },
+    {
+     "label": "Actual Air ΔT DB Cooling",
+     "columns": [
+      "Act. Air ΔT - DB Cooling"
+     ],
+     "status": "required"
     }
    ]
   },
