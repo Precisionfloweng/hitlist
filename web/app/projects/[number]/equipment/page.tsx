@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Header from "../../../Header";
 import ProjectHeader from "../ProjectHeader";
 import EquipmentView from "./EquipmentView";
+import CustomerEquipment from "./CustomerEquipment";
+import { customerTypes } from "@/lib/customerView";
 import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
@@ -23,7 +25,10 @@ export default async function EquipmentPage({ params, searchParams }:
       <Header user={user} />
       <main className="wide">
         <ProjectHeader user={{ customer: user.role === "customer", canSync: canEdit(user) }} project={p} tab="equipment" missingRequired={results?.summary.missing_required} notes={results?.notes?.length} />
-        {results ? <EquipmentView types={results.types} initialType={type} syncedAt={results.generated_at} tolerances={tol} deficiencies={results.deficiencies} notes={user.role === "customer" ? [] : results.notes ?? []} /> : (
+        {results && user.role === "customer" ? (
+          <CustomerEquipment types={customerTypes(results.types, results.deficiencies)} initialType={type}
+            syncedAt={results.generated_at} tolerances={tol} />
+        ) : results ? <EquipmentView types={results.types} initialType={type} syncedAt={results.generated_at} tolerances={tol} deficiencies={results.deficiencies} notes={user.role === "customer" ? [] : results.notes ?? []} /> : (
           <div className="card">No equipment results yet. Press <b>Sync</b> to pull this project from BuildingStart.</div>
         )}
       </main>

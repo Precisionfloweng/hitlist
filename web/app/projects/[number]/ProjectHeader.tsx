@@ -34,6 +34,7 @@ export default function ProjectHeader({ project: p, tab, missingRequired, rulesC
           <div className="muted phead-sub">
             {p.tech && `Tech: ${p.tech}`}
           </div>
+          {user.customer && <div className="muted phead-live">Updated each time the technician syncs from the field, so it isn&apos;t live.</div>}
         </div>
         <div className="row" style={{ alignItems: "flex-start" }}>
           <span className={s.cls} style={{ marginTop: 8 }}>Last sync: {s.text}</span>

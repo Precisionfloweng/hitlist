@@ -642,3 +642,15 @@ header.top .top-drop form button { background: transparent; }
 .training-ch img { width: 104px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; display: block; }
 .training-ch b { display: block; font-size: 15px; line-height: 1.25; }
 .training-ch small { color: var(--muted); font-size: 13px; }
+
+/* Customer checklist: main units only, Done / In progress / Not started */
+.cust-eq-card { padding: 16px; }
+.cust-table { width: 100%; border-collapse: collapse; background: #fff; font-size: 15px; }
+.cust-table th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+  padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.cust-table td { padding: 10px; border-bottom: 1px solid var(--line); }
+.cust-st { font-weight: 700; }
+.cust-st.done { color: var(--ok); }
+.cust-st.progress { color: #8a5a00; }
+.cust-st.none { color: var(--muted); }
+.phead-live { font-size: 13px; margin-top: 2px; }

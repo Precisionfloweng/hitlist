@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { customerTypes } from "@/lib/customerView";
 import { notFound } from "next/navigation";
 import Header from "../../Header";
 import { pct, syncLabel } from "../../format";
@@ -21,6 +22,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   if (!data || !canSee(user, data.project.id)) notFound();
   const { project: p } = data;
   const summary = results?.summary;
+  const customer = user.role === "customer";
+  const cust = customer && results ? customerTypes(results.types, results.deficiencies) : null;   // main units only
+  const custDone = cust?.reduce((n, t) => n + t.done, 0) ?? 0, custUnits = cust?.reduce((n, t) => n + t.units.length, 0) ?? 0;
   // Only "ticked Complete but required fields empty" (older results may also hold "went blank" flags).
   const issues = (results?.gap_flags ?? []).filter((g) => g.kind === "completed_but_missing");
   const eqHref = (type?: string) =>
@@ -104,7 +108,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
             })()}
             <div className="ov-head">Project summary</div>
             <div className="tiles summary-banner">
-              <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Items fully complete" />
+              {cust ? <Tile big={`${custDone} / ${custUnits}`} label="Units done" />
+                : <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Items fully complete" />}
               <Tile big={pct(summary ? summary.fields_pct : p.fieldsPct)} label="Overall complete"
                 title="Required fields filled across the whole project (same as Complete on the projects list)" />
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>
@@ -117,8 +122,26 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               )}
             </div>
 
-            {results && results.types.length > 0 && <div className="ov-head">Equipment <span>· {results.types.length} type{results.types.length === 1 ? "" : "s"} · tap a card for its checklist</span></div>}
-            {results && results.types.length > 0 && (
+            {cust && cust.length > 0 && (<>
+              <div className="ov-head">Equipment <span>· tap a card for its units</span></div>
+              <div className="type-cards">
+                {cust.map((t) => {
+                  const n = t.units.length, pctDone = Math.round(100 * t.done / n);
+                  return (
+                    <Link key={t.key} href={eqHref(t.key)} className={`type-card${t.done === n ? " full" : ""}`}>
+                      <span className="tc-name">{t.name}</span>
+                      <span className="tc-row">
+                        <span className="tc-num"><b>{t.done}</b> / {n} <span className="tc-units">done</span></span>
+                        <span className={`tc-pct${t.done === n ? " full" : ""}`}>{pctDone}%</span>
+                      </span>
+                      <span className={`tc-bar ${t.done === n ? "full" : ""}`}><span style={{ width: `${pctDone}%` }} /></span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </>)}
+            {!cust && results && results.types.length > 0 && <div className="ov-head">Equipment <span>· {results.types.length} type{results.types.length === 1 ? "" : "s"} · tap a card for its checklist</span></div>}
+            {!cust && results && results.types.length > 0 && (
               <div className="type-cards">
                 {[...results.types].sort(byTypeOrder).map((t) => {
                   const done = t.summary.units_complete, n = t.summary.units;
