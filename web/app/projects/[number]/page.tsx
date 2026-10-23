@@ -141,7 +141,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                     <Link key={t.key} href={eqHref(t.key)} className={`type-card${t.done === n ? " full" : ""}`}>
                       <span className="tc-name">{t.name}</span>
                       <span className="tc-row">
-                        <span className="tc-num"><b>{t.done}</b> / {n} <span className="tc-units">done</span></span>
+                        <span className={`tc-num tc-w${String(t.done).length + String(n).length}`}><b>{t.done}</b> / {n} <span className="tc-units">done</span></span>
                         <span className={`tc-pct${t.done === n ? " full" : ""}`}>{pctDone}%</span>
                       </span>
                       <span className={`tc-bar ${t.done === n ? "full" : ""}`}><span style={{ width: `${pctDone}%` }} /></span>
@@ -160,7 +160,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                     <Link key={t.key} href={eqHref(t.key)} className={`type-card${pctDone >= 100 ? " full" : ""}`} title={`${t.name}: ${done} of ${n} items fully complete, ${Math.round(t.summary.fields_pct)}% of required fields filled`}>
                       <span className="tc-name">{t.name}</span>
                       <span className="tc-row">
-                        <span className="tc-num"><b>{done}</b> / {n} <span className="tc-units">items</span></span>
+                        <span className={`tc-num tc-w${String(done).length + String(n).length}`}><b>{done}</b> / {n} <span className="tc-units">items</span></span>
                         <span className={`tc-pct${t.summary.fields_pct >= 100 ? " full" : ""}`} title="Required fields filled for this equipment type (same as the Equipment checklist)">{Math.round(t.summary.fields_pct)}%</span>
                       </span>
                       <span className={`tc-bar ${pctDone >= 100 ? "full" : ""}`}><span style={{ width: `${pctDone}%` }} /></span>

@@ -547,8 +547,11 @@ header.top .top-drop form button { background: transparent; }
 /* Narrow cards (iPad): keep "308 / 417" on one line next to the %, and drop the word "items" when it won't fit */
 .type-card { container-type: inline-size; }
 .tc-num { white-space: nowrap; }
-@container (max-width: 200px) { .tc-units { display: none; } }
-@container (max-width: 150px) { .tc-num b, .tc-pct { font-size: 16px; } }
+/* tc-wN = digits in "done / total": hide the word only when that card's numbers need the room (measured widths) */
+@container (max-width: 117px) { .tc-w4 .tc-units { display: none; } }
+@container (max-width: 135px) { .tc-w5 .tc-units, .tc-w6 .tc-units { display: none; } }
+@container (max-width: 162px) { .tc-w7 .tc-units, .tc-w8 .tc-units, .tc-w9 .tc-units, .tc-w10 .tc-units { display: none; } }
+@container (max-width: 112px) { .tc-num b, .tc-pct { font-size: 16px; } }
 .tc-pct { font-size: 18px; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; }
 .tc-pct.full { color: var(--ok); }
 .confirm-box { border-top-color: #e0a100; background: #fffaf0; margin-bottom: 10px; }
