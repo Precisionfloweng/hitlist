@@ -544,6 +544,11 @@ header.top .top-drop form button { background: transparent; }
 /* Overview type cards: units complete on the left, % complete on the right */
 .tc-row { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
 .tc-units { font-size: 11px; }
+/* Narrow cards (iPad): keep "308 / 417" on one line next to the %, and drop the word "items" when it won't fit */
+.type-card { container-type: inline-size; }
+.tc-num { white-space: nowrap; }
+@container (max-width: 200px) { .tc-units { display: none; } }
+@container (max-width: 150px) { .tc-num b, .tc-pct { font-size: 16px; } }
 .tc-pct { font-size: 18px; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; }
 .tc-pct.full { color: var(--ok); }
 .confirm-box { border-top-color: #e0a100; background: #fffaf0; margin-bottom: 10px; }
