@@ -4,7 +4,8 @@
 import type { BsValues } from "./bsvalues";
 import type { Results } from "./results";
 import type { Tolerances } from "./toleranceCats";
-import { ampChecksFor, checkAmps, checkUnit, fmtPct, HEATER_TOL, tolerancePairs, tolRange } from "./tolCheck";
+import { ampChecksFor, checkAmps, checkUnit, fmtPct, HEATER_TOL, isOutletSheet, tolerancePairs, tolRange } from "./tolCheck";
+import { parentTag, unitWhere } from "./unitLabel";
 import { byTypeOrder } from "./typeOrder";
 import { displayValue } from "./numberFormat";
 
@@ -59,7 +60,8 @@ export function toleranceReport(values: BsValues, results: Results | null, tol: 
               allowed: `up to ${c.design} A`, isDefault: false, phases: c.phases,
               note: c.perMotor ? `${c.motors} motors × ${c.perMotor} A` : undefined }),
       ];
-      const where = [u.v.Area, u.v.Zone].filter((x) => x !== undefined && x !== null && String(x).trim()).join(" · ");
+      const where = unitWhere(s.sheet, u.path, [u.v.Area, u.v.Zone].filter((x) => x !== undefined && x !== null && String(x).trim()).join(" · "))
+        || [u.v.Area, u.v.Zone].filter((x) => x !== undefined && x !== null && String(x).trim()).join(" · ");
       if (items.length) g.rows.push({ unit: u.name, typeKey, items, ...(where ? { where } : {}) });
     }
     if (g.checked || g.unchecked.length) groups.push(g);
@@ -73,14 +75,16 @@ export function toleranceReport(values: BsValues, results: Results | null, tol: 
 export function leftReport(results: Results): LeftReport {
   const groups: LeftGroup[] = results.types.filter((t) => t.units.length).map((t) => {
     const missingOf = (codes: string) => t.fields.filter((_, i) => codes[i] === "R").map((f) => f.label);
+    // A grille: "S-09 (VAV-1-04)", so two S-09s can be told apart.
+    const label = (u: { name: string; path: string }) => (isOutletSheet(t.export_sheet) && parentTag(u.path) ? `${u.name} (${parentTag(u.path)})` : u.name);
     const left = t.units.filter((u) => u.required_filled < u.required);
     const none = left.filter((u) => u.required_filled === 0);
     const counts = new Map<string, number>();
     for (const u of left) for (const f of missingOf(u.codes)) counts.set(f, (counts.get(f) ?? 0) + 1);
     return {
       key: t.key, name: t.name, units: t.units.length, complete: t.units.length - left.length,
-      notStarted: none.map((u) => u.name),
-      partly: left.filter((u) => !none.includes(u)).map((u) => ({ unit: u.name, missing: missingOf(u.codes) })),
+      notStarted: none.map((u) => label(u)),
+      partly: left.filter((u) => !none.includes(u)).map((u) => ({ unit: label(u), missing: missingOf(u.codes) })),
       topMissing: [...counts].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([field, units]) => ({ field, units })),
     };
   }).sort(byTypeOrder);

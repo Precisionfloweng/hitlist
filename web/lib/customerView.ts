@@ -3,6 +3,7 @@
 // open punch item. No field-by-field detail. Client-safe (no server imports).
 import type { Deficiency, TypeResult } from "./results";
 import { byTypeOrder } from "./typeOrder";
+import { unitWhere } from "./unitLabel";
 
 export type CustStatus = "done" | "progress" | "none";
 export type CustUnit = { name: string; path: string; location: string; status: CustStatus; punch: number };
@@ -50,7 +51,8 @@ export function customerTypes(types: TypeResult[], deficiencies: Deficiency[] = 
       const r = (k && rolled.get(k)) || { req: u.required, filled: u.required_filled };
       const status: CustStatus = r.req === 0 || r.filled >= r.req ? "done" : r.filled === 0 ? "none" : "progress";
       const punch = (k ? punchBy.get(k) ?? 0 : 0) + (punchByName.get(u.name) ?? 0);
-      units.push({ name: u.name, path: u.path, location: [u.area, u.zone].filter(Boolean).join(" · "), status, punch });
+      const loc = [u.area, u.zone].filter(Boolean).join(" · ");
+      units.push({ name: u.name, path: u.path, location: unitWhere(t.export_sheet, u.path, loc) || loc, status, punch });
     }
     if (units.length) out.push({ key: t.key, name: t.name, export_sheet: t.export_sheet, units,
       done: units.filter((u) => u.status === "done").length });

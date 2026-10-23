@@ -4,6 +4,7 @@ import { categoriesFor, fmtTol, hasTol, TOLERANCE_CATS, type Tolerances } from "
 import { loadLastType, saveLastType } from "@/lib/lastType";
 import type { Deficiency, Note, TypeResult } from "@/lib/results";
 import { byTypeOrder } from "@/lib/typeOrder";
+import { unitWhere } from "@/lib/unitLabel";
 
 type Filter = "missing" | "all";
 const STATUS_WORD: Record<string, string> = { P: "filled", R: "required, missing", O: "optional, missing",
@@ -191,12 +192,13 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
                 const defs = openDefs(u.path, u.name);
                 const uNotes = unitNotes(u.path, u.name);
                 const done = u.required ? u.required_filled / u.required : 1;
+                const where = unitWhere(t.export_sheet, u.path, u.area);
                 return (
                   <tr key={u.path || u.name} className={defs.length ? "has-def" : uNotes.length ? "has-note" : undefined}>
                     <td className="u">
                       <div className="u-name" title={u.path || u.name}>{u.name}</div>
                       {/* The badge leads the second line so a long unit name can't push it out of view */}
-                      {(defs.length > 0 || uNotes.length > 0 || u.area) && (
+                      {(defs.length > 0 || uNotes.length > 0 || where) && (
                         <div className="u-area">
                           {defs.length > 0 && (
                             <button type="button" className="def-badge" title="Show the open deficiencies"
@@ -210,7 +212,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
                               {uNotes.length} note{uNotes.length === 1 ? "" : "s"}
                             </button>
                           )}
-                          {u.area}
+                          {where}
                         </div>
                       )}
                     </td>

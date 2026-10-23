@@ -274,7 +274,8 @@ def gap_check(previous: dict[str, Any] | None, current: dict[str, Any]) -> list[
         for u in t["units"]:
             if u.get("completed_box") and u["required_filled"] < u["required"]:
                 missing = [lab for lab, c in zip(labels, u["codes"]) if c == MISSING_REQUIRED]
-                flags.append({"type": t["name"], "unit": u["name"], "kind": "completed_but_missing", "fields": missing})
+                flags.append({"type": t["name"], "unit": u["name"], "path": u.get("path", ""),
+                              "kind": "completed_but_missing", "fields": missing})
     return flags
 
 

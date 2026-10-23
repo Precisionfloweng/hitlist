@@ -19,7 +19,7 @@ export type Note = { equipment: string; path: string; item_type: string; categor
 export type Results = {
   project_number: string; generated_at: string; summary: Summary; types: TypeResult[];
   untracked_sheets: Record<string, number>; deficiencies: Deficiency[]; notes?: Note[];
-  gap_flags?: { type: string; unit: string; kind: string; fields: string[] }[]; warnings: string[];
+  gap_flags?: { type: string; unit: string; kind: string; fields: string[]; path?: string }[]; warnings: string[];
 };
 
 const pathFor = (project: string) => `results/${project.replace(/[^A-Za-z0-9_.-]/g, "_")}.json`;

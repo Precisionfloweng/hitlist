@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { customerTypes } from "@/lib/customerView";
+import { unitWhere } from "@/lib/unitLabel";
 import { completePct, typeTotals } from "@/lib/completion";
 import { loadWeights } from "@/lib/settings";
 import { notFound } from "next/navigation";
@@ -31,6 +32,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   const issues = (results?.gap_flags ?? []).filter((g) => g.kind === "completed_but_missing");
   const eqHref = (type?: string) =>
     `/projects/${encodeURIComponent(p.id)}/equipment${type ? `?type=${encodeURIComponent(type)}` : ""}`;
+  // The grey line for a flagged unit (a grille's unit and area): from the flag's path, else the only unit with that name.
+  const issueWhere = (g: { type: string; unit: string; path?: string }) => {
+    const t = results?.types.find((x) => x.name === g.type);
+    if (!t) return "";
+    const same = t.units.filter((u) => (g.path ? u.path === g.path : u.name === g.unit));
+    return same.length === 1 ? unitWhere(t.export_sheet, same[0].path, same[0].area) : g.path ? unitWhere(t.export_sheet, g.path) : "";
+  };
   // Group the issues by equipment type, in BuildingStart order (the flags carry the type's name).
   const typeKeys = new Map((results?.types ?? []).map((t) => [t.name, t.key]));
   const issueGroups = [...new Set(issues.map((g) => g.type))]
@@ -38,7 +46,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
     .sort(byTypeOrder)
     .map(({ name, key }) => ({
       type: name, href: eqHref(typeKeys.has(name) ? key : undefined),
-      items: issues.filter((g) => g.type === name).map((g) => ({ unit: g.unit, fields: g.fields })),
+      items: issues.filter((g) => g.type === name).map((g) => ({ unit: g.unit, fields: g.fields, where: issueWhere(g) })),
     }));
 
   return (

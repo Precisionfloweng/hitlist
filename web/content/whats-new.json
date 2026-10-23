@@ -1,5 +1,11 @@
 [
  {
+  "date": "2026-10-23",
+  "audience": "all",
+  "title": "Grilles show their unit",
+  "text": "Under each grille's tag you now see the unit it's on and its area (e.g. S-09 · VAV-1-04 · Level 1), on the checklist, Possible issues and AI Tools, so two grilles with the same tag can be told apart."
+ },
+ {
   "date": "2026-10-22",
   "audience": "all",
   "title": "Grilles are now checked",

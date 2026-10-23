@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-type Group = { type: string; href: string; items: { unit: string; fields: string[] }[] };
+type Group = { type: string; href: string; items: { unit: string; fields: string[]; where?: string }[] };
 
 const LIMIT = 15;
 
@@ -26,7 +26,7 @@ export default function IssuesList({ groups, total }: { groups: Group[]; total: 
           </div>
           <ul>
             {g.items.map((it, i) => (
-              <li key={i}><b>{it.unit}</b>: Ticked Complete but missing {it.fields.join(", ")}</li>
+              <li key={i}><b>{it.unit}</b>{it.where && <span className="muted"> ({it.where})</span>}: Ticked Complete but missing {it.fields.join(", ")}</li>
             ))}
           </ul>
         </div>
