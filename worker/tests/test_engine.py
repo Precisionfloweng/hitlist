@@ -194,6 +194,6 @@ def test_outlets_are_checked_with_the_bundled_rules():
     for key in ("supply_outlet", "return_inlet", "exhaust_inlet"):
         t = _type(r, key)
         assert [f["label"] for f in t["fields"]] == ["Area", "Zone", "Design Airflow", "Final Reading", "% Final Diff"]
-        assert _unit(t, "S-1")["codes"] == "PPPPP"          # "% Final Diff. " (trailing space) still matches
-        assert _unit(t, "S-2")["codes"] == "PPPRR"
+        assert _unit(t, "S-1")["codes"] == "PPPP-"          # % Final Diff is ignored: Hitlist does that math itself
+        assert _unit(t, "S-2")["codes"] == "PPPR-"
     assert not [w for w in r["warnings"] if "not in export" in w]

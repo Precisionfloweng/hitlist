@@ -8040,7 +8040,7 @@
      "columns": [
       "% Final Diff."
      ],
-     "status": "required"
+     "status": "ignore"
     }
    ]
   },
@@ -8084,7 +8084,7 @@
      "columns": [
       "% Final Diff."
      ],
-     "status": "required"
+     "status": "ignore"
     }
    ]
   },
@@ -8128,7 +8128,7 @@
      "columns": [
       "% Final Diff."
      ],
-     "status": "required"
+     "status": "ignore"
     }
    ]
   }
