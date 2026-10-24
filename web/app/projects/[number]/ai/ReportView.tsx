@@ -46,8 +46,8 @@ function Tolerance({ r, project }: { r: ToleranceReport; project: string }) {
             <table className="report-table">
               <thead><tr><th>Unit</th><th>Reading</th><th>Design</th><th>Actual</th><th>% of design</th><th>Allowed</th></tr></thead>
               <tbody>
-                {g.rows.flatMap((x) => x.items.map((it, i) => (
-                  <tr key={`${x.unit}-${i}`} className={i === 0 ? "unit-first" : "unit-more"}>
+                {g.rows.flatMap((x, r) => x.items.map((it, i) => (
+                  <tr key={`${r}-${i}`} className={i === 0 ? "unit-first" : "unit-more"}>
                     {i === 0 && <td rowSpan={x.items.length}><UnitLink project={project} unit={x.unit} typeKey={x.typeKey} />{x.where && <div className="muted" style={{ fontSize: 12 }}>{x.where}</div>}</td>}
                     <td>{it.reading}</td>
                     <td>{it.design.toLocaleString()}{it.kind !== "flow" && " A"}{it.note && <div className="muted" style={{ fontSize: 12 }}>{it.note}</div>}</td>
@@ -62,8 +62,8 @@ function Tolerance({ r, project }: { r: ToleranceReport; project: string }) {
           {g.unchecked.length > 0 && (
             <details className="report-more">
               <summary>{plural(g.unchecked.length, "unit")} can&apos;t be checked yet (no actual reading)</summary>
-              <ul>{g.unchecked.map((u) => (
-                <li key={u.unit}><UnitLink project={project} unit={u.unit} typeKey={u.typeKey} /> <span className="muted">· {u.readings.join(", ")}</span></li>
+              <ul>{g.unchecked.map((u, k) => (
+                <li key={k}><UnitLink project={project} unit={u.unit} typeKey={u.typeKey} />{u.where && <span className="muted"> ({u.where})</span>} <span className="muted">· {u.readings.join(", ")}</span></li>
               ))}</ul>
             </details>
           )}
@@ -107,7 +107,7 @@ function Left({ r, project }: { r: LeftReport; project: string }) {
               {g.topMissing.length > 0 && <div><span className="muted">Most often missing:</span> {g.topMissing.map((m) => `${m.field} (${m.units})`).join(", ")}</div>}
               {g.notStarted.length > 0 && <div><span className="muted">Not started:</span> {g.notStarted.join(", ")}</div>}
               {g.partly.length > 0 && (
-                <ul>{g.partly.map((u) => <li key={u.unit}><b>{u.unit}</b> <span className="muted">· missing {u.missing.join(", ")}</span></li>)}</ul>
+                <ul>{g.partly.map((u, k) => <li key={k}><b>{u.unit}</b> <span className="muted">· missing {u.missing.join(", ")}</span></li>)}</ul>
               )}
               <Link href={href}>Open {g.name} on the Equipment checklist →</Link>
             </div>

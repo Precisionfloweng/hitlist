@@ -15,7 +15,7 @@ export type OutItem = { reading: string; design: number; actual: number; kind: "
 /** One unit, with everything on it that's out of tolerance together. */
 export type OutRow = { unit: string; typeKey: string | null; items: OutItem[]; where?: string };   // where: Area · Zone (outlets)
 export type OutGroup = { sheet: string; checked: number; rows: OutRow[];
-  unchecked: { unit: string; typeKey: string | null; readings: string[] }[] };
+  unchecked: { unit: string; typeKey: string | null; readings: string[]; where?: string }[] };
 export type ToleranceReport = { kind: "tolerance"; synced: string; groups: OutGroup[]; outside: number; checked: number; unchecked: number };   // outside = units
 
 export type LeftGroup = { key: string; name: string; units: number; complete: number; notStarted: string[];
@@ -48,7 +48,8 @@ export function toleranceReport(values: BsValues, results: Results | null, tol: 
       if (!flows.length && !amps.length) continue;
       const typeKey = typeOf(s.sheet, u.path, u.name);
       const missing = [...flows.filter((c) => c.pct === null).map((c) => c.pair), ...amps.filter((c) => c.actual === null).map((c) => c.label)];
-      if (missing.length) g.unchecked.push({ unit: u.name, typeKey, readings: missing });
+      const grille = isOutletSheet(s.sheet) ? unitWhere(s.sheet, u.path, u.v.Area === undefined ? "" : String(u.v.Area)) : "";
+      if (missing.length) g.unchecked.push({ unit: u.name, typeKey, readings: missing, ...(grille ? { where: grille } : {}) });
       if (flows.some((c) => c.pct !== null) || amps.some((c) => c.actual !== null)) g.checked++;
       const items: OutItem[] = [
         ...flows.filter((c) => c.outside).map((c) => ({ reading: c.pair, design: c.design, actual: c.actual!, kind: "flow" as const,
