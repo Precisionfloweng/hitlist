@@ -2,6 +2,12 @@
  {
   "date": "2026-10-23",
   "audience": "all",
+  "title": "Tolerance checks round to whole %",
+  "text": "Out of tolerance now rounds % of design to a whole number before checking, like a TAB report: 110.4% counts as 110% (within ±10%), 110.5% as 111% (outside). Motor amps still flag anything over design."
+ },
+ {
+  "date": "2026-10-23",
+  "audience": "all",
   "title": "Grilles show their unit",
   "text": "Under each grille's tag you now see the unit it's on and its area (e.g. S-09 · VAV-1-04 · Level 1), on the checklist, Possible issues and AI Tools, so two grilles with the same tag can be told apart."
  },

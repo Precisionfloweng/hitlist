@@ -69,22 +69,28 @@ export function checkUnit(sheet: string, unitName: string, v: Record<string, unk
     const actual = num(v[p.actual]);
     const t = tol[cat];
     const pct = actual === null ? null : Math.round(((actual - design) / design) * 1000) / 10;
-    const outside = pct === null ? null : pct > Number(t.plus) + 1e-9 || pct < -Number(t.minus) - 1e-9;
+    const outside = pct === null ? null : isOutside(pct, t);
     out.push({ pair: p.name, design, actual, pct, tol: t, cat, outside });
   }
   return out;
 }
 
+/** Readings are judged the way TAB reports show them: % of design rounded to a whole number first, so 110.4% (→ 110%)
+ *  is within ±10% and 110.5% (→ 111%) is outside. Motor amps are not rounded (any amount over design is flagged). */
+export const wholeOfDesign = (pct: number) => Math.round(100 + pct + 1e-9);
+export function isOutside(pct: number, t: Tol): boolean {
+  const of = wholeOfDesign(pct);
+  return of > 100 + Number(t.plus) || of < 100 - Number(t.minus);
+}
+
 /** The allowed range as percent of design: ±10 → "90–110%", +10/−5 → "95–110%". */
 export const tolRange = (t: Tol) => `${100 - Number(t.minus)}–${100 + Number(t.plus)}%`;
 
-/** A reading as percent of design, the way TAB reports show it: +8% → "108%". Whole numbers, with one decimal
- *  only when rounding would land exactly on a limit (so 110.4% isn't shown as an in-range 110%). */
-export function fmtPct(pct: number, t?: Tol): string {
-  const of = 100 + pct;
-  const whole = Math.round(of);
-  const onLimit = t && (whole === 100 + Number(t.plus) || whole === 100 - Number(t.minus)) && Math.abs(of - whole) >= 0.05;
-  return `${onLimit ? of.toFixed(1) : whole}%`;
+/** A reading as percent of design, the way TAB reports show it: +8% → "108%", always a whole number
+ *  (the same rounded number the in/out of tolerance decision uses). */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function fmtPct(pct: number, _t?: Tol): string {
+  return `${wholeOfDesign(pct)}%`;
 }
 
 /** "92% of design, within 95–110%"-style text, or "no reading". */
@@ -158,7 +164,7 @@ export function checkAmps(sheet: string, v: Record<string, unknown>): AmpCheck[]
       const actual = readings.length ? readings.reduce((a, b) => (Math.abs(b - base) > Math.abs(a - base) ? b : a)) : null;
       const pct = actual === null ? null : Math.round(((actual - base) / base) * 1000) / 10;
       out.push({ label: m.label, heater: true, design: base, perMotor: null, motors: 1, actual, pct,
-        over: pct === null ? null : Math.abs(pct) > 10 + 1e-9, phases: readings });
+        over: pct === null ? null : isOutside(pct, HEATER_TOL), phases: readings });
       continue;
     }
     const counted = (m.count ?? []).map((c) => num(byNorm.get(norm(c)))).find((n) => n !== null && n !== undefined)
