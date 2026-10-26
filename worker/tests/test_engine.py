@@ -18,7 +18,9 @@ def _unit(type_result, name):
 def test_missing_values():
     assert is_missing(None) and is_missing("") and is_missing("  ")
     assert is_missing("?") and is_missing("??") and is_missing("`")
-    assert not is_missing(0) and not is_missing("0") and not is_missing("-")
+    # 0 is never a reading: BuildingStart puts 0 in calculated fields until readings are taken
+    assert is_missing(0) and is_missing("0") and is_missing(0.0) and is_missing("0.00") and is_missing("0%")
+    assert not is_missing("-") and not is_missing(0.1) and not is_missing("10") and not is_missing("Belt Drive")
     assert is_missing(False) and not is_missing(True)      # the Completed checkbox: unticked = not filled
 
 
@@ -197,3 +199,27 @@ def test_outlets_are_checked_with_the_bundled_rules():
         assert _unit(t, "S-1")["codes"] == "PPPP-"          # % Final Diff is ignored: Hitlist does that math itself
         assert _unit(t, "S-2")["codes"] == "PPPR-"
     assert not [w for w in r["warnings"] if "not in export" in w]
+
+
+def test_untested_traverse_with_zeros_is_not_complete():
+    headers = ["Full Path", "Equipment Name", "Type of Traverse", "Air Flow Area", "Number Of Rows", "Readings Per Row",
+               "Average Reading", "Actual Total Flow", "Design Total Flow"]
+    rows = [["AHU-9/FV-1", "FV-1", "Rectangular", 97.7, 6, 6, 0, 0, "60,000.0"],         # set up, no readings
+            ["AHU-9/FV-2", "FV-2", "Rectangular", 97.7, 6, 6, 780, "64,039.0", "60,000.0"]]
+    rules = {"version": 1, "types": [{"key": "face_velocity", "name": "Face Velocity Tests", "export_sheet": "Face Velocity Test",
+        "fields": [{"label": "Type of Traverse", "columns": ["Type of Traverse"], "status": "required"},
+                   {"label": "Air Flow Area", "columns": ["Air Flow Area"], "status": "required"},
+                   {"label": "Average Reading", "columns": ["Average Reading"], "status": "required"},
+                   {"label": "Design Total Flow", "columns": ["Design Total Flow"], "status": "optional"},
+                   {"label": "Actual Total Flow", "columns": ["Actual Total Flow"], "status": "required"}]}]}
+    r = check_project(Export(project={"Number": "99-011"}, sheets={"Face Velocity Test": Sheet(
+        "Face Velocity Test", headers, [dict(zip(headers, x)) for x in rows])}), load_rules(rules))
+    t = _type(r, "face_velocity")
+    assert _unit(t, "FV-1")["codes"] == "PPRPR" and _unit(t, "FV-1")["required_filled"] < _unit(t, "FV-1")["required"]
+    assert _unit(t, "FV-2")["codes"] == "PPPPP"
+
+
+def test_design_of_zero_skips_the_pair_like_a_blank_design():
+    r = check_project(_pair_export([("Z1", [0, None, 480]), ("Z2", ["0", 0, 480])]), load_rules(PAIR_RULES))
+    codes = {u["name"]: u["codes"] for u in r["types"][0]["units"]}
+    assert codes == {"Z1": "--P", "Z2": "--P"}

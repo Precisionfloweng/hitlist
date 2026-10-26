@@ -1,5 +1,11 @@
 [
  {
+  "date": "2026-10-26",
+  "audience": "all",
+  "title": "0 no longer counts as done",
+  "text": "A 0 in any field now counts as missing. BuildingStart fills averages and totals with 0 before readings are taken, so untested traverses and face velocity tests were showing complete. A design of 0 is treated like a blank design."
+ },
+ {
   "date": "2026-10-23",
   "audience": "all",
   "title": "Tolerance checks round to whole %",

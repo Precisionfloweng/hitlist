@@ -25,14 +25,28 @@ NON_TYPE_SHEETS = {"Project", "Deficiency", "Note"}
 CLOSED_DEFICIENCY = {"fixed", "accepted", "closed", "resolved", "complete", "completed", "void", "cancelled"}
 
 
+def is_zero(value: Any) -> bool:
+    """0, 0.0, "0", "0.00", "0%" ... BuildingStart fills calculated fields (averages, totals, % diff) with 0 until
+    readings are entered, so a 0 never counts as a reading (Rick, Oct 2026)."""
+    if value is None or isinstance(value, bool):
+        return False
+    if isinstance(value, (int, float)):
+        return value == 0
+    text = str(value).strip().replace(",", "").rstrip("%").strip()
+    try:
+        return text != "" and float(text) == 0
+    except ValueError:
+        return False
+
+
 def is_missing(value: Any) -> bool:
-    """Blank cells, and BuildingStart's "can't calculate" markers (?, ??, `), count as missing."""
+    """Blank cells, BuildingStart's "can't calculate" markers (?, ??, `) and 0 count as missing."""
     if value is None:
         return True
     if isinstance(value, bool):
         return not value              # a checkbox (BuildingStart's Completed): unticked counts as not filled
     text = str(value).strip()
-    return text == "" or set(text) <= {"?", "`"}
+    return text == "" or set(text) <= {"?", "`"} or is_zero(value)
 
 
 def is_na(value: Any) -> bool:
@@ -44,7 +58,8 @@ def is_na(value: Any) -> bool:
 
 
 def is_blank(value: Any) -> bool:
-    return value is None or (not isinstance(value, bool) and str(value).strip() == "")
+    """Empty, or 0 (a design of 0 means the unit doesn't have that item, like a blank design)."""
+    return value is None or (not isinstance(value, bool) and (str(value).strip() == "" or is_zero(value)))
 
 
 _DESIGN = re.compile(r"^(design|des)\.?\s+", re.I)
