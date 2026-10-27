@@ -223,3 +223,15 @@ def test_design_of_zero_skips_the_pair_like_a_blank_design():
     r = check_project(_pair_export([("Z1", [0, None, 480]), ("Z2", ["0", 0, 480])]), load_rules(PAIR_RULES))
     codes = {u["name"]: u["codes"] for u in r["types"][0]["units"]}
     assert codes == {"Z1": "--P", "Z2": "--P"}
+
+
+def test_zero_counts_for_sensor_offsets():
+    headers = ["Full Path", "Equipment Name", "Offset", "Actual Reading"]
+    rows = [["TS-1", "TS-1", 0, 72.5], ["TS-2", "TS-2", "", 71.0], ["TS-3", "TS-3", 0.5, 0]]
+    rules = {"version": 1, "types": [{"key": "temp_sensor", "name": "Temp Sensors", "export_sheet": "Temp _ Hum Sensor",
+        "fields": [{"label": "Offset", "columns": ["Offset"], "status": "required"},
+                   {"label": "Actual Reading", "columns": ["Actual Reading"], "status": "required"}]}]}
+    r = check_project(Export(project={"Number": "99-012"}, sheets={"Temp _ Hum Sensor": Sheet(
+        "Temp _ Hum Sensor", headers, [dict(zip(headers, x)) for x in rows])}), load_rules(rules))
+    codes = {u["name"]: u["codes"] for u in r["types"][0]["units"]}
+    assert codes == {"TS-1": "PP", "TS-2": "RP", "TS-3": "PR"}     # 0 offset counts; 0 reading elsewhere still doesn't

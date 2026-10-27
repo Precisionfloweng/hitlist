@@ -39,6 +39,15 @@ def is_zero(value: Any) -> bool:
         return False
 
 
+# Fields where 0 is a real answer, not BuildingStart's "nothing entered yet": sensor calibration offsets
+# (0 = no offset needed). Matched on the field name or its export column. Add more here as they come up.
+ZERO_COUNTS = re.compile(r"\boffset\b", re.I)
+
+
+def zero_counts(label: str, columns: list[str] | None = None) -> bool:
+    return bool(ZERO_COUNTS.search(label or "") or any(ZERO_COUNTS.search(c or "") for c in columns or []))
+
+
 def is_missing(value: Any) -> bool:
     """Blank cells, BuildingStart's "can't calculate" markers (?, ??, `) and 0 count as missing."""
     if value is None:
@@ -180,7 +189,8 @@ def check_project(export: Export, rules: RuleSet, project_number: str | None = N
                     codes.append(NOT_APPLICABLE)
                     continue
                 values = [row.get(c) for c in cols]
-                filled = any(not is_missing(v) and not is_na(v) for v in values)
+                zero_ok = zero_counts(f.label, cols)
+                filled = any((not is_missing(v) or (zero_ok and is_zero(v))) and not is_na(v) for v in values)
                 if not filled and any(is_na(v) for v in values):
                     codes.append(MARKED_NA)
                     continue

@@ -120,7 +120,7 @@ export default async function HelpPage() {
             <li><b>Enter the reading</b>, or</li>
             <li>if the field genuinely doesn&apos;t apply to that unit, <b>enter a dash ( - )</b>. The ✕ becomes a grey dash and stops counting against the unit.</li>
           </ul>
-          <p><b>?</b> in a field (BuildingStart&apos;s &quot;can&apos;t calculate yet&quot;) still counts as missing. <b>0</b> also counts as missing: BuildingStart puts 0 in calculated fields (averages, totals) until readings are taken, so enter the real reading. A design value of 0 means the unit doesn&apos;t have that item, like a blank design.</p>
+          <p><b>?</b> in a field (BuildingStart&apos;s &quot;can&apos;t calculate yet&quot;) still counts as missing. <b>0</b> also counts as missing (except in <b>Offset</b> fields on the sensor sheets, where 0 means no offset was needed): BuildingStart puts 0 in calculated fields (averages, totals) until readings are taken, so enter the real reading. A design value of 0 means the unit doesn&apos;t have that item, like a blank design.</p>
         </section>
 
         <section id="special">

@@ -1,5 +1,11 @@
 [
  {
+  "date": "2026-10-27",
+  "audience": "all",
+  "title": "0 counts for sensor offsets",
+  "text": "On the temp, flow and pressure sensor sheets, an Offset of 0 counts as done again (0 = no offset needed). Everywhere else a 0 still counts as missing."
+ },
+ {
   "date": "2026-10-26",
   "audience": "all",
   "title": "0 no longer counts as done",

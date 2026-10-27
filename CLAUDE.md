@@ -88,7 +88,8 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Missing = blank, or only `?`/`` ` `` (BuildingStart's "can't calculate yet" marker).
 - N/A entries (-, --, dashes, na, n/a, nd, n/d, none; any case, spaces/dots ignored) = code N:
   answered, left out of the counts. `?` is still missing, and so is `0` (`engine.is_zero`: BuildingStart fills calculated
-  fields like Average Reading / Actual Total Flow with 0 before readings; Rick: a 0 never counts as done). A 0 design = blank design.
+  fields like Average Reading / Actual Total Flow with 0 before readings; Rick: a 0 never counts as done), except fields named/columned "Offset"
+  (`engine.ZERO_COUNTS`: sensor calibration offsets, 0 = none needed). A 0 design = blank design.
 - Design/Actual pairs (matched by name: "Design X" / "Actual X", 112 in the default rules): a completely blank Design skips
   both fields (unit doesn't have it); a "-" Design still requires the Actual.
 - A field may list several columns (three-phase readings): filled if ANY has a value.
