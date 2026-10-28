@@ -19,7 +19,8 @@ type Choice = { id: string; label: string };
 /** For a customer: the projects they may see. A one-line button ("26-001 · Name ▾" / "3 projects ▾") that opens a
  *  small searchable checklist (ticked projects first). It floats over the page so the row stays short. */
 function ProjectPicker({ value, onChange, choices }: { value: string[]; onChange: (v: string[]) => void; choices: Choice[] }) {
-  const [at, setAt] = useState<{ x: number; y: number } | null>(null);   // open: where to draw the list
+  // open: where to draw the list — below the button, or above it when there isn't room below; max = its height limit
+  const [at, setAt] = useState<{ x: number; top?: number; bottom?: number; max: number } | null>(null);
   const [q, setQ] = useState("");
   const btn = useRef<HTMLButtonElement>(null), box = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -28,19 +29,27 @@ function ProjectPicker({ value, onChange, choices }: { value: string[]; onChange
       const t = e.target as Node;
       if (!box.current?.contains(t) && !btn.current?.contains(t)) setAt(null);
     };
-    const close = (e: Event) => { if (!box.current?.contains(e.target as Node)) setAt(null); };   // page scroll, not the list
+    const follow = (e: Event) => { if (!box.current?.contains(e.target as Node)) setAt(place()); };   // page scrolls: move with the button
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setAt(null); };
     document.addEventListener("mousedown", away); document.addEventListener("touchstart", away);
-    window.addEventListener("scroll", close, true); document.addEventListener("keydown", esc);
+    window.addEventListener("scroll", follow, true); window.addEventListener("resize", follow); document.addEventListener("keydown", esc);
     return () => {
       document.removeEventListener("mousedown", away); document.removeEventListener("touchstart", away);
-      window.removeEventListener("scroll", close, true); document.removeEventListener("keydown", esc);
+      window.removeEventListener("scroll", follow, true); window.removeEventListener("resize", follow); document.removeEventListener("keydown", esc);
     };
-  }, [at]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!at]);
+  function place() {
+    const r = btn.current!.getBoundingClientRect(), vh = window.innerHeight;
+    const x = Math.max(8, Math.min(r.left, window.innerWidth - 348));
+    const below = vh - r.bottom - 12, above = r.top - 12;
+    return below >= 300 || below >= above
+      ? { x, top: r.bottom + 4, max: Math.max(160, below) }
+      : { x, bottom: vh - r.top + 4, max: Math.max(160, above) };
+  }
   const toggle = () => {
     if (at) { setAt(null); return; }
-    const r = btn.current!.getBoundingClientRect();
-    setQ(""); setAt({ x: Math.max(8, Math.min(r.left, window.innerWidth - 348)), y: r.bottom + 4 });
+    setQ(""); setAt(place());
   };
   const picked = choices.filter((c) => value.includes(c.id));
   const label = picked.length === 0 ? "Pick projects" : picked.length === 1 ? picked[0].label : `${picked.length} projects`;
@@ -54,7 +63,7 @@ function ProjectPicker({ value, onChange, choices }: { value: string[]; onChange
         <span>{label}</span> <span aria-hidden>{at ? "▴" : "▾"}</span>
       </button>
       {at && (
-        <div ref={box} className="proj-pick-pop" style={{ left: at.x, top: at.y }}>
+        <div ref={box} className="proj-pick-pop" style={{ left: at.x, top: at.top, bottom: at.bottom, maxHeight: at.max }}>
           <div className="muted" style={{ fontSize: 12, marginBottom: 4 }}>Projects this customer can see ({picked.length}):</div>
           <input type="search" placeholder="Find a project #, or name" value={q} onChange={(e) => setQ(e.target.value)} />
           <div className="proj-pick-list">

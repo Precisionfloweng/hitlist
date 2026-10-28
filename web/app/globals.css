@@ -686,7 +686,7 @@ header.top .top-drop form button { background: transparent; }
 .proj-pick-btn span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .proj-pick-btn.empty { color: var(--bad); border-color: #f5c2c0; }
 .proj-pick-pop { position: fixed; z-index: 50; width: 340px; background: #fff; border: 1px solid var(--line); border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(16, 24, 40, .18); padding: 10px; }
+  box-shadow: 0 10px 30px rgba(16, 24, 40, .18); padding: 10px; display: flex; flex-direction: column; }
 .proj-pick-pop input[type=search] { width: 100%; margin-bottom: 6px; }
-.proj-pick-list { max-height: 240px; overflow: auto; }
+.proj-pick-list { max-height: 240px; min-height: 60px; overflow: auto; flex: 1 1 auto; }
 .proj-pick-list label { display: flex; gap: 6px; align-items: center; font-size: 13px; padding: 3px 0; white-space: nowrap; }
