@@ -2,6 +2,12 @@
  {
   "date": "2026-10-28",
   "audience": "admins",
+  "title": "Customers can open punch items",
+  "text": "On the customer's Equipment checklist, tapping a unit's red open-items pill now shows those punch items (number, text, priority, who it's assigned to), including items on its fans, coils and grilles."
+ },
+ {
+  "date": "2026-10-28",
+  "audience": "admins",
   "title": "Customer view: same % as yours",
   "text": "Customers' equipment cards now show the same % complete as the staff cards. Their summary shows Last updated and Last punch list sent instead of Units done and Overall complete."
  },

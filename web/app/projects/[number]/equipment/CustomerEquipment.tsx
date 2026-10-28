@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { STATUS_LABEL, type CustType } from "@/lib/customerView";
 
 /** The customer's checklist: each main unit Done / In progress / Not started, and any open punch items. */
@@ -8,6 +8,7 @@ export default function CustomerEquipment({ types, initialType, syncedAt }:
   const [key, setKey] = useState(() => types.find((t) => t.key === initialType)?.key ?? types[0]?.key);
   const [notDone, setNotDone] = useState(false);
   const [q, setQ] = useState("");
+  const [openKey, setOpenKey] = useState<string | null>(null);   // the unit whose punch items are showing
   const t = types.find((x) => x.key === key) ?? types[0];
   const rows = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -55,14 +56,38 @@ export default function CustomerEquipment({ types, initialType, syncedAt }:
         <table className="cust-table">
           <thead><tr><th>Unit</th><th>Location</th><th>Status</th><th>Punch list</th></tr></thead>
           <tbody>
-            {rows.map((u) => (
-              <tr key={u.path || u.name}>
-                <td><b>{u.name}</b></td>
-                <td className="muted">{u.location}</td>
-                <td><span className={`cust-st ${u.status}`}>{u.status === "done" ? "✓ " : ""}{STATUS_LABEL[u.status]}</span></td>
-                <td>{u.punch ? <span className="pill bad">{u.punch} open item{u.punch === 1 ? "" : "s"}</span> : <span className="muted">—</span>}</td>
-              </tr>
-            ))}
+            {rows.map((u) => {
+              const k = u.path || u.name, isOpen = openKey === k;
+              return (
+                <Fragment key={k}>
+                  <tr className={isOpen ? "cust-open" : undefined}>
+                    <td><b>{u.name}</b></td>
+                    <td className="muted">{u.location}</td>
+                    <td><span className={`cust-st ${u.status}`}>{u.status === "done" ? "✓ " : ""}{STATUS_LABEL[u.status]}</span></td>
+                    <td>{u.punch ? (
+                      <button type="button" className="pill bad cust-punch-btn" aria-expanded={isOpen}
+                        onClick={() => setOpenKey(isOpen ? null : k)}>
+                        {u.punch} open item{u.punch === 1 ? "" : "s"} {isOpen ? "▴" : "▾"}
+                      </button>
+                    ) : <span className="muted">—</span>}</td>
+                  </tr>
+                  {isOpen && (
+                    <tr className="cust-punch-row"><td colSpan={4}>
+                      <ul className="cust-punch">
+                        {u.punchItems.map((p, i) => (
+                          <li key={i}>
+                            <div><b>{p.number ? `#${p.number} ` : ""}{p.equipment && p.equipment !== u.name ? `${p.equipment}: ` : ""}</b>{p.text}</div>
+                            <div className="muted" style={{ fontSize: 13 }}>
+                              {[p.priority && `${p.priority} priority`, p.role, p.due && `due ${p.due}`].filter(Boolean).join(" · ")}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </td></tr>
+                  )}
+                </Fragment>
+              );
+            })}
             {!rows.length && <tr><td colSpan={4} className="muted">{q ? "No units match your search." : "Every unit is done. ✓"}</td></tr>}
           </tbody>
         </table>

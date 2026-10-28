@@ -6,7 +6,9 @@ import { byTypeOrder } from "./typeOrder";
 import { unitWhere } from "./unitLabel";
 
 export type CustStatus = "done" | "progress" | "none";
-export type CustUnit = { name: string; path: string; location: string; status: CustStatus; punch: number };
+/** An open punch item, as the customer sees it (the same fields as their Deficiencies tab). */
+export type CustPunch = { number: string; equipment: string; text: string; priority: string; role: string; due: string };
+export type CustUnit = { name: string; path: string; location: string; status: CustStatus; punch: number; punchItems: CustPunch[] };
 export type CustType = { key: string; name: string; export_sheet: string; units: CustUnit[]; done: number;
   pct: number };   // pct: required readings filled for this type, same as the staff card
 export const STATUS_LABEL: Record<CustStatus, string> = { done: "Done", progress: "In progress", none: "Not started" };
@@ -37,11 +39,13 @@ export function customerTypes(types: TypeResult[], deficiencies: Deficiency[] = 
     const r = rolled.get(owner) ?? { req: 0, filled: 0 };
     r.req += u.required; r.filled += u.required_filled; rolled.set(owner, r);
   }
-  const punchBy = new Map<string, number>(), punchByName = new Map<string, number>();
+  const punchBy = new Map<string, CustPunch[]>(), punchByName = new Map<string, CustPunch[]>();
+  const add = (m: Map<string, CustPunch[]>, k: string, p: CustPunch) => m.set(k, [...(m.get(k) ?? []), p]);
   for (const d of deficiencies.filter((x) => x.open)) {
+    const p: CustPunch = { number: d.number, equipment: d.equipment, text: d.text, priority: d.priority, role: d.role, due: d.date_due };
     const owner = d.path ? nearest(norm(d.path), shown) : null;
-    if (owner) punchBy.set(owner, (punchBy.get(owner) ?? 0) + 1);
-    else if (d.equipment) punchByName.set(d.equipment, (punchByName.get(d.equipment) ?? 0) + 1);
+    if (owner) add(punchBy, owner, p);
+    else if (d.equipment) add(punchByName, d.equipment, p);
   }
   const out: CustType[] = [];
   for (const t of [...types].sort(byTypeOrder)) {
@@ -51,9 +55,10 @@ export function customerTypes(types: TypeResult[], deficiencies: Deficiency[] = 
       if (k ? !shown.has(k) : isSubType(t)) continue;               // a sub-item: counted with its unit
       const r = (k && rolled.get(k)) || { req: u.required, filled: u.required_filled };
       const status: CustStatus = r.req === 0 || r.filled >= r.req ? "done" : r.filled === 0 ? "none" : "progress";
-      const punch = (k ? punchBy.get(k) ?? 0 : 0) + (punchByName.get(u.name) ?? 0);
+      const punchItems = [...(k ? punchBy.get(k) ?? [] : []), ...(punchByName.get(u.name) ?? [])];
+      const punch = punchItems.length;
       const loc = [u.area, u.zone].filter(Boolean).join(" · ");
-      units.push({ name: u.name, path: u.path, location: unitWhere(t.export_sheet, u.path, loc) || loc, status, punch });
+      units.push({ name: u.name, path: u.path, location: unitWhere(t.export_sheet, u.path, loc) || loc, status, punch, punchItems });
     }
     if (units.length) out.push({ key: t.key, name: t.name, export_sheet: t.export_sheet, units,
       done: units.filter((u) => u.status === "done").length, pct: t.summary.fields_pct });
