@@ -7,7 +7,8 @@ import { unitWhere } from "./unitLabel";
 
 export type CustStatus = "done" | "progress" | "none";
 export type CustUnit = { name: string; path: string; location: string; status: CustStatus; punch: number };
-export type CustType = { key: string; name: string; export_sheet: string; units: CustUnit[]; done: number };
+export type CustType = { key: string; name: string; export_sheet: string; units: CustUnit[]; done: number;
+  pct: number };   // pct: required readings filled for this type, same as the staff card
 export const STATUS_LABEL: Record<CustStatus, string> = { done: "Done", progress: "In progress", none: "Not started" };
 
 const norm = (path: string | null | undefined) => String(path ?? "").split("/").map((x) => x.trim()).filter(Boolean).join("/");
@@ -55,7 +56,7 @@ export function customerTypes(types: TypeResult[], deficiencies: Deficiency[] = 
       units.push({ name: u.name, path: u.path, location: unitWhere(t.export_sheet, u.path, loc) || loc, status, punch });
     }
     if (units.length) out.push({ key: t.key, name: t.name, export_sheet: t.export_sheet, units,
-      done: units.filter((u) => u.status === "done").length });
+      done: units.filter((u) => u.status === "done").length, pct: t.summary.fields_pct });
   }
   return out;
 }

@@ -27,7 +27,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   const summary = results?.summary;
   const customer = user.role === "customer";
   const cust = customer && results ? customerTypes(results.types, results.deficiencies) : null;   // main units only
-  const custDone = cust?.reduce((n, t) => n + t.done, 0) ?? 0, custUnits = cust?.reduce((n, t) => n + t.units.length, 0) ?? 0;
   // Only "ticked Complete but required fields empty" (older results may also hold "went blank" flags).
   const issues = (results?.gap_flags ?? []).filter((g) => g.kind === "completed_but_missing");
   const eqHref = (type?: string) =>
@@ -118,13 +117,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
             })()}
             <div className="ov-head">Project summary</div>
             <div className="tiles summary-banner">
-              {cust ? <Tile big={`${custDone} / ${custUnits}`} label="Units done" />
-                : <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Items fully complete" />}
-              <Tile big={pct(results ? completePct(typeTotals(results.types), weights, results.summary.fields_pct) : p.completePct)} label="Overall complete"
-                title="Each equipment category's % filled in, weighted by its share of the job (same as Complete on the projects list)" />
+              {customer ? (   // customers: when it was last updated instead of the counts and the overall %
+                <Tile big={p.lastSync ? new Date(p.lastSync).toLocaleString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "–"}
+                  label="Last updated" title="When the technician last synced this job from the field" />
+              ) : (<>
+                <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Items fully complete" />
+                <Tile big={pct(results ? completePct(typeTotals(results.types), weights, results.summary.fields_pct) : p.completePct)} label="Overall complete"
+                  title="Each equipment category's % filled in, weighted by its share of the job (same as Complete on the projects list)" />
+              </>)}
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={results ? String(results.deficiencies.filter((d) => !d.open).length) : "–"} label="Closed deficiencies" /></Link>
-              {user.role !== "customer" && (
+              {(
                 <Tile big={p.punchSent ? new Date(p.punchSent).toLocaleDateString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric" })
                   : p.dropboxPath ? "None yet" : "–"}
                   label={p.punchSent ? `Last punch list sent · ${syncLabel(daysSince(p.punchSent)).text.toLowerCase().replace(/ ago$/, "")}` : "Last punch list sent"}
@@ -136,15 +139,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               <div className="ov-head">Equipment <span>· tap a card for its units</span></div>
               <div className="type-cards">
                 {cust.map((t) => {
-                  const n = t.units.length, pctDone = Math.round(100 * t.done / n);
+                  const n = t.units.length, pctDone = Math.min(100, Math.round(t.pct));   // same % as the staff card
                   return (
-                    <Link key={t.key} href={eqHref(t.key)} className={`type-card${t.done === n ? " full" : ""}`}>
+                    <Link key={t.key} href={eqHref(t.key)} className={`type-card${pctDone >= 100 ? " full" : ""}`}>
                       <span className="tc-name">{t.name}</span>
                       <span className="tc-row">
                         <span className={`tc-num tc-w${String(t.done).length + String(n).length}`}><b>{t.done}</b> / {n} <span className="tc-units">done</span></span>
-                        <span className={`tc-pct${t.done === n ? " full" : ""}`}>{pctDone}%</span>
+                        <span className={`tc-pct${pctDone >= 100 ? " full" : ""}`}>{pctDone}%</span>
                       </span>
-                      <span className={`tc-bar ${t.done === n ? "full" : ""}`}><span style={{ width: `${pctDone}%` }} /></span>
+                      <span className={`tc-bar ${pctDone >= 100 ? "full" : ""}`}><span style={{ width: `${pctDone}%` }} /></span>
                     </Link>
                   );
                 })}

@@ -22,14 +22,14 @@ export default function CustomerEquipment({ types, initialType, syncedAt, tolera
     <div className="cust-eq">
       <nav className="eq-types" aria-label="Equipment types">
         <select className="eq-select" value={t.key} onChange={(e) => setKey(e.target.value)}>
-          {types.map((x) => <option key={x.key} value={x.key}>{x.name} ({x.done} of {x.units.length} done)</option>)}
+          {types.map((x) => <option key={x.key} value={x.key}>{x.name} ({Math.round(x.pct)}%)</option>)}
         </select>
         <ul>
           {types.map((x) => {
-            const pct = Math.round(100 * x.done / x.units.length);
+            const pct = Math.min(100, Math.round(x.pct));
             return (
               <li key={x.key}>
-                <button className={`${x.key === t.key ? "on" : ""}${x.done === x.units.length ? " full" : ""}`} onClick={() => setKey(x.key)}>
+                <button className={`${x.key === t.key ? "on" : ""}${pct >= 100 ? " full" : ""}`} onClick={() => setKey(x.key)}>
                   <span className="eq-name">{x.name}</span>
                   <span className="eq-pct">{pct}%</span>
                   <span className="bar"><span style={{ width: `${pct}%` }} /></span>

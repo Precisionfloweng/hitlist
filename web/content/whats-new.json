@@ -1,5 +1,11 @@
 [
  {
+  "date": "2026-10-28",
+  "audience": "admins",
+  "title": "Customer view: same % as yours",
+  "text": "Customers' equipment cards now show the same % complete as the staff cards. Their summary shows Last updated and Last punch list sent instead of Units done and Overall complete."
+ },
+ {
   "date": "2026-10-27",
   "audience": "all",
   "title": "0 counts for sensor offsets",
