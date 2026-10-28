@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type U = { email: string; name: string; role: string; active: boolean; added: string; projects: string[]; lastSeen?: string };
@@ -16,17 +16,59 @@ function lastUsed(date?: string): string {
 }
 type Choice = { id: string; label: string };
 
-/** For a customer: tick the projects they may see. */
+/** For a customer: the projects they may see. A one-line button ("26-001 · Name ▾" / "3 projects ▾") that opens a
+ *  small searchable checklist (ticked projects first). It floats over the page so the row stays short. */
 function ProjectPicker({ value, onChange, choices }: { value: string[]; onChange: (v: string[]) => void; choices: Choice[] }) {
+  const [at, setAt] = useState<{ x: number; y: number } | null>(null);   // open: where to draw the list
+  const [q, setQ] = useState("");
+  const btn = useRef<HTMLButtonElement>(null), box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!at) return;
+    const away = (e: MouseEvent | TouchEvent) => {
+      const t = e.target as Node;
+      if (!box.current?.contains(t) && !btn.current?.contains(t)) setAt(null);
+    };
+    const close = (e: Event) => { if (!box.current?.contains(e.target as Node)) setAt(null); };   // page scroll, not the list
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setAt(null); };
+    document.addEventListener("mousedown", away); document.addEventListener("touchstart", away);
+    window.addEventListener("scroll", close, true); document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("mousedown", away); document.removeEventListener("touchstart", away);
+      window.removeEventListener("scroll", close, true); document.removeEventListener("keydown", esc);
+    };
+  }, [at]);
+  const toggle = () => {
+    if (at) { setAt(null); return; }
+    const r = btn.current!.getBoundingClientRect();
+    setQ(""); setAt({ x: Math.max(8, Math.min(r.left, window.innerWidth - 348)), y: r.bottom + 4 });
+  };
+  const picked = choices.filter((c) => value.includes(c.id));
+  const label = picked.length === 0 ? "Pick projects" : picked.length === 1 ? picked[0].label : `${picked.length} projects`;
+  const s = q.trim().toLowerCase();
+  const list = [...choices].sort((a, b) => Number(value.includes(b.id)) - Number(value.includes(a.id)))
+    .filter((c) => !s || c.label.toLowerCase().includes(s));
   return (
-    <div className="proj-pick">
-      <div className="muted" style={{ fontSize: 12 }}>Projects this customer can see:</div>
-      {choices.map((c) => (
-        <label key={c.id}>
-          <input type="checkbox" checked={value.includes(c.id)}
-            onChange={(e) => onChange(e.target.checked ? [...value, c.id] : value.filter((x) => x !== c.id))} /> {c.label}
-        </label>
-      ))}
+    <div className="proj-pick-wrap">
+      <button type="button" ref={btn} className={`proj-pick-btn${picked.length ? "" : " empty"}`} onClick={toggle}
+        aria-expanded={!!at} title={picked.map((c) => c.label).join("\n") || "Projects this customer can see"}>
+        <span>{label}</span> <span aria-hidden>{at ? "▴" : "▾"}</span>
+      </button>
+      {at && (
+        <div ref={box} className="proj-pick-pop" style={{ left: at.x, top: at.y }}>
+          <div className="muted" style={{ fontSize: 12, marginBottom: 4 }}>Projects this customer can see ({picked.length}):</div>
+          <input type="search" placeholder="Find a project #, or name" value={q} onChange={(e) => setQ(e.target.value)} />
+          <div className="proj-pick-list">
+            {list.map((c) => (
+              <label key={c.id}>
+                <input type="checkbox" checked={value.includes(c.id)}
+                  onChange={(e) => onChange(e.target.checked ? [...value, c.id] : value.filter((x) => x !== c.id))} /> {c.label}
+              </label>
+            ))}
+            {!list.length && <div className="muted" style={{ fontSize: 13 }}>No projects match.</div>}
+          </div>
+          <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>Then press Save on the row.</div>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,6 +2,12 @@
  {
   "date": "2026-10-28",
   "audience": "admins",
+  "title": "Shorter customer rows on Users",
+  "text": "A customer's projects on Admin → Users now show as one button (e.g. \"3 projects\"); tap it for a searchable checklist, then press Save on the row."
+ },
+ {
+  "date": "2026-10-28",
+  "audience": "admins",
   "title": "Customers can open punch items",
   "text": "On the customer's Equipment checklist, tapping a unit's red open-items pill now shows those punch items (number, text, priority, who it's assigned to), including items on its fans, coils and grilles."
  },
