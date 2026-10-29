@@ -149,7 +149,8 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 2
+     "weight": 4,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Design External SP",
@@ -168,7 +169,8 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 2
+     "weight": 4,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Supply Duct SP Stpt",
