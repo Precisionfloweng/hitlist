@@ -176,8 +176,7 @@
       "Supply DSP Setpoint"
      ],
      "status": "optional",
-     "when": null,
-     "weight": 5
+     "when": null
     },
     {
      "label": "O/A Damper Position",
