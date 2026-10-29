@@ -79,7 +79,9 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   copies only the weights to the live tab). A group (e.g. "Unit Data") counts as one item (weight = max of members, earned = share
   of its live members filled). Live = code P/R/O (in a group only P/R: a blank optional member doesn't hold it back); ignored/N/skipped items drop out and the rest scale to 100. Engine `weighted_pct` (unit and
   summary), web `lib/weights.ts` (`applyWeights` recomputes from the current Rules, `typePct`/`unitPct`). Weighted types count
-  required × weighted% in the job %. Admins edit on Default Rules (WeightsPanel, POST /api/rules {weights}) → `recalcCompletePcts`.
+  required × weighted% in the job %. Admins edit both levels on Admin → Completion weights (`WeightsEditor`: categories ▸ types ▸ items; add item / into a group /
+  new group / remove; `lib/weightItems.ts`; POST /api/admin/weights {weights?, types: typeKey → changed fields} → `rules.saveTypeWeights`,
+  one `recalcCompletePcts`). The preview GET returns the project's fields + unit codes so the page computes the job % with the draft.
 
 ## Project keys
 - Projects can share a number (two sites on one contract). Each project's key is `project_id`, blank

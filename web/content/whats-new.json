@@ -1,9 +1,15 @@
 [
  {
   "date": "2026-10-29",
+  "audience": "admins",
+  "title": "All completion weights on one page",
+  "text": "Admin → Completion weights now holds both levels: each category's share of the job, and (open a category, then an equipment type) its item weights, one row each. Add items, make or edit combined items like Unit Data, or remove one, then press Save."
+ },
+ {
+  "date": "2026-10-29",
   "audience": "all",
   "title": "AHU % now weighted by the work",
-  "text": "An AHU's % done now counts each item by how much work it is (Actual Airflow 43%, Unit Data 22%, Actual O/A 11%…), so filling in nameplate data no longer counts the same as taking airflow. Admins set the weights on Default Rules/Weights."
+  "text": "An AHU's % done now counts each item by how much work it is (Actual Airflow 43%, Unit Data 22%, Actual O/A 11%…), so filling in nameplate data no longer counts the same as taking airflow. Admins set the weights on Admin → Completion weights."
  },
  {
   "date": "2026-10-28",

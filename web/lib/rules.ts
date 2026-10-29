@@ -2,13 +2,14 @@ import "server-only";
 import { appendRows, ensureHeader, ensureTab, readTab, readTabs, updateRows, type Rec } from "./sheets";
 import type { User } from "./auth";
 import { byTypeOrder } from "./typeOrder";
+import { describeItems, type FieldWeight } from "./weightItems";
 
 export type Condition = { column?: string | null; label?: string; equals?: string; gt?: number; filled?: boolean };
 export type RuleField = {
   order: number; field: string; columns: string; when: Condition[];
   status: string;          // what applies (the project's own choice, or the default)
   defaultStatus: string;   // the company default
-  weight: number | null;   // completion weight in % (company-wide; admins set it on Default Rules)
+  weight: number | null;   // completion weight in % (company-wide; admins set it on Admin → Completion weights)
   group: string;           // fields with the same weight group count as one item (e.g. "Unit Data")
 };
 export type RuleType = {
@@ -132,34 +133,49 @@ export async function saveProjectRuleChanges(project: string, typeKey: string, c
   return log.length;
 }
 
-/** Save one type's completion weights (admins only, checked by the caller). `items` maps a weight group name
- *  ("group:Unit Data") or a field ("field:<order>") to its weight in % (null/"" = no weight). Logged in RuleHistory. */
-export async function saveWeights(typeKey: string, items: Record<string, number | string | null>, by: User): Promise<number> {
+/** Save one type's item weights (admins only, checked by the caller): `fields` gives each changed field's new weight
+ *  (% or null) and weight group ("" = its own item). A group's members all get the group's weight; a group or field
+ *  with no weight drops out. One RuleHistory row per item that changed ("Weight: Unit Data"). Returns rows changed. */
+export async function saveTypeWeights(typeKey: string, fields: { order: number; weight: number | string | null; group: string }[],
+  by: User): Promise<number> {
   await ensureHeader("Rules");
   await ensureHeader("RuleHistory");
   const { Rules } = await readTabs(["Rules"], true);
   const rows = Rules.filter((r) => r.type_key === typeKey);
   if (!rows.length) throw new Error("Unknown equipment type");
-  const now = new Date().toISOString().replace(/\.\d+Z$/, "+00:00");
-  const updates: { row: number; rec: Record<string, unknown> }[] = [];
-  const log: Record<string, string>[] = [];
-  for (const [key, raw] of Object.entries(items)) {
-    const text = raw === null || raw === undefined ? "" : String(raw).trim();
+  const asFW = (r: Rec, w: string, g: string): FieldWeight => ({ order: Number(r.order), field: r.field, weight: Number(w) || null, group: g });
+  const before = rows.map((r) => asFW(r, String(r.weight ?? ""), String(r.weight_group ?? "").trim()));
+  const next = new Map(rows.map((r) => [Number(r.order), { w: String(r.weight ?? ""), g: String(r.weight_group ?? "").trim() }]));
+  for (const f of fields) {
+    const cur = next.get(Number(f.order));
+    if (!cur) throw new Error("Unknown field");
+    const text = f.weight === null || f.weight === undefined ? "" : String(f.weight).trim();
     const n = Number(text);
     if (text !== "" && (!isFinite(n) || n < 0 || n > 100)) throw new Error("A weight is a % from 0 to 100");
-    const value = text === "" || n === 0 ? "" : String(n);
-    const members = key.startsWith("group:")
-      ? rows.filter((r) => (r.weight_group ?? "").trim().toLowerCase() === key.slice(6).trim().toLowerCase())
-      : rows.filter((r) => key === `field:${r.order}` && !(r.weight_group ?? "").trim());
-    if (!members.length) continue;
-    const old = String(members[0].weight ?? "");
-    if (members.every((r) => String(r.weight ?? "") === value)) continue;
-    for (const r of members) updates.push({ row: r._row, rec: { ...r, weight: value } });
-    log.push({ changed_at: now, changed_by: by.email, type_key: typeKey,
-      field: `Weight: ${key.startsWith("group:") ? key.slice(6) : members[0].field}`,
-      old_status: old ? `${old}%` : "(none)", new_status: value ? `${value}%` : "(none)", project_number: "" });
+    const g = String(f.group ?? "").trim().replace(/\s+/g, " ");
+    if (g.length > 40) throw new Error("Keep a combined item's name under 40 characters");
+    next.set(Number(f.order), { w: text === "" || n === 0 ? "" : String(n), g });
   }
-  if (updates.length) await updateRows("Rules", updates);
+  // a group's weight is shared by every member; a group with no weight is undone
+  const groupW = new Map<string, string>();
+  for (const v of next.values()) if (v.g && v.w) groupW.set(v.g.toLowerCase(), String(Math.max(Number(groupW.get(v.g.toLowerCase()) ?? 0), Number(v.w))));
+  for (const v of next.values()) if (v.g) { const w = groupW.get(v.g.toLowerCase()); if (w) v.w = w; else { v.g = ""; v.w = ""; } }
+  const updates: { row: number; rec: Record<string, unknown> }[] = [];
+  for (const r of rows) {
+    const v = next.get(Number(r.order))!;
+    if (String(r.weight ?? "") !== v.w || String(r.weight_group ?? "").trim() !== v.g) updates.push({ row: r._row, rec: { ...r, weight: v.w, weight_group: v.g } });
+  }
+  if (!updates.length) return 0;
+  const after = rows.map((r) => { const v = next.get(Number(r.order))!; return asFW(r, v.w, v.g); });
+  const was = describeItems(before), now = describeItems(after);
+  const at = new Date().toISOString().replace(/\.\d+Z$/, "+00:00");
+  const log: Record<string, string>[] = [];
+  for (const name of new Set([...was.keys(), ...now.keys()])) {
+    if (was.get(name) === now.get(name)) continue;
+    log.push({ changed_at: at, changed_by: by.email, type_key: typeKey, field: `Weight: ${name}`,
+      old_status: was.get(name) ?? "(none)", new_status: now.get(name) ?? "(none)", project_number: "" });
+  }
+  await updateRows("Rules", updates);
   if (log.length) await appendRows("RuleHistory", log);
-  return log.length;
+  return updates.length;
 }

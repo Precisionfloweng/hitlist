@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Header from "../Header";
 import RulesEditor from "./RulesEditor";
 import { requireStaff } from "@/lib/auth";
@@ -12,7 +13,7 @@ export default async function RulesPage() {
     <>
       <Header user={user} />
       <main>
-        <h1>Default Rules/Weights</h1>
+        <h1>Default Rules</h1>
         <p className="muted">
           What each equipment type needs filled in. <span className="s-R">✖ Required</span> counts toward completion %,
           {" "}<span className="s-O">⚠ Optional</span> shows as a warning, <b>Ignore</b> isn&apos;t checked.
@@ -24,6 +25,8 @@ export default async function RulesPage() {
           except fields a project has changed for itself.
         </p>
         {user.role !== "admin" && <p className="card">Only admins can change the default rules.</p>}
+        {user.role === "admin" && <p className="muted">How much each item is worth toward a unit&apos;s % complete is set on
+          {" "}<Link href="/admin/weights">Admin → Completion weights</Link>.</p>}
         <RulesEditor types={types} history={history} canEdit={user.role === "admin"} />
       </main>
     </>

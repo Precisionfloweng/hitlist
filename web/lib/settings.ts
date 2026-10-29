@@ -97,7 +97,7 @@ export async function loadWeights(): Promise<Weights> {
 }
 
 /** Save the shares (must total 100), then recalculate every project's overall % from its last sync. */
-export async function saveWeights(input: Record<string, unknown>, by: User): Promise<{ weights: Weights; updated: number }> {
+export async function saveWeights(input: Record<string, unknown>, by: User, recalc = true): Promise<{ weights: Weights; updated: number }> {
   const values: Record<string, string> = {};
   let total = 0;
   for (const c of CATEGORIES) {
@@ -109,7 +109,7 @@ export async function saveWeights(input: Record<string, unknown>, by: User): Pro
   if (Math.abs(total - 100) > 0.001) throw new Error(`The shares add up to ${Math.round(total * 10) / 10}%, not 100%`);
   await saveSettings(values, by);
   const weights = await loadWeights();
-  return { weights, updated: await recalcCompletePcts(weights) };
+  return { weights, updated: recalc ? await recalcCompletePcts(weights) : 0 };
 }
 
 /** Every project's overall % from its last sync, with the current category shares and field weights (after either

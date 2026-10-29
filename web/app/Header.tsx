@@ -16,7 +16,7 @@ export default async function Header({ user }: { user: User }) {
         </Link>
         <TopMenu name={user.name} links={[
           { href: "/projects", label: "Projects" },
-          ...(user.role !== "customer" ? [{ href: "/rules", label: "Default Rules/Weights" }] : []),
+          ...(user.role !== "customer" ? [{ href: "/rules", label: "Default Rules" }] : []),
           ...(user.role === "admin" ? [{ href: "/admin", label: "Admin" }] : []),
           ...(user.role !== "customer" ? [{ href: "/help", label: "Help" }, { href: "/training", label: "🎬 Training" }] : []),
         ]} />
