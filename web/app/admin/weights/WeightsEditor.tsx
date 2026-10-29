@@ -5,10 +5,16 @@ import { CATEGORIES, categoryOf, categoryPcts, completePct, typeTotals, type Wei
 import { applyWeights, typePct } from "@/lib/weights";
 import { unweighted, weightItems, type FieldWeight, type WeightItem } from "@/lib/weightItems";
 import type { TypeResult } from "@/lib/results";
+import { byTypeOrder } from "@/lib/typeOrder";
 
 export type EditorType = { key: string; name: string; fields: (FieldWeight & { status: string })[] };
 type Draft = Record<string, Record<number, { weight: string; group: string }>>;   // typeKey → order → new values
 type Preview = { types: TypeResult[]; fields_pct: number };
+
+// categories in the app's usual equipment order (air handlers first … grilles last)
+const CAT_ORDER = ["air_handlers", "fans", "unitary", "face_velocity", "terminal", "hydronic", "other", "outlets"];
+const at = (k: string) => { const i = CAT_ORDER.indexOf(k); return i < 0 ? CAT_ORDER.length : i; };
+const ORDERED = [...CATEGORIES].sort((a, b) => at(a.key) - at(b.key));
 
 const num = (s: string) => (s.trim() === "" ? null : Number(s) || null);
 
@@ -152,8 +158,8 @@ export default function WeightsEditor({ initial, projects, types }:
       <table className="weights-table cw-table">
         <thead><tr><th>Category · equipment · item</th><th className="w">Weight</th>{cols === 3 && <th className="w">This job</th>}</tr></thead>
         <tbody>
-          {CATEGORIES.map((c) => {
-            const catTypes = current.filter((t) => categoryOf(t.key) === c.key);
+          {ORDERED.map((c) => {
+            const catTypes = current.filter((t) => categoryOf(t.key) === c.key).sort(byTypeOrder);
             const isOpen = open.has(c.key);
             return (
               <Fragment key={c.key}>
