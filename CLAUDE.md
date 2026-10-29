@@ -77,7 +77,8 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   changes. The category list (completion-categories.json, copy in the worker, a test checks they match) is now only headings; the old
   weight_<category> shares are no longer read.
 - Item weights per type (AHUs first): Rules tab columns weight / weight_group (bundled in rules_seed.json; `hitlist set-weights TYPE`
-  copies only the weights to the live tab). A group (e.g. "Unit Data") counts as one item (weight = max of members, earned = share
+  copies only the weights to the live tab; `set-weights new` does every type with no weights on the tab yet). Every type has
+  bundled starter weights (AHU/RTU/VAV from the boss's sheets, the rest a starting point: main reading biggest, nameplate/design in "Unit Data"). A group (e.g. "Unit Data") counts as one item (weight = max of members, earned = share
   of its live members filled). Live = code P/R/O (in a group only P/R: a blank optional member doesn't hold it back); ignored/N/skipped items drop out and the rest scale to 100. Engine `weighted_pct` (unit and
   summary), web `lib/weights.ts` (`applyWeights` recomputes from the current Rules, `typePct`/`unitPct`). Admins edit work per unit and
   item weights on Admin → Completion weights (`WeightsEditor`: headings ▸ types (work box) ▸ items; add item / into a group /

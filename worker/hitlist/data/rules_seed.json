@@ -1294,7 +1294,9 @@
       "Fan Design Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Airflow",
@@ -1302,7 +1304,8 @@
       "Fan Actual Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 45
     },
     {
      "label": "Design RPM",
@@ -1310,7 +1313,9 @@
       "Design RPM"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual RPM",
@@ -1318,7 +1323,8 @@
       "Actual RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5
     },
     {
      "label": "Design Total Static Pressure",
@@ -1326,7 +1332,9 @@
       "Design E.S.P."
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Total Static Pressure",
@@ -1334,7 +1342,9 @@
       "Actual E.S.P."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Fan Statics"
     },
     {
      "label": "Suction Static",
@@ -1342,7 +1352,9 @@
       "Suction SP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Fan Statics"
     },
     {
      "label": "Discharge Static",
@@ -1350,7 +1362,9 @@
       "Discharge SP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Fan Statics"
     },
     {
      "label": "Fan Serial",
@@ -1358,7 +1372,9 @@
       "Fan Serial Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan MFG",
@@ -1366,7 +1382,9 @@
       "Fan Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Model",
@@ -1374,7 +1392,9 @@
       "Fan Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor MFG",
@@ -1382,7 +1402,9 @@
       "Motor Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "HP",
@@ -1390,7 +1412,9 @@
       "Motor HP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Frame",
@@ -1398,7 +1422,9 @@
       "Motor Frame"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor RPM",
@@ -1406,7 +1432,9 @@
       "Motor RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Volts",
@@ -1414,7 +1442,9 @@
       "Motor Rated Volts"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Phase",
@@ -1422,7 +1452,9 @@
       "Motor Phase"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Hertz",
@@ -1430,7 +1462,9 @@
       "Motor Hertz"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Motor Amps",
@@ -1438,7 +1472,9 @@
       "Motor FL Amps"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Service Factor",
@@ -1446,7 +1482,9 @@
       "Motor Service Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Eff",
@@ -1454,7 +1492,9 @@
       "Nominal Efficiency"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Power Factor",
@@ -1462,7 +1502,9 @@
       "Power Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave MFG",
@@ -1476,7 +1518,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave Model",
@@ -1490,7 +1534,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave Dia",
@@ -1504,7 +1550,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave Bore",
@@ -1518,7 +1566,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave MFG",
@@ -1532,7 +1582,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Model",
@@ -1546,7 +1598,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Dia",
@@ -1560,7 +1614,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Bore",
@@ -1574,7 +1630,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "# of Belts",
@@ -1588,7 +1646,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belt Size",
@@ -1602,7 +1662,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Centerline Distance",
@@ -1616,7 +1678,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Volts",
@@ -1626,7 +1690,8 @@
       "Motor Volts T2-T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5
     },
     {
      "label": "Actual Amps",
@@ -1636,7 +1701,8 @@
       "Motor Amps T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5
     },
     {
      "label": "VFD Setting",
@@ -1644,7 +1710,8 @@
       "Final VFD Setting"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 2
     },
     {
      "label": "Drive Type",
@@ -1652,7 +1719,9 @@
       "Drive Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Operating Diameter",
@@ -1666,7 +1735,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Speed Control Setting",
@@ -1699,7 +1770,9 @@
       "Design Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Airflow",
@@ -1707,7 +1780,8 @@
       "Actual Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 40
     },
     {
      "label": "Design O/A",
@@ -1715,7 +1789,9 @@
       "Design Outside Air"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual O/A",
@@ -1723,7 +1799,8 @@
       "Actual Outside Air"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Design T.S.P.",
@@ -1731,7 +1808,9 @@
       "Design T.S.P."
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual T.S.P.",
@@ -1739,7 +1818,9 @@
       "Actual T.S.P."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Design E.S.P.",
@@ -1747,7 +1828,9 @@
       "Design E.S.P."
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual E.S.P.",
@@ -1755,7 +1838,9 @@
       "Actual E.S.P."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Design RPM",
@@ -1763,7 +1848,9 @@
       "Design RPM"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Fan RPM",
@@ -1771,7 +1858,8 @@
       "Actual RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 3
     },
     {
      "label": "Design Outlet CFM",
@@ -1779,7 +1867,9 @@
       "Total For Outlets"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "MFG",
@@ -1787,7 +1877,9 @@
       "Unit Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Model",
@@ -1795,7 +1887,9 @@
       "Unit Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Serial",
@@ -1803,7 +1897,9 @@
       "Unit Serial Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "VFD Setting",
@@ -1811,7 +1907,9 @@
       "Final VFD Setting"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Speed Setting",
@@ -1819,7 +1917,9 @@
       "Fan Speed - Final"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Filter Type",
@@ -1827,7 +1927,9 @@
       "Filter Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Qty S1",
@@ -1835,7 +1937,9 @@
       "Filter Qty - S1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Size S1",
@@ -1843,7 +1947,9 @@
       "Filter Size - S1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Make",
@@ -1851,7 +1957,9 @@
       "Motor Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Type",
@@ -1859,7 +1967,9 @@
       "Motor Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Frame",
@@ -1867,7 +1977,9 @@
       "Motor Frame"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "HP",
@@ -1875,7 +1987,9 @@
       "Motor HP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "RPM",
@@ -1883,7 +1997,9 @@
       "Motor RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Voltage",
@@ -1891,7 +2007,9 @@
       "Motor Rated Volts"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Phase",
@@ -1899,7 +2017,9 @@
       "Motor Phase"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Hertz",
@@ -1907,7 +2027,9 @@
       "Motor Hertz"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Amps",
@@ -1915,7 +2037,9 @@
       "Motor FL Amps"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "S.F.",
@@ -1923,7 +2047,9 @@
       "Motor Service Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Nom. Eff.",
@@ -1931,7 +2057,9 @@
       "Nominal Efficiency"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "PF",
@@ -1939,7 +2067,9 @@
       "Power Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave MFG",
@@ -1953,7 +2083,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Model",
@@ -1967,7 +2099,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Dia.",
@@ -1981,7 +2115,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Bore",
@@ -1995,7 +2131,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave MFG",
@@ -2009,7 +2147,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Model",
@@ -2023,7 +2163,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Diameter",
@@ -2037,7 +2179,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Bore",
@@ -2051,7 +2195,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belts",
@@ -2065,7 +2211,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belt Size",
@@ -2079,7 +2227,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Centerline",
@@ -2093,7 +2243,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Volts T1",
@@ -2103,7 +2255,8 @@
       "Motor Volts T1-T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Amps T1",
@@ -2113,7 +2266,8 @@
       "Motor Amps T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Operating Dia.",
@@ -2127,7 +2281,9 @@
        "label": "Motor Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Location",
@@ -2135,7 +2291,9 @@
       "Location"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Area Served",
@@ -2143,7 +2301,9 @@
       "Serves"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 28,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Heating EAT",
@@ -2151,7 +2311,9 @@
       "Heating E.A.T"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 6,
+     "weight_group": "Heating Temps"
     },
     {
      "label": "Heating LAT",
@@ -2159,7 +2321,9 @@
       "Heating L.A.T."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 6,
+     "weight_group": "Heating Temps"
     },
     {
      "label": "Completed",
@@ -2184,7 +2348,9 @@
       "Design Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Airflow",
@@ -2192,7 +2358,8 @@
       "Actual Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 40
     },
     {
      "label": "Fan Speed Setting",
@@ -2200,7 +2367,9 @@
       "Fan Speed - Final"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design EAT DB",
@@ -2208,7 +2377,9 @@
       "Des. E.A.T. DB"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual EAT DB",
@@ -2216,7 +2387,9 @@
       "Act. E.A.T. DB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Cooling Temps"
     },
     {
      "label": "Design EAT WB",
@@ -2224,7 +2397,9 @@
       "Des. E.A.T. WB"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual EAT WB",
@@ -2232,7 +2407,9 @@
       "Act. E.A.T. WB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Cooling Temps"
     },
     {
      "label": "Design LAT DB",
@@ -2240,7 +2417,9 @@
       "Des. L.A.T. DB"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual LAT DB",
@@ -2248,7 +2427,9 @@
       "Act. L.A.T DB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Cooling Temps"
     },
     {
      "label": "Design LAT WB",
@@ -2256,7 +2437,9 @@
       "Des. L.A.T. WB"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual LAT WB",
@@ -2264,14 +2447,18 @@
       "Act. L.A.T. WB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Cooling Temps"
     },
     {
      "label": "Actual Air ΔT DB Cooling",
      "columns": [
       "Act. Air ΔT - DB Cooling"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 20,
+     "weight_group": "Cooling Temps"
     },
     {
      "label": "Design EAT Heating",
@@ -2279,7 +2466,9 @@
       "Des. E.A.T. Heating"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual EAT Heating",
@@ -2287,7 +2476,9 @@
       "Act. Heating E.A.T"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Heating Temps"
     },
     {
      "label": "Location",
@@ -2295,7 +2486,9 @@
       "Location"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Area Served",
@@ -2303,7 +2496,9 @@
       "Serves"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "MFG",
@@ -2311,7 +2506,9 @@
       "Unit Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Model",
@@ -2319,7 +2516,9 @@
       "Unit Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Serial",
@@ -2327,7 +2526,9 @@
       "Unit Serial Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Amps",
@@ -2335,7 +2536,9 @@
       "Motor FL Amps"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Make",
@@ -2343,7 +2546,9 @@
       "Motor Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "HP",
@@ -2351,7 +2556,9 @@
       "Motor HP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Frame",
@@ -2359,7 +2566,9 @@
       "Motor Frame"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Voltage",
@@ -2367,7 +2576,9 @@
       "Motor Rated Volts"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Phase",
@@ -2375,7 +2586,9 @@
       "Motor Phase"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Hertz",
@@ -2383,7 +2596,9 @@
       "Motor Hertz"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "RPM",
@@ -2391,7 +2606,9 @@
       "Motor RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "S.F.",
@@ -2399,7 +2616,9 @@
       "Motor Service Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Nom. Eff.",
@@ -2407,7 +2626,9 @@
       "Nominal Efficiency"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "PF",
@@ -2415,7 +2636,9 @@
       "Power Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design LAT Heating",
@@ -2423,7 +2646,9 @@
       "Des. L.A.T. Heating"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual LAT Heating",
@@ -2431,7 +2656,9 @@
       "Act. L.A.T. Heating"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Heating Temps"
     },
     {
      "label": "Test Method",
@@ -2439,7 +2666,9 @@
       "Test Method"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Area SQFT",
@@ -2447,7 +2676,9 @@
       "Area"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "AK",
@@ -2455,7 +2686,9 @@
       "Open Area Ak"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Velocity",
@@ -2463,7 +2696,9 @@
       "Velocity"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Volts T1",
@@ -2471,7 +2706,8 @@
       "Volts"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Amps T1",
@@ -2479,7 +2715,8 @@
       "Amps"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Completed",
@@ -2504,7 +2741,9 @@
       "Design Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Airflow",
@@ -2512,7 +2751,8 @@
       "Actual Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 40
     },
     {
      "label": "Design O/A",
@@ -2520,7 +2760,9 @@
       "Design Outside Air"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual O/A",
@@ -2528,7 +2770,8 @@
       "Actual Outside Air"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Design E.S.P.",
@@ -2536,7 +2779,9 @@
       "Design E.S.P."
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual E.S.P.",
@@ -2544,7 +2789,8 @@
       "Actual E.S.P."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Design Outlet CFM",
@@ -2552,7 +2798,9 @@
       "Design Outlet Total Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Outlet CFM",
@@ -2560,7 +2808,8 @@
       "Total For Outlets"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 2
     },
     {
      "label": "MFG",
@@ -2568,7 +2817,9 @@
       "Unit Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Model",
@@ -2576,7 +2827,9 @@
       "Unit Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Serial",
@@ -2584,7 +2837,9 @@
       "Unit Serial Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Location",
@@ -2592,7 +2847,9 @@
       "Location"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Area Served",
@@ -2600,7 +2857,9 @@
       "Serves"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Make",
@@ -2608,7 +2867,9 @@
       "Motor Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Frame",
@@ -2616,7 +2877,9 @@
       "Motor Frame"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "HP",
@@ -2624,7 +2887,9 @@
       "Motor HP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "RPM",
@@ -2632,7 +2897,9 @@
       "Motor RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Voltage",
@@ -2640,7 +2907,9 @@
       "Motor Rated Volts"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Phase",
@@ -2648,7 +2917,9 @@
       "Motor Phase"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Hertz",
@@ -2656,7 +2927,9 @@
       "Motor Hertz"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Amps",
@@ -2664,7 +2937,9 @@
       "Motor FL Amps"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "S.F.",
@@ -2672,7 +2947,9 @@
       "Motor Service Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Nom. Eff.",
@@ -2680,7 +2957,9 @@
       "Nominal Efficiency"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "PF",
@@ -2688,7 +2967,9 @@
       "Power Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design RPM",
@@ -2696,7 +2977,9 @@
       "Design RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Fan RPM",
@@ -2704,7 +2987,8 @@
       "Actual RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 2
     },
     {
      "label": "Fan Speed Setting",
@@ -2712,7 +2996,9 @@
       "Fan Speed - Final"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Volts T1",
@@ -2722,7 +3008,8 @@
       "Motor Volts T1-T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Amps T1",
@@ -2732,7 +3019,8 @@
       "Motor Amps T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Des EAT DB",
@@ -2740,7 +3028,9 @@
       "Des. E.A.T. DB"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Des EAT WB",
@@ -2748,7 +3038,9 @@
       "Des. E.A.T. WB"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Des LAT DB",
@@ -2756,7 +3048,9 @@
       "Des. L.A.T. DB"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Des LAT WB",
@@ -2764,7 +3058,9 @@
       "Des. L.A.T. WB"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Act EAT WB",
@@ -2772,7 +3068,9 @@
       "Act. E.A.T. WB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 8,
+     "weight_group": "Cooling Temps"
     },
     {
      "label": "Act LAT WB",
@@ -2780,7 +3078,9 @@
       "Act. L.A.T. WB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 8,
+     "weight_group": "Cooling Temps"
     },
     {
      "label": "Heating EAT",
@@ -2788,7 +3088,9 @@
       "Act. Heating E.A.T"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4,
+     "weight_group": "Heating Temps"
     },
     {
      "label": "Heating LAT",
@@ -2796,7 +3098,9 @@
       "Act. L.A.T. Heating"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4,
+     "weight_group": "Heating Temps"
     },
     {
      "label": "Filter Type",
@@ -2804,7 +3108,9 @@
       "Filter Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave MFG",
@@ -2818,7 +3124,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Model",
@@ -2832,7 +3140,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Dia.",
@@ -2846,7 +3156,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Bore",
@@ -2860,7 +3172,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave MFG",
@@ -2874,7 +3188,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Model",
@@ -2888,7 +3204,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Diameter",
@@ -2902,7 +3220,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Bore",
@@ -2916,7 +3236,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belts",
@@ -2930,7 +3252,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belt Size",
@@ -2944,7 +3268,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Centerline",
@@ -2958,7 +3284,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Operating Dia.",
@@ -2972,7 +3300,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Act LAT DB",
@@ -2980,7 +3310,9 @@
       "Act. L.A.T DB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 8,
+     "weight_group": "Cooling Temps"
     },
     {
      "label": "Act EAT DB",
@@ -2988,7 +3320,9 @@
       "Act. E.A.T. DB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 8,
+     "weight_group": "Cooling Temps"
     },
     {
      "label": "Des EAT Heating",
@@ -2996,7 +3330,9 @@
       "Des. E.A.T. Heating"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Des LAT Heating",
@@ -3004,7 +3340,9 @@
       "Des. L.A.T. Heating"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "VFD Setting",
@@ -3012,7 +3350,9 @@
       "Final VFD Setting"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",
@@ -3035,301 +3375,395 @@
      "label": "Design Airflow",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Airflow",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 40
     },
     {
      "label": "Design O/A",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual O/A",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Design T.S.P.",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual T.S.P.",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Design E.S.P.",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual E.S.P.",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Design RPM",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Fan RPM",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 3
     },
     {
      "label": "Design Outlet CFM",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "ActOutletTotal",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 2
     },
     {
      "label": "MFG",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Model",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Serial",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Location",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Speed",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Volts T1",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Amps T1",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "VFD Setting",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave MFG",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Model",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Dia.",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Bore",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave MFG",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Model",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Diameter",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Bore",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belts",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belt Size",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Centerline",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Operating Dia.",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Make",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Frame",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "HP",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "RPM",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Voltage",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Phase",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Hertz",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Amps",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "S.F.",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Nom. Eff.",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "PF",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Filter Rating",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Filter Type",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Qty S1",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Size S1",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Area Served",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 32,
+     "weight_group": "Unit Data"
     },
     {
      "label": "External S.P. In",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "External S.P. Out",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Completed",
@@ -3354,7 +3788,9 @@
       "Coil Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Capacity MBH",
@@ -3362,7 +3798,9 @@
       "Design Coil Capacity"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design GPM",
@@ -3370,7 +3808,9 @@
       "Water Flow Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Press Drop",
@@ -3378,7 +3818,9 @@
       "Press. Drop Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual GPM",
@@ -3386,7 +3828,8 @@
       "Water Flow Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 35
     },
     {
      "label": "% Final GPM",
@@ -3402,7 +3845,8 @@
       "Press. Drop Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Design Ent Water Temp",
@@ -3410,7 +3854,9 @@
       "Ent. Water Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Ent Water Temp",
@@ -3418,7 +3864,9 @@
       "Ent. Water Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Design Leav Water Temp",
@@ -3426,7 +3874,9 @@
       "Leav. Water Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Leav Water Temp",
@@ -3434,7 +3884,9 @@
       "Leav. Water Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Design Water Delta T",
@@ -3442,7 +3894,9 @@
       "Water Delta T Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Water Delta T",
@@ -3450,7 +3904,9 @@
       "Water Delta T Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Face Area Sq.Ft.",
@@ -3458,7 +3914,9 @@
       "Airside Face Area"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Airflow",
@@ -3466,7 +3924,9 @@
       "Airflow Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Airflow",
@@ -3474,7 +3934,8 @@
       "Airflow Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Design Air Velocity",
@@ -3488,7 +3949,9 @@
        "label": "Airside Face Area",
        "filled": true
       }
-     ]
+     ],
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Air Velocity",
@@ -3502,7 +3965,9 @@
        "label": "Airside Face Area",
        "filled": true
       }
-     ]
+     ],
+     "weight": 5,
+     "weight_group": "Coil Pressures"
     },
     {
      "label": "Design Ent Air DB Temp",
@@ -3510,7 +3975,9 @@
       "Ent. Air DB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Ent Air DB Temp",
@@ -3518,7 +3985,9 @@
       "Ent. Air DB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Ent Air WB Temp",
@@ -3526,7 +3995,9 @@
       "Ent. Air WB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Ent Air WB Temp",
@@ -3534,7 +4005,9 @@
       "Ent. Air WB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Leav Air DB Temp",
@@ -3542,7 +4015,9 @@
       "Leav. Air DB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Leav Air DB Temp",
@@ -3550,7 +4025,9 @@
       "Leav. Air DB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Leav Air WB Temp",
@@ -3558,7 +4035,9 @@
       "Leav. Air WB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Leav Air WB Temp",
@@ -3566,7 +4045,9 @@
       "Leav. Air WB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Air Temp Delta T",
@@ -3574,7 +4055,9 @@
       "Air Temp Delta T Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Air Temp Delta T",
@@ -3582,7 +4065,9 @@
       "Air Temp Delta T Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Coil Inlet PSI Actual",
@@ -3590,7 +4075,9 @@
       "Coil Inlet PSI Actual"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Coil Pressures"
     },
     {
      "label": "Coil Outlet PSI Actual",
@@ -3598,7 +4085,9 @@
       "Coil Outlet PSI Actual"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Coil Pressures"
     },
     {
      "label": "Design Coil APD",
@@ -3606,7 +4095,9 @@
       "Design Coil APD"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Coil APD",
@@ -3614,7 +4105,9 @@
       "Actual Coil APD"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Coil Pressures"
     },
     {
      "label": "Rows",
@@ -3622,7 +4115,9 @@
       "# Rows"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fins Per Inch",
@@ -3630,7 +4125,9 @@
       "Fins Per Inch"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",
@@ -3657,7 +4154,9 @@
       "EDH Rated KW"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "EDH Actual KW",
@@ -3665,7 +4164,8 @@
       "EDH Actual KW"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30
     },
     {
      "label": "KW Final %",
@@ -3681,7 +4181,9 @@
       "EDH Stages"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Volts",
@@ -3689,7 +4191,9 @@
       "EDH Design Volts"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Amps",
@@ -3697,7 +4201,9 @@
       "EDH Design Amps"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Volts",
@@ -3705,7 +4211,8 @@
       "EDH Act. Volts 1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15
     },
     {
      "label": "Actual Amps",
@@ -3713,7 +4220,8 @@
       "EDH Act. Amps 1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15
     },
     {
      "label": "Phase",
@@ -3721,7 +4229,9 @@
       "Phase"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "EAT Design",
@@ -3729,7 +4239,9 @@
       "EAT Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "LAT Design",
@@ -3737,7 +4249,9 @@
       "LAT Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "EAT Actual",
@@ -3745,7 +4259,9 @@
       "EAT Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Air Temps"
     },
     {
      "label": "LAT Actual",
@@ -3753,7 +4269,9 @@
       "LAT Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Delta T",
@@ -3761,7 +4279,9 @@
       "Air Temp Delta T"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Airflow Design",
@@ -3769,7 +4289,9 @@
       "Airflow Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Airflow Actual",
@@ -3777,7 +4299,8 @@
       "Airflow Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Air Temp Design Delta T",
@@ -3785,7 +4308,9 @@
       "Air Temp Design Delta T"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",
@@ -4008,7 +4533,9 @@
       "Prelim. EMS"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Preliminary"
     },
     {
      "label": "Preliminary Test",
@@ -4016,7 +4543,9 @@
       "Prelim. Test"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Preliminary"
     },
     {
      "label": "Preliminary Diff",
@@ -4032,7 +4561,8 @@
       "EMS Offset"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Final EMS",
@@ -4040,7 +4570,9 @@
       "Final EMS"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 60,
+     "weight_group": "Final"
     },
     {
      "label": "Final Test",
@@ -4048,7 +4580,9 @@
       "Final Test"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 60,
+     "weight_group": "Final"
     },
     {
      "label": "Final Diff",
@@ -4089,7 +4623,9 @@
       "Prelim. EMS"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Preliminary"
     },
     {
      "label": "Preliminary Test",
@@ -4097,7 +4633,9 @@
       "Prelim. Test"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Preliminary"
     },
     {
      "label": "Preliminary Diff",
@@ -4113,7 +4651,8 @@
       "EMS Offset"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Final EMS",
@@ -4121,7 +4660,9 @@
       "Final EMS"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 60,
+     "weight_group": "Final"
     },
     {
      "label": "Final Test",
@@ -4129,7 +4670,9 @@
       "Final Test"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 60,
+     "weight_group": "Final"
     },
     {
      "label": "Final Diff",
@@ -4178,7 +4721,9 @@
       "Prelim. EMS"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Preliminary"
     },
     {
      "label": "Preliminary Test",
@@ -4186,7 +4731,9 @@
       "Prelim. Test"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Preliminary"
     },
     {
      "label": "Preliminary Diff",
@@ -4202,7 +4749,8 @@
       "EMS Offset"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Final EMS",
@@ -4210,7 +4758,9 @@
       "Final EMS"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 60,
+     "weight_group": "Final"
     },
     {
      "label": "Final Test",
@@ -4218,7 +4768,9 @@
       "Final Test"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 60,
+     "weight_group": "Final"
     },
     {
      "label": "Final Diff",
@@ -4260,7 +4812,9 @@
       "Unit Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Motor Volts",
@@ -4268,7 +4822,9 @@
       "Motor Volts"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Motor Amps",
@@ -4276,7 +4832,9 @@
       "Motor Amps"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Motor Volts",
@@ -4286,7 +4844,9 @@
       "Volts 3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Motor Readings"
     },
     {
      "label": "Actual Motor Amps",
@@ -4296,7 +4856,9 @@
       "Amps 3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Motor Readings"
     },
     {
      "label": "Model",
@@ -4304,7 +4866,9 @@
       "Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Serial",
@@ -4312,7 +4876,9 @@
       "Serial Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design KW",
@@ -4320,7 +4886,9 @@
       "Dsgn. KW"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual KW",
@@ -4334,7 +4902,8 @@
        "label": "Design KW",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15
     },
     {
      "label": "% Actual KW",
@@ -4362,7 +4931,9 @@
        "label": "Design KW",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Heater Volts",
@@ -4376,7 +4947,9 @@
        "label": "Design KW",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Heater Volts",
@@ -4392,7 +4965,9 @@
        "label": "Design KW",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15,
+     "weight_group": "Heater Readings"
     },
     {
      "label": "Actual Heater Amps",
@@ -4408,7 +4983,9 @@
        "label": "Design KW",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15,
+     "weight_group": "Heater Readings"
     },
     {
      "label": "Airflow Design",
@@ -4416,7 +4993,9 @@
       "Design Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Airflow Actual",
@@ -4424,7 +5003,8 @@
       "Actual Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15
     },
     {
      "label": "EAT",
@@ -4432,7 +5012,9 @@
       "EAT"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "LAT",
@@ -4440,7 +5022,9 @@
       "LAT"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Air Delta T",
@@ -4448,7 +5032,9 @@
       "Delta T"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design GPM",
@@ -4462,7 +5048,9 @@
        "label": "Water Delta T",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual GPM",
@@ -4476,7 +5064,9 @@
        "label": "Design GPM",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15,
+     "weight_group": "Water Readings"
     },
     {
      "label": "EWT",
@@ -4490,7 +5080,9 @@
        "label": "Design GPM",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15,
+     "weight_group": "Water Readings"
     },
     {
      "label": "Design DP",
@@ -4504,7 +5096,9 @@
        "label": "Design GPM",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "LWT",
@@ -4518,7 +5112,9 @@
        "label": "Design GPM",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15,
+     "weight_group": "Water Readings"
     },
     {
      "label": "Actual DP",
@@ -4532,7 +5128,9 @@
        "label": "Design GPM",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 15,
+     "weight_group": "Water Readings"
     },
     {
      "label": "Motor HP",
@@ -4540,7 +5138,9 @@
       "Motor HP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",
@@ -4565,7 +5165,9 @@
       "Location"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Service",
@@ -4573,7 +5175,9 @@
       "Service"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "MFG",
@@ -4581,7 +5185,9 @@
       "Make"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Model",
@@ -4589,7 +5195,9 @@
       "Model"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design GPM",
@@ -4597,7 +5205,9 @@
       "Design GPM"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Delta P",
@@ -4605,7 +5215,9 @@
       "Design Pressure Diff."
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual GPM",
@@ -4613,7 +5225,8 @@
       "Actual GPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 35
     },
     {
      "label": "Actual Delta P",
@@ -4621,7 +5234,8 @@
       "Actual RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Rated RPM",
@@ -4629,7 +5243,9 @@
       "Motor RPM"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual RPM",
@@ -4637,7 +5253,8 @@
       "Actual RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 3
     },
     {
      "label": "Design Impeller Diam",
@@ -4645,7 +5262,9 @@
       "Design Impeller Diam."
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Impeller Diam",
@@ -4653,7 +5272,8 @@
       "Actual Impeller Diam."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 2
     },
     {
      "label": "Final DP",
@@ -4661,7 +5281,9 @@
       "Final Pressure Hi"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Final Pressures"
     },
     {
      "label": "Final SP",
@@ -4669,7 +5291,9 @@
       "Final Pressure Lo"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Final Pressures"
     },
     {
      "label": "Serial",
@@ -4677,7 +5301,9 @@
       "Serial"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Make",
@@ -4685,7 +5311,9 @@
       "Motor Make"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Frame",
@@ -4693,7 +5321,9 @@
       "Motor Frame"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "HP",
@@ -4701,7 +5331,9 @@
       "Motor HP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Rated Volts",
@@ -4709,7 +5341,9 @@
       "Motor Rated Volts"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Phase",
@@ -4717,7 +5351,9 @@
       "Motor Phase"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Hertz",
@@ -4725,7 +5361,9 @@
       "Motor Hertz"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "FL Amps",
@@ -4733,7 +5371,9 @@
       "Motor F.L. Amps"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Service Factor",
@@ -4741,7 +5381,9 @@
       "Motor Service Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Volts",
@@ -4751,7 +5393,8 @@
       "Motor Volts T1-T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Actual Amps",
@@ -4761,7 +5404,8 @@
       "Motor Amps T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Valve Shut DP",
@@ -4769,7 +5413,9 @@
       "Valve Shut Hi"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Valve Tests"
     },
     {
      "label": "Valve Shut SP",
@@ -4777,7 +5423,9 @@
       "Valve Shut Lo"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Valve Tests"
     },
     {
      "label": "Valve Shut Diff.",
@@ -4785,7 +5433,9 @@
       "Valve Shut Diff."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Valve Tests"
     },
     {
      "label": "Valve Open DP",
@@ -4793,7 +5443,9 @@
       "Valve Open Hi"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Valve Tests"
     },
     {
      "label": "Valve Open SP",
@@ -4801,7 +5453,9 @@
       "Valve Open Lo"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Valve Tests"
     },
     {
      "label": "Valve Open Diff.",
@@ -4809,7 +5463,9 @@
       "Valve Open Diff."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Valve Tests"
     },
     {
      "label": "Valve Open GPM",
@@ -4817,7 +5473,9 @@
       "Valve Open GPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Valve Tests"
     },
     {
      "label": "Valve Setting %",
@@ -4833,7 +5491,9 @@
       "Nominal Efficiency"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Power Factor",
@@ -4841,7 +5501,9 @@
       "Power Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "VFD Setting",
@@ -4849,7 +5511,9 @@
       "VFD Setting"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "System DP Setpoint",
@@ -4857,7 +5521,9 @@
       "System DP Setpoint"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Valve Open Amps",
@@ -4865,7 +5531,9 @@
       "T1/T2/T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Valve Tests"
     },
     {
      "label": "Final Flow %",
@@ -4898,7 +5566,9 @@
       "Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Model",
@@ -4906,7 +5576,9 @@
       "Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Serial",
@@ -4914,7 +5586,9 @@
       "Serial Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Capacity (Tons)",
@@ -4922,7 +5596,9 @@
       "Tons"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Rated Capacity",
@@ -4930,7 +5606,9 @@
       "MBH"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Evaperator Design EWT",
@@ -4938,7 +5616,9 @@
       "Evap Dsgn Ent H2O Temp"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Evaperator Actual EWT",
@@ -4946,7 +5626,9 @@
       "Evap Act Ent H2O Temp"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Evaporator Temps"
     },
     {
      "label": "Evaperator Design LWT",
@@ -4954,7 +5636,9 @@
       "Evap Dsgn Lvg H2O Temp"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Evaperator Actual LWT",
@@ -4962,7 +5646,9 @@
       "Evap Act Lvg H2O Temp"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Evaporator Temps"
     },
     {
      "label": "Evaperator Flow Design",
@@ -4970,7 +5656,9 @@
       "Evap Flow Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Evaperator Flow Actual",
@@ -4978,7 +5666,8 @@
       "Evap Flow Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20
     },
     {
      "label": "Evaperator Design DP",
@@ -4986,7 +5675,9 @@
       "Evap DP Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Evaperator Actual DP",
@@ -4994,7 +5685,9 @@
       "Evap DP Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Pressure Drops"
     },
     {
      "label": "Condenser Design EWT",
@@ -5002,7 +5695,9 @@
       "Cond Dsgn Ent H2O Temp"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Condenser Actual EWT",
@@ -5010,7 +5705,9 @@
       "Cond Act Ent H2O Temp"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Condenser Temps"
     },
     {
      "label": "Condenser Design LWT",
@@ -5018,7 +5715,9 @@
       "Cond Dsgn Lvg H2O Temp"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Condenser Actual LWT",
@@ -5026,7 +5725,9 @@
       "Cond Act Lvg H2O Temp"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Condenser Temps"
     },
     {
      "label": "Condenser Flow Design",
@@ -5034,7 +5735,9 @@
       "Cond Flow Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Condenser Flow Actual",
@@ -5042,7 +5745,8 @@
       "Cond Flow Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20
     },
     {
      "label": "Condenser Design DP",
@@ -5050,7 +5754,9 @@
       "Cond DP Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Condenser Actual DP",
@@ -5058,7 +5764,9 @@
       "Cond DP Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Pressure Drops"
     },
     {
      "label": "Entering Evaperator PSI",
@@ -5066,7 +5774,9 @@
       "Evap. Pressure Hi"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Pressures"
     },
     {
      "label": "Leaving Evaperator PSI",
@@ -5074,7 +5784,9 @@
       "Evap. Pressure Lo"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Pressures"
     },
     {
      "label": "Entering Condenser PSI",
@@ -5082,7 +5794,9 @@
       "Cond. Pressure Hi"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Pressures"
     },
     {
      "label": "Leaving Condenser PSI",
@@ -5090,7 +5804,9 @@
       "Cond. Pressure Lo"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Pressures"
     },
     {
      "label": "Condenser Valve Setting",
@@ -5098,7 +5814,9 @@
       "Cond. Valve %"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Evaperator Valve Setting",
@@ -5106,7 +5824,9 @@
       "Evap. Valve %"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Condenser Delta T",
@@ -5114,7 +5834,9 @@
       "Cond. Delta T Dsgn"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Condenser Delta T",
@@ -5122,7 +5844,9 @@
       "Cond. Delta T Act"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Condenser Temps"
     },
     {
      "label": "Design Evaperator Delta T",
@@ -5130,7 +5854,9 @@
       "Evap. Delta T Dsgn"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Evaperator Delta T",
@@ -5138,7 +5864,9 @@
       "Evap. Delta T Act"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Evaporator Temps"
     },
     {
      "label": "Design Evaperator Min PD",
@@ -5146,7 +5874,9 @@
       "Des. Press. Drop Min. Evap. Flow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Evaperator Min GPM",
@@ -5154,7 +5884,9 @@
       "Des. Min. Evap. Flow Rate"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Evaperator Min PD",
@@ -5178,7 +5910,9 @@
       "System Diff. Press. (D.P.) Setpoint"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Evaperator Flow %",
@@ -5217,211 +5951,277 @@
      "label": "MFG",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Model",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Serial",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Capacity (Tons)",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "EAT Dry Bulb",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Air Temps"
     },
     {
      "label": "EAT Wet Bulb",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Air Temps"
     },
     {
      "label": "LAT Dry Bulb",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Air Temps"
     },
     {
      "label": "LAT Wet Bulb",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design GPM",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual GPM",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 35
     },
     {
      "label": "Design D.P.",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual D.P.",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Design EWT",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual EWT",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Design LWT",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual LWT",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Bypass Valve Temp Setpoint",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Ambient WB",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Make",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Frame",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor HP",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor RPM",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Rated Volts",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Phase",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Hertz",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor F.L. Amps",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Service Factor",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Nominal Efficiency",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "No. of Belts",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "VFD Setting Hertz",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Balance Valve Setting",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Power Factor",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Volts T1",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Actual Amps T1",
      "columns": null,
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "VFD Display Amps",
      "columns": null,
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 22,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",
@@ -5446,7 +6246,9 @@
       "Unit Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Model",
@@ -5454,7 +6256,9 @@
       "Unit Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Serial",
@@ -5462,7 +6266,9 @@
       "Unit Serial Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "BTU Input",
@@ -5470,7 +6276,9 @@
       "BTU Input"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "BTU Output",
@@ -5478,7 +6286,9 @@
       "BTU Output"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fuel Type",
@@ -5486,7 +6296,9 @@
       "Fuel Type"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design GPM",
@@ -5494,7 +6306,9 @@
       "Design Water Flow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual GPM",
@@ -5502,7 +6316,8 @@
       "Actual Water Flow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 40
     },
     {
      "label": "Design DP",
@@ -5510,7 +6325,9 @@
       "Design Diff Pressure"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual DP",
@@ -5518,7 +6335,8 @@
       "Actual Diff Pressure"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15
     },
     {
      "label": "Design EWT",
@@ -5526,7 +6344,9 @@
       "Design EWT"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design LWT",
@@ -5534,7 +6354,9 @@
       "Design LWT"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual EWT",
@@ -5542,7 +6364,9 @@
       "Actual EWT"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Actual LWT",
@@ -5550,7 +6374,9 @@
       "Actual LWT"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Completed",
@@ -5575,7 +6401,9 @@
       "Room"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Area Type",
@@ -5583,7 +6411,9 @@
       "Type of Area"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Room Size",
@@ -5591,7 +6421,9 @@
       "Room Size"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Area Status",
@@ -5599,7 +6431,9 @@
       "Area Status"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Min Req ACH",
@@ -5607,7 +6441,9 @@
       "Min Required ACH"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual ACH",
@@ -5615,7 +6451,8 @@
       "Actual ACH"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25
     },
     {
      "label": "Req Pressure",
@@ -5623,7 +6460,9 @@
       "Required Pressure"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual D.P.",
@@ -5631,7 +6470,8 @@
       "Actual Diff. Press."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25
     },
     {
      "label": "Room Monitor Pressure",
@@ -5639,7 +6479,9 @@
       "Room Monitor Pressure"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Supply Airflow",
@@ -5647,7 +6489,9 @@
       "Design Supply Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Supply Airflow",
@@ -5655,7 +6499,8 @@
       "Actual Supply Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20
     },
     {
      "label": "Design Exh/Ret Airflow",
@@ -5663,7 +6508,9 @@
       "Design Exh/Ret Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Exh/Ret Airflow",
@@ -5671,7 +6518,8 @@
       "Actual Exh/Ret Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15
     },
     {
      "label": "S.P. to Clean",
@@ -5679,7 +6527,9 @@
       "S.P. Relative to Clean"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "S.P. to Corridor",
@@ -5687,7 +6537,9 @@
       "S.P. relative to Corr."
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design D.P.",
@@ -5695,7 +6547,9 @@
       "Design Diff. Press."
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Min Required Airflow",
@@ -5703,7 +6557,9 @@
       "Min Req Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "S.P. to Ante",
@@ -5711,7 +6567,9 @@
       "S.P. to Ante"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Space Temp. BAS",
@@ -5719,7 +6577,9 @@
       "Space Temp. BAS"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Space Temp. Actual",
@@ -5735,7 +6595,9 @@
       "Space Humidity BAS"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Space Hum. Actual",
@@ -5751,7 +6613,9 @@
       "Door Sweep?"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Des. Airflow Diff.",
@@ -5767,7 +6631,8 @@
       "Act. Airflow Diff."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5
     },
     {
      "label": "Completed",
@@ -5792,7 +6657,9 @@
       "Design T.S.P."
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Total Static Pressure",
@@ -5800,7 +6667,8 @@
       "Actual T.S.P."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30
     },
     {
      "label": "Design RPM",
@@ -5808,7 +6676,9 @@
       "Design RPM"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual RPM",
@@ -5816,7 +6686,8 @@
       "Actual RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20
     },
     {
      "label": "VFD Setting",
@@ -5824,7 +6695,8 @@
       "VFD Setting"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5
     },
     {
      "label": "Motor MFG",
@@ -5832,7 +6704,9 @@
       "Motor MFG"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Hertz",
@@ -5840,7 +6714,9 @@
       "Motor Hertz"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Motor Amps",
@@ -5848,7 +6724,9 @@
       "Motor FL Amps"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Service Factor",
@@ -5856,7 +6734,9 @@
       "Motor Service Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor RPM",
@@ -5864,7 +6744,9 @@
       "Motor RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave MFG",
@@ -5878,7 +6760,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Volts",
@@ -5886,7 +6770,9 @@
       "Motor Rated Volts"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Eff",
@@ -5894,7 +6780,9 @@
       "Nominal Efficiency"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Phase",
@@ -5902,7 +6790,9 @@
       "Motor Phase"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Power Factor",
@@ -5910,7 +6800,9 @@
       "Motor Power Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave Model",
@@ -5924,7 +6816,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave Dia",
@@ -5938,7 +6832,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave Bore",
@@ -5952,7 +6848,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave MFG",
@@ -5966,7 +6864,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Model",
@@ -5980,7 +6880,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Dia",
@@ -5994,7 +6896,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Bore",
@@ -6008,7 +6912,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "# of Belts",
@@ -6022,7 +6928,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belt Size",
@@ -6036,7 +6944,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Centerline Distance",
@@ -6050,7 +6960,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Volts",
@@ -6060,7 +6972,8 @@
       "Motor Volts T1-T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Actual Amps",
@@ -6070,7 +6983,8 @@
       "Motor Amps T3"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "HP",
@@ -6078,7 +6992,9 @@
       "Horsepower"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Array",
@@ -6086,7 +7002,9 @@
       "Fan Array"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Frame",
@@ -6094,7 +7012,9 @@
       "Frame"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Drive Type",
@@ -6102,7 +7022,9 @@
       "Drive Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",
@@ -6127,7 +7049,9 @@
       "Water Flow Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual GPM",
@@ -6135,7 +7059,8 @@
       "Water Flow Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 35
     },
     {
      "label": "% Final GPM",
@@ -6151,7 +7076,9 @@
       "Press. Drop Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Press Drop",
@@ -6159,7 +7086,8 @@
       "Press. Drop Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Design Ent Water Temp",
@@ -6167,7 +7095,9 @@
       "Ent. Water Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Ent Water Temp",
@@ -6175,7 +7105,9 @@
       "Ent. Water Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Design Leav Water Temp",
@@ -6183,7 +7115,9 @@
       "Leav. Water Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Leav Water Temp",
@@ -6191,7 +7125,9 @@
       "Leav. Water Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Design Water Delta T",
@@ -6199,7 +7135,9 @@
       "Water Delta T Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Water Delta T",
@@ -6207,7 +7145,9 @@
       "Water Delta T Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Design Ent Air DB Temp",
@@ -6215,7 +7155,9 @@
       "Ent. Air DB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Ent Air DB Temp",
@@ -6223,7 +7165,9 @@
       "Ent. Air DB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Ent Air WB Temp",
@@ -6231,7 +7175,9 @@
       "Ent. Air WB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Ent Air WB Temp",
@@ -6239,7 +7185,9 @@
       "Ent. Air WB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Leav Air DB Temp",
@@ -6247,7 +7195,9 @@
       "Leav. Air DB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Leav Air DB Temp",
@@ -6255,7 +7205,9 @@
       "Leav. Air DB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Leav Air WB Temp",
@@ -6263,7 +7215,9 @@
       "Leav. Air WB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Leav Air WB Temp",
@@ -6271,7 +7225,9 @@
       "Leav. Air WB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Air Temp Delta T",
@@ -6279,7 +7235,9 @@
       "Air Temp Delta T Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Air Temp Delta T",
@@ -6287,7 +7245,9 @@
       "Air Temp Delta T Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Coil Inlet PSI Actual",
@@ -6295,7 +7255,9 @@
       "Coil Inlet PSI Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Coil Pressures"
     },
     {
      "label": "Coil Outlet PSI Actual",
@@ -6303,7 +7265,9 @@
       "Coil Outlet PSI Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Coil Pressures"
     },
     {
      "label": "Design Air Velocity",
@@ -6317,7 +7281,9 @@
        "label": "Airside Face Area",
        "filled": true
       }
-     ]
+     ],
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Air Velocity",
@@ -6331,7 +7297,8 @@
        "label": "Airside Face Area",
        "filled": true
       }
-     ]
+     ],
+     "weight": 5
     },
     {
      "label": "Design Coil APD",
@@ -6339,7 +7306,9 @@
       "Design Coil APD"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Capacity MBH",
@@ -6347,7 +7316,9 @@
       "Design Coil Capacity"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Coil APD",
@@ -6355,7 +7326,9 @@
       "Actual Coil APD"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Coil Pressures"
     },
     {
      "label": "Face Area Sq.Ft.",
@@ -6363,7 +7336,9 @@
       "Airside Face Area"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Rows",
@@ -6371,7 +7346,9 @@
       "# Rows"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fins Per Inch",
@@ -6379,7 +7356,9 @@
       "Fins Per Inch"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Coil Type",
@@ -6387,7 +7366,9 @@
       "Coil Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",
@@ -6412,7 +7393,9 @@
       "Des. Water Flow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual GPM",
@@ -6420,7 +7403,8 @@
       "Act. Water Flow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 35
     },
     {
      "label": "% Final GPM",
@@ -6436,7 +7420,9 @@
       "Press. Drop Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Press Drop",
@@ -6444,7 +7430,8 @@
       "Press. Drop Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Design Ent Water Temp",
@@ -6452,7 +7439,9 @@
       "Ent. Water Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Ent Water Temp",
@@ -6460,7 +7449,9 @@
       "Ent. Water Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Design Leav Water Temp",
@@ -6468,7 +7459,9 @@
       "Leav. Water Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Leav Water Temp",
@@ -6476,7 +7469,9 @@
       "Leav. Water Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Design Water Delta T",
@@ -6484,7 +7479,9 @@
       "Water Delta T Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Water Delta T",
@@ -6492,7 +7489,9 @@
       "Water Delta T Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Water Temps"
     },
     {
      "label": "Design Ent Air DB Temp",
@@ -6500,7 +7499,9 @@
       "Ent. Air DB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Ent Air DB Temp",
@@ -6508,7 +7509,9 @@
       "Ent. Air DB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Leav Air DB Temp",
@@ -6516,7 +7519,9 @@
       "Leav. Air DB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Leav Air DB Temp",
@@ -6524,7 +7529,9 @@
       "Leav. Air DB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Air Temp Delta T",
@@ -6532,7 +7539,9 @@
       "Air Temp Delta T Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Air Temp Delta T",
@@ -6540,7 +7549,9 @@
       "Air Temp Delta T Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Face Area Sq.Ft.",
@@ -6548,7 +7559,9 @@
       "Airside Face Area"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Rows",
@@ -6556,7 +7569,9 @@
       "# Rows"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fins Per Inch",
@@ -6564,7 +7579,9 @@
       "Fins Per Inch"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Capacity MBH",
@@ -6572,7 +7589,9 @@
       "Design Coil Capacity"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Air Velocity",
@@ -6586,7 +7605,9 @@
        "label": "Airside Face Area",
        "filled": true
       }
-     ]
+     ],
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Air Velocity",
@@ -6608,7 +7629,9 @@
       "Coil Inlet PSI Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Coil Pressures"
     },
     {
      "label": "Coil Outlet PSI Actual",
@@ -6616,7 +7639,9 @@
       "Coil Outlet PSI Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Coil Pressures"
     },
     {
      "label": "Design Coil APD",
@@ -6624,7 +7649,9 @@
       "Design Coil APD"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Coil APD",
@@ -6632,7 +7659,9 @@
       "Actual Coil APD"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Coil Pressures"
     },
     {
      "label": "Design Airflow",
@@ -6640,7 +7669,9 @@
       "Airflow Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Airflow",
@@ -6648,7 +7679,8 @@
       "Airflow Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Coil Type",
@@ -6656,7 +7688,9 @@
       "Coil Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",
@@ -6681,7 +7715,9 @@
       "Ent. Air DB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Ent Air DB Temp Actual",
@@ -6689,7 +7725,9 @@
       "Ent. Air DB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 50,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Ent Air WB Temp Design",
@@ -6697,7 +7735,9 @@
       "Ent. Air WB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Ent Air WB Temp Actual",
@@ -6705,7 +7745,9 @@
       "Ent. Air WB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 50,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Leav Air DB Temp Design",
@@ -6713,7 +7755,9 @@
       "Leav. Air DB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Leav Air DB Temp Actual",
@@ -6721,7 +7765,9 @@
       "Leav. Air DB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 50,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Leav Air WB Temp Design",
@@ -6729,7 +7775,9 @@
       "Leav. Air WB Temp Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Leav Air WB Temp Actual",
@@ -6737,7 +7785,9 @@
       "Leav. Air WB Temp Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 50,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Air Temp Delta T Design",
@@ -6745,7 +7795,9 @@
       "Air Temp Delta T Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Air Temp Delta T Actual",
@@ -6753,7 +7805,9 @@
       "Air Temp Delta T Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 50,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Face Area Sq.Ft.",
@@ -6761,7 +7815,9 @@
       "Airside Face Area"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Rows",
@@ -6769,7 +7825,9 @@
       "# Rows"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fins Per Inch",
@@ -6777,7 +7835,9 @@
       "Fins Per Inch"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Capacity MBH",
@@ -6785,7 +7845,9 @@
       "Design Coil Capacity"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Air Velocity Design",
@@ -6799,7 +7861,9 @@
        "label": "Airside Face Area",
        "filled": true
       }
-     ]
+     ],
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Air Velocity Actual",
@@ -6813,7 +7877,8 @@
        "label": "Airside Face Area",
        "filled": true
       }
-     ]
+     ],
+     "weight": 10
     },
     {
      "label": "Coil APD Design",
@@ -6821,7 +7886,9 @@
       "Design Coil APD"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Coil APD Actual",
@@ -6829,7 +7896,8 @@
       "Actual Coil APD"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Airflow Design",
@@ -6837,7 +7905,9 @@
       "Airflow Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Airflow Actual",
@@ -6845,7 +7915,8 @@
       "Airflow Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20
     },
     {
      "label": "Completed",
@@ -6870,7 +7941,9 @@
       "EAT Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual EAT",
@@ -6878,7 +7951,9 @@
       "EAT Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design LAT",
@@ -6886,7 +7961,9 @@
       "LAT Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual LAT",
@@ -6894,7 +7971,9 @@
       "LAT Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Air Temps"
     },
     {
      "label": "Design Delta T",
@@ -6902,7 +7981,9 @@
       "Air Temp Design Delta T"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Delta T",
@@ -6910,7 +7991,9 @@
       "Air Temp Delta T"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Air Temps"
     },
     {
      "label": "EDH Rated KW",
@@ -6918,7 +8001,9 @@
       "EDH Rated KW"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "EDH Actual KW",
@@ -6926,7 +8011,8 @@
       "EDH Actual KW"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25
     },
     {
      "label": "KW % Final",
@@ -6942,7 +8028,9 @@
       "EDH Stages"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Phase",
@@ -6950,7 +8038,9 @@
       "Phase"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Volts",
@@ -6958,7 +8048,9 @@
       "EDH Design Volts"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Volts",
@@ -6966,7 +8058,8 @@
       "EDH Act. Volts 1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15
     },
     {
      "label": "Design Amps",
@@ -6974,7 +8067,9 @@
       "EDH Design Amps"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Amps",
@@ -6982,7 +8077,8 @@
       "EDH Act. Amps 1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 15
     },
     {
      "label": "Design Airflow",
@@ -6990,7 +8086,9 @@
       "Airflow Design"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Airflow",
@@ -6998,7 +8096,8 @@
       "Airflow Actual"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Completed",
@@ -7023,7 +8122,9 @@
       "Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Unit Model Number",
@@ -7031,7 +8132,9 @@
       "Unit Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Unit Serial Number",
@@ -7039,7 +8142,9 @@
       "Unit Serial Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Location",
@@ -7047,7 +8152,9 @@
       "Location"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Area Served",
@@ -7055,7 +8162,9 @@
       "Area Served"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Final VFD Setting",
@@ -7063,7 +8172,8 @@
       "Final VFD Setting"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 2
     },
     {
      "label": "Design Airflow",
@@ -7071,7 +8181,9 @@
       "Design Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Airflow",
@@ -7079,7 +8191,8 @@
       "Actual Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 40
     },
     {
      "label": "Airflow %",
@@ -7095,7 +8208,9 @@
       "Design Outlet Total Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design T.S.P.",
@@ -7103,7 +8218,9 @@
       "Design T.S.P."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual T.S.P.",
@@ -7111,7 +8228,9 @@
       "Actual T.S.P."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Design E.S.P.",
@@ -7119,7 +8238,9 @@
       "Design E.S.P."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual E.S.P.",
@@ -7127,7 +8248,9 @@
       "Actual E.S.P."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Fan SP In",
@@ -7135,7 +8258,9 @@
       "Fan SP In"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Fan SP Out",
@@ -7143,7 +8268,9 @@
       "Fan SP Out"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "External SP in",
@@ -7151,7 +8278,9 @@
       "External SP in"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "External SP out",
@@ -7159,7 +8288,9 @@
       "External SP out"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5,
+     "weight_group": "Unit Statics"
     },
     {
      "label": "Design Fan RPM",
@@ -7167,7 +8298,9 @@
       "Design Fan RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Fan RPM",
@@ -7175,7 +8308,8 @@
       "Actual Fan RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 2.5
     },
     {
      "label": "Des. BHP",
@@ -7183,7 +8317,9 @@
       "Des. BHP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Act. BHP",
@@ -7191,7 +8327,8 @@
       "Act. BHP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 1
     },
     {
      "label": "Motor Make",
@@ -7199,7 +8336,9 @@
       "Motor Make"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Horse Power",
@@ -7207,7 +8346,9 @@
       "Horse Power"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor RPM",
@@ -7215,7 +8356,9 @@
       "Motor RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Voltage",
@@ -7223,7 +8366,9 @@
       "Voltage"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Amps",
@@ -7231,7 +8376,9 @@
       "Amps"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Phase",
@@ -7239,7 +8386,9 @@
       "Motor Phase"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Hertz",
@@ -7247,7 +8396,9 @@
       "Motor Hertz"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Service Factor",
@@ -7255,7 +8406,9 @@
       "Service Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Nominal Efficiency",
@@ -7263,7 +8416,9 @@
       "Nominal Efficiency"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Power Factor",
@@ -7271,7 +8426,9 @@
       "Power Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Frame",
@@ -7279,7 +8436,9 @@
       "Frame"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Drive Type",
@@ -7287,7 +8446,9 @@
       "Drive Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Volts T1-T2",
@@ -7295,7 +8456,8 @@
       "Motor Volts T1-T2"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Motor Amps T1",
@@ -7303,7 +8465,8 @@
       "Motor Amps T1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 4
     },
     {
      "label": "Motor Sheave MFG",
@@ -7317,7 +8480,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave Model",
@@ -7331,7 +8496,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave Diam.",
@@ -7345,7 +8512,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave Bore",
@@ -7359,7 +8528,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Sheave O.D.",
@@ -7373,7 +8544,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave MFG",
@@ -7387,7 +8560,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Model",
@@ -7401,7 +8576,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Diam.",
@@ -7415,7 +8592,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Bore",
@@ -7429,7 +8608,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Number of Belts",
@@ -7443,7 +8624,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belt Size",
@@ -7457,7 +8640,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Center Line",
@@ -7471,7 +8656,9 @@
        "label": "Drive Type",
        "equals": "Belt Drive"
       }
-     ]
+     ],
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Filter Type",
@@ -7479,7 +8666,9 @@
       "Filter Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Filter Manufacturer",
@@ -7487,7 +8676,9 @@
       "Filter Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Filter Qty - S1",
@@ -7495,7 +8686,9 @@
       "Filter Qty - S1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Filter Size - S1",
@@ -7503,7 +8696,9 @@
       "Filter Size - S1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Pre-Filter Press. IN",
@@ -7511,7 +8706,9 @@
       "Pre-Filter Press. IN"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 3,
+     "weight_group": "Pre-Filter"
     },
     {
      "label": "Pre-Filter Press. OUT",
@@ -7519,7 +8716,9 @@
       "Pre-Filter Press. OUT"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 3,
+     "weight_group": "Pre-Filter"
     },
     {
      "label": "Des. Pre-Filter P.D.",
@@ -7527,7 +8726,9 @@
       "Des. Pre-Filter P.D."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Act. Pre-Filter P.D.",
@@ -7535,7 +8736,9 @@
       "Act. Pre-Filter P.D."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 3,
+     "weight_group": "Pre-Filter"
     },
     {
      "label": "Des. Entering Air Temp. DB/WB",
@@ -7543,7 +8746,9 @@
       "Des. Entering Air Temp. DB/WB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Act. Entering Air Temp. DB/WB",
@@ -7551,7 +8756,9 @@
       "Act. Entering Air Temp. DB/WB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 8,
+     "weight_group": "DX Coil"
     },
     {
      "label": "Des. Leaving Air Temp. DB/WB",
@@ -7559,7 +8766,9 @@
       "Des. Leaving Air Temp. DB/WB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Act. Leaving Air Temp. DB/WB",
@@ -7567,7 +8776,9 @@
       "Act. Leaving Air Temp. DB/WB"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 8,
+     "weight_group": "DX Coil"
     },
     {
      "label": "Dx Unit DB Delta T",
@@ -7575,7 +8786,9 @@
       "Dx Unit DB Delta T"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 8,
+     "weight_group": "DX Coil"
     },
     {
      "label": "DX Coil Press. IN",
@@ -7583,7 +8796,9 @@
       "DX Coil Press. IN"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 8,
+     "weight_group": "DX Coil"
     },
     {
      "label": "DX Coil Press. OUT",
@@ -7591,7 +8806,9 @@
       "DX Coil Press. OUT"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 8,
+     "weight_group": "DX Coil"
     },
     {
      "label": "Des. DX Coil P.D.",
@@ -7599,7 +8816,9 @@
       "Des. DX Coil P.D."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30.5,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Act. DX Coil P.D.",
@@ -7607,7 +8826,9 @@
       "Act. DX Coil P.D."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 8,
+     "weight_group": "DX Coil"
     },
     {
      "label": "Completed",
@@ -7632,7 +8853,9 @@
       "Area Served"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Design Airflow",
@@ -7640,7 +8863,9 @@
       "Fan Design Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Actual Airflow",
@@ -7648,7 +8873,8 @@
       "Fan Actual Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 50
     },
     {
      "label": "% Act. / Des.",
@@ -7664,7 +8890,9 @@
       "Fan Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Model Number",
@@ -7672,7 +8900,9 @@
       "Fan Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Serial Number",
@@ -7680,7 +8910,9 @@
       "Fan Serial Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Volts T1-T2",
@@ -7688,7 +8920,8 @@
       "Motor Volts T1-T2"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5
     },
     {
      "label": "Motor Amps T1",
@@ -7696,7 +8929,8 @@
       "Motor Amps T1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5
     },
     {
      "label": "Light Switch Interlock",
@@ -7704,7 +8938,9 @@
       "Light Switch Interlock"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Checks"
     },
     {
      "label": "Speed Control",
@@ -7712,7 +8948,9 @@
       "Speed Control"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Checks"
     },
     {
      "label": "Motor Manufacturer",
@@ -7720,7 +8958,9 @@
       "Motor Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor HP",
@@ -7728,7 +8968,9 @@
       "Motor HP"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor RPM",
@@ -7736,7 +8978,9 @@
       "Motor RPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Rated Volts",
@@ -7744,7 +8988,9 @@
       "Motor Rated Volts"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Phase",
@@ -7752,7 +8998,9 @@
       "Motor Phase"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Hertz",
@@ -7760,7 +9008,9 @@
       "Motor Hertz"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor FL Amps",
@@ -7768,7 +9018,9 @@
       "Motor FL Amps"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Speed Control Setting",
@@ -7776,7 +9028,9 @@
       "Speed Control Setting"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10,
+     "weight_group": "Checks"
     },
     {
      "label": "Completed",
@@ -7801,7 +9055,9 @@
       "Filter Type"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 100,
+     "weight_group": "Filter Data"
     },
     {
      "label": "Filter Qty - S1",
@@ -7809,7 +9065,9 @@
       "Filter Qty - S1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 100,
+     "weight_group": "Filter Data"
     },
     {
      "label": "Filter Size - S1",
@@ -7817,7 +9075,9 @@
       "Filter Size - S1"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 100,
+     "weight_group": "Filter Data"
     },
     {
      "label": "Completed",
@@ -7842,7 +9102,9 @@
       "Type of Traverse"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Traverse Setup"
     },
     {
      "label": "Duct Size",
@@ -7851,7 +9113,9 @@
       "Outer Width"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Traverse Setup"
     },
     {
      "label": "Air Flow Area",
@@ -7859,7 +9123,9 @@
       "Air Flow Area"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Traverse Setup"
     },
     {
      "label": "Number of Rows",
@@ -7867,7 +9133,9 @@
       "Number Of Rows"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Traverse Setup"
     },
     {
      "label": "Readings per Row",
@@ -7875,7 +9143,9 @@
       "Readings Per Row"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20,
+     "weight_group": "Traverse Setup"
     },
     {
      "label": "Average Reading",
@@ -7883,7 +9153,8 @@
       "Average Reading"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Design Total Flow",
@@ -7891,7 +9162,8 @@
       "Design Total Flow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Measured Total Flow",
@@ -7899,7 +9171,8 @@
       "Actual Total Flow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 50
     },
     {
      "label": "% Airflow Final",
@@ -7915,7 +9188,8 @@
       "Duct Static Press."
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 10
     },
     {
      "label": "Insulation Width",
@@ -7964,7 +9238,9 @@
       "Type of Traverse"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Traverse Setup"
     },
     {
      "label": "Duct Size",
@@ -7973,7 +9249,9 @@
       "Outer Width"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Traverse Setup"
     },
     {
      "label": "Air Flow Area",
@@ -7981,7 +9259,9 @@
       "Air Flow Area"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Traverse Setup"
     },
     {
      "label": "Number of Rows",
@@ -7989,7 +9269,9 @@
       "Number Of Rows"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Traverse Setup"
     },
     {
      "label": "Readings per Row",
@@ -7997,7 +9279,9 @@
       "Readings Per Row"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25,
+     "weight_group": "Traverse Setup"
     },
     {
      "label": "Average Reading",
@@ -8005,7 +9289,8 @@
       "Average Reading"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 25
     },
     {
      "label": "Design Total Flow",
@@ -8021,7 +9306,8 @@
       "Actual Total Flow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 50
     },
     {
      "label": "Duct Static Press.",
@@ -8078,7 +9364,9 @@
       "Valve Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Model Number",
@@ -8086,7 +9374,9 @@
       "Valve Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Valve Size",
@@ -8094,7 +9384,9 @@
       "Valve Size"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Range (PSI)",
@@ -8102,7 +9394,9 @@
       "Range (PSI)"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design GPM",
@@ -8110,7 +9404,9 @@
       "Design GPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual GPM",
@@ -8118,7 +9414,8 @@
       "Actual GPM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 50
     },
     {
      "label": "% Diff",
@@ -8134,7 +9431,8 @@
       "Actual D.P. PSI"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20
     },
     {
      "label": "Entering Water Temp",
@@ -8142,7 +9440,9 @@
       "Entering Water Temp"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Leaving Water Temp",
@@ -8150,7 +9450,9 @@
       "Leaving Water Temp"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Water Delta T",
@@ -8158,7 +9460,9 @@
       "Water Delta T"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Entering Air Temp",
@@ -8166,7 +9470,9 @@
       "Entering Air Temp"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Leaving Air Temp",
@@ -8174,7 +9480,9 @@
       "Leaving Air Temp"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Air Delta T",
@@ -8182,7 +9490,9 @@
       "Air Delta T"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Coil In PSI",
@@ -8190,7 +9500,9 @@
       "Coil In PSI"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Coil Out PSI",
@@ -8198,7 +9510,9 @@
       "Coil Out PSI"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 30,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",
@@ -8222,28 +9536,35 @@
      "columns": [
       "Area"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 10,
+     "weight_group": "Grille Data"
     },
     {
      "label": "Zone",
      "columns": [
       "Zone"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 10,
+     "weight_group": "Grille Data"
     },
     {
      "label": "Design Airflow",
      "columns": [
       "Design Airflow"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 10,
+     "weight_group": "Grille Data"
     },
     {
      "label": "Final Reading",
      "columns": [
       "Final Reading"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 90
     },
     {
      "label": "% Final Diff",
@@ -8266,28 +9587,35 @@
      "columns": [
       "Area"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 10,
+     "weight_group": "Grille Data"
     },
     {
      "label": "Zone",
      "columns": [
       "Zone"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 10,
+     "weight_group": "Grille Data"
     },
     {
      "label": "Design Airflow",
      "columns": [
       "Design Airflow"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 10,
+     "weight_group": "Grille Data"
     },
     {
      "label": "Final Reading",
      "columns": [
       "Final Reading"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 90
     },
     {
      "label": "% Final Diff",
@@ -8310,28 +9638,35 @@
      "columns": [
       "Area"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 10,
+     "weight_group": "Grille Data"
     },
     {
      "label": "Zone",
      "columns": [
       "Zone"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 10,
+     "weight_group": "Grille Data"
     },
     {
      "label": "Design Airflow",
      "columns": [
       "Design Airflow"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 10,
+     "weight_group": "Grille Data"
     },
     {
      "label": "Final Reading",
      "columns": [
       "Final Reading"
      ],
-     "status": "required"
+     "status": "required",
+     "weight": 90
     },
     {
      "label": "% Final Diff",

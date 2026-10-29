@@ -11,7 +11,8 @@
     python -m hitlist add-field TYPE_KEY "Field name" --column "Export column" [--status required]   add one field
     python -m hitlist add-field TYPE_KEY --from-bundled    add the bundled fields whose export column the type doesn't use yet
     python -m hitlist move-field TYPE_KEY "Field" --after "Other field"   (names: the start, or words in them)
-    python -m hitlist set-weights TYPE_KEY                         copy a type's completion weights from the bundled rules
+    python -m hitlist set-weights TYPE_KEY [...] | new               copy a type's completion weights from the bundled rules
+                                                                   ("new": every type with no weights on the Rules tab yet)
     python -m hitlist update-rules TYPE_KEY [--statuses]        copy a type's sheet/column links (and names) from the bundled rules
     python -m hitlist dropbox-setup [--relink]                  connect the read-only Dropbox app (once), then test it
     python -m hitlist dropbox-test                              show what the server can see in Dropbox
@@ -66,7 +67,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="add the bundled rules' fields for this type whose export column isn't on the Rules tab yet")
     af.add_argument("--status", default="required", choices=["required", "optional", "ignore"])
     sw = sub.add_parser("set-weights", help="Copy a type's completion weights from the bundled rules to the Rules tab")
-    sw.add_argument("type_key", nargs="+", help="e.g. ahu")
+    sw.add_argument("type_key", nargs="+", help="e.g. ahu, or new for every type that has no weights yet")
     mf = sub.add_parser("move-field", help="Move a field to just after another on the Rules tab")
     mf.add_argument("type_key", help="e.g. ductless")
     mf.add_argument("field", help="the field to move (or the start of its name)")
@@ -129,7 +130,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "set-weights":
         store.setup()                       # adds the weight columns to the Rules tab if they're new
-        for key in args.type_key:
+        keys = list(args.type_key)
+        if keys == ["new"]:                 # every bundled type with weights whose Rules tab rows have none yet
+            live = store.rows("Rules")
+            weighted = {r["type_key"] for r in live if str(r.get("weight", "")).strip()}
+            keys = [t["key"] for t in _seed_dict()["types"] if any(f.get("weight") for f in t["fields"])
+                    and t["key"] not in weighted and any(r["type_key"] == t["key"] for r in live)]
+            print(f"Types without weights yet: {', '.join(keys) or 'none'}")
+        for key in keys:
             try:
                 n = store.set_weights(_seed_dict(), key)
             except KeyError as e:

@@ -300,3 +300,15 @@ def test_bundled_ahu_weights_scale_to_100():
         if f.weight:
             v_items[f.group or f.label] = f.weight
     assert round(sum(v_items.values()), 1) == 100 and v_items["Actual Max Airflow"] == 40 and v_items["K Factor"] == 20 and v_items["Unit Data"] == 3
+
+
+def test_every_bundled_type_has_starter_weights():
+    rules = load_rules()
+    for t in rules.types:
+        items = {}
+        for f in t.fields:
+            if f.weight:
+                items[f.group or f.label] = f.weight
+            assert not (f.weight and f.label == "Completed"), t.key
+        assert items, f"{t.key} has no weights"
+        assert 90 <= sum(items.values()) <= 120, (t.key, sum(items.values()))
