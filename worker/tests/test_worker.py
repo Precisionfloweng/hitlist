@@ -490,3 +490,15 @@ def test_set_weights_copies_only_the_weights():
     from hitlist.store import rows_to_rules
     f = rows_to_rules(store.rows("Rules"))["types"][0]["fields"][0]
     assert f["weight"] == "12.5" and f["weight_group"] == "Unit Data"
+
+
+def test_update_many_writes_runs_of_rows():
+    store = make_store()
+    writes = []
+    real = store.b.write
+    store.b.write = lambda tab, start, rows: (writes.append((start, len(rows))), real(tab, start, rows))[1]
+    rules = store.rows("Rules")
+    rows = [r for r in rules[:3]] + [rules[5]]
+    store.update_many("Rules", [(r["_row"], {**r, "weight": "7"}) for r in rows])
+    assert writes == [(rules[0]["_row"], 3), (rules[5]["_row"], 1)]
+    assert [r["weight"] for r in store.rows("Rules")[:3]] == ["7", "7", "7"] and store.rows("Rules")[5]["weight"] == "7"

@@ -122,6 +122,16 @@ class SheetsBackend:
         self.http = AuthorizedSession(creds)
         self.base = self.API + sheet_id
 
+    def _send(self, method: str, url: str, **kw):
+        """One request; when Google says too many requests per minute (429), wait and try again."""
+        import time
+        for wait in (20, 40, 60, 0):
+            resp = getattr(self.http, method)(url, **kw)
+            if resp.status_code != 429 or not wait:
+                return resp
+            time.sleep(wait)
+        return resp
+
     def _ok(self, resp):
         if resp.status_code >= 400:
             raise RuntimeError(f"Google Sheets error {resp.status_code}: {resp.text[:300]}")
@@ -145,14 +155,14 @@ class SheetsBackend:
 
     def write(self, tab: str, start_row: int, rows: list[list[Any]]) -> None:
         if rows:
-            self._ok(self.http.put(f"{self.base}/values/{self._range(tab, f'A{start_row}')}",
-                                   params={"valueInputOption": "RAW"}, json={"values": _cells(rows)}))
+            self._ok(self._send("put", f"{self.base}/values/{self._range(tab, f'A{start_row}')}",
+                                params={"valueInputOption": "RAW"}, json={"values": _cells(rows)}))
 
     def append(self, tab: str, rows: list[list[Any]]) -> None:
         if rows:
-            self._ok(self.http.post(f"{self.base}/values/{self._range(tab, 'A1')}:append",
-                                    params={"valueInputOption": "RAW", "insertDataOption": "INSERT_ROWS"},
-                                    json={"values": _cells(rows)}))
+            self._ok(self._send("post", f"{self.base}/values/{self._range(tab, 'A1')}:append",
+                                params={"valueInputOption": "RAW", "insertDataOption": "INSERT_ROWS"},
+                                json={"values": _cells(rows)}))
 
     def clear(self, tab: str) -> None:
         self._ok(self.http.post(f"{self.base}/values/{self._range(tab)}:clear", json={}))
@@ -201,6 +211,16 @@ class HitlistStore:
 
     def update(self, tab: str, row_number: int, rec: dict[str, Any]) -> None:
         self.b.write(tab, row_number, [self._to_row(tab, rec)])
+
+    def update_many(self, tab: str, changes: list[tuple[int, dict[str, Any]]]) -> None:
+        """Write several rows, one request per run of neighbouring rows (Google allows ~60 writes a minute)."""
+        run: list[tuple[int, dict[str, Any]]] = []
+        for row, rec in sorted(changes, key=lambda c: c[0]) + [(-1, {})]:
+            if run and row != run[-1][0] + 1:
+                self.b.write(tab, run[0][0], [self._to_row(tab, r) for _, r in run])
+                run = []
+            if row >= 0:
+                run.append((row, rec))
 
     def replace_for_project(self, tab: str, project_number: str, records: list[dict[str, Any]]) -> None:
         """Swap out one project's rows in a tab only the worker writes (Dashboard, Deficiencies)."""
@@ -346,7 +366,7 @@ class HitlistStore:
         if src is None:
             raise KeyError(f"No equipment type '{type_key}' in the bundled rules")
         want = {f["label"].strip().lower(): f for f in src["fields"]}
-        changed = 0
+        updates: list[tuple[int, dict[str, Any]]] = []
         for r in self.rows("Rules"):
             if r["type_key"] != type_key:
                 continue
@@ -354,8 +374,9 @@ class HitlistStore:
             w = "" if not f or f.get("weight") in (None, "") else str(f["weight"])
             g = (f or {}).get("weight_group", "") or ""
             if str(r.get("weight", "")) != w or str(r.get("weight_group", "")) != g:
-                self.update("Rules", r["_row"], {**r, "weight": w, "weight_group": g})
-                changed += 1
+                updates.append((r["_row"], {**r, "weight": w, "weight_group": g}))
+        self.update_many("Rules", updates)
+        changed = len(updates)
         if changed:
             self.append("RuleHistory", [{"changed_at": now_iso(), "changed_by": by, "type_key": type_key,
                                          "field": "(completion weights)", "old_status": "", "new_status": f"set from bundled rules ({changed} fields)"}])
