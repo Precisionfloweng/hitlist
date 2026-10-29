@@ -3810,7 +3810,9 @@
       "Manufacturer"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 3,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Unit Model",
@@ -3818,7 +3820,9 @@
       "Model Number"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 3,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Unit Address",
@@ -3826,7 +3830,9 @@
       "VAV Address"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 3,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Inlet Size",
@@ -3834,7 +3840,8 @@
       "Box Inlet Size"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5
     },
     {
      "label": "K Factor",
@@ -3842,7 +3849,8 @@
       "K Factor"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 20
     },
     {
      "label": "Design Max Airflow",
@@ -3850,7 +3858,9 @@
       "Design Max Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 3,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Max Airflow",
@@ -3858,7 +3868,8 @@
       "Actual Max Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 40
     },
     {
      "label": "Design Min Airflow",
@@ -3866,7 +3877,9 @@
       "Design Min Airflow"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 3,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Min Airflow",
@@ -3874,7 +3887,8 @@
       "Actual Min Airflow"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 12
     },
     {
      "label": "Design Reheat Airflow",
@@ -3888,7 +3902,9 @@
        "label": "Design Reheat Airflow",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 3,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Reheat Airflow",
@@ -3902,7 +3918,8 @@
        "label": "Design Reheat Airflow",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 10
     },
     {
      "label": "BAS Airflow",
@@ -3910,7 +3927,8 @@
       "BAS CFM"
      ],
      "status": "required",
-     "when": null
+     "when": null,
+     "weight": 5
     },
     {
      "label": "Design Fan Airflow",
@@ -3924,7 +3942,9 @@
        "label": "Design Fan Airflow",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 3,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Fan Airflow",
@@ -3938,7 +3958,8 @@
        "label": "Design Fan Airflow",
        "gt": 0.5
       }
-     ]
+     ],
+     "weight": 5
     },
     {
      "label": "EDC Box Fan Setting",
@@ -3960,7 +3981,9 @@
       "Box Type"
      ],
      "status": "optional",
-     "when": null
+     "when": null,
+     "weight": 3,
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",

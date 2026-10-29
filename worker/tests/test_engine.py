@@ -294,3 +294,9 @@ def test_bundled_ahu_weights_scale_to_100():
             r_items[f.group or f.label] = f.weight
     # the boss's RTU sheet x100: airflow 40, O/A 10, Unit Data 52 (nameplate, motor, sheave, filters, drive type, design), ...
     assert round(sum(r_items.values()), 1) == 118.5 and r_items["Actual Airflow"] == 40 and r_items["Unit Data"] == 52
+    vav = next(t for t in rules.types if t.key == "vav")
+    v_items = {}
+    for f in vav.fields:
+        if f.weight:
+            v_items[f.group or f.label] = f.weight
+    assert round(sum(v_items.values()), 1) == 100 and v_items["Actual Max Airflow"] == 40 and v_items["K Factor"] == 20 and v_items["Unit Data"] == 3
