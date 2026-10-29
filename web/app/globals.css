@@ -386,7 +386,7 @@ header.top .top-drop a.on { background: #f0f5fa; color: var(--brand); }
 .top-drop-sep { height: 1px; background: var(--line); margin: 6px 4px; }
 header.top .top-drop form button { width: 100%; text-align: left; color: var(--bad); border: 0; padding: 11px 14px; font-weight: 600; }
 header.top .top-drop form button:hover { background: #f5f6f8; }
-@media (max-width: 720px) {
+@media (max-width: 800px) {
   header.top .top-links { display: none; }
   header.top .top-burger { display: block; }
 }
