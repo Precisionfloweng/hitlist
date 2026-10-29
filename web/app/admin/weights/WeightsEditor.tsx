@@ -1,7 +1,7 @@
 "use client";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CATEGORIES, DEFAULT_WORK, categoryOf, jobProgress, typeTotals, workOf, type Progress, type Work, type WorkUnit } from "@/lib/completion";
+import { CATEGORIES, DEFAULT_WORK, categoryOf, jobProgress, typeTotals, workOf, workText, type Progress, type Work, type WorkUnit } from "@/lib/completion";
 import { applyWeights } from "@/lib/weights";
 import { unweighted, weightItems, type FieldWeight, type WeightItem } from "@/lib/weightItems";
 import type { TypeResult } from "@/lib/results";
@@ -19,10 +19,9 @@ const ORDERED = [...CATEGORIES].sort((a, b) => at(a.key) - at(b.key));
 const COLS = 4;
 
 const num = (s: string) => (s.trim() === "" ? null : Number(s) || null);
-const fmtN = (n: number) => (n >= 10 ? Math.round(n) : Math.round(n * 10) / 10).toLocaleString();
 
 /**
- * Admin → Completion weights. Each equipment type has one number: how much work one unit is (points or hours;
+ * Admin → Completion weights. Each equipment type has one number: how much work one unit is (points or minutes;
  * the unit is only a label). A job's % = work done ÷ total work over its own equipment, so nothing is set per project.
  * Open a type for its item weights (how much of one unit each item is), one row each: single fields or combined
  * items (e.g. "Unit Data"), which can be added, combined, split off or removed. One Save stores everything and
@@ -125,7 +124,7 @@ export default function WeightsEditor({ initial, projects, types }:
   const before = useMemo(() => calc(types, saved), [preview, types, saved]); // eslint-disable-line react-hooks/exhaustive-deps
   const after = useMemo(() => (workValid ? calc(current, draftWork) : null), [preview, current, workBoxes, unit]); // eslint-disable-line react-hooks/exhaustive-deps
   const shown = after ?? before;
-  const label = unit === "hours" ? "hrs" : "pts";
+  const label = unit === "minutes" ? "min" : "pts";
 
   async function save() {
     setBusy(true); setMsg(null);
@@ -150,12 +149,12 @@ export default function WeightsEditor({ initial, projects, types }:
           <span className="muted" style={{ fontSize: 13 }}>Set once for every project. Hitlist counts each job&apos;s equipment from
             BuildingStart and adds up the work: the job&apos;s % complete = work done ÷ total work. Sub-items (coils, sensors…) are just
             equipment with their own number. A type left blank counts {DEFAULT_WORK}. Open a type (▸) for its <b>item weights</b>: how much of
-            one unit each item is. Admins only; techs never see the hours.</span>
+            one unit each item is. Admins only; techs never see the times.</span>
         </div>
         <div className="row" style={{ gap: 8, alignItems: "center" }}>
           <span className="muted">Count work in</span>
           <div className="tabs seg" style={{ margin: 0 }}>
-            {(["points", "hours"] as const).map((u) => <button key={u} type="button" className={unit === u ? "on" : ""} onClick={() => setUnit(u)}>{u === "points" ? "Points" : "Hours"}</button>)}
+            {(["points", "minutes"] as const).map((u) => <button key={u} type="button" className={unit === u ? "on" : ""} onClick={() => setUnit(u)}>{u === "points" ? "Points" : "Minutes"}</button>)}
           </div>
         </div>
       </div>
@@ -167,7 +166,7 @@ export default function WeightsEditor({ initial, projects, types }:
             {projects.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
           </select>
           {shown && <span className="cw-big">{shown.pct}% complete</span>}
-          {shown && <span>· about <b>{fmtN(shown.left)}</b> of {fmtN(shown.total)} {unit === "hours" ? "hours" : "points"} left</span>}
+          {shown && <span>· about <b>{workText(shown.left, unit)}</b> of {workText(shown.total, unit)} left</span>}
           {before && after && dirty && after.pct !== before.pct && <span className="muted">(now {before.pct}%)</span>}
           {preview && !preview.types.length && <span className="muted">No sync results for this project yet.</span>}
         </div>
@@ -185,7 +184,7 @@ export default function WeightsEditor({ initial, projects, types }:
                 {catTypes.map((t) => <TypeRows key={t.key} t={t} items={itemsOf(t)} isOpen={open.has(`t:${t.key}`)}
                   onToggle={() => toggle(`t:${t.key}`)} itemBox={(it) => itemBox(t.key, it)} onWeight={(it, v) => setItemWeight(t.key, it, v)}
                   onRemove={(it) => removeItem(t.key, it)} onRemoveMember={(o) => removeMember(t.key, o)}
-                  work={workBox(t.key)} workNow={workOf(draftWork, t.key)} label={label} hasPreview={!!shown}
+                  work={workBox(t.key)} workNow={workOf(draftWork, t.key)} label={label} unit={unit} hasPreview={!!shown}
                   onWork={(v) => setWorkBoxes({ ...workBoxes, [t.key]: v.replace(/[^\d.]/g, "") })}
                   job={shown?.byType.get(t.key)}
                   onAdd={(orders, group, weight) => {
@@ -210,11 +209,11 @@ export default function WeightsEditor({ initial, projects, types }:
 }
 
 /** One equipment type: its row, and when open, one row per weighted item plus the add buttons. */
-function TypeRows({ t, items, isOpen, onToggle, itemBox, onWeight, onRemove, onRemoveMember, onAdd, work, workNow, label, onWork, job, hasPreview }: {
+function TypeRows({ t, items, isOpen, onToggle, itemBox, onWeight, onRemove, onRemoveMember, onAdd, work, workNow, label, unit, onWork, job, hasPreview }: {
   t: EditorType; items: WeightItem[]; isOpen: boolean; onToggle: () => void;
   itemBox: (it: WeightItem) => string; onWeight: (it: WeightItem, v: string) => void; onRemove: (it: WeightItem) => void;
   onRemoveMember: (order: number) => void; onAdd: (orders: number[], group: string, weight: string) => void;
-  work: string; workNow: number; label: string; onWork: (v: string) => void; job?: JobRow; hasPreview: boolean;
+  work: string; workNow: number; label: string; unit: WorkUnit; onWork: (v: string) => void; job?: JobRow; hasPreview: boolean;
 }) {
   const cols = COLS;
   const [adding, setAdding] = useState("");   // "" | "item" | "group" | "into:<combined item>"
@@ -229,7 +228,7 @@ function TypeRows({ t, items, isOpen, onToggle, itemBox, onWeight, onRemove, onR
             : <span className="cw-tag">No item weights yet</span>}</td>
         <td className="w"><span className="tol-input"><input inputMode="decimal" aria-label={`Work for one ${t.name}`} value={work}
           placeholder={String(DEFAULT_WORK)} onChange={(e) => onWork(e.target.value)} /> {label}</span></td>
-        <td className="w muted">{!hasPreview ? "" : job ? `${job.units} × ${workNow} = ${fmtN(job.units * workNow)} ${label}` : "none on this job"}</td>
+        <td className="w muted">{!hasPreview ? "" : job ? `${job.units} × ${workNow} ${label} = ${workText(job.units * workNow, unit)}` : "none on this job"}</td>
         <td>{job && <span className="cw-done"><span className="bar"><span style={{ width: `${Math.min(100, job.pct)}%` }} /></span>{Math.round(job.pct)}%</span>}</td>
       </tr>
       {isOpen && <>

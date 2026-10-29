@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { customerTypes } from "@/lib/customerView";
 import { unitWhere } from "@/lib/unitLabel";
-import { jobProgress, typeTotals } from "@/lib/completion";
+import { jobProgress, typeTotals, workText } from "@/lib/completion";
 import { loadWork } from "@/lib/settings";
 import { loadRules } from "@/lib/rules";
 import { applyWeights, typePct } from "@/lib/weights";
@@ -127,7 +127,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               ) : (<>
                 <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Items fully complete" />
 <Tile big={pct(progress ? progress.pct : p.completePct)} label="Overall complete"
-                  sub={progress && user.role === "admin" && work.unit === "hours" ? `about ${Math.round(progress.left).toLocaleString()} of ${Math.round(progress.total).toLocaleString()} hrs left` : undefined}
+                  sub={progress && user.role === "admin" && work.unit === "minutes" ? `about ${workText(progress.left, "minutes")} of ${workText(progress.total, "minutes")} left` : undefined}
                   title="Each unit's % done, weighted by how much work one of its type is (same as Complete on the projects list)" />
               </>)}
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>

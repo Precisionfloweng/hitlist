@@ -3,7 +3,7 @@
   "date": "2026-10-29",
   "audience": "admins",
   "title": "Job % now follows the work per unit",
-  "text": "Admin → Completion weights: each equipment type has one number for how much work one unit is (points or hours). A job's % complete = work done ÷ total work from its own equipment, replacing the category shares. Types not set yet count 1."
+  "text": "Admin → Completion weights: each equipment type has one number for how much work one unit is (points, or minutes). A job's % complete = work done ÷ total work from its own equipment, replacing the category shares. Types not set yet count 1."
  },
  {
   "date": "2026-10-29",

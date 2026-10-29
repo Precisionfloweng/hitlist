@@ -91,15 +91,15 @@ export async function saveCompanyTolerances(all: Partial<Tol>, cats: Record<stri
   return companyTolerances();
 }
 
-/** Work per unit (Admin → Completion weights): one number per equipment type, points or hours. */
+/** Work per unit (Admin → Completion weights): one number per equipment type, points or minutes. */
 export async function loadWork(): Promise<Work> {
   return workFromSettings(await loadSettings());
 }
 
-/** Save the unit (points/hours) and any types' work per unit (blank = back to the default 1). */
+/** Save the unit (points/minutes) and any types' work per unit (blank = back to the default 1). */
 export async function saveWork(input: { unit?: string; perType?: Record<string, unknown> }, by: User): Promise<Work> {
   const values: Record<string, string> = {};
-  if (input.unit !== undefined) values.work_unit = input.unit === "hours" ? "hours" : "points";
+  if (input.unit !== undefined) values.work_unit = input.unit === "minutes" ? "minutes" : "points";
   for (const [k, raw] of Object.entries(input.perType ?? {})) {
     if (!/^[a-z0-9_]{1,60}$/.test(k)) throw new Error("Unknown equipment type");
     const text = String(raw ?? "").trim();

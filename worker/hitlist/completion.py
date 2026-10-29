@@ -1,7 +1,7 @@
 """The job's overall % complete by work per unit (Admin -> Completion weights on the website).
 
-Each equipment type has one number: how much work one unit is (points or hours; Settings work_<type>, default 1;
-work_unit = "points" | "hours" is only a label). Job % = sum(work x unit %) / sum(work) over every unit on the job,
+Each equipment type has one number: how much work one unit is (points or minutes; Settings work_<type>, default 1;
+work_unit = "points" | "minutes" is only a label). Job % = sum(work x unit %) / sum(work) over every unit on the job,
 so the job's mix comes from its own equipment and nothing is set per project. A unit's % is its weighted % when
 its type has item weights, else its required fields filled. Units with nothing required (and no weights) are left
 out. The website (web/lib/completion.ts) does the same sum. The category list is only used for headings.

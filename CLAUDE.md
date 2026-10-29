@@ -70,8 +70,8 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 
 ## Completion weights
 - Overall % complete = Σ(work × unit %) / Σ(work) over every unit on the job (work per unit, Admin → Completion weights). Settings
-  work_<typeKey> = how much work one unit is (blank = 1), work_unit = points | hours (label only; hours left shown to admins only:
-  editor preview and Overview tile sub-line). Unit % = weighted_pct when the type has item weights, else required filled/required; units with
+  work_<typeKey> = how much work one unit is (blank = 1), work_unit = points | minutes (minutes per unit; totals shown in hours, `workText`; older "hours" reads as minutes;
+  hours left shown to admins only: editor preview and Overview tile sub-line). Unit % = weighted_pct when the type has item weights, else required filled/required; units with
   nothing required are left out. Worker `hitlist/completion.py` (work_from_settings, complete_pct) writes Projects/History complete_pct on
   each sync; web `lib/completion.ts` (typeTotals → unit %s, jobProgress) is the same sum; `settings.saveWork` + `recalcCompletePcts` after
   changes. The category list (completion-categories.json, copy in the worker, a test checks they match) is now only headings; the old
