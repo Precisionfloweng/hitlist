@@ -66,7 +66,7 @@ export default function WeightsPanel({ t, canEdit }: { t: RuleType; canEdit: boo
             <tr className="weights-total"><td><b>Total</b></td><td><b>{total}%</b>{total !== 100 && total > 0 &&
               <span className="muted" style={{ fontSize: 12 }}> · scaled to 100%</span>}</td></tr></tbody></table>
       )}
-      {items.zero.length > 0 && (
+      {items.zero.length > 0 && items.weighted.length === 0 && (
         <details style={{ marginTop: 8 }}>
           <summary className="muted">{items.zero.length} field{items.zero.length === 1 ? "" : "s"} worth 0%{canEdit ? " (give one a weight here)" : ""}</summary>
           <table className="weights-table"><tbody>{items.zero.map(row)}</tbody></table>
