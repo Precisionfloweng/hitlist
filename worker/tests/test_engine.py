@@ -276,4 +276,4 @@ def test_bundled_ahu_weights_scale_to_100():
     for f in ahu.fields:
         if f.weight:
             items[f.group or f.label] = f.weight
-    assert round(sum(items.values()), 1) == 98.0 and items["Actual Airflow"] == 40 and items["Unit Data"] == 18.5
+    assert round(sum(items.values()), 1) == 92.5 and items["Actual Airflow"] == 40 and items["Unit Data"] == 20 and "Drive Type" not in items
