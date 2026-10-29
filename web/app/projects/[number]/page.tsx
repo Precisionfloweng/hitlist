@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { customerTypes } from "@/lib/customerView";
 import { unitWhere } from "@/lib/unitLabel";
-import { completePct, typeTotals } from "@/lib/completion";
-import { loadWeights } from "@/lib/settings";
+import { jobProgress, typeTotals } from "@/lib/completion";
+import { loadWork } from "@/lib/settings";
 import { loadRules } from "@/lib/rules";
 import { applyWeights, typePct } from "@/lib/weights";
 import { notFound } from "next/navigation";
@@ -22,9 +22,10 @@ export const dynamic = "force-dynamic";
 export default async function ProjectPage({ params }: { params: Promise<{ number: string }> }) {
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
-  const [data, raw, { tol, def }, tolSrc, weights, rules] = await Promise.all([getProject(number), loadResults(number),
-    loadTolerancesWithDefaults(number), loadToleranceSources(number), loadWeights(), loadRules()]);
+  const [data, raw, { tol, def }, tolSrc, work, rules] = await Promise.all([getProject(number), loadResults(number),
+    loadTolerancesWithDefaults(number), loadToleranceSources(number), loadWork(), loadRules()]);
   const results = raw ? applyWeights(raw, rules.types) : null;   // each type's % by its completion weights, when it has them
+  const progress = results ? jobProgress(typeTotals(results.types), work, results.summary.fields_pct) : null;   // job % by work per unit
   if (!data || !canSee(user, data.project.id)) notFound();
   const { project: p } = data;
   const summary = results?.summary;
@@ -125,8 +126,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
                   label="Last updated" title="When the technician last synced this job from the field" />
               ) : (<>
                 <Tile big={summary ? `${summary.units_complete} / ${summary.units}` : pct(p.unitsPct)} label="Items fully complete" />
-                <Tile big={pct(results ? completePct(typeTotals(results.types), weights, results.summary.fields_pct) : p.completePct)} label="Overall complete"
-                  title="Each equipment category's % filled in, weighted by its share of the job (same as Complete on the projects list)" />
+<Tile big={pct(progress ? progress.pct : p.completePct)} label="Overall complete"
+                  sub={progress && user.role === "admin" && work.unit === "hours" ? `about ${Math.round(progress.left).toLocaleString()} of ${Math.round(progress.total).toLocaleString()} hrs left` : undefined}
+                  title="Each unit's % done, weighted by how much work one of its type is (same as Complete on the projects list)" />
               </>)}
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={String(p.openDeficiencies ?? "–")} label="Open deficiencies" /></Link>
               <Link href={`/projects/${encodeURIComponent(p.id)}/deficiencies`} className="tile-link"><Tile big={results ? String(results.deficiencies.filter((d) => !d.open).length) : "–"} label="Closed deficiencies" /></Link>
@@ -210,6 +212,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
   );
 }
 
-function Tile({ big, label, title }: { big: string; label: string; title?: string }) {
-  return <div className="card tile" title={title}><div className="big">{big}</div><div className="label">{label}</div></div>;
+function Tile({ big, label, title, sub }: { big: string; label: string; title?: string; sub?: string }) {
+  return <div className="card tile" title={title}><div className="big">{big}</div><div className="label">{label}</div>{sub && <div className="label tile-sub">{sub}</div>}</div>;
 }

@@ -1,44 +1,55 @@
-// The job's overall % complete, weighted by equipment category (Admin → Completion weights).
-// Each category's own % = required fields filled / required fields across its types (same as the type cards).
-// Job % = Σ(share × category %) / Σ(share) over the categories the job has, so a missing category's share is
-// spread over the rest. Same sum as worker/hitlist/completion.py (both read the same category list).
+// The job's overall % complete by work per unit (Admin → Completion weights). Each equipment type has one number:
+// how much work one unit is (Settings work_<type>, default 1; work_unit "points" | "hours" is only the label, and
+// hours are shown to admins only). Job % = Σ(work × unit %) / Σ(work) over every unit on the job, so each job's mix
+// comes from its own equipment and nothing is set per project. A unit's % = its weighted % when its type has item
+// weights (lib/weights.ts), else its required fields filled; units with nothing required are left out.
+// Same sum as worker/hitlist/completion.py. The category list is only used for headings.
 import data from "@/content/completion-categories.json";
 
 export type Category = { key: string; label: string; default: number; types: string[]; includes: string };
 export const CATEGORIES: Category[] = data.categories;
 const TYPE_CATEGORY = new Map(CATEGORIES.flatMap((c) => c.types.map((t) => [t, c.key] as const)));
 export const categoryOf = (typeKey: string) => TYPE_CATEGORY.get(typeKey) ?? "other";
-export type Weights = Record<string, number>;
-export const DEFAULT_WEIGHTS: Weights = Object.fromEntries(CATEGORIES.map((c) => [c.key, c.default]));
 
-/** Per-type totals: all the sum needs from a project's results (small enough to send to the browser). */
-export type TypeTotals = { key: string; name: string; required: number; filled: number }[];
-export const typeTotals = (types: { key: string; name: string; units: { required: number; required_filled: number }[];
-  summary?: { weighted_pct?: number } }[]): TypeTotals =>
-  types.map((t) => {
-    const required = t.units.reduce((n, u) => n + u.required, 0);
-    const wp = t.summary?.weighted_pct;   // a type with completion weights counts by its weighted %
-    return { key: t.key, name: t.name, required,
-      filled: wp !== undefined ? (required * wp) / 100 : t.units.reduce((n, u) => n + u.required_filled, 0) };
-  });
+export const DEFAULT_WORK = 1;
+export type WorkUnit = "points" | "hours";
+export type Work = { unit: WorkUnit; perType: Record<string, number> };
+export const workOf = (w: Work, typeKey: string) => w.perType[typeKey] ?? DEFAULT_WORK;
 
-/** Each category the job has (with required fields): its % of required fields filled. */
-export function categoryPcts(totals: TypeTotals): Record<string, number> {
-  const req: Record<string, number> = {}, filled: Record<string, number> = {};
-  for (const t of totals) { const c = categoryOf(t.key); req[c] = (req[c] ?? 0) + t.required; filled[c] = (filled[c] ?? 0) + t.filled; }
-  return Object.fromEntries(Object.entries(req).filter(([, n]) => n > 0).map(([c, n]) => [c, (100 * filled[c]) / n]));
+export function workFromSettings(s: Record<string, string>): Work {
+  const perType: Record<string, number> = {};
+  for (const [k, v] of Object.entries(s)) {
+    if (!k.startsWith("work_") || k === "work_unit") continue;
+    const n = Number(String(v ?? "").trim());
+    if (String(v ?? "").trim() !== "" && isFinite(n) && n >= 0) perType[k.slice(5)] = n;
+  }
+  return { unit: s.work_unit === "hours" ? "hours" : "points", perType };
 }
 
-export function completePct(totals: TypeTotals, weights: Weights, fallback = 100): number {
-  const pcts = categoryPcts(totals);
-  const total = Object.keys(pcts).reduce((n, c) => n + (weights[c] ?? 0), 0);
-  if (!total) return fallback;
-  return Math.round(10 * Object.entries(pcts).reduce((n, [c, p]) => n + (weights[c] ?? 0) * p, 0) / total) / 10;
+/** Each type's unit %s: all the sum needs from a project's results (small enough to send to the browser). */
+export type TypeTotals = { key: string; name: string; pcts: number[] }[];
+type UnitLike = { required: number; required_filled: number; weighted_pct?: number };
+export const unitPctOf = (u: UnitLike): number | null =>
+  u.weighted_pct !== undefined && u.weighted_pct !== null ? u.weighted_pct : u.required ? (100 * u.required_filled) / u.required : null;
+export const typeTotals = (types: { key: string; name: string; units: UnitLike[] }[]): TypeTotals =>
+  types.map((t) => ({ key: t.key, name: t.name, pcts: t.units.map(unitPctOf).filter((p): p is number => p !== null) }));
+
+export type Progress = { pct: number; total: number; done: number; left: number;
+  byType: Map<string, { units: number; work: number; total: number; pct: number }> };
+export function jobProgress(totals: TypeTotals, work: Work, fallback = 100): Progress {
+  let total = 0, done = 0;
+  const byType = new Map<string, { units: number; work: number; total: number; pct: number }>();
+  for (const t of totals) {
+    const w = workOf(work, t.key);
+    if (!t.pcts.length) continue;
+    const sum = t.pcts.reduce((a, b) => a + b, 0);
+    byType.set(t.key, { units: t.pcts.length, work: w, total: w * t.pcts.length, pct: sum / t.pcts.length });
+    if (w <= 0) continue;
+    total += w * t.pcts.length;
+    done += (w * sum) / 100;
+  }
+  const pct = total ? Math.round((1000 * done) / total) / 10 : fallback;
+  return { pct, total, done, left: Math.max(0, total - done), byType };
 }
 
-export function weightsFromSettings(s: Record<string, string>): Weights {
-  return Object.fromEntries(CATEGORIES.map((c) => {
-    const v = Number(String(s[`weight_${c.key}`] ?? "").trim());
-    return [c.key, s[`weight_${c.key}`] !== undefined && String(s[`weight_${c.key}`]).trim() !== "" && isFinite(v) && v >= 0 ? v : c.default];
-  }));
-}
+export const completePct = (totals: TypeTotals, work: Work, fallback = 100) => jobProgress(totals, work, fallback).pct;

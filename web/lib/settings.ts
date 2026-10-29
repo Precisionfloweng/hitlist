@@ -2,7 +2,7 @@
 import "server-only";
 import type { User } from "./auth";
 import { appendRows, ensureHeader, ensureTab, readTab, updateCell, updateRows } from "./sheets";
-import { CATEGORIES, completePct, typeTotals, weightsFromSettings, type Weights } from "./completion";
+import { completePct, typeTotals, workFromSettings, type Work } from "./completion";
 import { loadResults } from "./results";
 import { loadRules } from "./rules";
 import { applyWeights } from "./weights";
@@ -91,32 +91,31 @@ export async function saveCompanyTolerances(all: Partial<Tol>, cats: Record<stri
   return companyTolerances();
 }
 
-/** Completion weights (Admin → Completion weights): each category's share of the job. */
-export async function loadWeights(): Promise<Weights> {
-  return weightsFromSettings(await loadSettings());
+/** Work per unit (Admin → Completion weights): one number per equipment type, points or hours. */
+export async function loadWork(): Promise<Work> {
+  return workFromSettings(await loadSettings());
 }
 
-/** Save the shares (must total 100), then recalculate every project's overall % from its last sync. */
-export async function saveWeights(input: Record<string, unknown>, by: User, recalc = true): Promise<{ weights: Weights; updated: number }> {
+/** Save the unit (points/hours) and any types' work per unit (blank = back to the default 1). */
+export async function saveWork(input: { unit?: string; perType?: Record<string, unknown> }, by: User): Promise<Work> {
   const values: Record<string, string> = {};
-  let total = 0;
-  for (const c of CATEGORIES) {
-    const v = Number(String(input[c.key] ?? "").trim());
-    if (String(input[c.key] ?? "").trim() === "" || !isFinite(v) || v < 0 || v > 100) throw new Error(`Enter a % from 0 to 100 for ${c.label}`);
-    values[`weight_${c.key}`] = String(v);
-    total += v;
+  if (input.unit !== undefined) values.work_unit = input.unit === "hours" ? "hours" : "points";
+  for (const [k, raw] of Object.entries(input.perType ?? {})) {
+    if (!/^[a-z0-9_]{1,60}$/.test(k)) throw new Error("Unknown equipment type");
+    const text = String(raw ?? "").trim();
+    const n = Number(text);
+    if (text !== "" && (!isFinite(n) || n < 0 || n > 1000)) throw new Error("Enter a number from 0 to 1000");
+    values[`work_${k}`] = text === "" ? "" : String(n);
   }
-  if (Math.abs(total - 100) > 0.001) throw new Error(`The shares add up to ${Math.round(total * 10) / 10}%, not 100%`);
-  await saveSettings(values, by);
-  const weights = await loadWeights();
-  return { weights, updated: recalc ? await recalcCompletePcts(weights) : 0 };
+  if (Object.keys(values).length) await saveSettings(values, by);
+  return loadWork();
 }
 
-/** Every project's overall % from its last sync, with the current category shares and field weights (after either
+/** Every project's overall % from its last sync, with the current work per unit and item weights (after either
  *  changes). Returns how many changed. */
-export async function recalcCompletePcts(shares?: Weights): Promise<number> {
+export async function recalcCompletePcts(work?: Work): Promise<number> {
   await ensureHeader("Projects");
-  const w = shares ?? await loadWeights();
+  const w = work ?? await loadWork();
   const { types: ruleTypes } = await loadRules();
   let updated = 0;
   for (const p of await readTab("Projects", true)) {

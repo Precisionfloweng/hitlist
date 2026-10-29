@@ -24,13 +24,13 @@ SCHEMA: dict[str, list[str]] = {
                  "values_updated", "values_status",
                  # who pressed Sync for the last good sync (their name from Users, else their email; "server" = from the server)
                  "last_sync_by",
-                 # overall % complete weighted by equipment category (hitlist/completion.py); the website updates it when weights change
+                 # overall % complete by work per unit (hitlist/completion.py); the website updates it when weights change
                  "complete_pct"],
     # projects: for role "customer", the project keys they may see (" | " separated)
     "Users": ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
     "Rules": ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
               "order", "field", "columns", "status", "when",
-              # completion weight in % (admins set it on Default Rules); fields with the same weight_group count as one item
+              # completion weight in % (admins set it on Admin -> Completion weights); fields with the same weight_group count as one item
               "weight", "weight_group"],
     "RuleHistory": ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status",
                     "project_number"],

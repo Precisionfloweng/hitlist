@@ -69,18 +69,19 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
 - Document folders named Older versions / Old / Superseded / Archive / Previous / Void are skipped (`is_old_copy`).
 
 ## Completion weights
-- Overall % complete = Σ(category share × category's required-fields %) / Σ(shares of categories the job has). Categories are fixed in
-  `web/content/completion-categories.json` (copy in `worker/hitlist/data/completion_categories.json`; a test checks they match); unknown types →
-  "other". Shares: Settings weight_<category> (Admin → Completion weights, must total 100), else each category's default.
-  Worker `hitlist/completion.py` writes Projects/History complete_pct on each sync; web `lib/completion.ts` (Overview, preview) and
-  `settings.saveWeights` recalculates every project's complete_pct from its results when shares change. Projects list/email read complete_pct
-  (fallback fields_pct). Type cards keep their own fields_pct.
+- Overall % complete = Σ(work × unit %) / Σ(work) over every unit on the job (work per unit, Admin → Completion weights). Settings
+  work_<typeKey> = how much work one unit is (blank = 1), work_unit = points | hours (label only; hours left shown to admins only:
+  editor preview and Overview tile sub-line). Unit % = weighted_pct when the type has item weights, else required filled/required; units with
+  nothing required are left out. Worker `hitlist/completion.py` (work_from_settings, complete_pct) writes Projects/History complete_pct on
+  each sync; web `lib/completion.ts` (typeTotals → unit %s, jobProgress) is the same sum; `settings.saveWork` + `recalcCompletePcts` after
+  changes. The category list (completion-categories.json, copy in the worker, a test checks they match) is now only headings; the old
+  weight_<category> shares are no longer read.
 - Item weights per type (AHUs first): Rules tab columns weight / weight_group (bundled in rules_seed.json; `hitlist set-weights TYPE`
   copies only the weights to the live tab). A group (e.g. "Unit Data") counts as one item (weight = max of members, earned = share
   of its live members filled). Live = code P/R/O (in a group only P/R: a blank optional member doesn't hold it back); ignored/N/skipped items drop out and the rest scale to 100. Engine `weighted_pct` (unit and
-  summary), web `lib/weights.ts` (`applyWeights` recomputes from the current Rules, `typePct`/`unitPct`). Weighted types count
-  required × weighted% in the job %. Admins edit both levels on Admin → Completion weights (`WeightsEditor`: categories ▸ types ▸ items; add item / into a group /
-  new group / remove; `lib/weightItems.ts`; POST /api/admin/weights {weights?, types: typeKey → changed fields} → `rules.saveTypeWeights`,
+  summary), web `lib/weights.ts` (`applyWeights` recomputes from the current Rules, `typePct`/`unitPct`). Admins edit work per unit and
+  item weights on Admin → Completion weights (`WeightsEditor`: headings ▸ types (work box) ▸ items; add item / into a group /
+  new group / remove; `lib/weightItems.ts`; POST /api/admin/weights {work?: {unit, perType}, types: typeKey → changed fields} → `rules.saveTypeWeights`,
   one `recalcCompletePcts`). The preview GET returns the project's fields + unit codes so the page computes the job % with the draft.
 
 ## Project keys

@@ -448,16 +448,19 @@ def test_move_rule_field_after_another():
         store.move_rule_field(key, "no such field", first)
 
 
-def test_complete_pct_is_weighted_by_category(sample_export, tmp_path):
-    from hitlist.completion import complete_pct, weights_from_settings
-    types = [{"key": "supply_outlet", "units": [{"required": 10, "required_filled": 10}]},     # outlets 100%
-             {"key": "ahu", "units": [{"required": 20, "required_filled": 10}]},               # air handlers 50%
-             {"key": "something_new", "units": [{"required": 4, "required_filled": 0}]}]       # other 0%
-    w = weights_from_settings({})
-    assert w["outlets"] == 40 and w["air_handlers"] == 30 and w["other"] == 2
-    # (40*100 + 30*50 + 2*0) / (40+30+2) = 76.4; categories the job doesn't have don't count
-    assert complete_pct({"types": types}, w) == 76.4
-    assert complete_pct({"types": types}, weights_from_settings({"weight_other": "0", "weight_air_handlers": "x"})) == 78.6
+def test_complete_pct_is_work_per_unit(sample_export, tmp_path):
+    from hitlist.completion import complete_pct, work_from_settings
+    types = [{"key": "ahu", "units": [{"required": 20, "required_filled": 20}, {"required": 20, "required_filled": 10, "weighted_pct": 50}]},
+             {"key": "chw_coil_sub", "units": [{"required": 4, "required_filled": 0}] * 2},
+             {"key": "supply_outlet", "units": [{"required": 2, "required_filled": 2}] * 80 + [{"required": 2, "required_filled": 0}] * 20},
+             {"key": "something_new", "units": [{"required": 0, "required_filled": 0}]}]           # nothing required: left out
+    w = work_from_settings({"work_ahu": "4", "work_chw_coil_sub": "2", "work_supply_outlet": "0.1", "work_unit": "hours", "work_x": "abc"})
+    assert w == {"ahu": 4.0, "chw_coil_sub": 2.0, "supply_outlet": 0.1}
+    # AHUs 4 + 2 of 8, coils 0 of 4, outlets 8 of 10  ->  14 / 22
+    assert complete_pct({"types": types}, w) == round(100 * 14 / 22, 1)
+    # not set: every unit counts 1  ->  (1 + 0.5 + 0 + 80) / 104
+    assert complete_pct({"types": types}, {}) == round(100 * 81.5 / 104, 1)
+    assert complete_pct({"types": [], "summary": {"fields_pct": 42.0}}, w) == 42.0
     # written on each sync, to Projects and History
     store, s, mail = make_store(), settings(tmp_path), Mailer("app@example.com", "")
     store.request_refresh("99-001", "tech@example.com")

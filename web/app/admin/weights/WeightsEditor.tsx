@@ -1,8 +1,8 @@
 "use client";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CATEGORIES, categoryOf, categoryPcts, completePct, typeTotals, type Weights } from "@/lib/completion";
-import { applyWeights, typePct } from "@/lib/weights";
+import { CATEGORIES, DEFAULT_WORK, categoryOf, jobProgress, typeTotals, workOf, type Progress, type Work, type WorkUnit } from "@/lib/completion";
+import { applyWeights } from "@/lib/weights";
 import { unweighted, weightItems, type FieldWeight, type WeightItem } from "@/lib/weightItems";
 import type { TypeResult } from "@/lib/results";
 import { byTypeOrder } from "@/lib/typeOrder";
@@ -10,26 +10,30 @@ import { byTypeOrder } from "@/lib/typeOrder";
 export type EditorType = { key: string; name: string; fields: (FieldWeight & { status: string })[] };
 type Draft = Record<string, Record<number, { weight: string; group: string }>>;   // typeKey → order → new values
 type Preview = { types: TypeResult[]; fields_pct: number };
+type JobRow = { units: number; work: number; total: number; pct: number };
 
-// categories in the app's usual equipment order (air handlers first … grilles last)
+// headings in the app's usual equipment order (air handlers first … grilles last)
 const CAT_ORDER = ["air_handlers", "fans", "unitary", "face_velocity", "terminal", "hydronic", "other", "outlets"];
 const at = (k: string) => { const i = CAT_ORDER.indexOf(k); return i < 0 ? CAT_ORDER.length : i; };
 const ORDERED = [...CATEGORIES].sort((a, b) => at(a.key) - at(b.key));
+const COLS = 4;
 
 const num = (s: string) => (s.trim() === "" ? null : Number(s) || null);
+const fmtN = (n: number) => (n >= 10 ? Math.round(n) : Math.round(n * 10) / 10).toLocaleString();
 
 /**
- * Admin → Completion weights: one page for how a job's % complete is built.
- * Level 1: each category's share of the job (must total 100). Level 2 (open a category): its equipment types.
- * Level 3 (open a type): that type's item weights, one row each — single fields or combined items (e.g. "Unit Data").
- * Items can be added, combined, split off or removed; one Save stores everything and recalculates every project.
+ * Admin → Completion weights. Each equipment type has one number: how much work one unit is (points or hours;
+ * the unit is only a label). A job's % = work done ÷ total work over its own equipment, so nothing is set per project.
+ * Open a type for its item weights (how much of one unit each item is), one row each: single fields or combined
+ * items (e.g. "Unit Data"), which can be added, combined, split off or removed. One Save stores everything and
+ * recalculates every project. Hours left shows on the project preview here (admins only).
  */
 export default function WeightsEditor({ initial, projects, types }:
-  { initial: Weights; projects: { id: string; label: string }[]; types: EditorType[] }) {
+  { initial: Work; projects: { id: string; label: string }[]; types: EditorType[] }) {
   const router = useRouter();
-  const str = (w: Weights) => Object.fromEntries(CATEGORIES.map((c) => [c.key, String(w[c.key] ?? c.default)]));
-  const [saved, setSaved] = useState<Weights>(initial);
-  const [boxes, setBoxes] = useState<Record<string, string>>(str(initial));
+  const [saved, setSaved] = useState<Work>(initial);
+  const [unit, setUnit] = useState<WorkUnit>(initial.unit);
+  const [workBoxes, setWorkBoxes] = useState<Record<string, string>>({});   // typeKey → typed value (draft)
   const [draft, setDraft] = useState<Draft>({});
   const [keep, setKeep] = useState<Record<string, Set<number>>>({});
   const [open, setOpen] = useState<Set<string>>(new Set());
@@ -53,10 +57,16 @@ export default function WeightsEditor({ initial, projects, types }:
   const byKey = new Map(current.map((t) => [t.key, t]));
   const savedOrder = useMemo(() => new Map(types.map((t) => [t.key, weightItems(t.fields).map((i) => i.key)])), [types]);
 
-  const nums: Weights = Object.fromEntries(CATEGORIES.map((c) => [c.key, Number(boxes[c.key]) || 0]));
-  const total = Math.round(10 * Object.values(nums).reduce((a, b) => a + b, 0)) / 10;
-  const sharesDirty = CATEGORIES.some((c) => Number(boxes[c.key]) !== saved[c.key] || boxes[c.key].trim() === "");
-  const sharesValid = CATEGORIES.every((c) => boxes[c.key].trim() !== "" && Number(boxes[c.key]) >= 0 && Number(boxes[c.key]) <= 100) && total === 100;
+  // work per unit: saved values with what's typed on top (blank box = the default 1)
+  const workBox = (k: string) => workBoxes[k] ?? (saved.perType[k] !== undefined ? String(saved.perType[k]) : "");
+  const workChanges = Object.fromEntries(Object.entries(workBoxes).filter(([k, v]) =>
+    (v.trim() === "" ? undefined : Number(v)) !== saved.perType[k]));
+  const workValid = Object.values(workBoxes).every((v) => v.trim() === "" || (isFinite(Number(v)) && Number(v) >= 0 && Number(v) <= 1000));
+  const draftWork: Work = { unit, perType: { ...saved.perType, ...Object.fromEntries(Object.entries(workBoxes)
+    .filter(([, v]) => v.trim() !== "" && isFinite(Number(v))).map(([k, v]) => [k, Number(v)])) } };
+  for (const [k, v] of Object.entries(workBoxes)) if (v.trim() === "") delete draftWork.perType[k];
+  const unitDirty = unit !== saved.unit;
+
   const changes = useMemo(() => {
     const out: Record<string, { order: number; weight: string; group: string }[]> = {};
     for (const t of types) {
@@ -67,10 +77,9 @@ export default function WeightsEditor({ initial, projects, types }:
     }
     return out;
   }, [types, draft]);
-  const typesDirty = Object.keys(changes).length > 0;
-  const dirty = sharesDirty || typesDirty;
+  const dirty = unitDirty || Object.keys(workChanges).length > 0 || Object.keys(changes).length > 0;
 
-  // ---- editing helpers
+  // ---- item-weight editing helpers
   const setFields = (typeKey: string, orders: number[], v: (cur: { weight: string; group: string }) => { weight: string; group: string }) => {
     const t = byKey.get(typeKey)!;
     const next = { ...(draft[typeKey] ?? {}) };
@@ -106,42 +115,49 @@ export default function WeightsEditor({ initial, projects, types }:
     return [...items].sort((a, b) => pos(a.key) - pos(b.key));   // keep rows still while typing; new ones at the end
   }
 
-  // ---- preview: the job % with the saved weights and with what's on screen
-  const calc = (ts: { key: string; fields: FieldWeight[] }[], shares: Weights) => {
+  // ---- preview: the job's progress with the saved weights and with what's on screen
+  const calc = (ts: { key: string; fields: FieldWeight[] }[], work: Work): Progress | null => {
     if (!preview || !preview.types.length) return null;
     const rules = ts.map((t) => ({ key: t.key, fields: t.fields.map((f) => ({ field: f.field, weight: f.weight, group: f.group })) }));
     const r = applyWeights({ types: preview.types }, rules);
-    const totals = typeTotals(r.types);
-    return { job: completePct(totals, shares, preview.fields_pct), cats: categoryPcts(totals),
-      types: new Map(r.types.map((t) => [t.key, typePct(t)])) };
+    return jobProgress(typeTotals(r.types), work, preview.fields_pct);
   };
   const before = useMemo(() => calc(types, saved), [preview, types, saved]); // eslint-disable-line react-hooks/exhaustive-deps
-  const after = useMemo(() => (sharesValid ? calc(current, nums) : null), [preview, current, boxes]); // eslint-disable-line react-hooks/exhaustive-deps
+  const after = useMemo(() => (workValid ? calc(current, draftWork) : null), [preview, current, workBoxes, unit]); // eslint-disable-line react-hooks/exhaustive-deps
+  const shown = after ?? before;
+  const label = unit === "hours" ? "hrs" : "pts";
 
   async function save() {
     setBusy(true); setMsg(null);
+    const work = unitDirty || Object.keys(workChanges).length ? { unit, perType: workChanges } : undefined;
     const r = await fetch("/api/admin/weights", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ weights: sharesDirty ? boxes : undefined, types: changes }) });
+      body: JSON.stringify({ work, types: changes }) });
     const data = await r.json().catch(() => ({}));
     setBusy(false);
     if (!r.ok) { setMsg({ text: data.error || "Save failed", ok: false }); return; }
-    if (data.weights) { setSaved(data.weights); setBoxes(str(data.weights)); }
-    setDraft({}); setKeep({}); setTyped({});
+    if (data.work) { setSaved(data.work); setUnit(data.work.unit); }
+    setWorkBoxes({}); setDraft({}); setKeep({}); setTyped({});
     setMsg({ text: `Saved · ${data.updated} project${data.updated === 1 ? "" : "s"} recalculated`, ok: true });
     router.refresh();
   }
-
-  const fmt = (n: number | undefined) => (n === undefined ? "" : `${Math.round(n)}%`);
-  const cols = preview && preview.types.length ? 3 : 2;
+  const discard = () => { setUnit(saved.unit); setWorkBoxes({}); setDraft({}); setKeep({}); setTyped({}); setMsg(null); };
 
   return (
     <div className="card tol-card cw">
-      <div className="card-head">
-        <b>Completion weights</b>
-        <span className="muted" style={{ fontSize: 13 }}>How a project&apos;s % complete is built. Each category&apos;s <b>share of the job</b> (must
-          total 100%); open a category for its equipment, and open one of those for its <b>item weights</b>: how much of one unit each
-          item is. A unit&apos;s % = the weights of what&apos;s filled in, scaled to 100%; items a unit doesn&apos;t have are left out. Equipment
-          with no item weights counts its required fields equally. Admins only.</span>
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
+        <div className="card-head" style={{ marginBottom: 0, maxWidth: 640 }}>
+          <b>How much work is one of each?</b>
+          <span className="muted" style={{ fontSize: 13 }}>Set once for every project. Hitlist counts each job&apos;s equipment from
+            BuildingStart and adds up the work: the job&apos;s % complete = work done ÷ total work. Sub-items (coils, sensors…) are just
+            equipment with their own number. A type left blank counts {DEFAULT_WORK}. Open a type (▸) for its <b>item weights</b>: how much of
+            one unit each item is. Admins only; techs never see the hours.</span>
+        </div>
+        <div className="row" style={{ gap: 8, alignItems: "center" }}>
+          <span className="muted">Count work in</span>
+          <div className="tabs seg" style={{ margin: 0 }}>
+            {(["points", "hours"] as const).map((u) => <button key={u} type="button" className={unit === u ? "on" : ""} onClick={() => setUnit(u)}>{u === "points" ? "Points" : "Hours"}</button>)}
+          </div>
+        </div>
       </div>
 
       {projects.length > 0 && (
@@ -150,47 +166,43 @@ export default function WeightsEditor({ initial, projects, types }:
           <select value={project} onChange={(e) => setProject(e.target.value)}>
             {projects.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
           </select>
-          {before && <span>Overall complete: <b>{before.job}%</b> now{dirty && <> → <b>{after ? `${after.job}%` : "–"}</b> with these changes</>}</span>}
+          {shown && <span className="cw-big">{shown.pct}% complete</span>}
+          {shown && <span>· about <b>{fmtN(shown.left)}</b> of {fmtN(shown.total)} {unit === "hours" ? "hours" : "points"} left</span>}
+          {before && after && dirty && after.pct !== before.pct && <span className="muted">(now {before.pct}%)</span>}
           {preview && !preview.types.length && <span className="muted">No sync results for this project yet.</span>}
         </div>
       )}
 
       <table className="weights-table cw-table">
-        <thead><tr><th>Category · equipment · item</th><th className="w">Weight</th>{cols === 3 && <th className="w">This job</th>}</tr></thead>
+        <thead><tr><th>Equipment</th><th className="w">One is worth</th><th className="w">On this job</th><th>Done</th></tr></thead>
         <tbody>
           {ORDERED.map((c) => {
             const catTypes = current.filter((t) => categoryOf(t.key) === c.key).sort(byTypeOrder);
-            const isOpen = open.has(c.key);
+            if (!catTypes.length) return null;
             return (
               <Fragment key={c.key}>
-                <tr className="cw-cat">
-                  <td><button type="button" className="cw-arrow" aria-expanded={isOpen} onClick={() => toggle(c.key)}>{isOpen ? "▾" : "▸"} <b>{c.label}</b></button>
-                    <span className="muted cw-sub">{c.includes}</span></td>
-                  <td className="w"><span className="tol-input"><input inputMode="decimal" aria-label={`${c.label} share of the job`} value={boxes[c.key]}
-                    onChange={(e) => setBoxes({ ...boxes, [c.key]: e.target.value.replace(/[^\d.]/g, "") })} />%</span></td>
-                  {cols === 3 && <td className="w muted">{after?.cats[c.key] !== undefined ? `${fmt(after.cats[c.key])} done` : before?.cats[c.key] !== undefined ? `${fmt(before.cats[c.key])} done` : "not on this job"}</td>}
-                </tr>
-                {isOpen && catTypes.map((t) => <TypeRows key={t.key} t={t} cols={cols} items={itemsOf(t)} isOpen={open.has(`t:${t.key}`)}
+                <tr className="cw-head"><td colSpan={COLS}>{c.label}</td></tr>
+                {catTypes.map((t) => <TypeRows key={t.key} t={t} items={itemsOf(t)} isOpen={open.has(`t:${t.key}`)}
                   onToggle={() => toggle(`t:${t.key}`)} itemBox={(it) => itemBox(t.key, it)} onWeight={(it, v) => setItemWeight(t.key, it, v)}
                   onRemove={(it) => removeItem(t.key, it)} onRemoveMember={(o) => removeMember(t.key, o)}
-                  jobPct={after?.types.get(t.key) ?? before?.types.get(t.key)}
+                  work={workBox(t.key)} workNow={workOf(draftWork, t.key)} label={label} hasPreview={!!shown}
+                  onWork={(v) => setWorkBoxes({ ...workBoxes, [t.key]: v.replace(/[^\d.]/g, "") })}
+                  job={shown?.byType.get(t.key)}
                   onAdd={(orders, group, weight) => {
                     if (!group) keepAdd(t.key, orders);
                     setFields(t.key, orders, () => ({ weight, group }));
                     if (!open.has(`t:${t.key}`)) toggle(`t:${t.key}`);
                   }} />)}
-                {isOpen && !catTypes.length && <tr><td colSpan={cols} className="muted cw-type">No equipment types in this category.</td></tr>}
               </Fragment>
             );
           })}
-          <tr className="weights-total"><td><b>Job total</b></td><td className="w"><b className={total === 100 ? "ok-text" : "error"}>{total}%</b></td>{cols === 3 && <td />}</tr>
-          {total !== 100 && <tr><td colSpan={cols} className="error">The shares must add up to 100%.</td></tr>}
         </tbody>
       </table>
 
       <div className="row" style={{ marginTop: 12 }}>
-        <button className="primary" disabled={busy || !sharesValid || !dirty} onClick={save}>{busy ? "Saving…" : dirty ? "Save changes" : "No changes"}</button>
-        {dirty && <button disabled={busy} onClick={() => { setBoxes(str(saved)); setDraft({}); setKeep({}); setTyped({}); setMsg(null); }}>Discard</button>}
+        <button className="primary" disabled={busy || !workValid || !dirty} onClick={save}>{busy ? "Saving…" : dirty ? "Save changes" : "No changes"}</button>
+        {dirty && <button disabled={busy} onClick={discard}>Discard</button>}
+        {!workValid && <span className="error">Enter a number from 0 to 1000.</span>}
         {msg && <span className={msg.ok ? "pill ok" : "error"}>{msg.text}</span>}
       </div>
     </div>
@@ -198,11 +210,13 @@ export default function WeightsEditor({ initial, projects, types }:
 }
 
 /** One equipment type: its row, and when open, one row per weighted item plus the add buttons. */
-function TypeRows({ t, cols, items, isOpen, onToggle, itemBox, onWeight, onRemove, onRemoveMember, onAdd, jobPct }: {
-  t: EditorType; cols: number; items: WeightItem[]; isOpen: boolean; onToggle: () => void;
+function TypeRows({ t, items, isOpen, onToggle, itemBox, onWeight, onRemove, onRemoveMember, onAdd, work, workNow, label, onWork, job, hasPreview }: {
+  t: EditorType; items: WeightItem[]; isOpen: boolean; onToggle: () => void;
   itemBox: (it: WeightItem) => string; onWeight: (it: WeightItem, v: string) => void; onRemove: (it: WeightItem) => void;
-  onRemoveMember: (order: number) => void; onAdd: (orders: number[], group: string, weight: string) => void; jobPct?: number;
+  onRemoveMember: (order: number) => void; onAdd: (orders: number[], group: string, weight: string) => void;
+  work: string; workNow: number; label: string; onWork: (v: string) => void; job?: JobRow; hasPreview: boolean;
 }) {
+  const cols = COLS;
   const [adding, setAdding] = useState("");   // "" | "item" | "group" | "into:<combined item>"
   const [showMembers, setShowMembers] = useState<string>("");
   const total = Math.round(10 * items.reduce((n, it) => n + (Number(itemBox(it)) || 0), 0)) / 10;
@@ -211,10 +225,12 @@ function TypeRows({ t, cols, items, isOpen, onToggle, itemBox, onWeight, onRemov
     <>
       <tr className="cw-type-row">
         <td className="cw-type"><button type="button" className="cw-arrow" aria-expanded={isOpen} onClick={onToggle}>{isOpen ? "▾" : "▸"} <b>{t.name}</b></button>
-          {items.length ? <span className="muted cw-sub">{items.length} item{items.length === 1 ? "" : "s"} · total {total}%</span>
+          {items.length ? <span className="cw-tag cw-tag-on">{items.length} item weight{items.length === 1 ? "" : "s"}</span>
             : <span className="cw-tag">No item weights yet</span>}</td>
-        <td className="w" />
-        {cols === 3 && <td className="w muted">{jobPct === undefined ? "" : `${Math.round(jobPct)}% done`}</td>}
+        <td className="w"><span className="tol-input"><input inputMode="decimal" aria-label={`Work for one ${t.name}`} value={work}
+          placeholder={String(DEFAULT_WORK)} onChange={(e) => onWork(e.target.value)} /> {label}</span></td>
+        <td className="w muted">{!hasPreview ? "" : job ? `${job.units} × ${workNow} = ${fmtN(job.units * workNow)} ${label}` : "none on this job"}</td>
+        <td>{job && <span className="cw-done"><span className="bar"><span style={{ width: `${Math.min(100, job.pct)}%` }} /></span>{Math.round(job.pct)}%</span>}</td>
       </tr>
       {isOpen && <>
         {!items.length && <tr><td colSpan={cols} className="muted cw-item">Every required field counts the same. Add an item to start weighting {t.name}.</td></tr>}
@@ -233,11 +249,11 @@ function TypeRows({ t, cols, items, isOpen, onToggle, itemBox, onWeight, onRemov
             <td className="w"><span className="tol-input"><input inputMode="decimal" aria-label={`${it.name} weight`} value={itemBox(it)} placeholder="0"
               onChange={(e) => onWeight(it, e.target.value)} />%</span>
               <button type="button" className="cw-x" title={`Remove ${it.name}${it.group ? " (its fields go back to the Add list)" : ""}`} aria-label={`Remove ${it.name}`} onClick={() => onRemove(it)}>×</button></td>
-            {cols === 3 && <td />}
+            <td colSpan={2} />
           </tr>
         ))}
         {items.length > 0 && <tr className="cw-item-row"><td className="cw-item"><b>{t.name} total</b></td>
-          <td className="w"><b>{total}%</b>{total !== 100 && total > 0 && <span className="muted" style={{ fontSize: 12 }}> · scaled to 100%</span>}</td>{cols === 3 && <td />}</tr>}
+          <td className="w"><b>{total}%</b>{total !== 100 && total > 0 && <span className="muted" style={{ fontSize: 12 }}> · scaled to 100%</span>}</td><td colSpan={2} /></tr>}
         <tr><td colSpan={cols} className="cw-item">
           {adding ? <AddPanel key={adding} t={t} mode={adding === "group" ? "group" : "item"} startInto={adding.startsWith("into:") ? adding.slice(5) : ""} groups={groups} onCancel={() => setAdding("")}
             onAdd={(orders, group, weight) => { onAdd(orders, group, weight); setAdding(""); }} />

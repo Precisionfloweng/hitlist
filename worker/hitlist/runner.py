@@ -15,7 +15,7 @@ from .engine import check_project, dashboard_rows, gap_check
 from .export_reader import read_export
 from .exporter import ExportError, run_export
 from .mailer import Mailer, esc
-from .completion import complete_pct, weights_from_settings
+from .completion import complete_pct, work_from_settings
 from .rules import load_rules
 from .store import DONE, FAILED, RUNNING, HitlistStore, apply_overrides, now_iso
 
@@ -314,12 +314,12 @@ def _call_export(export_fn: ExportFn, number: str, step: StepFn, name: str = "",
 
 
 def _weights(store: HitlistStore) -> dict[str, float]:
-    """Completion weights from the Settings tab (Admin -> Completion weights), else the defaults."""
+    """Work per unit from the Settings tab (Admin -> Completion weights); types not set count 1."""
     try:
         settings = {r.get("setting", ""): r.get("value", "") for r in store.rows("Settings")}
     except Exception:  # noqa: BLE001 - tab missing or unreadable: defaults
         settings = {}
-    return weights_from_settings(settings)
+    return work_from_settings(settings)
 
 
 def _who(store: HitlistStore, email: str) -> str:

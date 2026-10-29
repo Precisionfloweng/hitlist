@@ -14,7 +14,7 @@ export const SCHEMA = {
     "values_updated", "values_status",
     // who pressed Sync for the last good sync (name from Users, else email; "server" = from the server)
     "last_sync_by",
-    // overall % complete weighted by equipment category (lib/completion.ts); written by the server, and here when weights change
+    // overall % complete by work per unit (lib/completion.ts); written by the server, and here when weights change
     "complete_pct"],
   // projects: for role "customer", the project keys they may see (" | " separated)
   // last_seen: date (Central) the person last opened the app, updated at most once a day.

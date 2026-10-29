@@ -3,13 +3,13 @@ import AdminNav from "../AdminNav";
 import WeightsEditor, { type EditorType } from "./WeightsEditor";
 import { requireAdmin } from "@/lib/auth";
 import { listProjects } from "@/lib/data";
-import { loadWeights } from "@/lib/settings";
+import { loadWork } from "@/lib/settings";
 import { loadRules } from "@/lib/rules";
 
 export const dynamic = "force-dynamic";
 
 export default async function WeightsAdmin() {
-  const [user, weights, projects, rules] = await Promise.all([requireAdmin(), loadWeights(), listProjects(), loadRules()]);
+  const [user, work, projects, rules] = await Promise.all([requireAdmin(), loadWork(), listProjects(), loadRules()]);
   const choices = projects.filter((p) => p.status === "active" && p.lastSync)
     .map((p) => ({ id: p.id, label: `${p.number} · ${p.name}` }));
   const types: EditorType[] = rules.types.map((t) => ({ key: t.key, name: t.name,
@@ -20,7 +20,7 @@ export default async function WeightsAdmin() {
       <main>
         <h1>Admin</h1>
         <AdminNav on="weights" />
-        <WeightsEditor initial={weights} projects={choices} types={types} />
+        <WeightsEditor initial={work} projects={choices} types={types} />
       </main>
     </>
   );
