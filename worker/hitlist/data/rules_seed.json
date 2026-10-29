@@ -74,8 +74,7 @@
       "Actual Outlet Total"
      ],
      "status": "required",
-     "when": null,
-     "weight": 1
+     "when": null
     },
     {
      "label": "Design O/A",
@@ -112,8 +111,7 @@
       "Actual Return Airflow"
      ],
      "status": "required",
-     "when": null,
-     "weight": 1
+     "when": null
     },
     {
      "label": "Design Fan RPM",
@@ -187,8 +185,7 @@
       "O/A Damper Position"
      ],
      "status": "optional",
-     "when": null,
-     "weight": 1
+     "when": null
     },
     {
      "label": "R/A Damper Position",
@@ -224,8 +221,7 @@
       "Final VFD Setting"
      ],
      "status": "optional",
-     "when": null,
-     "weight": 2
+     "when": null
     },
     {
      "label": "Motor Make",
