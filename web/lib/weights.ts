@@ -1,6 +1,6 @@
 // Completion weights per field (Default Rules, admins only): how much of a unit's work each field is. A unit's % is
 // the weight of what's filled in; fields sharing a weight group (e.g. "Unit Data") count as one item, each
-// member equal; items that don't apply to the unit (ignored, no design, N/A) are left out and the rest scale to 100%.
+// member equal (a blank Optional member doesn't count against its group); items that don't apply to the unit (ignored, no design, N/A) are left out and the rest scale to 100%.
 // Same sum as worker/hitlist/engine.py weighted_pct. Client-safe.
 import type { TypeResult } from "./results";
 
@@ -17,8 +17,10 @@ export function weightedPct(fields: WeightField[], codes: string): number | null
   });
   if (!items.size) return null;
   let earned = 0, available = 0;
-  for (const { w, idx } of items.values()) {
-    const live = idx.filter((i) => "PRO".includes(codes[i] ?? "-") && codes[i] !== undefined);
+  for (const [key, { w, idx }] of items) {
+    // inside a group a blank Optional field doesn't count against it: only filled and required fields do
+    const counted = key.startsWith("g:") ? "PR" : "PRO";
+    const live = idx.filter((i) => codes[i] !== undefined && codes[i] !== "" && counted.includes(codes[i]));
     if (!live.length) continue;
     available += w;
     earned += (w * live.filter((i) => codes[i] === "P").length) / live.length;

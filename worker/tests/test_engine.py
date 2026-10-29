@@ -264,6 +264,16 @@ def test_weighted_pct():
     assert [f.get("weight") for f in t["fields"]] == [10, 40, 10, 10, None]
 
 
+def test_blank_optional_does_not_hold_a_group_back():
+    from hitlist.engine import weighted_pct
+    f = [{"weight": 20, "weight_group": "Unit Data"}, {"weight": 20, "weight_group": "Unit Data"},
+         {"weight": 20, "weight_group": "Unit Data"}, {"weight": 80}]
+    assert weighted_pct(f, "PPOR") == 20.0        # group full (blank optional skipped), airflow missing
+    assert weighted_pct(f, "PROR") == 10.0        # one required still blank: half the group
+    assert weighted_pct(f, "OOOP") == 100.0       # group has nothing required: left out
+    assert weighted_pct([{"weight": 5}, {"weight": 5}], "PO") == 50.0   # a single optional item still counts
+
+
 def test_no_weights_means_no_weighted_pct(sample_export, sample_rules):
     r = check_project(read_export(sample_export), load_rules(sample_rules))
     assert all("weighted_pct" not in t["summary"] for t in r["types"])

@@ -77,7 +77,7 @@ Plan and decisions: the "Project Hitlist — Conversion Plan" doc in the Project
   (fallback fields_pct). Type cards keep their own fields_pct.
 - Item weights per type (AHUs first): Rules tab columns weight / weight_group (bundled in rules_seed.json; `hitlist set-weights TYPE`
   copies only the weights to the live tab). A group (e.g. "Unit Data") counts as one item (weight = max of members, earned = share
-  of its live members filled). Live = code P/R/O; ignored/N/skipped items drop out and the rest scale to 100. Engine `weighted_pct` (unit and
+  of its live members filled). Live = code P/R/O (in a group only P/R: a blank optional member doesn't hold it back); ignored/N/skipped items drop out and the rest scale to 100. Engine `weighted_pct` (unit and
   summary), web `lib/weights.ts` (`applyWeights` recomputes from the current Rules, `typePct`/`unitPct`). Weighted types count
   required × weighted% in the job %. Admins edit on Default Rules (WeightsPanel, POST /api/rules {weights}) → `recalcCompletePcts`.
 

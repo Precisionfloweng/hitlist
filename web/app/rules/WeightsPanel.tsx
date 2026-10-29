@@ -56,7 +56,7 @@ export default function WeightsPanel({ t, canEdit }: { t: RuleType; canEdit: boo
       <div className="card-head">
         <b>Completion weights · {t.name}</b>
         <span className="muted" style={{ fontSize: 13 }}>How much of a unit&apos;s work each item is. A unit&apos;s % = the weights of what&apos;s
-          filled in, scaled so the total is 100%. Items a unit doesn&apos;t have (ignored, no design value) are left out and the rest scaled up.
+          filled in, scaled so the total is 100%. Items a unit doesn&apos;t have (ignored, no design value) are left out and the rest scaled up. In a combined item (e.g. Unit Data) a blank Optional field doesn&apos;t count against it.
           Required / Optional still decide what gets a red ✗. {items.weighted.length === 0 && <b>No weights yet: every required field counts the same.</b>}
           {!canEdit && " Only admins can change these."}</span>
       </div>

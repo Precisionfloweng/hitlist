@@ -250,7 +250,9 @@ def weighted_pct(fields: list[Any], codes: str) -> float | None:
     """A unit's % complete by completion weight (Default Rules): each weighted item (a field, or a weight_group such
     as "Unit Data" counting each member equally) earns its weight times the share of its fields filled in.
     Items that don't apply to this unit (ignored, no design, condition not met, marked N/A) are left out and their
-    weight spread over the rest, so the total always scales to 100. None when the type has no weights.
+    weight spread over the rest, so the total always scales to 100. Inside a group a blank Optional field doesn't count
+    against it (only filled fields and required ones do), so a group is full once its required fields are filled.
+    None when the type has no weights.
     The website (web/lib/weights.ts) does the same sum."""
     items: dict[str, list[Any]] = {}
     for i, f in enumerate(fields):
@@ -265,8 +267,9 @@ def weighted_pct(fields: list[Any], codes: str) -> float | None:
     if not items:
         return None
     earned = available = 0.0
-    for w, idx in items.values():
-        live = [i for i in idx if i < len(codes) and codes[i] in (PASS, MISSING_REQUIRED, MISSING_OPTIONAL)]
+    for key, (w, idx) in items.items():
+        counted = (PASS, MISSING_REQUIRED) if key.startswith("g:") else (PASS, MISSING_REQUIRED, MISSING_OPTIONAL)
+        live = [i for i in idx if i < len(codes) and codes[i] in counted]
         if not live:
             continue
         available += w
