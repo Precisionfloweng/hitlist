@@ -287,3 +287,10 @@ def test_bundled_ahu_weights_scale_to_100():
         if f.weight:
             items[f.group or f.label] = f.weight
     assert round(sum(items.values()), 1) == 90 and items["Unit Statics"] == 4 and items["Actual Airflow"] == 43 and items["Unit Data"] == 22 and "Drive Type" not in items
+    rtu = next(t for t in rules.types if t.key == "rtu")
+    r_items = {}
+    for f in rtu.fields:
+        if f.weight:
+            r_items[f.group or f.label] = f.weight
+    # the boss's RTU sheet x100: airflow 40, O/A 10, Unit Data 52 (nameplate, motor, sheave, filters, drive type, design), ...
+    assert round(sum(r_items.values()), 1) == 118.5 and r_items["Actual Airflow"] == 40 and r_items["Unit Data"] == 52
