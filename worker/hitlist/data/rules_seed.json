@@ -16,7 +16,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -26,7 +26,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -36,7 +36,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -46,7 +46,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -56,7 +56,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 40
+     "weight": 43
     },
     {
      "label": "Des Outlet Total",
@@ -65,7 +65,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -75,7 +75,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 0.5
+     "weight": 1
     },
     {
      "label": "Design O/A",
@@ -84,7 +84,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -94,7 +94,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 10
+     "weight": 11
     },
     {
      "label": "Design R/A",
@@ -103,7 +103,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -113,7 +113,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 0.5
+     "weight": 1
     },
     {
      "label": "Design Fan RPM",
@@ -122,7 +122,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -141,7 +141,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -160,7 +160,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -188,7 +188,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 0.5
+     "weight": 1
     },
     {
      "label": "R/A Damper Position",
@@ -205,7 +205,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -215,7 +215,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -234,7 +234,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -244,7 +244,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -254,7 +254,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -264,7 +264,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -274,7 +274,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -284,7 +284,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -294,7 +294,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -304,7 +304,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -314,7 +314,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -324,7 +324,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -334,7 +334,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -344,7 +344,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -354,7 +354,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -370,7 +370,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -386,7 +386,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -402,7 +402,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -418,7 +418,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -434,7 +434,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -450,7 +450,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -466,7 +466,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -482,7 +482,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -498,7 +498,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -514,7 +514,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -530,7 +530,7 @@
        "equals": "Belt Drive"
       }
      ],
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -540,7 +540,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -572,7 +572,7 @@
      ],
      "status": "optional",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -582,7 +582,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -592,7 +592,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -602,7 +602,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -612,7 +612,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
@@ -622,7 +622,7 @@
      ],
      "status": "required",
      "when": null,
-     "weight": 20,
+     "weight": 22,
      "weight_group": "Unit Data"
     },
     {
