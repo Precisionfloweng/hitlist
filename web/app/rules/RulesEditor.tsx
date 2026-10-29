@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadLastType, saveLastType } from "@/lib/lastType";
 import { useRouter } from "next/navigation";
+import WeightsPanel from "./WeightsPanel";
 import type { Condition, HistoryRow, RuleType } from "@/lib/rules";
 
 const LABEL: Record<string, string> = { required: "✖ Required", optional: "⚠ Optional", ignore: "Ignore" };
@@ -114,6 +115,8 @@ export default function RulesEditor({ types, history, canEdit, project }:
           {!t.confirmed && <p className="muted" style={{ margin: "8px 0 0" }}>● This type wasn&apos;t in the sample export, so its sheet and column names are best guesses. Once a project with this equipment syncs, check the names against the export and tick Confirmed.</p>}
         </div>
 
+        {!project && <WeightsPanel key={t.key} t={t} canEdit={canEdit} />}
+
         <div className="row" style={{ marginBottom: 8 }}>
           <input placeholder="Find a field" value={q} onChange={(e) => setQ(e.target.value)} />
           <span className="muted">{t.fields.length} fields</span>
@@ -170,7 +173,7 @@ export default function RulesEditor({ types, history, canEdit, project }:
                   <tr key={i}>
                     <td className="muted">{new Date(h.changedAt).toLocaleString()}</td><td>{h.changedBy}</td><td>{h.field}</td>
                     <td>{h.old}</td><td>{h.new}</td>
-                    <td>{canEdit && i === typeHistory.findIndex((x) => x.field === h.field) &&
+                    <td>{canEdit && !h.field.startsWith("Weight: ") && i === typeHistory.findIndex((x) => x.field === h.field) &&
                       <button disabled={busy} onClick={() => undo(h)}>Undo</button>}</td>
                   </tr>
                 ))}

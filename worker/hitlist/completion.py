@@ -33,8 +33,11 @@ def category_pcts(types: list[dict[str, Any]]) -> dict[str, float]:
     filled: dict[str, int] = {}
     for t in types:
         c = TYPE_CATEGORY.get(t["key"], "other")
-        req[c] = req.get(c, 0) + sum(u["required"] for u in t["units"])
-        filled[c] = filled.get(c, 0) + sum(u["required_filled"] for u in t["units"])
+        n = sum(u["required"] for u in t["units"])
+        wp = (t.get("summary") or {}).get("weighted_pct")
+        req[c] = req.get(c, 0) + n
+        # a type with completion weights counts by its weighted % (same size in the category as before)
+        filled[c] = filled.get(c, 0) + (n * wp / 100.0 if wp is not None else sum(u["required_filled"] for u in t["units"]))
     return {c: 100.0 * filled[c] / n for c, n in req.items() if n > 0}
 
 

@@ -79,6 +79,10 @@ class FieldRule:
     columns: list[str] | None
     status: str
     when: list[Condition] = field(default_factory=list)
+    # Completion weight (Default Rules, admins only): how much of the unit's work this field is, in %. Fields sharing
+    # a weight_group count as one item worth the group's weight (each member equal), e.g. "Unit Information".
+    weight: float | None = None
+    group: str = ""
 
 
 @dataclass
@@ -121,7 +125,13 @@ def _parse(data: dict[str, Any]) -> RuleSet:
                               c.get("label") or c.get("column") or "",
                               c.get("equals"), c.get("gt"), bool(c.get("filled")))
                     for c in (f.get("when") or [])]
-            fields.append(FieldRule(f["label"], cols, f.get("status", REQUIRED), when))
+            w = f.get("weight")
+            try:
+                weight = float(w) if w not in (None, "") else None
+            except (TypeError, ValueError):
+                weight = None
+            fields.append(FieldRule(f["label"], cols, f.get("status", REQUIRED), when, weight,
+                                    str(f.get("weight_group") or "").strip()))
         types.append(TypeRule(t["key"], t["name"], t["export_sheet"],
                               bool(t.get("export_sheet_confirmed", True)),
                               t.get("parent_types"), fields))

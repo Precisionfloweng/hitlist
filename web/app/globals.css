@@ -690,3 +690,6 @@ header.top .top-drop form button { background: transparent; }
 .proj-pick-pop input[type=search] { width: 100%; margin-bottom: 6px; }
 .proj-pick-list { max-height: 240px; min-height: 60px; overflow: auto; flex: 1 1 auto; }
 .proj-pick-list label { display: flex; gap: 6px; align-items: center; font-size: 13px; padding: 3px 0; white-space: nowrap; }
+
+.weights-card .weights-table .tol-input input { width: 64px; }
+.weights-card .w { white-space: nowrap; }

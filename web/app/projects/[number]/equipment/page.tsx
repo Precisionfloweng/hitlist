@@ -8,6 +8,8 @@ import { canEdit, canSee, requireUser } from "@/lib/auth";
 import { getProject } from "@/lib/data";
 import { loadResults } from "@/lib/results";
 import { loadTolerancesWithDefaults } from "@/lib/tolerances";
+import { loadRules } from "@/lib/rules";
+import { applyWeights } from "@/lib/weights";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +18,8 @@ export default async function EquipmentPage({ params, searchParams }:
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
   const { type } = await searchParams;
-  const [data, results, tol] = await Promise.all([getProject(number), loadResults(number), loadTolerancesWithDefaults(number).then((t) => t.tol)]);
+  const [data, raw, tol, rules] = await Promise.all([getProject(number), loadResults(number), loadTolerancesWithDefaults(number).then((t) => t.tol), loadRules()]);
+  const results = raw ? applyWeights(raw, rules.types) : null;   // % by completion weights, when the type has them
   if (!data || !canSee(user, data.project.id)) notFound();
   const p = data.project;
 

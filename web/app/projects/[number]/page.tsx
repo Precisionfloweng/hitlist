@@ -3,6 +3,8 @@ import { customerTypes } from "@/lib/customerView";
 import { unitWhere } from "@/lib/unitLabel";
 import { completePct, typeTotals } from "@/lib/completion";
 import { loadWeights } from "@/lib/settings";
+import { loadRules } from "@/lib/rules";
+import { applyWeights, typePct } from "@/lib/weights";
 import { notFound } from "next/navigation";
 import Header from "../../Header";
 import { pct, syncLabel } from "../../format";
@@ -20,8 +22,9 @@ export const dynamic = "force-dynamic";
 export default async function ProjectPage({ params }: { params: Promise<{ number: string }> }) {
   const user = await requireUser();
   const number = decodeURIComponent((await params).number);
-  const [data, results, { tol, def }, tolSrc, weights] = await Promise.all([getProject(number), loadResults(number),
-    loadTolerancesWithDefaults(number), loadToleranceSources(number), loadWeights()]);
+  const [data, raw, { tol, def }, tolSrc, weights, rules] = await Promise.all([getProject(number), loadResults(number),
+    loadTolerancesWithDefaults(number), loadToleranceSources(number), loadWeights(), loadRules()]);
+  const results = raw ? applyWeights(raw, rules.types) : null;   // each type's % by its completion weights, when it has them
   if (!data || !canSee(user, data.project.id)) notFound();
   const { project: p } = data;
   const summary = results?.summary;
@@ -158,13 +161,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ number
               <div className="type-cards">
                 {[...results.types].sort(byTypeOrder).map((t) => {
                   const done = t.summary.units_complete, n = t.summary.units;
-                  const pctDone = Math.min(100, t.summary.fields_pct);   // the bar follows the % (required fields filled)
+                  const pctDone = Math.min(100, typePct(t));   // the bar follows the % (by weights, else required fields filled)
                   return (
-                    <Link key={t.key} href={eqHref(t.key)} className={`type-card${pctDone >= 100 ? " full" : ""}`} title={`${t.name}: ${done} of ${n} items fully complete, ${Math.round(t.summary.fields_pct)}% of required fields filled`}>
+                    <Link key={t.key} href={eqHref(t.key)} className={`type-card${pctDone >= 100 ? " full" : ""}`} title={`${t.name}: ${done} of ${n} items fully complete, ${Math.round(typePct(t))}% done${t.summary.weighted_pct !== undefined ? " (by completion weights)" : " (required fields filled)"}`}>
                       <span className="tc-name">{t.name}</span>
                       <span className="tc-row">
                         <span className={`tc-num tc-w${String(done).length + String(n).length}`}><b>{done}</b> / {n} <span className="tc-units">items</span></span>
-                        <span className={`tc-pct${t.summary.fields_pct >= 100 ? " full" : ""}`} title="Required fields filled for this equipment type (same as the Equipment checklist)">{Math.round(t.summary.fields_pct)}%</span>
+                        <span className={`tc-pct${typePct(t) >= 100 ? " full" : ""}`} title="% done for this equipment type (same as the Equipment checklist)">{Math.round(typePct(t))}%</span>
                       </span>
                       <span className={`tc-bar ${pctDone >= 100 ? "full" : ""}`}><span style={{ width: `${pctDone}%` }} /></span>
                     </Link>

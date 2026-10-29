@@ -11,6 +11,7 @@
     python -m hitlist add-field TYPE_KEY "Field name" --column "Export column" [--status required]   add one field
     python -m hitlist add-field TYPE_KEY --from-bundled    add the bundled fields whose export column the type doesn't use yet
     python -m hitlist move-field TYPE_KEY "Field" --after "Other field"   (names: the start, or words in them)
+    python -m hitlist set-weights TYPE_KEY                         copy a type's completion weights from the bundled rules
     python -m hitlist update-rules TYPE_KEY [--statuses]        copy a type's sheet/column links (and names) from the bundled rules
     python -m hitlist dropbox-setup [--relink]                  connect the read-only Dropbox app (once), then test it
     python -m hitlist dropbox-test                              show what the server can see in Dropbox
@@ -64,6 +65,8 @@ def main(argv: list[str] | None = None) -> int:
     af.add_argument("--from-bundled", action="store_true",
                     help="add the bundled rules' fields for this type whose export column isn't on the Rules tab yet")
     af.add_argument("--status", default="required", choices=["required", "optional", "ignore"])
+    sw = sub.add_parser("set-weights", help="Copy a type's completion weights from the bundled rules to the Rules tab")
+    sw.add_argument("type_key", nargs="+", help="e.g. ahu")
     mf = sub.add_parser("move-field", help="Move a field to just after another on the Rules tab")
     mf.add_argument("type_key", help="e.g. ductless")
     mf.add_argument("field", help="the field to move (or the start of its name)")
@@ -123,6 +126,16 @@ def main(argv: list[str] | None = None) -> int:
                 store.append("Users", [{"email": email, "name": name, "role": "admin",
                                         "active": "yes", "added": date.today().isoformat()}])
                 print(f"Added admin {email}.")
+        return 0
+    if args.cmd == "set-weights":
+        store.setup()                       # adds the weight columns to the Rules tab if they're new
+        for key in args.type_key:
+            try:
+                n = store.set_weights(_seed_dict(), key)
+            except KeyError as e:
+                print(e.args[0])
+                return 1
+            print(f"{key}: weights set on {n} field(s)" if n else f"{key}: weights already up to date")
         return 0
     if args.cmd == "move-field":
         try:

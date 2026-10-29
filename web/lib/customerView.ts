@@ -4,6 +4,7 @@
 import type { Deficiency, TypeResult } from "./results";
 import { byTypeOrder } from "./typeOrder";
 import { unitWhere } from "./unitLabel";
+import { typePct } from "./weights";
 
 export type CustStatus = "done" | "progress" | "none";
 /** An open punch item, as the customer sees it (the same fields as their Deficiencies tab). */
@@ -61,7 +62,7 @@ export function customerTypes(types: TypeResult[], deficiencies: Deficiency[] = 
       units.push({ name: u.name, path: u.path, location: unitWhere(t.export_sheet, u.path, loc) || loc, status, punch, punchItems });
     }
     if (units.length) out.push({ key: t.key, name: t.name, export_sheet: t.export_sheet, units,
-      done: units.filter((u) => u.status === "done").length, pct: t.summary.fields_pct });
+      done: units.filter((u) => u.status === "done").length, pct: typePct(t) });
   }
   return out;
 }

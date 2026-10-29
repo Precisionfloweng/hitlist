@@ -8,6 +8,8 @@ export type RuleField = {
   order: number; field: string; columns: string; when: Condition[];
   status: string;          // what applies (the project's own choice, or the default)
   defaultStatus: string;   // the company default
+  weight: number | null;   // completion weight in % (company-wide; admins set it on Default Rules)
+  group: string;           // fields with the same weight group count as one item (e.g. "Unit Information")
 };
 export type RuleType = {
   key: string; name: string; exportSheet: string; confirmed: boolean; parentTypes: string;
@@ -36,8 +38,10 @@ export async function loadRules(project?: string): Promise<{ types: RuleType[]; 
     let when: Condition[] = [];
     try { when = r.when ? JSON.parse(r.when) : []; } catch { when = []; }
     const def = r.status || "required";
+    const w = Number(r.weight);
     t.fields.push({ order: Number(r.order) || 0, field: r.field, columns: r.columns, when,
-      defaultStatus: def, status: overrides.get(`${r.type_key}|${r.field}`) ?? def });
+      defaultStatus: def, status: overrides.get(`${r.type_key}|${r.field}`) ?? def,
+      weight: r.weight !== undefined && String(r.weight).trim() !== "" && isFinite(w) ? w : null, group: (r.weight_group ?? "").trim() });
   }
   const types = [...byKey.values()].sort(byTypeOrder);
   types.forEach((t) => t.fields.sort((a, b) => a.order - b.order));
@@ -124,6 +128,38 @@ export async function saveProjectRuleChanges(project: string, typeKey: string, c
   }
   if (updates.length) await updateRows("ProjectRules", updates);
   if (adds.length) await appendRows("ProjectRules", adds);
+  if (log.length) await appendRows("RuleHistory", log);
+  return log.length;
+}
+
+/** Save one type's completion weights (admins only, checked by the caller). `items` maps a weight group name
+ *  ("group:Unit Information") or a field ("field:<order>") to its weight in % (null/"" = no weight). Logged in RuleHistory. */
+export async function saveWeights(typeKey: string, items: Record<string, number | string | null>, by: User): Promise<number> {
+  await ensureHeader("Rules");
+  await ensureHeader("RuleHistory");
+  const { Rules } = await readTabs(["Rules"], true);
+  const rows = Rules.filter((r) => r.type_key === typeKey);
+  if (!rows.length) throw new Error("Unknown equipment type");
+  const now = new Date().toISOString().replace(/\.\d+Z$/, "+00:00");
+  const updates: { row: number; rec: Record<string, unknown> }[] = [];
+  const log: Record<string, string>[] = [];
+  for (const [key, raw] of Object.entries(items)) {
+    const text = raw === null || raw === undefined ? "" : String(raw).trim();
+    const n = Number(text);
+    if (text !== "" && (!isFinite(n) || n < 0 || n > 100)) throw new Error("A weight is a % from 0 to 100");
+    const value = text === "" || n === 0 ? "" : String(n);
+    const members = key.startsWith("group:")
+      ? rows.filter((r) => (r.weight_group ?? "").trim().toLowerCase() === key.slice(6).trim().toLowerCase())
+      : rows.filter((r) => key === `field:${r.order}` && !(r.weight_group ?? "").trim());
+    if (!members.length) continue;
+    const old = String(members[0].weight ?? "");
+    if (members.every((r) => String(r.weight ?? "") === value)) continue;
+    for (const r of members) updates.push({ row: r._row, rec: { ...r, weight: value } });
+    log.push({ changed_at: now, changed_by: by.email, type_key: typeKey,
+      field: `Weight: ${key.startsWith("group:") ? key.slice(6) : members[0].field}`,
+      old_status: old ? `${old}%` : "(none)", new_status: value ? `${value}%` : "(none)", project_number: "" });
+  }
+  if (updates.length) await updateRows("Rules", updates);
   if (log.length) await appendRows("RuleHistory", log);
   return log.length;
 }

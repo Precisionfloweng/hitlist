@@ -13,9 +13,14 @@ export const DEFAULT_WEIGHTS: Weights = Object.fromEntries(CATEGORIES.map((c) =>
 
 /** Per-type totals: all the sum needs from a project's results (small enough to send to the browser). */
 export type TypeTotals = { key: string; name: string; required: number; filled: number }[];
-export const typeTotals = (types: { key: string; name: string; units: { required: number; required_filled: number }[] }[]): TypeTotals =>
-  types.map((t) => ({ key: t.key, name: t.name, required: t.units.reduce((n, u) => n + u.required, 0),
-    filled: t.units.reduce((n, u) => n + u.required_filled, 0) }));
+export const typeTotals = (types: { key: string; name: string; units: { required: number; required_filled: number }[];
+  summary?: { weighted_pct?: number } }[]): TypeTotals =>
+  types.map((t) => {
+    const required = t.units.reduce((n, u) => n + u.required, 0);
+    const wp = t.summary?.weighted_pct;   // a type with completion weights counts by its weighted %
+    return { key: t.key, name: t.name, required,
+      filled: wp !== undefined ? (required * wp) / 100 : t.units.reduce((n, u) => n + u.required_filled, 0) };
+  });
 
 /** Each category the job has (with required fields): its % of required fields filled. */
 export function categoryPcts(totals: TypeTotals): Record<string, number> {

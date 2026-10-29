@@ -471,3 +471,19 @@ def test_completion_categories_match_the_website():
     a = (here / "web" / "content" / "completion-categories.json").read_text(encoding="utf-8")
     b = (here / "worker" / "hitlist" / "data" / "completion_categories.json").read_text(encoding="utf-8")
     assert a == b, "copy web/content/completion-categories.json to worker/hitlist/data/completion_categories.json"
+
+
+def test_set_weights_copies_only_the_weights():
+    store = make_store()
+    key = SAMPLE_RULES["types"][0]["key"]
+    first = [r for r in store.rows("Rules") if r["type_key"] == key][0]
+    bundled = json.loads(json.dumps({"types": [SAMPLE_RULES["types"][0]]}))
+    bundled["types"][0]["fields"][0].update({"weight": 12.5, "weight_group": "Unit Information"})
+    store.update("Rules", first["_row"], {**first, "status": "optional"})          # an admin's choice stays
+    assert store.set_weights(bundled, key) == 1
+    row = [r for r in store.rows("Rules") if r["type_key"] == key][0]
+    assert row["weight"] == "12.5" and row["weight_group"] == "Unit Information" and row["status"] == "optional"
+    assert store.set_weights(bundled, key) == 0
+    from hitlist.store import rows_to_rules
+    f = rows_to_rules(store.rows("Rules"))["types"][0]["fields"][0]
+    assert f["weight"] == "12.5" and f["weight_group"] == "Unit Information"

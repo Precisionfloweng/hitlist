@@ -29,7 +29,9 @@ SCHEMA: dict[str, list[str]] = {
     # projects: for role "customer", the project keys they may see (" | " separated)
     "Users": ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
     "Rules": ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
-              "order", "field", "columns", "status", "when"],
+              "order", "field", "columns", "status", "when",
+              # completion weight in % (admins set it on Default Rules); fields with the same weight_group count as one item
+              "weight", "weight_group"],
     "RuleHistory": ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status",
                     "project_number"],
     # One project's differences from the default rules (status only). Blank status = use the default.
@@ -337,6 +339,28 @@ class HitlistStore:
                                      "field": moving["field"], "old_status": "", "new_status": f"moved after {anchor['field']}"}])
         return moving["field"]
 
+    def set_weights(self, rules: dict[str, Any], type_key: str, by: str = "server") -> int:
+        """Copy one type's completion weights (weight, weight_group) from the bundled rules onto the Rules tab,
+        matched by field name. Nothing else changes. Returns the rows changed."""
+        src = next((t for t in rules["types"] if t["key"] == type_key), None)
+        if src is None:
+            raise KeyError(f"No equipment type '{type_key}' in the bundled rules")
+        want = {f["label"].strip().lower(): f for f in src["fields"]}
+        changed = 0
+        for r in self.rows("Rules"):
+            if r["type_key"] != type_key:
+                continue
+            f = want.get(r["field"].strip().lower())
+            w = "" if not f or f.get("weight") in (None, "") else str(f["weight"])
+            g = (f or {}).get("weight_group", "") or ""
+            if str(r.get("weight", "")) != w or str(r.get("weight_group", "")) != g:
+                self.update("Rules", r["_row"], {**r, "weight": w, "weight_group": g})
+                changed += 1
+        if changed:
+            self.append("RuleHistory", [{"changed_at": now_iso(), "changed_by": by, "type_key": type_key,
+                                         "field": "(completion weights)", "old_status": "", "new_status": f"set from bundled rules ({changed} fields)"}])
+        return changed
+
     def add_bundled_fields(self, rules: dict[str, Any], type_key: str, by: str = "server") -> list[str]:
         """Add the bundled rules' fields for one type whose export column the Rules tab doesn't use yet
         (so renamed fields aren't added twice). Returns the names added."""
@@ -449,6 +473,8 @@ def rules_to_rows(rules: dict[str, Any]) -> list[dict[str, Any]]:
                 "columns": " | ".join(f.get("columns") or []),
                 "status": f["status"],
                 "when": json.dumps(f["when"]) if f.get("when") else "",
+                "weight": "" if f.get("weight") in (None, "") else f["weight"],
+                "weight_group": f.get("weight_group", "") or "",
             })
     return rows
 
@@ -466,5 +492,7 @@ def rows_to_rules(rows: list[dict[str, str]]) -> dict[str, Any]:
             "columns": [c.strip() for c in r["columns"].split("|") if c.strip()] or None,
             "status": r["status"] or "required",
             "when": json.loads(r["when"]) if r.get("when") else None,
+            "weight": r.get("weight", "") or None,
+            "weight_group": r.get("weight_group", "") or "",
         })
     return {"version": len(rows), "types": list(types.values())}

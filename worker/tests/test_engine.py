@@ -235,3 +235,45 @@ def test_zero_counts_for_sensor_offsets():
         "Temp _ Hum Sensor", headers, [dict(zip(headers, x)) for x in rows])}), load_rules(rules))
     codes = {u["name"]: u["codes"] for u in r["types"][0]["units"]}
     assert codes == {"TS-1": "PP", "TS-2": "RP", "TS-3": "PR"}     # 0 offset counts; 0 reading elsewhere still doesn't
+
+
+WEIGHT_RULES = {"version": 1, "types": [{"key": "ahu", "name": "AHUs", "export_sheet": "Air Handling Unit", "fields": [
+    {"label": "Design O/A", "columns": ["Design O/A"], "status": "optional", "weight": 10, "weight_group": "Unit Information"},
+    {"label": "Actual Airflow", "columns": ["Actual Airflow"], "status": "required", "weight": 40},
+    {"label": "Actual O/A", "columns": ["Actual O/A"], "status": "required", "weight": 10},
+    {"label": "Serial", "columns": ["Serial"], "status": "required", "weight": 10, "weight_group": "Unit Information"},
+    {"label": "Location", "columns": ["Location"], "status": "optional"}]}]}
+
+
+def _weight_export(rows):
+    headers = ["Full Path", "Equipment Name", "Design O/A", "Actual Airflow", "Actual O/A", "Serial", "Location"]
+    return Export(project={"Number": "99-013"}, sheets={"Air Handling Unit": Sheet(
+        "Air Handling Unit", headers, [dict(zip(headers, [n, n, *r])) for n, r in rows])})
+
+
+def test_weighted_pct():
+    r = check_project(_weight_export([
+        ("W1", [500, 9000, 480, None, None]),      # airflow 40 + O/A 10 + half of Unit Information (design yes, serial no) 5 = 55 / 60
+        ("W2", [None, None, None, "SN1", None]),   # no O/A design: O/A skipped (its 10 spread); serial = all of Unit Info: 10 / 50
+        ("W3", [500, 9000, 480, "SN2", "Roof"]),   # everything: 100
+    ]), load_rules(WEIGHT_RULES))
+    t = r["types"][0]
+    w = {u["name"]: u["weighted_pct"] for u in t["units"]}
+    assert w == {"W1": round(100 * 55 / 60, 1), "W2": 20.0, "W3": 100.0}
+    assert t["summary"]["weighted_pct"] == round((w["W1"] + 20 + 100) / 3, 1)
+    assert [f.get("weight") for f in t["fields"]] == [10, 40, 10, 10, None]
+
+
+def test_no_weights_means_no_weighted_pct(sample_export, sample_rules):
+    r = check_project(read_export(sample_export), load_rules(sample_rules))
+    assert all("weighted_pct" not in t["summary"] for t in r["types"])
+
+
+def test_bundled_ahu_weights_scale_to_100():
+    rules = load_rules()
+    ahu = next(t for t in rules.types if t.key == "ahu")
+    items = {}
+    for f in ahu.fields:
+        if f.weight:
+            items[f.group or f.label] = f.weight
+    assert round(sum(items.values()), 1) == 98.0 and items["Actual Airflow"] == 40 and items["Unit Information"] == 18.5

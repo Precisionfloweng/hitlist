@@ -213,10 +213,18 @@ def check_project(export: Export, rules: RuleSet, project_number: str | None = N
                 "required": req_total, "required_filled": req_filled,
                 "optional": opt_total, "optional_filled": opt_filled,
             })
+            wp = weighted_pct(type_rule.fields, units[-1]["codes"])
+            if wp is not None:
+                units[-1]["weighted_pct"] = wp
         if units:
+            summary = _summarize(units)
+            if any("weighted_pct" in u for u in units):     # the type has completion weights: its % follows them
+                summary["weighted_pct"] = round(sum(u.get("weighted_pct", 100.0) for u in units) / len(units), 1)
             types_out.append({
                 "key": type_rule.key, "name": type_rule.name, "export_sheet": type_rule.export_sheet,
-                "fields": fields_out, "units": units, "summary": _summarize(units),
+                "fields": [{**fo, **({"weight": f.weight} if f.weight is not None else {}),
+                            **({"weight_group": f.group} if f.group else {})} for fo, f in zip(fields_out, type_rule.fields)],
+                "units": units, "summary": summary,
             })
 
     untracked = {n: len(s.rows) for n, s in export.equipment_sheets().items()
@@ -236,6 +244,34 @@ def check_project(export: Export, rules: RuleSet, project_number: str | None = N
         "notes": notes,
         "warnings": warnings,
     }
+
+
+def weighted_pct(fields: list[Any], codes: str) -> float | None:
+    """A unit's % complete by completion weight (Default Rules): each weighted item (a field, or a weight_group such
+    as "Unit Information" counting each member equally) earns its weight times the share of its fields filled in.
+    Items that don't apply to this unit (ignored, no design, condition not met, marked N/A) are left out and their
+    weight spread over the rest, so the total always scales to 100. None when the type has no weights.
+    The website (web/lib/weights.ts) does the same sum."""
+    items: dict[str, list[Any]] = {}
+    for i, f in enumerate(fields):
+        w = getattr(f, "weight", None) if not isinstance(f, dict) else f.get("weight")
+        g = (getattr(f, "group", "") if not isinstance(f, dict) else f.get("weight_group", "")) or ""
+        if not w or float(w) <= 0:
+            continue
+        key = f"g:{g.lower()}" if g else f"f:{i}"
+        item = items.setdefault(key, [0.0, []])
+        item[0] = max(item[0], float(w))
+        item[1].append(i)
+    if not items:
+        return None
+    earned = available = 0.0
+    for w, idx in items.values():
+        live = [i for i in idx if i < len(codes) and codes[i] in (PASS, MISSING_REQUIRED, MISSING_OPTIONAL)]
+        if not live:
+            continue
+        available += w
+        earned += w * sum(codes[i] == PASS for i in live) / len(live)
+    return round(100.0 * earned / available, 1) if available else 100.0
 
 
 def _summarize(units: list[dict[str, Any]]) -> dict[str, Any]:

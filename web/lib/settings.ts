@@ -4,6 +4,8 @@ import type { User } from "./auth";
 import { appendRows, ensureHeader, ensureTab, readTab, updateCell, updateRows } from "./sheets";
 import { CATEGORIES, completePct, typeTotals, weightsFromSettings, type Weights } from "./completion";
 import { loadResults } from "./results";
+import { loadRules } from "./rules";
+import { applyWeights } from "./weights";
 import { isToleranceKey, TOLERANCE_CATS, type Tol, type Tolerances } from "./toleranceCats";
 
 export const DEFAULT_TOL: Tol = { plus: "10", minus: "10" };
@@ -106,15 +108,24 @@ export async function saveWeights(input: Record<string, unknown>, by: User): Pro
   }
   if (Math.abs(total - 100) > 0.001) throw new Error(`The shares add up to ${Math.round(total * 10) / 10}%, not 100%`);
   await saveSettings(values, by);
-  await ensureHeader("Projects");
   const weights = await loadWeights();
+  return { weights, updated: await recalcCompletePcts(weights) };
+}
+
+/** Every project's overall % from its last sync, with the current category shares and field weights (after either
+ *  changes). Returns how many changed. */
+export async function recalcCompletePcts(shares?: Weights): Promise<number> {
+  await ensureHeader("Projects");
+  const w = shares ?? await loadWeights();
+  const { types: ruleTypes } = await loadRules();
   let updated = 0;
   for (const p of await readTab("Projects", true)) {
     const key = (p.project_id || "").trim() || p.project_number;
-    const r = key ? await loadResults(key) : null;
-    if (!r) continue;
-    const pct = String(completePct(typeTotals(r.types), weights, r.summary.fields_pct));
+    const raw = key ? await loadResults(key) : null;
+    if (!raw) continue;
+    const r = applyWeights(raw, ruleTypes);
+    const pct = String(completePct(typeTotals(r.types), w, r.summary.fields_pct));
     if (pct !== (p.complete_pct ?? "")) { await updateCell("Projects", p._row, "complete_pct", pct); updated++; }
   }
-  return { weights, updated };
+  return updated;
 }

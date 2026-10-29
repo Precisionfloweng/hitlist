@@ -20,7 +20,9 @@ export const SCHEMA = {
   // last_seen: date (Central) the person last opened the app, updated at most once a day.
   Users: ["email", "name", "role", "active", "added", "password_hash", "projects", "last_seen"],
   Rules: ["type_key", "type_name", "export_sheet", "sheet_confirmed", "parent_types",
-    "order", "field", "columns", "status", "when"],
+    "order", "field", "columns", "status", "when",
+    // completion weight in % (admins, Default Rules); fields with the same weight_group count as one item
+    "weight", "weight_group"],
   RuleHistory: ["changed_at", "changed_by", "type_key", "field", "old_status", "new_status", "project_number"],
   // One project's differences from the default rules (status only). Blank status = use the default.
   ProjectRules: ["project_number", "type_key", "field", "status", "changed_by", "changed_at"],

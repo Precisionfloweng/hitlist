@@ -4,13 +4,14 @@ import { del, get, put } from "@vercel/blob";
 
 export type TypeResult = {
   key: string; name: string; export_sheet: string;
-  fields: { label: string; status: string }[];
+  fields: { label: string; status: string; weight?: number; weight_group?: string }[];
   units: { name: string; path: string; parent: string | null; area: string | null; zone: string | null;
-    codes: string; required: number; required_filled: number; optional: number; optional_filled: number }[];
+    codes: string; required: number; required_filled: number; optional: number; optional_filled: number;
+    weighted_pct?: number }[];   // weighted_pct: by completion weights (lib/weights.ts), when the type has them
   summary: Summary;
 };
 export type Summary = { units: number; units_complete: number; required_fields: number; required_filled: number;
-  missing_required: number; missing_optional: number; fields_pct: number; units_pct: number };
+  missing_required: number; missing_optional: number; fields_pct: number; units_pct: number; weighted_pct?: number };
 export type Deficiency = { equipment: string; path: string; item_type: string; number: string; text: string;
   status: string; priority: string; role: string; contact: string; date_due: string; date_completed: string; open: boolean };
 /** A row of BuildingStart's Note sheet. Blank path = a general note for the whole project. */

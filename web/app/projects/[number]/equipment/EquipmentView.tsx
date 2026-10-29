@@ -5,6 +5,7 @@ import { loadLastType, saveLastType } from "@/lib/lastType";
 import type { Deficiency, Note, TypeResult } from "@/lib/results";
 import { byTypeOrder } from "@/lib/typeOrder";
 import { unitWhere } from "@/lib/unitLabel";
+import { typePct, unitPct } from "@/lib/weights";
 
 type Filter = "missing" | "all";
 const STATUS_WORD: Record<string, string> = { P: "filled", R: "required, missing", O: "optional, missing",
@@ -117,6 +118,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
           <div>
             <h2>{t.name}</h2>
             <div className="muted">
+              {t.summary.weighted_pct !== undefined && <><b>{Math.round(t.summary.weighted_pct)}% done</b> by completion weights · </>}
               {t.summary.units_complete} of {t.summary.units} items complete · {missingReq} required field{missingReq === 1 ? "" : "s"} missing
               {syncedAt && <> · synced {new Date(syncedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</>}
             </div>
@@ -136,7 +138,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
 
       <nav className="eq-types" aria-label="Equipment types">
         <select className="eq-select" value={t.key} onChange={(e) => pick(e.target.value)}>
-          {sorted.map((x) => <option key={x.key} value={x.key}>{x.name} ({Math.round(x.summary.fields_pct)}%)</option>)}
+          {sorted.map((x) => <option key={x.key} value={x.key}>{x.name} ({Math.round(typePct(x))}%)</option>)}
         </select>
         <ul>
           {sorted.map((x) => {
@@ -145,8 +147,8 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
               <li key={x.key}>
                 <button className={`${x.key === t.key ? "on" : ""}${!open && x.units.length ? " full" : ""}`} onClick={() => pick(x.key)}>
                   <span className="eq-name">{x.name}</span>
-                  <span className="eq-pct">{Math.round(x.summary.fields_pct)}%</span>
-                  <span className="bar"><span style={{ width: `${x.summary.fields_pct}%` }} /></span>
+                  <span className="eq-pct">{Math.round(typePct(x))}%</span>
+                  <span className="bar"><span style={{ width: `${Math.min(100, typePct(x))}%` }} /></span>
                   <span className="eq-sub">{open ? `${open} of ${x.units.length} need data` : `✓ All ${x.units.length} complete`}</span>
                 </button>
               </li>
@@ -191,7 +193,7 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
               {units.map((u) => {
                 const defs = openDefs(u.path, u.name);
                 const uNotes = unitNotes(u.path, u.name);
-                const done = u.required ? u.required_filled / u.required : 1;
+                const done = unitPct(u) / 100;   // by completion weights when the type has them
                 const where = unitWhere(t.export_sheet, u.path, u.area);
                 return (
                   <tr key={u.path || u.name} className={defs.length ? "has-def" : uNotes.length ? "has-note" : undefined}>
@@ -217,7 +219,8 @@ export default function EquipmentView({ types, initialType, syncedAt, deficienci
                       )}
                     </td>
                     <td className="d">
-                      <div className="d-num">{u.required_filled}/{u.required}</div>
+                      <div className="d-num" title={u.weighted_pct !== undefined ? `${u.required_filled} of ${u.required} required fields; ${Math.round(u.weighted_pct)}% by completion weights` : undefined}>
+                        {u.weighted_pct !== undefined ? `${Math.round(u.weighted_pct)}%` : `${u.required_filled}/${u.required}`}</div>
                       <div className={`d-bar ${done >= 1 ? "full" : ""}`}><span style={{ width: `${done * 100}%` }} /></div>
                     </td>
                     {cols.map((c) => <Cell key={c.i} code={u.codes[c.i] ?? "-"} label={c.label} />)}
