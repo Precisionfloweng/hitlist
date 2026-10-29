@@ -47,9 +47,7 @@ export default function WeightsPanel({ t, canEdit }: { t: RuleType; canEdit: boo
     <tr key={x.key}>
       <td><b>{x.name}</b>{x.members.length > 0 && <div className="muted" style={{ fontSize: 12 }}>{x.members.length} fields, each counting equally: {x.members.join(", ")}</div>}</td>
       <td className="w"><span className="tol-input"><input inputMode="decimal" aria-label={`${x.name} weight`} disabled={!canEdit}
-        value={val(x.key, x.weight)} placeholder="0" onChange={(e) => set(x.key, e.target.value)} />%</span>
-        {total > 0 && Number(val(x.key, x.weight)) > 0 && <span className="muted" style={{ fontSize: 12, marginLeft: 6 }}>
-          → {Math.round((1000 * Number(val(x.key, x.weight))) / total) / 10}% of the unit</span>}</td>
+        value={val(x.key, x.weight)} placeholder="0" onChange={(e) => set(x.key, e.target.value)} />%</span></td>
     </tr>
   );
 
