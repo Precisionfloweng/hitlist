@@ -1,5 +1,5 @@
 // Completion weights per field (Default Rules, admins only): how much of a unit's work each field is. A unit's % is
-// the weight of what's filled in; fields sharing a weight group (e.g. "Unit Information") count as one item, each
+// the weight of what's filled in; fields sharing a weight group (e.g. "Unit Data") count as one item, each
 // member equal; items that don't apply to the unit (ignored, no design, N/A) are left out and the rest scale to 100%.
 // Same sum as worker/hitlist/engine.py weighted_pct. Client-safe.
 import type { TypeResult } from "./results";

@@ -238,10 +238,10 @@ def test_zero_counts_for_sensor_offsets():
 
 
 WEIGHT_RULES = {"version": 1, "types": [{"key": "ahu", "name": "AHUs", "export_sheet": "Air Handling Unit", "fields": [
-    {"label": "Design O/A", "columns": ["Design O/A"], "status": "optional", "weight": 10, "weight_group": "Unit Information"},
+    {"label": "Design O/A", "columns": ["Design O/A"], "status": "optional", "weight": 10, "weight_group": "Unit Data"},
     {"label": "Actual Airflow", "columns": ["Actual Airflow"], "status": "required", "weight": 40},
     {"label": "Actual O/A", "columns": ["Actual O/A"], "status": "required", "weight": 10},
-    {"label": "Serial", "columns": ["Serial"], "status": "required", "weight": 10, "weight_group": "Unit Information"},
+    {"label": "Serial", "columns": ["Serial"], "status": "required", "weight": 10, "weight_group": "Unit Data"},
     {"label": "Location", "columns": ["Location"], "status": "optional"}]}]}
 
 
@@ -253,7 +253,7 @@ def _weight_export(rows):
 
 def test_weighted_pct():
     r = check_project(_weight_export([
-        ("W1", [500, 9000, 480, None, None]),      # airflow 40 + O/A 10 + half of Unit Information (design yes, serial no) 5 = 55 / 60
+        ("W1", [500, 9000, 480, None, None]),      # airflow 40 + O/A 10 + half of Unit Data (design yes, serial no) 5 = 55 / 60
         ("W2", [None, None, None, "SN1", None]),   # no O/A design: O/A skipped (its 10 spread); serial = all of Unit Info: 10 / 50
         ("W3", [500, 9000, 480, "SN2", "Roof"]),   # everything: 100
     ]), load_rules(WEIGHT_RULES))
@@ -276,4 +276,4 @@ def test_bundled_ahu_weights_scale_to_100():
     for f in ahu.fields:
         if f.weight:
             items[f.group or f.label] = f.weight
-    assert round(sum(items.values()), 1) == 98.0 and items["Actual Airflow"] == 40 and items["Unit Information"] == 18.5
+    assert round(sum(items.values()), 1) == 98.0 and items["Actual Airflow"] == 40 and items["Unit Data"] == 18.5

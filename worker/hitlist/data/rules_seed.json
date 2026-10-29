@@ -17,7 +17,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Model",
@@ -27,7 +27,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Serial",
@@ -37,7 +37,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Design Airflow",
@@ -47,7 +47,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Airflow",
@@ -66,7 +66,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Act Outlet Total",
@@ -85,7 +85,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual O/A",
@@ -104,7 +104,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual R/A",
@@ -123,7 +123,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Fan RPM",
@@ -142,7 +142,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual Total SP",
@@ -161,7 +161,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Actual External SP",
@@ -206,7 +206,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Area Served",
@@ -216,7 +216,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "VFD Setting",
@@ -235,7 +235,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "HP",
@@ -245,7 +245,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Motor Rated KW",
@@ -255,7 +255,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Nom. Eff.",
@@ -265,7 +265,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "PF",
@@ -275,7 +275,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Frame",
@@ -285,7 +285,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "RPM",
@@ -295,7 +295,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Volts",
@@ -305,7 +305,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Phase",
@@ -315,7 +315,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Hertz",
@@ -325,7 +325,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Amps",
@@ -335,7 +335,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Service Factor",
@@ -345,7 +345,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Wall Array",
@@ -355,7 +355,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave MFG",
@@ -371,7 +371,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Model",
@@ -387,7 +387,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Diam.",
@@ -403,7 +403,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Sheave Bore",
@@ -419,7 +419,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave MFG",
@@ -435,7 +435,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Model",
@@ -451,7 +451,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Diam.",
@@ -467,7 +467,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Fan Sheave Bore",
@@ -483,7 +483,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belts",
@@ -499,7 +499,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Belt Size",
@@ -515,7 +515,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Centerline",
@@ -531,7 +531,7 @@
       }
      ],
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Drive Type",
@@ -572,7 +572,7 @@
      "status": "optional",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Filter MFG",
@@ -582,7 +582,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Filter Type",
@@ -592,7 +592,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Filter Rating",
@@ -602,7 +602,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Qty S1",
@@ -612,7 +612,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Size S1",
@@ -622,7 +622,7 @@
      "status": "required",
      "when": null,
      "weight": 18.5,
-     "weight_group": "Unit Information"
+     "weight_group": "Unit Data"
     },
     {
      "label": "Completed",

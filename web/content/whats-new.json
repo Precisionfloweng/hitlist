@@ -3,7 +3,7 @@
   "date": "2026-10-29",
   "audience": "all",
   "title": "AHU % now weighted by the work",
-  "text": "An AHU's % done now counts each item by how much work it is (Actual Airflow 40%, Unit Information 18.5%, Actual O/A 10%…), so filling in nameplate data no longer counts the same as taking airflow. Admins set the weights on Default Rules."
+  "text": "An AHU's % done now counts each item by how much work it is (Actual Airflow 40%, Unit Data 18.5%, Actual O/A 10%…), so filling in nameplate data no longer counts the same as taking airflow. Admins set the weights on Default Rules."
  },
  {
   "date": "2026-10-28",

@@ -80,7 +80,7 @@ class FieldRule:
     status: str
     when: list[Condition] = field(default_factory=list)
     # Completion weight (Default Rules, admins only): how much of the unit's work this field is, in %. Fields sharing
-    # a weight_group count as one item worth the group's weight (each member equal), e.g. "Unit Information".
+    # a weight_group count as one item worth the group's weight (each member equal), e.g. "Unit Data".
     weight: float | None = None
     group: str = ""
 

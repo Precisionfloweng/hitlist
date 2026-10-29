@@ -9,7 +9,7 @@ export type RuleField = {
   status: string;          // what applies (the project's own choice, or the default)
   defaultStatus: string;   // the company default
   weight: number | null;   // completion weight in % (company-wide; admins set it on Default Rules)
-  group: string;           // fields with the same weight group count as one item (e.g. "Unit Information")
+  group: string;           // fields with the same weight group count as one item (e.g. "Unit Data")
 };
 export type RuleType = {
   key: string; name: string; exportSheet: string; confirmed: boolean; parentTypes: string;
@@ -133,7 +133,7 @@ export async function saveProjectRuleChanges(project: string, typeKey: string, c
 }
 
 /** Save one type's completion weights (admins only, checked by the caller). `items` maps a weight group name
- *  ("group:Unit Information") or a field ("field:<order>") to its weight in % (null/"" = no weight). Logged in RuleHistory. */
+ *  ("group:Unit Data") or a field ("field:<order>") to its weight in % (null/"" = no weight). Logged in RuleHistory. */
 export async function saveWeights(typeKey: string, items: Record<string, number | string | null>, by: User): Promise<number> {
   await ensureHeader("Rules");
   await ensureHeader("RuleHistory");

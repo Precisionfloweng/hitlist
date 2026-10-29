@@ -248,7 +248,7 @@ def check_project(export: Export, rules: RuleSet, project_number: str | None = N
 
 def weighted_pct(fields: list[Any], codes: str) -> float | None:
     """A unit's % complete by completion weight (Default Rules): each weighted item (a field, or a weight_group such
-    as "Unit Information" counting each member equally) earns its weight times the share of its fields filled in.
+    as "Unit Data" counting each member equally) earns its weight times the share of its fields filled in.
     Items that don't apply to this unit (ignored, no design, condition not met, marked N/A) are left out and their
     weight spread over the rest, so the total always scales to 100. None when the type has no weights.
     The website (web/lib/weights.ts) does the same sum."""

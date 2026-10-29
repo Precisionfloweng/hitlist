@@ -18,7 +18,7 @@ export default function WeightsPanel({ t, canEdit }: { t: RuleType; canEdit: boo
       } else fields.push({ key: `field:${f.order}`, name: f.field, weight: f.weight, members: [] });
     }
     const byWeight = (a: { weight: number | null }, b: { weight: number | null }) => (b.weight ?? 0) - (a.weight ?? 0);
-    // groups (e.g. Unit Information) first, then the single items by weight
+    // groups (e.g. Unit Data) first, then the single items by weight
     const all = [...[...groups.values()].sort(byWeight), ...fields.filter((x) => x.weight).sort(byWeight)];
     return { weighted: all, zero: fields.filter((x) => !x.weight) };
   }, [t]);
