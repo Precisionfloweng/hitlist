@@ -713,3 +713,5 @@ header.top .top-drop form button { background: transparent; }
 .cw-pick { max-height: 240px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: #fff; }
 .cw-pick label { display: flex; gap: 8px; align-items: center; font-size: 13px; padding: 3px 0; }
 @media (max-width: 720px) { .cw-type { padding-left: 16px !important; } .cw-item { padding-left: 28px !important; } .cw-sub { display: block; margin-left: 20px; } }
+.cw-toggle { border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 12px; padding: 2px 10px; font-size: 12px; font-weight: 600; cursor: pointer; margin-left: 4px; }
+.cw-toggle:hover { border-color: #1f5fa8; color: #1f5fa8; }

@@ -217,10 +217,11 @@ function TypeRows({ t, cols, items, isOpen, onToggle, itemBox, onWeight, onRemov
             <td className="cw-item">
               {it.group ? <><b>{it.name}</b>
                 <div className="muted cw-members">{it.members.length} field{it.members.length === 1 ? "" : "s"} counted together{showMembers === it.key ? ":" : `: ${it.members.slice(0, 6).map((m) => m.field).join(", ")}${it.members.length > 6 ? "…" : ""}`}
-                  {" "}<button type="button" className="linkish" onClick={() => setShowMembers(showMembers === it.key ? "" : it.key)}>{showMembers === it.key ? "Done" : "Edit fields"}</button>
+                  {" "}<button type="button" className="cw-toggle" aria-expanded={showMembers === it.key} onClick={() => setShowMembers(showMembers === it.key ? "" : it.key)}>{showMembers === it.key ? "▴ Close" : "▾ Edit fields"}</button>
                   {showMembers === it.key && <div className="cw-chips">{it.members.map((m) => (
                     <span key={m.order} className="cw-chip">{m.field}<button type="button" aria-label={`Take ${m.field} out of ${it.name}`} onClick={() => onRemoveMember(m.order)}>×</button></span>))}
-                    <button type="button" className="linkish" onClick={() => setAdding(`into:${it.name}`)}>+ Add a field to {it.name}</button></div>}
+                    <button type="button" className="linkish" onClick={() => setAdding(`into:${it.name}`)}>+ Add a field to {it.name}</button>
+                    <button type="button" className="cw-toggle" onClick={() => setShowMembers("")}>▴ Close</button></div>}
                 </div></> : it.name}
             </td>
             <td className="w"><span className="tol-input"><input inputMode="decimal" aria-label={`${it.name} weight`} value={itemBox(it)} placeholder="0"
